@@ -1,0 +1,162 @@
+PDS_VERSION_ID        = PDS3                                                  
+                                                                              
+RECORD_TYPE           = "FIXED_LENGTH"                                        
+RECORD_BYTES          = 48                                                    
+FILE_RECORDS          = 6140                                                  
+                                                                              
+^VERTEX_TABLE         = ("4769CASTALIA.TAB",1)                                
+^FACET_TABLE          = ("4769CASTALIA.TAB",2049)                             
+                                                                              
+DATA_SET_ID           = "EAR-A-5-DDR-RADARSHAPE-MODELS-V2.0"                  
+PRODUCT_NAME          = "Asteroid Radar Shape Models, 4769 Castalia"          
+PRODUCT_ID            = "RSHAPES-4769CASTALIA-200405"                         
+INSTRUMENT_HOST_NAME  = {"GOLDSTONE SOLAR SYSTEM RADAR",                      
+                         "ARECIBO OBSERVATORY"}                               
+INSTRUMENT_NAME       = "RADIO TELESCOPE"                                     
+TARGET_NAME           = "4769 CASTALIA"                                       
+START_TIME            = 1989-08-19T06:33                                      
+STOP_TIME             = 1989-08-30T19:35                                      
+PRODUCT_CREATION_TIME = 2004-05-20  /* Peer Review Date */                    
+CITATION_DESC         = "Hudson, R.S. and S.J. Ostro.  Asteroid Radar Shape   
+Models, 4769 Castalia.                                                        
+EAR-A-5-DDR-RADARSHAPE-MODELS-V2.0:RSHAPES-4769CASTALIA-200405.               
+NASA Planetary Data System, 2004."                                            
+                                                                              
+OBJECT     = VERTEX_TABLE                                                     
+  ROWS               = 2048                                                   
+  ROW_BYTES          = 48                                                     
+  INTERCHANGE_FORMAT = "ASCII"                                                
+  COLUMNS            = 4                                                      
+  DESCRIPTION        = "This shape file of asteroid 4769 Castalia was         
+    created by Hudson and Ostro (1994) based on radar observations and        
+    has the format                                                            
+                                                                              
+        v x1 y1 z1                                                            
+        v x2 y2 z2                                                            
+        v x3 y3 z3                                                            
+        (etc.)                                                                
+        f i1 j1 k1                                                            
+        f i2 j2 k2                                                            
+        (etc.)                                                                
+                                                                              
+    where the letter 'v' denotes a vertex and the letter 'f' denotes a        
+    triangular facet.  The VERTEX_TABLE is the first part, describing the     
+    positions of the vertices of the shape model.  The floating point         
+    numbers x1 y1 z1 are the coordinates of vertex 1, and so on (vertices     
+    are implicitly numbered beginning with 1).  The origin is the center      
+    of mass, and the axes are the principle axes of the shape model.  The     
+    units are kilometers.  The linking of vertices into facets is provided    
+    in the FACET_TABLE.                                                       
+                                                                              
+    This format is identical to a Wavefront OBJ file.  There is a freeware    
+    program called WCVT2POV that will convert this format into other formats  
+    such as POVray and DXF.                                                   
+                                                                              
+    Hudson, R.S. and S.J. Ostro 1994.  Shape of asteroid 4769 Castalia        
+    (1989 PB) from inversion of radar images.  Science 263, 940-943.          
+    [HUDSON&OSTRO1994]                                                        
+    "                                                                         
+                                                                              
+  OBJECT     = COLUMN                                                         
+    COLUMN_NUMBER = 1                                                         
+    NAME          = "VERTEX_FLAG"                                             
+    DATA_TYPE     = "CHARACTER"                                               
+    START_BYTE    = 1                                                         
+    BYTES         = 1                                                         
+    FORMAT        = "A1"                                                      
+    DESCRIPTION   = "A 'v', indicating this record contains the               
+      coordinates of a vertex"                                                
+  END_OBJECT = COLUMN                                                         
+                                                                              
+  OBJECT     = COLUMN                                                         
+    COLUMN_NUMBER = 2                                                         
+    NAME          = "X"                                                       
+    UNIT          = "KILOMETER"                                               
+    DATA_TYPE     = "ASCII_REAL"                                              
+    START_BYTE    = 3                                                         
+    BYTES         = 14                                                        
+    FORMAT        = "E14.6"                                                   
+    DESCRIPTION   = "X coordinate of the vertex"                              
+  END_OBJECT = COLUMN                                                         
+                                                                              
+  OBJECT     = COLUMN                                                         
+    COLUMN_NUMBER = 3                                                         
+    NAME          = "Y"                                                       
+    UNIT          = "KILOMETER"                                               
+    DATA_TYPE     = "ASCII_REAL"                                              
+    START_BYTE    = 18                                                        
+    BYTES         = 14                                                        
+    FORMAT        = "E14.6"                                                   
+    DESCRIPTION   = "Y coordinate of the vertex"                              
+  END_OBJECT = COLUMN                                                         
+                                                                              
+  OBJECT     = COLUMN                                                         
+    COLUMN_NUMBER = 4                                                         
+    NAME          = "Z"                                                       
+    UNIT          = "KILOMETER"                                               
+    DATA_TYPE     = "ASCII_REAL"                                              
+    START_BYTE    = 33                                                        
+    BYTES         = 14                                                        
+    FORMAT        = "E14.6"                                                   
+    DESCRIPTION   = "Z coordinate of the vertex"                              
+  END_OBJECT = COLUMN                                                         
+                                                                              
+END_OBJECT = VERTEX_TABLE                                                     
+                                                                              
+/*======================================================================*/    
+/* FACET TABLE */                                                             
+                                                                              
+OBJECT     = FACET_TABLE                                                      
+  ROWS               = 4092                                                   
+  ROW_BYTES          = 48                                                     
+  INTERCHANGE_FORMAT = "ASCII"                                                
+  COLUMNS            = 4                                                      
+  DESCRIPTION        = "The FACET_TABLE is the second part of the             
+    shape model file providing the linking of vertices into facets.           
+    The integers i1 j1 k1 are the indices of the 3 vertices that form         
+    triangular facet 1, and so on."                                           
+                                                                              
+  OBJECT     = COLUMN                                                         
+    COLUMN_NUMBER = 1                                                         
+    NAME          = "FACET_FLAG"                                              
+    DATA_TYPE     = "CHARACTER"                                               
+    START_BYTE    = 1                                                         
+    BYTES         = 1                                                         
+    FORMAT        = "A1"                                                      
+    DESCRIPTION   = "An 'f', indicating this record contain the               
+      indices of three vertices defining a single, triangular facet"          
+  END_OBJECT = COLUMN                                                         
+                                                                              
+  OBJECT     = COLUMN                                                         
+    COLUMN_NUMBER = 2                                                         
+    NAME          = "VERTEX_1"                                                
+    DATA_TYPE     = "ASCII_INTEGER"                                           
+    START_BYTE    = 3                                                         
+    BYTES         = 4                                                         
+    FORMAT        = "I4"                                                      
+    DESCRIPTION   = "Index of the first vertex (record number in the          
+      preceding table)"                                                       
+  END_OBJECT = COLUMN                                                         
+                                                                              
+  OBJECT     = COLUMN                                                         
+    COLUMN_NUMBER = 3                                                         
+    NAME          = "VERTEX_2"                                                
+    DATA_TYPE     = "ASCII_INTEGER"                                           
+    START_BYTE    = 8                                                         
+    BYTES         = 4                                                         
+    FORMAT        = "I4"                                                      
+    DESCRIPTION   = "Index of the second vertex"                              
+  END_OBJECT = COLUMN                                                         
+                                                                              
+  OBJECT     = COLUMN                                                         
+    COLUMN_NUMBER = 4                                                         
+    NAME          = "VERTEX_3"                                                
+    DATA_TYPE     = "ASCII_INTEGER"                                           
+    START_BYTE    = 13                                                        
+    BYTES         = 4                                                         
+    FORMAT        = "I4"                                                      
+    DESCRIPTION   = "Index of the third vertex"                               
+  END_OBJECT = COLUMN                                                         
+                                                                              
+END_OBJECT = FACET_TABLE                                                      
+END                                                                           
