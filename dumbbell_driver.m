@@ -31,7 +31,7 @@ fprintf('SIMULATING!\n')
 
 num_steps = 100000;
 constants.num_steps = num_steps;
-t_final = 10000;
+t_final = 1000;
 
 tspan = linspace(0,t_final,constants.num_steps);
 initial_pos = [1.495746722510590;0.000001002669660;0.006129720493607]; % km for center of mass
