@@ -5,7 +5,7 @@
 function [state_dot] = ast_eoms(t,state,constants)
 
 % unpack the state
-pos = state(1:3); % location of the center of mass
+pos = state(1:3); % location of the center of mass in asteroid body frame
 vel = state(4:6);
 R = reshape(state(7:15),3,3); % asteroid frame to sc body frame
 W = state(16:18);
