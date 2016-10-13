@@ -44,3 +44,4 @@ initial_state = [initial_pos;initial_vel;initial_R;initial_W];
 
 fprintf('FINISHED SIM\n')
 %% PLOT THE MOTION
+plot_motion
