@@ -6,9 +6,9 @@ function [state_dot] = ast_eoms(t,state,constants)
 
 % unpack the state
 pos = state(1:3); % location of the center of mass in asteroid body frame
-vel = state(4:6);
-R = reshape(state(7:15),3,3); % asteroid frame to sc body frame
-W = state(16:18);
+vel = state(4:6);% vel of com in asteroid body frame
+R = reshape(state(7:15),3,3); % asteroid body frame to sc body frame
+w = state(16:18); % asteroid body frame to sc body frame expressed in asteroid frame
 
 % unpack constants
 m1 = constants.m1;
@@ -17,7 +17,7 @@ lcg = constants.lcg;
 l = constants.l;
 J = constants.J;
 
-% compute the potential/force on each mass
+% the position of each mass in the asteroid body frame
 pos_m1 = pos - R'*lcg*[1;0;0];
 pos_m2 = pos + R'*(l-lcg)*[1;0;0];
 
@@ -39,15 +39,20 @@ switch constants.pot_model
         [U_m2,U_grad_m2, ~, ~] = polyhedron_potential(pos, constants.asteroid_grav);
 end
 
+% force due to each mass expressed in asteroid body frame
+F1 = m1*U_grad_m1;
+F2 = m2*U_grad_m2;
+
 % compute the moments due to each mass
-M1 = hat_map(pos_m1)*m1*U_grad_m1;
-M2 = hat_map(pos_m2)*m2*U_grad_m2;
+M1 = hat_map(R'*lcg*[1;0;0])*F1;
+M2 = hat_map(R'*(l-lcg)*[1;0;0])*F2;
 
 % state derivatives
 pos_dot = vel;
-vel_dot = 1/(m1+m2) * (m1*U_grad_m1 + m2*U_grad_m2) + [2*constants.omega*vel(2);-2*constants.omega*vel(1);0] + constants.omega^2*[pos(1);pos(2);0];
-R_dot = reshape(R*hat_map(W),9,1);
-W_dot = J\(M1 + M2 - hat_map(W)*J*W);
+vel_dot = 1/(m1+m2) * (F1+F2) - 2*hat_map(constants.omega*[0;0;1])*vel - hat_map(constants.omega*[0;0;1])*hat_map(constants.omega*[0;0;1])*pos;
+R_dot = -hat_map(R*w)*R;
+R_dot = reshape(R_dot,9,1);
+w_dot = J\(M1 + M2 - hat_map(constants.omega*[0;0;1])*J*(constants.omega*[0;0;1] + w));
 
-state_dot = [pos_dot;vel_dot;R_dot;W_dot];
+state_dot = [pos_dot;vel_dot;R_dot;w_dot];
 end

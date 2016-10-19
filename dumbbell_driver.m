@@ -31,17 +31,17 @@ fprintf('SIMULATING!\n')
 
 num_steps = 100000;
 constants.num_steps = num_steps;
-t_final = 1000;
+t_final = 10000;
 
 tspan = linspace(0,t_final,constants.num_steps);
 initial_pos = [1.495746722510590;0.000001002669660;0.006129720493607]; % km for center of mass
-initial_vel = [0.000000302161724;-0.000899607989820;-0.000000013286327];
-initial_R = reshape(eye(3,3),9,1);
-initial_W = [0;0;0];
+initial_vel = [0.000000302161724;-0.000899607989820;-0.000000013286327]; % km/sec for COM in asteroid fixed frame
+initial_R = reshape(eye(3,3),9,1); % transforms from asteroid body frame to dumbbell body frame
+initial_w = [0;0;0]; % angular velocity of dumbbell wrt to asteroid represented in asteroid body fixed frame
 
-initial_state = [initial_pos;initial_vel;initial_R;initial_W];
+initial_state = [initial_pos;initial_vel;initial_R;initial_w];
 [t,state_body] = ode113(@(t,state)ast_eoms(t,state,constants),tspan,initial_state,constants.ode_options);
 
 fprintf('FINISHED SIM\n')
 %% PLOT THE MOTION
-plot_motion
+% plot_motion

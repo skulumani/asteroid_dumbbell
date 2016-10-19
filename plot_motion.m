@@ -1,18 +1,18 @@
 % load the data
 clc
-clearvars
+% clearvars
 close all
 
-type = 'movie';
-animation_fname = 'dumbbell'
+type = 'none';
+animation_fname = 'dumbbell';
 fontsize = 18;
 fontname = 'Times';
 
-load planar_orbit.mat
+% load planar_orbit.mat
 
 pos_cm = state_body(:,1:3);
 vel_cm = state_body(:,4:6);
-W_ast2sc = state_body(:,16:18);
+w_ast2sc = state_body(:,16:18);
 % extract and store the rotation matrix
 R_ast2sc = zeros(3,3,length(t));
 
@@ -34,6 +34,9 @@ for ii = 1:length(t)
     pos_m1 = pos_cm(ii,:)' - R_ast2sc(:,:,ii)'*constants.lcg*[1;0;0];
     pos_m2 = pos_cm(ii,:)' + R_ast2sc(:,:,ii)'*(constants.l - constants.lcg)*[1;0;0];
   
+    % angular velocity of body wrt inertial frame represented in the
+    % asteroid body fixed frame
+    w_inertial2sc = constants.omega*[0;0;1] + w_ast2sc(ii,:)';
     % potential energy
     switch constants.pot_model
         case 'polyhedron'
@@ -53,7 +56,7 @@ for ii = 1:length(t)
             [U_m2,~, ~, ~] = polyhedron_potential(pos, constants.asteroid_grav);
     end
     
-    T(ii) = 1/2*W_ast2sc(ii,:)*constants.J*W_ast2sc(ii,:)' + 1/2*(constants.m1+constants.m2)*(vel_inertial'*vel_inertial);
+    T(ii) = 1/2*w_inertial2sc'*constants.J*w_inertial2sc + 1/2*(constants.m1+constants.m2)*(vel_inertial'*vel_inertial);
     V(ii) = -constants.m1*U_m1 - constants.m2*U_m2;
     E(ii) = T(ii) + V(ii);
 end
