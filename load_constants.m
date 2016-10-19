@@ -2,6 +2,9 @@
 % load constants of asteroid
 
 function constants = load_constants(asteroid,reduce_flag)
+constants.fontsize = 18;
+constants.fontname = 'Times';
+
 % define constants
 constants.G = 6.673e-20; % km^3/kg/sec^2
 

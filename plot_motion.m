@@ -1,14 +1,10 @@
-% load the data
-clc
-% clearvars
-close all
+function [] = plot_motion(t,state_body,constants)
 
 type = 'none';
 animation_fname = 'dumbbell';
-fontsize = 18;
-fontname = 'Times';
 
-% load planar_orbit.mat
+fontsize = constants.fontsize;
+fontname = constants.fontname;
 
 pos_cm = state_body(:,1:3);
 vel_cm = state_body(:,4:6);
