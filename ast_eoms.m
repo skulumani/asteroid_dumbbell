@@ -27,6 +27,7 @@ switch constants.pot_model
             case 1024
                 [U_m1,U_grad_m1,~, ~] = polyhedron_potential_mex_1024(pos_m1, constants.asteroid_grav);
                 [U_m2,U_grad_m2,~, ~] = polyhedron_potential_mex_1024(pos_m2, constants.asteroid_grav);
+                [~,U_grad_com,~, ~] = polyhedron_potential_mex_1024(pos, constants.asteroid_grav);
             case 4092
                 [U_m1,U_grad_m1,~, ~] = polyhedron_potential_mex_4092(pos_m1, constants.asteroid_grav);
                 [U_m2,U_grad_m1,~, ~] = polyhedron_potential_mex_4092(pos_m2, constants.asteroid_grav);
