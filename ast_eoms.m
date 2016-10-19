@@ -25,24 +25,28 @@ switch constants.pot_model
     case 'polyhedron'
         switch constants.asteroid_grav.num_f
             case 1024
-                [U_m1,U_grad_m1,~, ~] = polyhedron_potential_mex_1024(pos_m1, constants.asteroid_grav);
-                [U_m2,U_grad_m2,~, ~] = polyhedron_potential_mex_1024(pos_m2, constants.asteroid_grav);
+                [~,U_grad_m1,~, ~] = polyhedron_potential_mex_1024(pos_m1, constants.asteroid_grav);
+                [~,U_grad_m2,~, ~] = polyhedron_potential_mex_1024(pos_m2, constants.asteroid_grav);
                 [~,U_grad_com,~, ~] = polyhedron_potential_mex_1024(pos, constants.asteroid_grav);
             case 4092
-                [U_m1,U_grad_m1,~, ~] = polyhedron_potential_mex_4092(pos_m1, constants.asteroid_grav);
-                [U_m2,U_grad_m1,~, ~] = polyhedron_potential_mex_4092(pos_m2, constants.asteroid_grav);
+                [~,U_grad_m1,~, ~] = polyhedron_potential_mex_4092(pos_m1, constants.asteroid_grav);
+                [~,U_grad_m2,~, ~] = polyhedron_potential_mex_4092(pos_m2, constants.asteroid_grav);
+                [~,U_grad_com,~, ~] = polyhedron_potential_mex_4092(pos, constants.asteroid_grav);
         end
     case 'mascon'
-        [U_m1,U_grad_m1] = mascon_potential(state,constants.asteroid_grav,constants);
-        [U_m2,U_grad_m2] = mascon_potential(state,constants.asteroid_grav,constants);
+        [~,U_grad_m1] = mascon_potential(pos_m1,constants.asteroid_grav,constants);
+        [~,U_grad_m2] = mascon_potential(pos_m2,constants.asteroid_grav,constants);
+        [~,U_grad_com] = mascon_potential(pos,constants.asteroid_grav,constants);
     case 'matlab'
-        [U_m1,U_grad_m1, ~, ~] = polyhedron_potential(pos, constants.asteroid_grav);
-        [U_m2,U_grad_m2, ~, ~] = polyhedron_potential(pos, constants.asteroid_grav);
+        [~,U_grad_m1, ~, ~] = polyhedron_potential(pos_m1, constants.asteroid_grav);
+        [~,U_grad_m2, ~, ~] = polyhedron_potential(pos_m2, constants.asteroid_grav);
+        [~,U_grad_com, ~, ~] = polyhedron_potential(pos, constants.asteroid_grav);
 end
 
 % force due to each mass expressed in asteroid body frame
 F1 = m1*U_grad_m1;
 F2 = m2*U_grad_m2;
+F_com = (m1+m2)*U_grad_com;
 
 % compute the moments due to each mass
 M1 = hat_map(R'*lcg*[1;0;0])*F1;
@@ -51,9 +55,10 @@ M2 = hat_map(R'*(l-lcg)*[1;0;0])*F2;
 % state derivatives
 pos_dot = vel;
 vel_dot = 1/(m1+m2) * (F1+F2) - 2*hat_map(constants.omega*[0;0;1])*vel - hat_map(constants.omega*[0;0;1])*hat_map(constants.omega*[0;0;1])*pos;
+% vel_dot = 1/(m1+m2) * (F_com) - 2*hat_map(constants.omega*[0;0;1])*vel - hat_map(constants.omega*[0;0;1])*hat_map(constants.omega*[0;0;1])*pos;
 R_dot = -hat_map(R*w)*R;
 R_dot = reshape(R_dot,9,1);
-w_dot = J\(M1 + M2 - hat_map(constants.omega*[0;0;1])*J*(constants.omega*[0;0;1] + w));
+w_dot = J\(M1 + M2 - hat_map(constants.omega*[0;0;1]+ w)*J*(constants.omega*[0;0;1] + w));
 
 state_dot = [pos_dot;vel_dot;R_dot;w_dot];
 end
