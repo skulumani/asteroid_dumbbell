@@ -44,4 +44,5 @@ initial_state = [initial_pos;initial_vel;initial_R;initial_w];
 
 fprintf('FINISHED SIM\n')
 %% PLOT THE MOTION
+energy_plot(t,state_body,constants)
 % plot_motion
