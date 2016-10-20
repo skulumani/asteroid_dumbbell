@@ -57,7 +57,8 @@ for ii = 1:length(t)
             [U_com,~, ~, ~] = polyhedron_potential(pos_cm(ii,:)', constants.asteroid_grav);
     end
     
-    T(ii) = 1/2*w_inertial2sc'*constants.J*w_inertial2sc + 1/2*(constants.m1+constants.m2)*(vel_inertial'*vel_inertial);
+%     T(ii) = 1/2*w_inertial2sc'*constants.J*w_inertial2sc + 1/2*(constants.m1+constants.m2)*(vel_inertial'*vel_inertial);
+    T(ii) = 1/2*w_inertial2sc'*constants.J*w_inertial2sc + (constants.m1+constants.m2)*(1/2*(vel_cm(ii,:)*vel_cm(ii,:)') - 1/2*constants.omega^2*(pos_cm(ii,1)^2+pos_cm(ii,2)^2));
     V(ii) = -constants.m1*U_m1 - constants.m2*U_m2;
     E(ii) = T(ii) + V(ii);
 
