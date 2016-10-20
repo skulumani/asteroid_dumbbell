@@ -78,7 +78,7 @@ switch type
         nFrames = length(t)/tstep;
         vidObj = VideoWriter(strcat(animation_fname,'.avi'));
         vidObj.Quality = 100;
-        vidObj.FrameRate = 30;
+        vidObj.FrameRate = 60;
         open(vidObj);
     case 'images'
     
