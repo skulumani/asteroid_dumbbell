@@ -1,5 +1,9 @@
 % test function to call polyhedron_potential for code generation
 
+% add functions to path
+restoredefaultpath
+addpath(genpath('./attitude_ref'));
+
 % define inputs
 constants = load_constants('castalia','true'); % false = full number of faces
 asteroid_grav = polyhedron_shape_input(constants);
