@@ -2,7 +2,7 @@
 
 % add functions to path
 restoredefaultpath
-addpath(genpath('./attitude_ref'));
+addpath(genpath(['..',filesep,'/.']));
 
 % define inputs
 constants = load_constants('castalia','true'); % false = full number of faces
