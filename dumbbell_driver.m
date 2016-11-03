@@ -64,6 +64,6 @@ fprintf('FINISHED INERTIAL SIM\n')
 % 
 % fprintf('FINISHED BODY SIM\n')
 %% PLOT THE MOTION
-energy_plot(t,state_inertial,constants)
+energy_plot_inertial(t,state_inertial,constants)
 % energy_plot(t,state_body,constants)
 % plot_motion
