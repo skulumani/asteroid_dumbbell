@@ -75,6 +75,8 @@ switch asteroid
             case 'true' % reduce number of faces for mex function
                 fprintf('Reducing number of faces\n')
                 [F,V] = reducepatch(F,V,1024); % must use 1024 for polyhedron_potential_mex
+            case 'low' % reduce faces for super fast computations
+                fprintf('Super small number of faces!\n')
             otherwise
                 fprintf('No reduction\n')
                	 
