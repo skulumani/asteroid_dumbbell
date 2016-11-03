@@ -21,7 +21,7 @@ J = constants.J;
 
 % the position of each mass in the asteroid body frame
 rho_1 = lcg*[1;0;0];
-rho_2= -(l-lcg)*[1;0;0];
+rho_2= (l-lcg)*[-1;0;0];
 
 % position of each mass in the asteroid frame
 z1 = Ra'*(pos + R * rho_1);
