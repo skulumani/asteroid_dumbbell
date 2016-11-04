@@ -5,14 +5,14 @@ restoredefaultpath
 addpath(genpath(['..',filesep,'/.']));
 
 % define inputs
-constants = load_constants('castalia','true'); % false = full number of faces
+constants = load_constants('castalia','low'); % false = full number of faces
 asteroid_grav = polyhedron_shape_input(constants);
 
 state = [1;0.2;0];
 
 
 [U_mat,Ug_mat,Ug_mat_mat, Ulap_mat] = polyhedron_potential(state, asteroid_grav)
-[U_mex,Ug_mex,Ug_mat_mex, Ulap_mex] = polyhedron_potential_mex_1024(state, asteroid_grav)
+[U_mex,Ug_mex,Ug_mat_mex, Ulap_mex] = polyhedron_potential_mex_32(state, asteroid_grav)
 
 
 fprintf('Difference between mex and matlab functions\n')

@@ -40,6 +40,10 @@ switch constants.pot_model
                 [~,U_grad_m1,~, ~] = polyhedron_potential_mex_4092(z1, constants.asteroid_grav);
                 [~,U_grad_m2,~, ~] = polyhedron_potential_mex_4092(z2, constants.asteroid_grav);
                 [~,U_grad_com,~, ~] = polyhedron_potential_mex_4092(z, constants.asteroid_grav);
+            case 32
+                [~,U_grad_m1,~, ~] = polyhedron_potential_mex_32(z1, constants.asteroid_grav);
+                [~,U_grad_m2,~, ~] = polyhedron_potential_mex_32(z2, constants.asteroid_grav);
+                [~,U_grad_com,~, ~] = polyhedron_potential_mex_32(z, constants.asteroid_grav);
         end
     case 'mascon'
         [~,U_grad_m1] = mascon_potential(z1,constants.asteroid_grav,constants);

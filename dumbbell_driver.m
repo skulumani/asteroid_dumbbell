@@ -9,7 +9,7 @@ close all
 fprintf('LOADING CONSTANTS\n')
 addpath(genpath(['.',filesep]));
 
-constants = load_constants('castalia','true'); % only 1024 faces
+constants = load_constants('castalia','low'); % only 1024 faces
 asteroid_grav = polyhedron_shape_input(constants);
 constants.asteroid_grav = asteroid_grav;
 
