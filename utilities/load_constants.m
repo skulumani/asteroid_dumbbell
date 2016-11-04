@@ -49,7 +49,7 @@ switch asteroid
         
     case 'castalia'
         % add directory to path
-        addpath(strcat('.',filesep,'CASTALIA'))
+        addpath(genpath(strcat('..',filesep,'dynamics',filesep,'CASTALIA')))
         % 4769 Casstalia
         constants.G = 6.673e-20; % km^3/kg/sec^2
         constants.M = 1.4091e12; % kg
