@@ -27,10 +27,10 @@ constants.Ia = 2/5*constants.m1*0.001^2 + 2/5*constants.m2*0.001^2;
 constants.J = diag([constants.Ia,constants.It,constants.It]);
 
 %% INERTIAL SIMULATION
-fprintf('INERTIAL SIMULATING!\n')
+fprintf('INERTIAL SIMULATION!\n')
 
 t_step = 0.1;
-t_final = 10000;
+t_final = 1000;
 constants.num_steps = t_final/t_step;
 
 tspan = linspace(0,t_final,constants.num_steps);
@@ -42,28 +42,51 @@ initial_R = reshape(eye(3,3),9,1); % transforms from dumbbell body frame to the 
 initial_w = [0;0;0]; % angular velocity of dumbbell wrt to asteroid represented in sc body frame
 
 initial_state = [initial_pos;initial_vel;initial_R;initial_w];
-[t,state_inertial] = ode113(@(t,state)ast_eoms_inertial(t,state,constants),tspan,initial_state,constants.ode_options);
+[t_inertial,state_inertial] = ode113(@(t,state)ast_eoms_inertial(t,state,constants),tspan,initial_state,constants.ode_options);
 
 fprintf('FINISHED INERTIAL SIM\n')
 
-% %% SIMULATE ODE
-% fprintf('BODY SIMULATING!\n')
-% 
-% t_step = 0.1;
-% t_final = 10000;
-% constants.num_steps = t_final/t_step;
-% 
-% tspan = linspace(0,t_final,constants.num_steps);
-% initial_pos = [1.495746722510590;0.000001002669660;0.006129720493607]; % km for center of mass
-% initial_vel = [0.000000302161724;-0.000899607989820;-0.000000013286327]; % km/sec for COM in asteroid fixed frame
-% initial_R = reshape(eye(3,3),9,1); % transforms from dumbbell body frame to asteroid body frame
-% initial_w = [0;0;0]; % angular velocity of dumbbell wrt to asteroid represented in asteroid body fixed frame
-% 
-% initial_state = [initial_pos;initial_vel;initial_R;initial_w];
-% [t,state_body] = ode113(@(t,state)ast_eoms(t,state,constants),tspan,initial_state,constants.ode_options);
-% 
-% fprintf('FINISHED BODY SIM\n')
+%% SIMULATE ODE
+fprintf('BODY SIMULATION!\n')
+
+t_step = 0.1;
+t_final = 1000;
+constants.num_steps = t_final/t_step;
+
+tspan = linspace(0,t_final,constants.num_steps);
+initial_pos = [1.495746722510590;0.000001002669660;0.006129720493607]; % km for center of mass
+initial_vel = [0.000000302161724;-0.000899607989820;-0.000000013286327]; % km/sec for COM in asteroid fixed frame
+initial_R = reshape(eye(3,3),9,1); % transforms from dumbbell body frame to asteroid body frame
+initial_w = [0;0;0]; % angular velocity of dumbbell wrt to asteroid represented in asteroid body fixed frame
+
+initial_state = [initial_pos;initial_vel;initial_R;initial_w];
+[t_body,state_body] = ode113(@(t,state)ast_eoms_body(t,state,constants),tspan,initial_state,constants.ode_options);
+
+fprintf('FINISHED BODY SIM\n')
+
+%% SIMULATE ODE
+fprintf('TRANSLATION SIMULATION!\n')
+
+t_step = 0.1;
+t_final = 1000;
+constants.num_steps = t_final/t_step;
+
+tspan = linspace(0,t_final,constants.num_steps);
+initial_pos = [1.495746722510590;0.000001002669660;0.006129720493607]; % km for center of mass
+initial_vel = [0.000000302161724;-0.000899607989820;-0.000000013286327]; % km/sec for COM in asteroid fixed frame
+
+initial_state = [initial_pos;initial_vel];
+[t_trans,state_trans] = ode113(@(t,state)ast_eoms(t,state,constants),tspan,initial_state,constants.ode_options);
+
+fprintf('FINISHED TRANSLATION SIM\n')
+
 %% PLOT THE MOTION
-energy_plot_inertial(t,state_inertial,constants)
-% energy_plot(t,state_body,constants)
-% plot_motion
+% energy_plot_inertial(t_inertial,state_inertial,constants)
+% energy_plot_body(t_body,state_body,constants)
+% energy_plot_trans(t_trans,state_trans,constants)
+
+% plot_motion(t_body,state_body,constants)
+
+%% Compare the motion of the two body frame equations of motion
+figure
+title('Position Space')
