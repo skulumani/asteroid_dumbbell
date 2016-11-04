@@ -13,6 +13,8 @@ switch constants.pot_model
                 [U,U_grad,U_grad_mat, Ulaplace] = polyhedron_potential_mex_1024(pos, constants.asteroid_grav);
             case 4092
                 [U,U_grad,U_grad_mat, Ulaplace] = polyhedron_potential_mex_4092(pos, constants.asteroid_grav);
+            case 32
+               [U,U_grad,U_grad_mat, Ulaplace] = polyhedron_potential_mex_32(pos, constants.asteroid_grav); 
         end
     case 'mascon'
         [U,U_grad] = mascon_potential(state,constants.asteroid_grav,constants);
