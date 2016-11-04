@@ -89,4 +89,9 @@ fprintf('FINISHED TRANSLATION SIM\n')
 
 %% Compare the motion of the two body frame equations of motion
 figure
-title('Position Space')
+title('Asteroid fixed frame','interpreter','latex','fontsize',constants.fontsize,'fontname',constants.fontname)
+grid on
+hold on
+plot3(state_body(:,1),state_body(:,2),state_body(:,3),'b')
+plot3(state_trans(:,1),state_trans(:,2),state_trans(:,3),'r')
+legend('Coupled EOMS','Translation EOMS')
