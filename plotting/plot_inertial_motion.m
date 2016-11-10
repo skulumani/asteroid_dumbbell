@@ -1,7 +1,7 @@
 function [] = plot_inertial_motion(t,state_inertial,constants)
 
-type = 'none';
-animation_fname = 'dumbbell';
+type = 'movie';
+animation_fname = 'dumbbell_inertial';
 
 fontsize = constants.fontsize;
 fontname = constants.fontname;
@@ -26,6 +26,7 @@ grid on;
 axis on
 axis equal
 hold on
+title('Motion in inertial frame','interpreter','latex','fontsize',fontsize,'fontname',fontname)
 ast_inertial = patch('Faces',constants.F,'Vertices',constants.V);
 set(ast_inertial,'FaceLighting','gouraud','AmbientStrength',0.3,...
     'DiffuseStrength',0.8,'SpecularStrength',0.9,'BackFaceLighting','unlit','Facealpha',1,'Facecolor',[0.8 0.8 0.8], 'EdgeAlpha',0.0);
@@ -36,7 +37,7 @@ view(3)
 h_inertial_attitude = subplot(2,2,2);
 grid on;
 hold on
-title('Inertial Attitude')
+title('Inertial Attitude','interpreter','latex','fontsize',fontsize,'fontname',fontname)
 axis([-1.1 1.1 -1.1 1.1 -1.1 1.1]); axis equal
 % draw intertial frame
 line([0 1],[0 0],[0 0],'color','k','linewidth',3);
@@ -47,6 +48,7 @@ view(3)
 h_tran_body = subplot(2,2,3);
 grid on
 hold on
+title('Motion in asteroid body frame','interpreter','latex','fontsize',fontsize,'fontname',fontname)
 ast_body = patch('Faces',constants.F,'Vertices',constants.V);
 set(ast_body,'FaceLighting','gouraud','AmbientStrength',0.3,...
     'DiffuseStrength',0.8,'SpecularStrength',0.9,'BackFaceLighting','unlit','Facealpha',1,'Facecolor',[0.8 0.8 0.8], 'EdgeAlpha',0.0);
@@ -57,7 +59,7 @@ view(3)
 h_body_attitude = subplot(2,2,4);
 grid on;
 hold on
-title('Asteroid Body Frame Attitude')
+title('Asteroid Body Frame Attitude','interpreter','latex','fontsize',fontsize,'fontname',fontname)
 axis([-1.1 1.1 -1.1 1.1 -1.1 1.1]); axis equal
 % draw asteroid body frame
 line([0 1],[0 0],[0 0],'color','k','linewidth',3);
@@ -88,12 +90,13 @@ for ii = 1:tstep:length(t)
     R_ast2i = R_ast2inertial(:,:,ii);
     R_i2ast = R_ast2inertial(:,:,ii)';
     
-    pos_i = pos_cm(ii,:)';
-    pos_b = R_i2ast*pos_i;
+    % location of cm in both inertial and body frame of asteroid
+    pos_i = pos_cm(ii,:)'; 
+    pos_b = R_i2ast'*pos_i;
     
     % first body axis (first column of R)
-    sc1_i = R_sc2inertial(1,:,ii)'; % first body axis of SC represented in inertial frame
-    sc1_b = R_i2ast*sc1_i; % first body axis of SC represented in asteroid fixed frame
+    sc1_i = (R_sc2inertial(1,:,ii))'; % first body axis of SC represented in inertial frame
+    sc1_b = R_i2ast'*sc1_i; % first body axis of SC represented in asteroid fixed frame
     sc1_bt = sc1_b + pos_b;
     sc1_it = sc1_i + pos_i;
     
@@ -139,62 +142,34 @@ for ii = 1:tstep:length(t)
     subplot(2,2,4)
     db_b = line([0 sc1_b(1)],[0 sc1_b(2)],[0 sc1_b(3)],'color','r','linewidth',3);
     db_b_mass = plot3([-sc1_b(1)/2 sc1_b(1)/2],[-sc1_b(2)/2 sc1_b(2)/2],[-sc1_b(3)/2 sc1_b(3)/2],'MarkerSize',20,'Marker','.','LineWidth',1,'Color','b');
+    xlabel(sprintf('t = %5.2f s',t(ii)));
 
-
-%     % SC wrt asteroid body frame
-%     subplot(2,2,1)
-%     db_b = line([0 sc1_b(1)],[0 sc1_b(2)],[0 sc1_b(3)],'color','b','linewidth',3);
-%     db_b_mass = plot3([-sc1_b(1)/2 sc1_b(1)/2],[-sc1_b(2)/2 sc1_b(2)/2],[-sc1_b(3)/2 sc1_b(3)/2],'MarkerSize',20,'Marker','.','LineWidth',1,'Color','b');
-%     
-%     % SC wrt inertial frame
-%     subplot(2,2,2)
-%     db_i = line([0 sc1_i(1)],[0 sc1_i(2)],[0 sc1_i(3)],'color','b','linewidth',3);
-%     db_i_mass = plot3([-sc1_i(1)/2 sc1_i(1)/2],[-sc1_i(2)/2 sc1_i(2)/2],[-sc1_i(3)/2 sc1_i(3)/2],'MarkerSize',20,'Marker','.','LineWidth',1,'Color','b');
-%     % draw the body frame
-%     ast_x = line([0 ast1(1)],[0 ast1(2)],[0 ast1(3)],'color','r','linewidth',3);
-%     ast_y = line([0 ast2(1)],[0 ast2(2)],[0 ast2(3)],'color','g','linewidth',3);
-%     ast_z = line([0 ast3(1)],[0 ast3(2)],[0 ast3(3)],'color','b','linewidth',3);
-%     
-%     % translation/rotation in asteroid body frame
-%     subplot(2,2,3)
-%     db_bt = line([pos_cm(ii,1) sc1_bt(1)],[pos_cm(ii,2) sc1_bt(2)],[pos_cm(ii,3) sc1_bt(3)],'color','b','linewidth',3);
-%     db_bt_mass = plot3([pos_cm(ii,1)-sc1_b(1)/2 pos_cm(ii,1)+sc1_b(1)/2],[pos_cm(ii,2)-sc1_b(2)/2 pos_cm(ii,2)+sc1_b(2)/2],[pos_cm(ii,3)-sc1_b(3)/2 pos_cm(ii,3)+sc1_b(3)/2],'MarkerSize',20,'Marker','.','LineWidth',1,'Color','b');
-%     
-%     % inertial frame
-%     subplot(2,2,4)
-%     nV = constants.V*R_i2ast';
-%     set(ast_inertial,'Vertices',nV);
-%     
-%     db_it = line([pos_i(1) sc1_it(1)],[pos_i(2) sc1_it(2)],[pos_i(3) sc1_it(3)],'color','b','linewidth',3);
-%     db_it_mass = plot3([pos_i(1)-sc1_i(1)/2 pos_i(1)+sc1_i(1)/2],[pos_i(2)-sc1_i(2)/2 pos_i(2)+sc1_i(2)/2],[pos_i(3)-sc1_i(3)/2 pos_i(3)+sc1_i(3)/2],'MarkerSize',20,'Marker','.','LineWidth',1,'Color','b');
-%     xlabel(sprintf('t = %5.2f s',t(ii)));
-    % delete things that should be removed
     drawnow
     
-%     switch type
-%         case 'gif'
-%             
-%             frame = getframe(ani_plot);
-%             im = frame2im(frame);
-%             [imind,cm] = rgb2ind(im,256);
-%             outfile = strcat(animation_fname,'.gif');
-%             
-%             % On the first loop, create the file. In subsequent loops, append.
-%             if ii==1
-%                 imwrite(imind,cm,outfile,'gif','DelayTime',0,'loopcount',inf);
-%             else
-%                 imwrite(imind,cm,outfile,'gif','DelayTime',0,'writemode','append');
-%             end
-%         case 'movie'
-%             writeVideo(vidObj,getframe(ani_plot));
-%         case 'images'
-%             outfile =  sprintf('%s_%d.jpg',animation_fname,ii);
-%             frame = getframe(ani_plot);
-%             imwrite(frame2im(frame),outfile);
-%         otherwise
-%             
-%     end
-%     
+    switch type
+        case 'gif'
+            
+            frame = getframe(ani_plot);
+            im = frame2im(frame);
+            [imind,cm] = rgb2ind(im,256);
+            outfile = strcat(animation_fname,'.gif');
+            
+            % On the first loop, create the file. In subsequent loops, append.
+            if ii==1
+                imwrite(imind,cm,outfile,'gif','DelayTime',0,'loopcount',inf);
+            else
+                imwrite(imind,cm,outfile,'gif','DelayTime',0,'writemode','append');
+            end
+        case 'movie'
+            writeVideo(vidObj,getframe(ani_plot));
+        case 'images'
+            outfile =  sprintf('%s_%d.jpg',animation_fname,ii);
+            frame = getframe(ani_plot);
+            imwrite(frame2im(frame),outfile);
+        otherwise
+            
+    end
+    
     delete(db_b);delete(db_b_mass)
     delete(db_i);delete(db_i_mass)
     delete(ast_x);delete(ast_y);delete(ast_z)
