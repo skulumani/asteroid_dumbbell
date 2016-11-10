@@ -83,7 +83,7 @@ fprintf('FINISHED INERTIAL SIM\n')
 % fprintf('FINISHED TRANSLATION SIM\n')
 
 %% PLOT THE MOTION
-% energy_plot_inertial(t_inertial,state_inertial,constants)
+energy_plot_inertial(t_inertial,state_inertial,constants)
 % energy_plot_body(t_body,state_body,constants)
 % energy_plot_trans(t_trans,state_trans,constants)
 
