@@ -1,6 +1,6 @@
 function [] = plot_inertial_motion(t,state_inertial,constants)
 
-type = 'movie';
+type = 'none';
 animation_fname = 'dumbbell_inertial';
 
 fontsize = constants.fontsize;
