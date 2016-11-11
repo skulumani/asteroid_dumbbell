@@ -1,6 +1,6 @@
 % compute and plot energy
 
-function [] = energy_plot(t,state_body,constants)
+function [] = energy_plot_body(t,state_body,constants)
 
 
 fontsize = constants.fontsize;
