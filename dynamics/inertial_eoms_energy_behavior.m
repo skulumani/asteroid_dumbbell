@@ -71,8 +71,8 @@ end
 fprintf('DONE\n')
 
 %% save the array to mat function
-save('./data/inertial_energy_behavior.mat','t_array','state_array','ode_tol','initial_state','constants','tspan')
-
+% save('./data/inertial_energy_behavior.mat','t_array','state_array','ode_tol','initial_state','constants','tspan')
+load('./data/inertial_energy_behavior.mat')
 %% plot all of the results
 fontsize = constants.fontsize;
 fontname = constants.fontname;
@@ -173,6 +173,7 @@ for jj=1:length(ode_tol)
     plot(t_inertial,abs(E_diff./E(1)))
     
     subplot(1,2,2)
-    plot(t_inertial,E_diff)
+    plot(t_inertial,E_diff,'DisplayName',sprintf('Tol:%3.2e',ode_tol(jj)))
     drawnow
+    
 end
