@@ -22,6 +22,8 @@ slprj/
 # Session info
 octave-workspace
 
+# Data Files
+*.mat
 
 ### Windows ###
 # Windows image file caches
@@ -42,7 +44,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
 
 ### macOS ###
 *.DS_Store
