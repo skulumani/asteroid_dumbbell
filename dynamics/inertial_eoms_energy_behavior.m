@@ -24,7 +24,7 @@ constants.pot_model = 'polyhedron'; % or mascon or matlab
 
 constants.m1 = 100; % kg first mass
 constants.m2 = 100; % kg second mass
-constants.l = 0.100; % m rigid link
+constants.l = 0.400; % m rigid link
 constants.lcg = constants.m2/(constants.m1+constants.m2)*constants.l;
 constants.It = constants.m1*constants.lcg^2+constants.m2*(constants.l-constants.lcg)^2;
 constants.Ia = 2/5*constants.m1*0.001^2 + 2/5*constants.m2*0.001^2;
@@ -42,7 +42,7 @@ initial_vel = [0.000000302161724;-0.000899607989820;-0.000000013286327]; % km/se
 initial_vel = initial_vel + hat_map(constants.omega*[0;0;1])*initial_pos;
 % initial_pos = [3;0;0];
 % initial_vel = [0;0;0];
-initial_R = reshape(eye(3,3),9,1); % transforms from dumbbell body frame to the inertial frame
+initial_R = reshape(ROT3(pi/2),9,1); % transforms from dumbbell body frame to the inertial frame
 initial_w = [0;0;0]; % angular velocity of dumbbell wrt to asteroid represented in sc body frame
 
 initial_state = [initial_pos;initial_vel;initial_R;initial_w];
@@ -71,7 +71,7 @@ end
 fprintf('DONE\n')
 
 %% save the array to mat function
-save('./data/inertial_energy_behavior_big_dumbbell.mat','t_array','state_array','ode_tol','initial_state','constants','tspan')
+save('./data/inertial_energy_behavior_bigger_dumbbell.mat','t_array','state_array','ode_tol','initial_state','constants','tspan')
 % load('./data/inertial_energy_behavior.mat')
 %% plot all of the results
 fontsize = constants.fontsize;
