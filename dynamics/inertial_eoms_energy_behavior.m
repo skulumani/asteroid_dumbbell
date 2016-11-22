@@ -24,7 +24,7 @@ constants.pot_model = 'polyhedron'; % or mascon or matlab
 
 constants.m1 = 100; % kg first mass
 constants.m2 = 100; % kg second mass
-constants.l = 0.002; % m rigid link
+constants.l = 0.100; % m rigid link
 constants.lcg = constants.m2/(constants.m1+constants.m2)*constants.l;
 constants.It = constants.m1*constants.lcg^2+constants.m2*(constants.l-constants.lcg)^2;
 constants.Ia = 2/5*constants.m1*0.001^2 + 2/5*constants.m2*0.001^2;
@@ -71,8 +71,8 @@ end
 fprintf('DONE\n')
 
 %% save the array to mat function
-% save('./data/inertial_energy_behavior.mat','t_array','state_array','ode_tol','initial_state','constants','tspan')
-load('./data/inertial_energy_behavior.mat')
+save('./data/inertial_energy_behavior_big_dumbbell.mat','t_array','state_array','ode_tol','initial_state','constants','tspan')
+% load('./data/inertial_energy_behavior.mat')
 %% plot all of the results
 fontsize = constants.fontsize;
 fontname = constants.fontname;
