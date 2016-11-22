@@ -20,3 +20,8 @@ The results doen't show much difference as the tolerance level is decreased
 * `inertial_energy_behavior_big_dumbbell.mat` - results with a 100 meter dummbell.
 The results still do not show much difference 
     Commit - `af8d793fa8454737c3a87384984b6b5ce3ab6607`
+* `inertial_energy_behavior_bigger_dumbbell.mat` - results with a 400 meter dumbbell.
+Still not much difference and same kind of behavior
+    Commit - `f1863e48d0ae6d31a204e0a3d85f5f727e078ae6`
+* `inertial_energy_behavior_bigandheavy_dumbbell.mat` - 500 meter dumbbell with 1000 kg masses
+    Commit - `1f6fbbe118b6bf4b14d84c19c25bdbe88d8e92f8`
