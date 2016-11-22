@@ -22,9 +22,9 @@ constants.pot_model = 'polyhedron'; % or mascon or matlab
 
 %% SPACECRAFT CONSTANTS
 
-constants.m1 = 100; % kg first mass
-constants.m2 = 100; % kg second mass
-constants.l = 0.400; % m rigid link
+constants.m1 = 1000; % kg first mass
+constants.m2 = 1000; % kg second mass
+constants.l = 0.500; % m rigid link
 constants.lcg = constants.m2/(constants.m1+constants.m2)*constants.l;
 constants.It = constants.m1*constants.lcg^2+constants.m2*(constants.l-constants.lcg)^2;
 constants.Ia = 2/5*constants.m1*0.001^2 + 2/5*constants.m2*0.001^2;
@@ -71,7 +71,7 @@ end
 fprintf('DONE\n')
 
 %% save the array to mat function
-save('./data/inertial_energy_behavior_bigger_dumbbell.mat','t_array','state_array','ode_tol','initial_state','constants','tspan')
+save('./data/inertial_energy_behavior_bigandheavy_dumbbell.mat','t_array','state_array','ode_tol','initial_state','constants','tspan')
 % load('./data/inertial_energy_behavior.mat')
 %% plot all of the results
 fontsize = constants.fontsize;
