@@ -23,12 +23,13 @@ J = constants.J;
 rho_1 = lcg*[1;0;0];
 rho_2= (l-lcg)*[-1;0;0];
 
-% position of each mass in the asteroid frame
+% position of each mass in the inertial frame
 z1 = Ra'*(pos + R * rho_1);
 z2 = Ra'*(pos + R * rho_2);
 
 z = Ra' * pos; % position of COM in asteroid frame
 
+% these gradients are defined in the asteroid fixed body frame
 switch constants.pot_model
     case 'polyhedron'
         switch constants.asteroid_grav.num_f
@@ -55,7 +56,7 @@ switch constants.pot_model
         [~,U_grad_com, ~, ~] = polyhedron_potential(z, constants.asteroid_grav);
 end
 
-% force due to each mass expressed in asteroid body frame
+% force due to each mass expressed in the inertial body frame
 F1 = m1*Ra*U_grad_m1;
 F2 = m2*Ra*U_grad_m2;
 F_com = (m1+m2)*Ra*U_grad_com;
