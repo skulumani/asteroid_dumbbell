@@ -20,10 +20,11 @@ constants.ode_options = odeset('RelTol',1e-9,'AbsTol',1e-9);
 
 constants.m1 = 100; % kg first mass
 constants.m2 = 100; % kg second mass
-constants.l = 0.002; % m rigid link
+constants.l = 0.002; % km rigid link
+constants.r = 0.001; % km radius of each spherical mass 
 constants.lcg = constants.m2/(constants.m1+constants.m2)*constants.l;
-constants.It = constants.m1*constants.lcg^2+constants.m2*(constants.l-constants.lcg)^2;
-constants.Ia = 2/5*constants.m1*0.001^2 + 2/5*constants.m2*0.001^2;
+constants.It = constants.Ia + constants.m1*constants.lcg^2+constants.m2*(constants.l-constants.lcg)^2;
+constants.Ia = 2/5*constants.m1*constants.r^2 + 2/5*constants.m2*constants.r^2;
 constants.J = diag([constants.Ia,constants.It,constants.It]);
 
 %% INERTIAL SIMULATION
