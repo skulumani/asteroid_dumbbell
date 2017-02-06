@@ -2,6 +2,8 @@
 import numpy as np
 import scipy.io
 import os
+import utilities
+import pdb
 
 class Asteroid(object):
     """An asteroid that we're orbiting about
@@ -91,7 +93,7 @@ class Asteroid(object):
         self.lat = self.lat[index]
         
         # compute a bunch of parameters for the polyhedron model
-        # () = self.polyhedron_shape_input(self)
+        a = self.polyhedron_shape_input()
 
     def polyhedron_shape_input(self):
         """Precomputes parameters for a given polyhedron shape model
@@ -99,7 +101,7 @@ class Asteroid(object):
         Adds attributes to the class - polyhedron gravity model
         """
         G = self.G
-        sigma = self.sigma/1000*(100/1)^3*(1000/1)^3 # kg/km^3
+        sigma = self.sigma/1000*(100/1)**3*(1000/1)**3 # kg/km^3
         F = self.F
         V = self.V
 
@@ -116,11 +118,11 @@ class Asteroid(object):
 
         F_face = np.zeros([3,3,num_f])
 
-        # calculate all the edges
-        Fa = F[:,0]
-        Fb = F[:,1]
-        Fc = F[:,2]
-
+        # calculate all the edges - zero indexing for python
+        Fa = F[:,0]-1
+        Fb = F[:,1]-1
+        Fc = F[:,2]-1
+        
         V1 = V[Fa,:]
         V2 = V[Fb,:]
         V3 = V[Fc,:]
@@ -138,20 +140,20 @@ class Asteroid(object):
         # e1_norm=e1./repmat(sqrt(e1(:,1).^2+e1(:,2).^2+e1(:,3).^2),1,3); 
         # e2_norm=e2./repmat(sqrt(e2(:,1).^2+e2(:,2).^2+e2(:,3).^2),1,3); 
         # e3_norm=e3./repmat(sqrt(e3(:,1).^2+e3(:,2).^2+e3(:,3).^2),1,3);
-
+        
         # normal to face
         normal_face = np.cross(e1,e2)
-        normal_face = normal_face / np.tile(np.sqrt(normal_face[:,0]**2 + normal_face[:,1]**2 + normal_face[:,2]**2),(1,3))
+        normal_face = normal_face / np.tile(np.reshape(np.sqrt(np.sum(normal_face**2,axis=1)),(num_f,1)),(1,3))
 
         # normal to each edge
         e1_normal = np.cross(e1,normal_face) 
-        e1_normal = e1_normal / np.tile(np.sqrt(e1_normal[:,0]**2 + e1_normal[:,1]**2 + e1_normal[:,2]**2),(1,3))
+        e1_normal = e1_normal / np.tile(np.reshape(np.sqrt(np.sum(e1_normal**2,axis=1)),(num_f,1)),(1,3))
 
         e2_normal = np.cross(e2,normal_face)
-        e2_normal = e2_normal / np.tile(np.sqrt(e2_normal[:,0]**2 + e2_normal[:,1]**2 + e2_normal[:,2]**2),(1,3))
+        e2_normal = e2_normal / np.tile(np.reshape(np.sqrt(np.sum(e2_normal**2,axis=1)),(num_f,1)),(1,3))
 
         e3_normal = np.cross(e3,normal_face)
-        e3_normal = e3_normal / np.tile(np.sqrt(e3_normal[:,0]**2 + e3_normal[:,1]**2 + e3_normal[:,2]**2),(1,3))
+        e3_normal = e3_normal / np.tile(np.reshape(np.sqrt(np.sum(e3_normal**2,axis=1)),(num_f,1)),(1,3))
 
         # calculate the center of each face
         center_face = 1.0/3 * (V[Fa,:] + V[Fb,:] + V[Fc,:])
