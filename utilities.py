@@ -46,15 +46,5 @@ def ismember_index(a,b):
     return index
 
 if __name__ == "__main__":
-    a = np.array([[4, 6,5],[2, 6,5],[5, 2,5]])
-    b = np.array([[1, 7,5],[1, 8,5],[2, 6,5],[2, 1,5],[2, 4,5],[4, 6,5],[4, 7,5],[5, 9,5],[5, 2,5],[5, 1,5]])
-    idx = ismember_rows(a, b)
-    print(idx)
-    print(np.all(b[idx] == a))
-
-    indx = in1d_index(a,b)
-    print(indx)
-
-    e1 = np.array([[1, 2,3],[4,5,6],[7,8,9],[-1,-2,-3]])
-    print(ismember_rows(e1,-e1))
-    print(in1d_index(e1,-e1))
+    
+    print("Some versions of trying to duplicate Matlab's ismember function.")
