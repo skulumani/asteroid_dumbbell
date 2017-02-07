@@ -1,8 +1,9 @@
 import numpy as np
 import utilities
-import pdb
 
-def test_ismember_index():
+class TestIsmember():
+    a = np.array([[4, 6,5],[2, 6,5],[5, 2,5]])
+    b = np.array([[1, 7,5],[1, 8,5],[2, 6,5],[2, 1,5],[2, 4,5],[4, 6,5],[4, 7,5],[5, 9,5],[5, 2,5],[5, 1,5]])
 
     e1 = np.array([
         [0.1699,  -0.5125,    0.1174],
@@ -105,28 +106,18 @@ def test_ismember_index():
          0,
          0,
          0])
-    
 
-    indx = utilities.ismember_index(-e1,e1)
+    def test_in1d_index(self):
+        indx = utilities.in1d_index(self.a,self.b)
+        np.testing.assert_allclose(np.array([2,5,8]),indx)
 
-    np.testing.assert_allclose(indx, e1_ind1b -1)
+    def test_ismember_rows(self):
+        indx = utilities.ismember_rows(self.a,self.b)
+        np.testing.assert_allclose(np.array([5,2,8]),indx)
 
-def test_Asteroid_castalia_32():
-    # ensure everything matches Matlab from the class definition
+    def test_ismember_index(self):
+        indx = utilities.ismember_index(-self.e1,self.e1)
 
-    # might want to set up a test fixture since there will be several related tests
-    pass
+        np.testing.assert_allclose(indx, self.e1_ind1b -1)
 
-# test vertices
 
-# test edges
-
-# test edge normals
-
-# test face normals
-
-# test E for each edge
-
-# test F for each face
-
-# test the edge/face maps
