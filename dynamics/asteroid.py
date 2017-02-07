@@ -93,7 +93,9 @@ class Asteroid(object):
         self.lat = self.lat[index]
         
         # compute a bunch of parameters for the polyhedron model
-        a = self.polyhedron_shape_input()
+        asteroid_param = self.polyhedron_shape_input()
+
+        self.asteroid_param = asteroid_param
 
     def polyhedron_shape_input(self):
         """Precomputes parameters for a given polyhedron shape model
@@ -271,44 +273,34 @@ class Asteroid(object):
 
             E3_edge[:,:,ii] = np.outer(nA,nA3) + np.outer(nB,nB3) # second order dyadic tensor
 
-            # % save as a structure with all the precomputed polyhedron potential data
-
-            # asteroid_grav.F = F;
-            # asteroid_grav.V = V;
-
-            # asteroid_grav.V1 = V1;
-            # asteroid_grav.V2 = V2;
-            # asteroid_grav.V3 = V3;
-
-            # asteroid_grav.e1 = e1;
-            # asteroid_grav.e2 = e2;
-            # asteroid_grav.e3 = e3;
-
-            # asteroid_grav.e1_face_map = e1_face_map;
-            # asteroid_grav.e2_face_map = e2_face_map;
-            # asteroid_grav.e3_face_map = e3_face_map;
-
-            # asteroid_grav.e1_vertex_map = e1_vertex_map;
-            # asteroid_grav.e2_vertex_map = e2_vertex_map;
-            # asteroid_grav.e3_vertex_map = e3_vertex_map;
-
-            # asteroid_grav.normal_face = normal_face;
-            # asteroid_grav.center_face = center_face;
-
-            # asteroid_grav.e1_normal = e1_normal;
-            # asteroid_grav.e2_normal = e2_normal;
-            # asteroid_grav.e3_normal = e3_normal;
-
-            # asteroid_grav.E1_edge = E1_edge;
-            # asteroid_grav.E2_edge = E2_edge;
-            # asteroid_grav.E3_edge = E3_edge;
-
-            # asteroid_grav.F_face = F_face;
-
-            # asteroid_grav.num_f = num_f;
-            # asteroid_grav.num_e = num_e;
-            # asteroid_grav.num_v = num_v;
-
-            # asteroid_grav.G = G;
-            # asteroid_grav.sigma = sigma;
+        # save as a structure with all the precomputed polyhedron potential data
+        asteroid_grav = {
+                        'F':                F,
+                        'V':                V,
+                        'V1':               V1,
+                        'V2':               V2,
+                        'V3':               V3,
+                        'e1':               e1,
+                        'e2':               e2,
+                        'e3':               e3,
+                        'e1_face_map':      e1_face_map,
+                        'e2_face_map':      e2_face_map,
+                        'e3_face_map':      e3_face_map,
+                        'e1_vertex_map':    e1_vertex_map,
+                        'e2_vertex_map':    e2_vertex_map,
+                        'e3_vertex_map':    e3_vertex_map,
+                        'normal_face':      normal_face,
+                        'center_face':      center_face,
+                        'e1_normal':        e1_normal,
+                        'e2_normal':        e2_normal,
+                        'e3_normal':        e3_normal,
+                        'E1_edge':          E1_edge,
+                        'E2_edge':          E2_edge,
+                        'E3_edge':          E3_edge,
+                        'F_face':           F_face,
+                        'num_f':            num_f,
+                        'num_v':            num_v,
+                        'num_e':            num_e}
+    
+        return asteroid_grav
 
