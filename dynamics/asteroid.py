@@ -225,8 +225,8 @@ class Asteroid(object):
             nA3 = e3_normal[e3_face_map[ii,0],:]
 
             # find adjacent face for edge 1
-            col = np.where(e1_face_map[ii,1:] >= 0)[0]
-            face_index = int(e1_face_map[ii,col+1])
+            col = np.where(e1_face_map[ii,1:] >= 0)[0][0]
+            face_index = e1_face_map[ii,col+1]
 
             if col == 0: # adjacent face is also edge 1
                 nB1 = e1_normal[face_index,:]
@@ -241,8 +241,8 @@ class Asteroid(object):
             E1_edge[:,:,ii] = np.outer(nA,nA1) + np.outer(nB,nB1) # second order dyadic tensor
 
             # find adjacent face for edge 2
-            col = np.where(e2_face_map[ii,1:] >= 0)[0]
-            face_index = int(e2_face_map[ii,col+1])
+            col = np.where(e2_face_map[ii,1:] >= 0)[0][0]
+            face_index = e2_face_map[ii,col+1]
 
             if col == 0: # adjacent face is also edge 1
                 nB2 = e1_normal[face_index,:] 
@@ -255,10 +255,9 @@ class Asteroid(object):
 
             E2_edge[:,:,ii] = np.outer(nA,nA2) + np.outer(nB,nB2) # second order dyadic tensor
 
-            pdb.set_trace()
             # find adjacent face for edge 3
-            col = np.where(e3_face_map[ii,1:] >= 0)[0]
-            face_index = int(e3_face_map[ii,col+1])
+            col = np.where(e3_face_map[ii,1:] >= 0)[0][0]
+            face_index = e3_face_map[ii,col+1]
 
             if col == 0: # adjacent face is also edge 1
                 nB3 = e1_normal[face_index,:] 
