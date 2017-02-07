@@ -13,4 +13,4 @@ tol = 1e-6
 diffcorr_plot = 0
 jacobi_step = 1e-9
 
-ast = dynamics.asteroid.Asteroid('itokawa',64)
+ast = dynamics.asteroid.Asteroid('itokawa',32)
