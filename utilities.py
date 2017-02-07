@@ -27,6 +27,24 @@ def in1d_index(a, b):
     voida, voidb = map(asvoid, (a, b))
     return np.where(np.in1d(voidb, voida))[0]
 
+def ismember_index(a,b):
+    """Find index of matching elements
+    
+    Actually find the index of elements and their match. 
+    """
+
+    voida, voidb = map(asvoid,(a,b))
+
+    index = np.full(a.shape[0], -1, dtype='int8')
+    
+    for ii in range(a.shape[0]):
+        match = np.where(voida[ii] == voidb)[0]
+
+        if match.size:
+            index[ii] = match[0]
+
+    return index
+
 if __name__ == "__main__":
     a = np.array([[4, 6,5],[2, 6,5],[5, 2,5]])
     b = np.array([[1, 7,5],[1, 8,5],[2, 6,5],[2, 1,5],[2, 4,5],[4, 6,5],[4, 7,5],[5, 9,5],[5, 2,5],[5, 1,5]])
