@@ -132,9 +132,9 @@ class Asteroid(object):
         e2 = V[Fc,:]-V[Fb,:]
         e3 = V[Fa,:]-V[Fc,:]
 
-        e1_vertex_map = np.vstack((Fb, Fa))
-        e2_vertex_map = np.vstack((Fc, Fb))
-        e3_vertex_map = np.vstack((Fa, Fc))
+        e1_vertex_map = np.vstack((Fb, Fa)).T
+        e2_vertex_map = np.vstack((Fc, Fb)).T
+        e3_vertex_map = np.vstack((Fa, Fc)).T
 
         # Normalize edge vectors
         # e1_norm=e1./repmat(sqrt(e1(:,1).^2+e1(:,2).^2+e1(:,3).^2),1,3); 
@@ -192,6 +192,7 @@ class Asteroid(object):
             e2_face_map[ii,0] = ii
             e3_face_map[ii,0] = ii
 
+            pdb.set_trace()
             # e1 edge duplicate
             if ii in e1_ind1b:
                 e1_face_map[ii,1] = ii
