@@ -130,9 +130,9 @@ class Asteroid(object):
         V3 = V[Fc,:]
 
         # Get all edge vectors
-        e1 = V[Fb,:]-V[Fa,:]
-        e2 = V[Fc,:]-V[Fb,:]
-        e3 = V[Fa,:]-V[Fc,:]
+        e1 = V2-V1
+        e2 = V3-V2
+        e3 = V1-V3
 
         e1_vertex_map = np.vstack((Fb, Fa)).T
         e2_vertex_map = np.vstack((Fc, Fb)).T
