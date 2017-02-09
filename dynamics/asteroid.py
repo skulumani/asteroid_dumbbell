@@ -430,23 +430,23 @@ class Asteroid(object):
                 # it's a duplicate
                 
                 # edge 1
-                if np.sum(e1_lock[ii,:]) == 0: # new edge
+                if np.sum(e1_lock[ii,:]) == -4: # new edge
                     
                     U1 = r_v[e1_vertex_map[ii,0],:].dot(E1_edge[:,:,ii]).dot(r_v[e1_vertex_map[ii,0],:].T)*L1_edge[ii,0]
                     U1_grad = E1_edge[:,:,ii].dot(r_v[e1_vertex_map[ii,1],:].T)*L1_edge[ii,0]
                     U1_grad_mat = E1_edge[:,:,ii]*L1_edge[ii,0]
                     
-                    col = np.where(e1_face_map[ii,1:] != -1)
+                    col = np.where(e1_face_map[ii,1:] != -1)[0][0]
                     row = e1_face_map[ii,col+1]
                     
                     e1_lock[ii,0] = ii
                     e1_lock[ii,col+1] = row
                     # update lock
-                    if col[0] == 0: # adjacent face is also edge 1
+                    if col == 0: # adjacent face is also edge 1
                         e1_lock[row,1] = ii
-                    elif col[0] == 2: # adjacent face is edge 2
+                    elif col == 1: # adjacent face is edge 2
                         e2_lock[row,1] = ii
-                    elif col[0] == 3:
+                    elif col == 2:
                         e3_lock[row,1] = ii
                     
                 else:
@@ -455,26 +455,25 @@ class Asteroid(object):
                     U1 = 0
                     U1_grad = np.zeros((3,1))
                     U1_grad_mat = np.zeros((3,3))
-                
+
                 # edge 2
-                if np.sum(e2_lock[ii,:]) == 0:
+                if np.sum(e2_lock[ii,:]) == -4:
                     U2 = r_v[e2_vertex_map[ii,0],:].dot(E2_edge[:,:,ii]).dot(r_v[e2_vertex_map[ii,0],:].T)*L2_edge[ii,0]
-                    pdb.set_trace()
                     U2_grad = E2_edge[:,:,ii].dot(r_v[e2_vertex_map[ii,0],:].T)*L2_edge[ii,0]
                     U2_grad_mat = E2_edge[:,:,ii]*L2_edge[ii,0]
                     
-                    col = np.where(e2_face_map[ii,1:end] != -1 )
+                    col = np.where(e2_face_map[ii,1:] != -1 )[0][0]
                     row = e2_face_map[ii,col+1]
                     
                     e2_lock[ii,0] = ii
                     e2_lock[ii,col+1] = row
                     
                     # update lock
-                    if col[0] == 0: # duplicate edge is edge 1 on another face
+                    if col == 0: # duplicate edge is edge 1 on another face
                         e1_lock[row,2] = ii
-                    elif col[0] == 1: # adjacent face is edge 2
+                    elif col == 1: # adjacent face is edge 2
                         e2_lock[row,2] = ii
-                    elif col[0] == 2:
+                    elif col == 2:
                         e3_lock[row,2] = ii
 
                 else:
@@ -485,22 +484,22 @@ class Asteroid(object):
                     U2_grad_mat = np.zeros((3,3))
                 
                 # edge 3
-                if np.sum(e3_lock[ii,:]) == 0:
+                if np.sum(e3_lock[ii,:]) == -4:
                     U3 = r_v[e3_vertex_map[ii,0],:].dot(E3_edge[:,:,ii]).dot(r_v[e3_vertex_map[ii,0],:].T)*L3_edge[ii,0]
                     U3_grad = E3_edge[:,:,ii].dot(r_v[e3_vertex_map[ii,0],:].T)*L3_edge[ii,0]
                     U3_grad_mat = E3_edge[:,:,ii]*L3_edge[ii,0]
                     
-                    col = np.where(e3_face_map[ii,1:] != -1)
+                    col = np.where(e3_face_map[ii,1:] != -1)[0][0]
                     row = e3_face_map[ii,col+1]
                     
                     e3_lock[ii,0] = ii
                     e3_lock[ii,col+1] = row
                     # update lock
-                    if col[0] == 0: # duplicate is in e1
+                    if col == 0: # duplicate is in e1
                         e1_lock[row,3] = ii
-                    elif col[0] == 1:
+                    elif col == 1:
                         e2_lock[row,3] = ii
-                    elif col[0] == 2:
+                    elif col == 2:
                         e3_lock[row,3] = ii
                     
                 else:
@@ -511,7 +510,7 @@ class Asteroid(object):
                     U3_grad_mat = np.zeros((3,3))
                 
                 U_edge = U_edge + U1 + U2 + U3
-                U_grad_edge = U_grad_edge + U1_grad + U2_grad + U3_grad
+                U_grad_edge = U_grad_edge + U1_grad.reshape(U_grad_edge.shape) + U2_grad.reshape(U_grad_edge.shape) + U3_grad.reshape(U_grad_edge.shape)
                 U_grad_mat_edge = U_grad_mat_edge + U1_grad_mat + U2_grad_mat + U3_grad_mat
                 
             # combine edge and face summations
@@ -519,7 +518,6 @@ class Asteroid(object):
             U_grad = -G*sigma*U_grad_edge + G*sigma*U_grad_face
             U_grad_mat = G*sigma*U_grad_mat_edge -G*sigma*U_grad_mat_face
             Ulaplace = -G*sigma*np.sum(w_face)
-
         else:
             U = 0
             U_grad = np.zeros((3,1))
