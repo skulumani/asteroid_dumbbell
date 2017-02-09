@@ -384,12 +384,12 @@ class Asteroid(object):
         # check if point is inside or outside the body
         inside_check = np.sum(w_face) # zero when outside body and -G*sigma*4 pi on the inside
 
-        if inside_check < 1e-9 # outside the body
+        if inside_check < 1e-9: # outside the body
             
             r1i = r_v[e1_vertex_map[:,0],:]
             r1j = r_v[e1_vertex_map[:,1],:]
-            r1i_norm = np.sqrt(np.sum(rli**2, axis=1))
-            r1j_norm = np.sqrt(np.sum(rlj**2, axis=1))
+            r1i_norm = np.sqrt(np.sum(r1i**2, axis=1))
+            r1j_norm = np.sqrt(np.sum(r1j**2, axis=1))
             e1_norm = np.sqrt(np.sum(e1**2, axis=1))
             L1_edge = np.log((r1i_norm+r1j_norm+e1_norm)/(r1i_norm+r1j_norm-e1_norm))
             
@@ -419,6 +419,7 @@ class Asteroid(object):
             
         # sum over edges
         for ii in range(num_f):
+            pdb.set_trace()
             # face contribution
             # this can potentially be done completely outside of the for loop
             U_face = U_face + r_v[Fa[ii],:].dot(F_face[:,:,ii]).dot(r_v[Fa[ii],:].T)*w_face[ii,0]
@@ -429,101 +430,101 @@ class Asteroid(object):
             # it's a duplicate
             
             # edge 1
-            if np.sum(e1_lock[ii,:]) == 0 # new edge
+            if np.sum(e1_lock[ii,:]) == 0: # new edge
                 
-                U1 = r_v[e1_vertex_map[ii,0],:].dot(E1_edge[:,:,ii]).dot(r_v[e1_vertex_map[ii,0],:].T)*L1_edge[ii,1]
-                U1_grad = E1_edge(:,:,ii)*r_v(e1_vertex_map(ii,1),:)'*L1_edge(ii,1);
-                U1_grad_mat = E1_edge(:,:,ii)*L1_edge(ii,1);
+                U1 = r_v[e1_vertex_map[ii,0],:].dot(E1_edge[:,:,ii]).dot(r_v[e1_vertex_map[ii,0],:].T)*L1_edge[ii,0]
+                U1_grad = E1_edge[:,:,ii].dot(r_v[e1_vertex_map[ii,1],:].T)*L1_edge[ii,0]
+                U1_grad_mat = E1_edge[:,:,ii]*L1_edge[ii,0]
                 
-                col = find(e1_face_map(ii,2:end) ~= 0);
-                row = e1_face_map(ii,col+1);
+                col = np.where(e1_face_map[ii,1:] != -1)
+                row = e1_face_map[ii,col+1]
                 
-                e1_lock(ii,1) = ii;
-                e1_lock(ii,col+1) = row;
-                % update lock
-                if col(1) == 1 % adjacent face is also edge 1
-                    e1_lock(row,2) = ii;
-                elseif col(1) == 2 % adjacent face is edge 2
-                    e2_lock(row,2) = ii;
-                elseif col(1) == 3
-                    e3_lock(row,2) = ii;
-                end
+                e1_lock[ii,0] = ii
+                e1_lock[ii,col+1] = row
+                # update lock
+                if col[0] == 0: # adjacent face is also edge 1
+                    e1_lock[row,1] = ii
+                elif col[0] == 2: # adjacent face is edge 2
+                    e2_lock[row,1] = ii
+                elif col[0] == 3:
+                    e3_lock[row,1] = ii
                 
-            else
-                e1_lock(ii,1) = ii;
+            else:
+                e1_lock[ii,0] = ii
                 
-                U1 = 0;
-                U1_grad = zeros(3,1);
-                U1_grad_mat = zeros(3,3);
-            end
-            % edge 2
-            if sum(e2_lock(ii,:)) == 0
-                U2 = r_v(e2_vertex_map(ii,1),:)*E2_edge(:,:,ii)*r_v(e2_vertex_map(ii,1),:)'*L2_edge(ii,1);
-                U2_grad = E2_edge(:,:,ii)*r_v(e2_vertex_map(ii,1),:)'*L2_edge(ii,1);
-                U2_grad_mat = E2_edge(:,:,ii)*L2_edge(ii,1);
-                
-                col = find(e2_face_map(ii,2:end) ~= 0 );
-                row = e2_face_map(ii,col+1);
-                
-                e2_lock(ii,1) = ii;
-                e2_lock(ii,col+1) = row;
-                
-                % update lock
-                if col(1) == 1 % duplicate edge is edge 1 on another face
-                    e1_lock(row,3) = ii;
-                elseif col(1) == 2 % adjacent face is edge 2
-                    e2_lock(row,3) = ii;
-                elseif col(1) == 3
-                    e3_lock(row,3) = ii;
-                end
-            else
-                e2_lock(ii,1) = ii;
-                
-                U2 = 0;
-                U2_grad = zeros(3,1);
-                U2_grad_mat = zeros(3,3);
-            end
-            % edge 3
-            if sum(e3_lock(ii,:)) == 0
-                U3 = r_v(e3_vertex_map(ii,1),:)*E3_edge(:,:,ii)*r_v(e3_vertex_map(ii,1),:)'*L3_edge(ii,1);
-                U3_grad = E3_edge(:,:,ii)*r_v(e3_vertex_map(ii,1),:)'*L3_edge(ii,1);
-                U3_grad_mat = E3_edge(:,:,ii)*L3_edge(ii,1);
-                
-                col = find(e3_face_map(ii,2:end) ~= 0);
-                row = e3_face_map(ii,col+1);
-                
-                e3_lock(ii,1) = ii;
-                e3_lock(ii,col+1) = row;
-                % update lock
-                if col(1) == 1 % duplicate is in e1
-                    e1_lock(row,4) = ii;
-                elseif col(1) == 2
-                    e2_lock(row,4) = ii;
-                elseif col(1) == 3
-                    e3_lock(row,4) = ii;
-                end
-            else
-                e3_lock(ii,1) = ii;
-                
-                U3 = 0;
-                U3_grad = zeros(3,1);
-                U3_grad_mat = zeros(3,3);
-            end
+                U1 = 0
+                U1_grad = np.zeros((3,1))
+                U1_grad_mat = np.zeros((3,3))
             
-            U_edge = U_edge + U1 + U2 + U3;
-            U_grad_edge = U_grad_edge + U1_grad + U2_grad + U3_grad;
-            U_grad_mat_edge = U_grad_mat_edge + U1_grad_mat + U2_grad_mat + U3_grad_mat;
+            # edge 2
+            if np.sum(e2_lock[ii,:]) == 0:
+                U2 = r_v[e2_vertex_map[ii,0],:].dot(E2_edge[:,:,ii]).dot(r_v[e2_vertex_map[ii,0],:].T)*L2_edge[ii,0]
+                pdb.set_trace()
+                U2_grad = E2_edge[:,:,ii].dot(r_v[e2_vertex_map[ii,0],:].T)*L2_edge[ii,0]
+                U2_grad_mat = E2_edge[:,:,ii]*L2_edge[ii,0]
+                
+                col = np.where(e2_face_map[ii,1:end] != -1 )
+                row = e2_face_map[ii,col+1]
+                
+                e2_lock[ii,0] = ii
+                e2_lock[ii,col+1] = row
+                
+                # update lock
+                if col[0] == 0: # duplicate edge is edge 1 on another face
+                    e1_lock[row,2] = ii
+                elif col[0] == 1: # adjacent face is edge 2
+                    e2_lock[row,2] = ii
+                elif col[0] == 2:
+                    e3_lock[row,2] = ii
+
+            else:
+                e2_lock[ii,0] = ii
+                
+                U2 = 0
+                U2_grad = np.zeros((3,1))
+                U2_grad_mat = np.zeros((3,3))
             
-        end
-        % combine edge and face summations
-        U = 1/2*G*sigma*U_edge-1/2*G*sigma*U_face;
-        U_grad = -G*sigma*U_grad_edge + G*sigma*U_grad_face;
-        U_grad_mat = G*sigma*U_grad_mat_edge -G*sigma*U_grad_mat_face;
-        Ulaplace = -G*sigma*sum(w_face);
-    else
-        U = 0;
-        U_grad = zeros(3,1);
-        U_grad_mat = zeros(3,3);
-        Ulaplace = 0;
-    %     fprintf('INSIDE BODY!\n')
-    end
+    #         % edge 3
+    #         if sum(e3_lock(ii,:)) == 0
+    #             U3 = r_v(e3_vertex_map(ii,1),:)*E3_edge(:,:,ii)*r_v(e3_vertex_map(ii,1),:)'*L3_edge(ii,1);
+    #             U3_grad = E3_edge(:,:,ii)*r_v(e3_vertex_map(ii,1),:)'*L3_edge(ii,1);
+    #             U3_grad_mat = E3_edge(:,:,ii)*L3_edge(ii,1);
+                
+    #             col = find(e3_face_map(ii,2:end) ~= 0);
+    #             row = e3_face_map(ii,col+1);
+                
+    #             e3_lock(ii,1) = ii;
+    #             e3_lock(ii,col+1) = row;
+    #             % update lock
+    #             if col(1) == 1 % duplicate is in e1
+    #                 e1_lock(row,4) = ii;
+    #             elseif col(1) == 2
+    #                 e2_lock(row,4) = ii;
+    #             elseif col(1) == 3
+    #                 e3_lock(row,4) = ii;
+    #             end
+    #         else
+    #             e3_lock(ii,1) = ii;
+                
+    #             U3 = 0;
+    #             U3_grad = zeros(3,1);
+    #             U3_grad_mat = zeros(3,3);
+    #         end
+            
+    #         U_edge = U_edge + U1 + U2 + U3;
+    #         U_grad_edge = U_grad_edge + U1_grad + U2_grad + U3_grad;
+    #         U_grad_mat_edge = U_grad_mat_edge + U1_grad_mat + U2_grad_mat + U3_grad_mat;
+            
+    #     end
+    #     % combine edge and face summations
+    #     U = 1/2*G*sigma*U_edge-1/2*G*sigma*U_face;
+    #     U_grad = -G*sigma*U_grad_edge + G*sigma*U_grad_face;
+    #     U_grad_mat = G*sigma*U_grad_mat_edge -G*sigma*U_grad_mat_face;
+    #     Ulaplace = -G*sigma*sum(w_face);
+    # else
+    #     U = 0;
+    #     U_grad = zeros(3,1);
+    #     U_grad_mat = zeros(3,3);
+    #     Ulaplace = 0;
+    # %     fprintf('INSIDE BODY!\n')
+    # end
