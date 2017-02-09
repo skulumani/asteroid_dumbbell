@@ -37,7 +37,7 @@ class Asteroid(object):
 
         if name == 'castalia':
             self.M = 1.4091e12
-            self.sigma = 2.1
+            self.sigma = 2.1 # g/cm^3
             self.axes = np.array([1.6130, 0.9810, 0.8260])*1.0e3 / 2.0
             self.omega = 2*np.pi/4.07/3600
             
@@ -48,7 +48,7 @@ class Asteroid(object):
 
         elif name == 'itokawa':
             self.M = 3.51e10
-            self.sigma = 1.9
+            self.sigma = 1.9 # # g/cm^3
             self.axes = np.array([535, 294, 209]) # size in meters
             self.omega = 2*np.pi/12.132/3600
             
@@ -69,6 +69,7 @@ class Asteroid(object):
         print("Polyhedron Model: %g faces, %g vertices." % (self.F.shape[0],self.V.shape[0]))
 
         self.mu = self.G*self.M
+        self.sigma = self.sigma/1000*(100/1)**3*(1000/1)**3 # kg/km^3
 
         # Compute some inertia properties
         self.Ixx = self.M/5*(self.axes[1]**2+self.axes[2]**2)
@@ -101,7 +102,7 @@ class Asteroid(object):
         Adds attributes to the class - polyhedron gravity model
         """
         G = self.G
-        sigma = self.sigma/1000*(100/1)**3*(1000/1)**3 # kg/km^3
+        sigma = self.sigma
         F = self.F
         V = self.V
 
