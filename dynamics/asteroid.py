@@ -380,7 +380,7 @@ class Asteroid(object):
 
         den = ri_norm*rj_norm * rk_norm + ri_norm * rjrk_dot + rj_norm * rkri_dot + rk_norm * rirj_dot
 
-        w_face = 2.0 * np.arctan2(num,den)
+        w_face = 2.0 * np.arctan2(num,den).reshape((num_f,1))
     
         # check if point is inside or outside the body
         inside_check = np.sum(w_face) # zero when outside body and -G*sigma*4 pi on the inside
@@ -391,21 +391,21 @@ class Asteroid(object):
             r1i_norm = np.sqrt(np.sum(r1i**2, axis=1))
             r1j_norm = np.sqrt(np.sum(r1j**2, axis=1))
             e1_norm = np.sqrt(np.sum(e1**2, axis=1))
-            L1_edge = np.log((r1i_norm+r1j_norm+e1_norm)/(r1i_norm+r1j_norm-e1_norm))
+            L1_edge = np.log((r1i_norm+r1j_norm+e1_norm)/(r1i_norm+r1j_norm-e1_norm)).reshape((num_f,1))
             
             r2i = r_v[e2_vertex_map[:,0],:]
             r2j = r_v[e2_vertex_map[:,1],:]
             r2i_norm = np.sqrt(np.sum(r2i**2, axis=1))
             r2j_norm = np.sqrt(np.sum(r2j**2, axis=1))
             e2_norm = np.sqrt(np.sum(e2**2, axis=1))
-            L2_edge = np.log((r2i_norm+r2j_norm+e2_norm)/(r2i_norm+r2j_norm-e2_norm))
+            L2_edge = np.log((r2i_norm+r2j_norm+e2_norm)/(r2i_norm+r2j_norm-e2_norm)).reshape((num_f,1))
             
             r3i = r_v[e3_vertex_map[:,0],:]
             r3j = r_v[e3_vertex_map[:,1],:]
             r3i_norm = np.sqrt(np.sum(r3i**2, axis=1))
             r3j_norm = np.sqrt(np.sum(r3j**2, axis=1))
             e3_norm = np.sqrt(np.sum(e3**2, axis=1))
-            L3_edge = np.log((r3i_norm+r3j_norm+e3_norm)/(r3i_norm+r3j_norm-e3_norm))
+            L3_edge = np.log((r3i_norm+r3j_norm+e3_norm)/(r3i_norm+r3j_norm-e3_norm)).reshape((num_f,1))
 
             # calculate the potential at input state
             U_edge = 0
@@ -423,8 +423,8 @@ class Asteroid(object):
                 # face contribution
                 # this can potentially be done completely outside of the for loop
                 U_face = U_face + r_v[Fa[ii],:].dot(F_face[:,:,ii]).dot(r_v[Fa[ii],:].T)*w_face[ii,0]
-                U_grad_face = U_grad_face + F_face[:,:,ii].dot(r_v[Fa[ii],:].T)*w_face[ii,0]
-                U_grad_mat_face = U_grad_mat_face + F_face[:,:,ii]*w_face[ii,0]
+                U_grad_face = U_grad_face + F_face[:,:,ii].dot(r_v[Fa[ii],:].T).reshape((3,1))*w_face[ii,0]
+                U_grad_mat_face = U_grad_mat_face + F_face[:,:,ii]*w_face[ii]
               
                 # compute contributions for the three edges on this face but ignore if
                 # it's a duplicate
