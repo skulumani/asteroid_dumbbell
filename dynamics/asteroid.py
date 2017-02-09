@@ -384,8 +384,7 @@ class Asteroid(object):
         # check if point is inside or outside the body
         inside_check = np.sum(w_face) # zero when outside body and -G*sigma*4 pi on the inside
 
-        if inside_check < 1e-9: # outside the body
-            
+        if np.isclose(inside_check, 0): # outside the body
             r1i = r_v[e1_vertex_map[:,0],:]
             r1j = r_v[e1_vertex_map[:,1],:]
             r1i_norm = np.sqrt(np.sum(r1i**2, axis=1))
