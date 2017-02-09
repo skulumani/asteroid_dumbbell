@@ -419,7 +419,7 @@ class Asteroid(object):
                 
             # sum over edges
             for ii in range(num_f):
-                pdb.set_trace()
+                
                 # face contribution
                 # this can potentially be done completely outside of the for loop
                 U_face = U_face + r_v[Fa[ii],:].dot(F_face[:,:,ii]).dot(r_v[Fa[ii],:].T)*w_face[ii,0]
