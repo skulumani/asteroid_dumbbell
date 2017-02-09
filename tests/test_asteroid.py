@@ -9,6 +9,17 @@ class TestAsteroidCastalia32():
     decimal = 3
     ast = dynamics.asteroid.Asteroid(name, faces)
 
+    state = np.array([1.0,0.2,0.0])
+
+    (U,Ug, Ug_mat, Ulap) = ast.polyhedron_potential(state)
+
+    U_true = 6.833293127500053e-08
+    Ug_true = 1e-7 * np.array([-0.766352770047407, -0.244511372833393, 0.053088099547142]).reshape((3,1))
+    Ug_mat_true = 1e-6 * np.array([[0.173095584649422,   0.095136610693398,  -0.029749276967576],
+                                  [0.095136610693398,  -0.059099834150282,  -0.010959201354203],
+                                  [-0.029749276967576,  -0.010959201354203,  -0.113995750499140]])
+    Ulap_true = -5.761280515159674e-23
+
     V1 = np.array([
         [ 0.6595 ,   0.3555 ,   0.0664],
         [-0.2995 ,  -0.4483 ,   0.2802],
@@ -253,54 +264,54 @@ class TestAsteroidCastalia32():
         [-0.0301 ,  -0.0229 ,   0.1974],
         [-0.6180 ,   0.1974 ,  -0.7466]])
 
-    def test_asteroid_params(self):
-        assert self.ast.asteroid_param['num_f'] == self.faces
+    def test_asteroid_gravs(self):
+        assert self.ast.asteroid_grav['num_f'] == self.faces
         assert self.ast.name == self.name
 
     def test_faces(self):
         assert self.ast.F.shape[0] == self.faces
 
     def test_vertices_V1(self):
-        np.testing.assert_allclose(self.V1, self.ast.asteroid_param['V1'], rtol=self.rel_tol)
+        np.testing.assert_allclose(self.V1, self.ast.asteroid_grav['V1'], rtol=self.rel_tol)
     
     def test_vertices_V2(self):
-        np.testing.assert_allclose(self.V2, self.ast.asteroid_param['V2'], rtol=self.rel_tol)
+        np.testing.assert_allclose(self.V2, self.ast.asteroid_grav['V2'], rtol=self.rel_tol)
     
     def test_vertices_V3(self):
-        np.testing.assert_allclose(self.V3, self.ast.asteroid_param['V3'], rtol=self.rel_tol)
+        np.testing.assert_allclose(self.V3, self.ast.asteroid_grav['V3'], rtol=self.rel_tol)
             
     def test_edges_e1(self):
-        np.testing.assert_array_almost_equal(self.e1,self.ast.asteroid_param['e1'],decimal=self.decimal)
+        np.testing.assert_array_almost_equal(self.e1,self.ast.asteroid_grav['e1'],decimal=self.decimal)
 
     def test_edges_e2(self):
-        np.testing.assert_array_almost_equal(self.e2,self.ast.asteroid_param['e2'],decimal=self.decimal)
+        np.testing.assert_array_almost_equal(self.e2,self.ast.asteroid_grav['e2'],decimal=self.decimal)
 
     def test_edges_e3(self):
-        np.testing.assert_array_almost_equal(self.e3,self.ast.asteroid_param['e3'],decimal=self.decimal)
+        np.testing.assert_array_almost_equal(self.e3,self.ast.asteroid_grav['e3'],decimal=self.decimal)
 
     def test_face_dyad_first(self):
-        np.testing.assert_array_almost_equal(self.F_face_zero,self.ast.asteroid_param['F_face'][:,:,0], decimal=self.decimal)
+        np.testing.assert_array_almost_equal(self.F_face_zero,self.ast.asteroid_grav['F_face'][:,:,0], decimal=self.decimal)
 
     def test_face_dyad_end(self):
-        np.testing.assert_array_almost_equal(self.F_face_end,self.ast.asteroid_param['F_face'][:,:,-1], decimal=self.decimal)
+        np.testing.assert_array_almost_equal(self.F_face_end,self.ast.asteroid_grav['F_face'][:,:,-1], decimal=self.decimal)
 
     def test_edge_one_dyad_first(self):
-        np.testing.assert_array_almost_equal(self.E1_edge_zero,self.ast.asteroid_param['E1_edge'][:,:,0], decimal=self.decimal)
+        np.testing.assert_array_almost_equal(self.E1_edge_zero,self.ast.asteroid_grav['E1_edge'][:,:,0], decimal=self.decimal)
 
     def test_edge_one_dyad_end(self):
-        np.testing.assert_array_almost_equal(self.E1_edge_end,self.ast.asteroid_param['E1_edge'][:,:,-1], decimal=self.decimal)
+        np.testing.assert_array_almost_equal(self.E1_edge_end,self.ast.asteroid_grav['E1_edge'][:,:,-1], decimal=self.decimal)
 
     def test_edge_two_dyad_first(self):
-        np.testing.assert_array_almost_equal(self.E2_edge_zero,self.ast.asteroid_param['E2_edge'][:,:,0], decimal=self.decimal)
+        np.testing.assert_array_almost_equal(self.E2_edge_zero,self.ast.asteroid_grav['E2_edge'][:,:,0], decimal=self.decimal)
 
     def test_edge_two_dyad_end(self):
-        np.testing.assert_array_almost_equal(self.E2_edge_end,self.ast.asteroid_param['E2_edge'][:,:,-1], decimal=self.decimal)
+        np.testing.assert_array_almost_equal(self.E2_edge_end,self.ast.asteroid_grav['E2_edge'][:,:,-1], decimal=self.decimal)
 
     def test_edge_three_dyad_first(self):
-        np.testing.assert_array_almost_equal(self.E3_edge_zero,self.ast.asteroid_param['E3_edge'][:,:,0], decimal=self.decimal)
+        np.testing.assert_array_almost_equal(self.E3_edge_zero,self.ast.asteroid_grav['E3_edge'][:,:,0], decimal=self.decimal)
 
     def test_edge_three_dyad_end(self):
-        np.testing.assert_array_almost_equal(self.E3_edge_end,self.ast.asteroid_param['E3_edge'][:,:,-1], decimal=self.decimal)
+        np.testing.assert_array_almost_equal(self.E3_edge_end,self.ast.asteroid_grav['E3_edge'][:,:,-1], decimal=self.decimal)
 
     def test_face_normal(self):
         pass
@@ -314,3 +325,14 @@ class TestAsteroidCastalia32():
     def test_face_map(self):
         pass
         
+    def test_polyhedron_potential_U(self):
+        np.testing.assert_allclose(self.U_true,self.U)
+
+    def test_polyhedron_potential_Ug(self):
+        np.testing.assert_allclose(self.Ug_true,self.Ug)
+
+    def test_polyhedron_potential_Ug_mat(self):
+        np.testing.assert_allclose(self.Ug_mat_true,self.Ug_mat)
+
+    def test_polyhedron_potential_Ulaplace(self):
+        np.testing.assert_almost_equal(self.Ulap_true,self.Ulap)
