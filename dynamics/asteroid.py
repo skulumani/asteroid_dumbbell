@@ -331,9 +331,9 @@ class Asteroid(object):
         e2_face_map = self.asteroid_grav['e2_face_map']
         e3_face_map = self.asteroid_grav['e3_face_map']
 
-        e1_lock = np.zeros(e1_face_map.shape)
-        e2_lock = np.zeros(e2_face_map.shape)
-        e3_lock = np.zeros(e3_face_map.shape)
+        e1_lock = np.full(e1_face_map.shape, -1, dtype='int8')
+        e2_lock = np.full(e2_face_map.shape, -1, dtype='int8')
+        e3_lock = np.full(e3_face_map.shape, -1, dtype='int8')
 
         e1_vertex_map = self.asteroid_grav['e1_vertex_map']
         e2_vertex_map = self.asteroid_grav['e2_vertex_map']
