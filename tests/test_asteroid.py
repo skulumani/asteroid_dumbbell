@@ -213,6 +213,46 @@ class TestAsteroidCastalia32():
         [ 0.4748 ,   0.0353 ,  -0.0915],
         [-0.0512 ,  -0.3389 ,  -0.0472]])
      
+    F_face_zero = np.array([
+        [0.8940,    0.3054,    0.0390],
+        [0.3054,    0.1043,    0.0133],
+        [0.0390,    0.0133,    0.0017]])
+
+    F_face_end = np.array([
+            [0.1667 ,   0.0266  , -0.3718],
+            [0.0266 ,   0.0042  , -0.0593],
+           [-0.3718,   -0.0593 ,   0.8290]])
+
+    E1_edge_zero = np.array([
+        [0.3516 ,   0.2135 ,   0.4229],
+        [0.2135 ,   0.0802 ,   0.0412],
+        [0.4229 ,   0.0412 ,  -0.4318]])
+
+    E1_edge_end = np.array([
+       [-0.0542 ,   0.0405 ,  -0.0560],
+       [ 0.0405 ,  -0.0201 ,   0.0051],
+       [-0.0560 ,   0.0051 ,   0.0743]])
+
+    E2_edge_zero = np.array([
+       [ 0.7791 ,  -0.5549 ,   0.0185],
+       [-0.5549 ,  -0.7791 ,  -0.0354],
+       [ 0.0185 ,  -0.0354 ,   0.0000]])
+
+    E2_edge_end = np.array([
+        [ 0.4413 ,  -0.3398 ,  -0.3697],
+        [-0.3398 ,  -0.0506 ,   0.7523],
+        [-0.3697 ,   0.7523 ,  -0.3908]])
+    
+    E3_edge_zero = np.array([
+        [ 0.2897 ,   0.2672 ,  -0.7697],
+        [ 0.2672 ,   0.1323 ,  -0.1794],
+        [-0.7697 ,  -0.1794 ,  -0.4221]])
+    
+    E3_edge_end = np.array([
+        [ 0.7695 ,  -0.0301 ,  -0.6180],
+        [-0.0301 ,  -0.0229 ,   0.1974],
+        [-0.6180 ,   0.1974 ,  -0.7466]])
+
     def test_asteroid_params(self):
         assert self.ast.asteroid_param['num_f'] == self.faces
         assert self.ast.name == self.name
@@ -238,15 +278,29 @@ class TestAsteroidCastalia32():
     def test_edges_e3(self):
         np.testing.assert_array_almost_equal(self.e3,self.ast.asteroid_param['e3'],decimal=self.decimal)
 
+    def test_face_dyad_first(self):
+        np.testing.assert_array_almost_equal(self.F_face_zero,self.ast.asteroid_param['F_face'][:,:,0], decimal=self.decimal)
 
-    def test_edges(self):
-        pass
+    def test_face_dyad_end(self):
+        np.testing.assert_array_almost_equal(self.F_face_end,self.ast.asteroid_param['F_face'][:,:,-1], decimal=self.decimal)
 
-    def test_edge_dyad(self):
-        pass
+    def test_edge_one_dyad_first(self):
+        np.testing.assert_array_almost_equal(self.E1_edge_zero,self.ast.asteroid_param['E1_edge'][:,:,0], decimal=self.decimal)
 
-    def test_face_dyad(self):
-        pass
+    def test_edge_one_dyad_end(self):
+        np.testing.assert_array_almost_equal(self.E1_edge_end,self.ast.asteroid_param['E1_edge'][:,:,-1], decimal=self.decimal)
+
+    def test_edge_two_dyad_first(self):
+        np.testing.assert_array_almost_equal(self.E2_edge_zero,self.ast.asteroid_param['E2_edge'][:,:,0], decimal=self.decimal)
+
+    def test_edge_two_dyad_end(self):
+        np.testing.assert_array_almost_equal(self.E2_edge_end,self.ast.asteroid_param['E2_edge'][:,:,-1], decimal=self.decimal)
+
+    def test_edge_three_dyad_first(self):
+        np.testing.assert_array_almost_equal(self.E3_edge_zero,self.ast.asteroid_param['E3_edge'][:,:,0], decimal=self.decimal)
+
+    def test_edge_three_dyad_end(self):
+        np.testing.assert_array_almost_equal(self.E3_edge_end,self.ast.asteroid_param['E3_edge'][:,:,-1], decimal=self.decimal)
 
     def test_face_normal(self):
         pass
@@ -259,21 +313,4 @@ class TestAsteroidCastalia32():
 
     def test_face_map(self):
         pass
-        # ensure everything matches Matlab from the class definition
-
-        # might want to set up a test fixture since there will be several related tests
         
-
-    # test vertices
-
-    # test edges
-
-    # test edge normals
-
-    # test face normals
-
-    # test E for each edge
-
-    # test F for each face
-
-    # test the edge/face maps
