@@ -43,7 +43,7 @@ def ismember_index(a,b):
         if match.size:
             index[ii] = match[0]
 
-    return int(index)
+    return index
 
 if __name__ == "__main__":
     
