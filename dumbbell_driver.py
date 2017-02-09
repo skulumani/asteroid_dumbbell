@@ -14,3 +14,7 @@ diffcorr_plot = 0
 jacobi_step = 1e-9
 
 ast = dynamics.asteroid.Asteroid('castalia',32)
+
+state = np.array([1.5,0,0])
+
+ast.polyhedron_potential(state)
