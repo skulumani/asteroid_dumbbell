@@ -1,6 +1,8 @@
 # Run the simulation
 
 import dynamics.asteroid
+import dynamics.dumbbell
+
 import numpy as np
 
 fontsize = 18;
@@ -15,6 +17,4 @@ jacobi_step = 1e-9
 
 ast = dynamics.asteroid.Asteroid('castalia',32)
 
-state = np.array([1.0,0.2,0.0])
-
-ast.polyhedron_potential(state)
+dum = dynamics.dumbbell.Dumbbell()
