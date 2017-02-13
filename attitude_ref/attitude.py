@@ -46,6 +46,24 @@ def rot3(angle):
     
     return rot_mat
     
+def hat_map(vec):
+    """Return that hat map of a vector
+    
+    Inputs: 
+        vec - 3 element vector
+
+    Outputs:
+        skew - 3,3 skew symmetric matrix
+
+    """
+
+    skew = np.array(
+                    [0, -vec[2], vec[1]],
+                    [vec[2], 0, -vec[0]],
+                    [-vec[1], vec[0], 0])
+
+    return skew
+
 if __name__ == "__main__":
     angle = math.pi/4.0
     
