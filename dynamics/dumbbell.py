@@ -76,6 +76,23 @@ class Dumbbell():
 
         return statedot
 
-    def eoms_relative(t,state,ast):
+    def eoms_relative(self,t,state,ast):
 
         pass
+
+    def inertial_kinetic_energy(self,state):
+        """Compute the kinetic energy of the dumbbell given the current state
+        
+        Input:
+            state - nx18 state array
+                pos - 0:3 position in inertial frame (km)
+                vel - 3:6 velocity in inertial frame (km/sec)
+                R - 6:16 rotation matrix from dumbbell frame to inertial frame
+                ang_vel - 16:18 angular velocity of dumbbell frame wrt to inertial frame expressed in dumbbell frame (rad/sec)
+
+        Outputs:
+            T - nx1 kinetic energy array which should be the same length as state input
+
+        """
+
+        
