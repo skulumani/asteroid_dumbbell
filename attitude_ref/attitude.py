@@ -57,12 +57,23 @@ def hat_map(vec):
 
     """
 
-    skew = np.array(
+    skew = np.array([
                     [0, -vec[2], vec[1]],
                     [vec[2], 0, -vec[0]],
-                    [-vec[1], vec[0], 0])
+                    [-vec[1], vec[0], 0]])
 
     return skew
+
+def vee_map(skew):
+    """Return the vee map of a vector
+
+    """
+
+    vec = 1/2 * np.array([skew[2,1] - skew[1,2],
+                          skew[0,2] - skew[2,0],
+                          skew[1,0] - skew[0,1]])
+
+    return vec
 
 if __name__ == "__main__":
     angle = math.pi/4.0
