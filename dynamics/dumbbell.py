@@ -1,4 +1,5 @@
 import numpy as np
+import attitude_ref.attitude as attitude
 import pdb
 
 class Dumbbell():
@@ -27,7 +28,7 @@ class Dumbbell():
 
         self.J = self.Jm1 + self.Jm2 + self.m1 *(np.inner(self.zeta1,self.zeta1)*np.eye(3,3) - np.outer(self.zeta1,self.zeta1)) + self.m2 * (np.inner(self.zeta2,self.zeta2)*np.eye(3,3) - np.outer(self.zeta2,self.zeta2))
 
-    def eoms_intertial(self, t, state, ast):
+    def eoms_inertial(self, state,t, ast):
         """Inertial dumbbell equations of motion about an asteroid
         
         Inputs:
@@ -36,28 +37,42 @@ class Dumbbell():
             ast - Asteroid class object holding the asteroid gravitational model and
             other useful parameters
         """
-        pdb.set_trace()
         # unpack the state
-        pos = state[0:2] # location of the center of mass in the inertial frame
-        vel = state[3:5] # vel of com in inertial frame
-        R = np.reshape(state[6:14],(3,3)) # sc body frame to inertial frame
-        w = state[15:17] # angular velocity of sc wrt inertial frame defined in body frame
+        pos = state[0:3] # location of the center of mass in the inertial frame
+        vel = state[3:6] # vel of com in inertial frame
+        R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+        ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
 
-        Ra = ROT3(-ast.omega*t) # asteroid body frame to inertial frame
+        Ra = attitude.rot3(-ast.omega*t) # asteroid body frame to inertial frame
 
         # unpack parameters for the dumbbell
         J = self.J
 
-        zeta1 = self.zeta1
-        zeta2 = self.zeta2
+        rho1 = self.zeta1
+        rho2 = self.zeta2
 
         # position of each mass in the inertial frame
-        z1 = Ra.T*(pos + R * zeta1)
-        z2 = Ra.T*(pos + R * zeta2)
+        z1 = Ra.T.dot(pos + R.dot(rho1))
+        z2 = Ra.T.dot(pos + R.dot(rho2))
 
-        z = Ra.T * pos # position of COM in asteroid frame
+        z = Ra.T.dot(pos) # position of COM in asteroid frame
 
-        statedot = np.zeros(state.shape)
+        # compute the potential at this state
+        (U1, U1_grad, U1_grad_mat, U1laplace) = ast.polyhedron_potential(z1)
+        (U2, U2_grad, U2_grad_mat, U2laplace) = ast.polyhedron_potential(z2)
+
+        F1 = self.m1*Ra.dot(U1_grad)
+        F2 = self.m2*Ra.dot(U2_grad)
+
+        M1 = self.m1 * attitude.vee_map(np.outer(R.T.dot(U1_grad), Ra.T.dot(rho1)) - np.outer(Ra.T.dot(rho1), U1_grad.dot(R)))
+        M2 = self.m2 * attitude.vee_map(np.outer(R.T.dot(U2_grad), Ra.T.dot(rho2)) - np.outer(Ra.T.dot(rho2), U2_grad.dot(R)))
+
+        pos_dot = vel
+        vel_dot = 1/(self.m1+self.m2) *(F1 + F2)
+        R_dot = R.dot(attitude.hat_map(ang_vel)).reshape(9)
+        ang_vel_dot = np.linalg.inv(J).dot(-np.cross(ang_vel,J.dot(ang_vel)) + M1 + M2)
+
+        statedot = np.hstack((pos_dot,vel_dot,R_dot,ang_vel_dot))
 
         return statedot
 
