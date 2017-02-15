@@ -18,3 +18,7 @@ class TestDumbbell():
         np.testing.assert_array_almost_equal(self.dum.J.T, self.dum.J)
 
     def test_eoms_inertial(self):
+        pass
+
+    def test_moment_of_inertia(self):
+        np.testing.assert_allclose(self.dum.J, np.trace(self.dum.Jd)*np.eye(3,3) - self.dum.Jd)
