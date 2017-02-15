@@ -81,8 +81,8 @@ class Dumbbell():
 
         pass
 
-    def inertial_kinetic_energy(self,vel,ang_vel):
-        """Compute the kinetic energy of the dumbbell given the current state
+    def inertial_energy(self,time,state, ast):
+        """Compute the kinetic and potential energy of the dumbbell given the current state
         
         Input:
             vel - nx3 velocity in inertial frame (km/sec)
@@ -96,9 +96,25 @@ class Dumbbell():
         m = self.m1 + self.m2 # total mass of dumbbell in kg
         Jd = self.Jd
 
-        KE = np.zeros(vel.shape[0])
+        KE = np.zeros(time.shape[0])
+        PE = np.zeros(time.shape[0])
 
-        for ii in range(ang_vel.shape[0]):
-            KE[ii] = 1.0/2 * m * vel[ii,:].dot(vel[ii,:]) + 1.0/2 * np.trace(attitude.hat_map(ang_vel[ii,:]).dot(Jd).dot(attitude.hat_map(ang_vel[ii,:]).T))
+        for ii in range(time.shape[0]):
+            pos = state[ii,0:3] # location of the center of mass in the inertial frame
+            vel = state[ii,3:6] # vel of com in inertial frame
+            R = np.reshape(state[ii,6:15],(3,3)) # sc body frame to inertial frame
+            ang_vel = state[ii,15:18] # angular velocity of sc wrt inertial frame defined in body frame
 
-        return KE
+            Ra = attitude.rot3(-ast.omega*time[ii]) # asteroid body frame to inertial frame
+
+            # position of each mass in the inertial frame
+            z1 = Ra.T.dot(pos + R.dot(self.zeta1))
+            z2 = Ra.T.dot(pos + R.dot(self.zeta2))
+
+            (U1, U1_grad, U1_grad_mat, U1laplace) = ast.polyhedron_potential(z1)
+            (U2, U2_grad, U2_grad_mat, U2laplace) = ast.polyhedron_potential(z2)
+
+            PE[ii] = -self.m1*U1 - self.m2*U2
+            KE[ii] = 1.0/2 * m * vel.dot(vel) + 1.0/2 * np.trace(attitude.hat_map(ang_vel).dot(Jd).dot(attitude.hat_map(ang_vel).T))
+
+        return KE, PE

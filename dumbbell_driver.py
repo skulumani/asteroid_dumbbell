@@ -31,7 +31,7 @@ initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 # time span
 t0 = 0
 tf = 1e6 # sec
-num_steps = 1e6
+num_steps = 1e4
 
 time = np.linspace(t0,tf,num_steps)
 
@@ -42,8 +42,7 @@ vel = state[:,3:6]
 R = state[:,6:15]
 ang_vel = state[:,15:18]
 
-KE = dum.inertial_kinetic_energy(vel,ang_vel)
-
+KE, PE = dum.inertial_energy(time,state,ast)
 
 mpl.rcParams['legend.fontsize'] = 10
 
@@ -54,9 +53,11 @@ ax.plot(pos[:,0],pos[:,1],pos[:,2])
 
 # kinetic energy
 plt.figure()
-plt.plot(time,KE)
+
+plt.plot(time,KE, label='Kinetic Energy')
+plt.plot(time,PE, label='Potential Energy')
+plt.plot(time,PE+KE, label='Total Energy')
 plt.xlabel('Time')
-plt.ylabel('Kinetic Energy')
-
-
+plt.ylabel('Energy')
+plt.legend()
 plt.show()
