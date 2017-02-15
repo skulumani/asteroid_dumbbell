@@ -24,15 +24,15 @@ class TestEulerRot():
 
     def test_rot1_orthogonal(self):
         mat = attitude.rot1(self.angle)
-        np.testing.assert_allclose(mat.T.dot(mat), np.eye(3,3))
+        np.testing.assert_array_almost_equal(mat.T.dot(mat), np.eye(3,3))
 
     def test_rot2_orthogonal(self):
         mat = attitude.rot2(self.angle)
-        np.testing.assert_allclose(mat.T.dot(mat), np.eye(3,3))
+        np.testing.assert_array_almost_equal(mat.T.dot(mat), np.eye(3,3))
 
     def test_rot3_orthogonal(self):
         mat = attitude.rot3(self.angle)
-        np.testing.assert_allclose(mat.T.dot(mat), np.eye(3,3))
+        np.testing.assert_array_almost_equal(mat.T.dot(mat), np.eye(3,3))
 
     def test_rot1_determinant_1(self):
         mat = attitude.rot1(self.angle)
