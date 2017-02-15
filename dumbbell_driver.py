@@ -30,8 +30,8 @@ initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
 # time span
 t0 = 0
-tf = 1e6 # sec
-num_steps = 1e4
+tf = 1e3 # sec
+num_steps = 1e3
 
 time = np.linspace(t0,tf,num_steps)
 
