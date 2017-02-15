@@ -31,7 +31,7 @@ initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 # time span
 t0 = 0
 tf = 1e6 # sec
-num_steps = 1e5
+num_steps = 1e6
 
 time = np.linspace(t0,tf,num_steps)
 
@@ -39,13 +39,24 @@ state = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), at
 
 pos = state[:,0:3]
 vel = state[:,3:6]
-R = state[:,6:16]
-ang_vel = state[:,16:18]
+R = state[:,6:15]
+ang_vel = state[:,15:18]
+
+KE = dum.inertial_kinetic_energy(vel,ang_vel)
+
 
 mpl.rcParams['legend.fontsize'] = 10
 
+# trajectory plot
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-
 ax.plot(pos[:,0],pos[:,1],pos[:,2])
+
+# kinetic energy
+plt.figure()
+plt.plot(time,KE)
+plt.xlabel('Time')
+plt.ylabel('Kinetic Energy')
+
+
 plt.show()

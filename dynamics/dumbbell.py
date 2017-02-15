@@ -11,8 +11,8 @@ class Dumbbell():
             
         """
 
-        self.m1 = 100 # kg first mass
-        self.m2 = 100 # kg second mass
+        self.m1 = 100.0 # kg first mass
+        self.m2 = 100.0 # kg second mass
         self.l = 0.003 # km rigid link
         self.r1 = 0.001 # km radius of each spherical mass 
         self.r2 = 0.001
@@ -23,10 +23,11 @@ class Dumbbell():
         self.zeta1 = np.array([-self.lcg1,0,0])
         self.zeta2 = np.array([self.lcg2,0,0])
 
-        self.Jm1 = 2/5*self.m1*self.r1**2 * np.diag([1,1,1])
-        self.Jm2 = 2/5*self.m2*self.r2**2 * np.diag([1,1,1])
+        self.Jm1 = 2.0/5*self.m1*self.r1**2 * np.diag([1,1,1])
+        self.Jm2 = 2.0/5*self.m2*self.r2**2 * np.diag([1,1,1])
 
         self.J = self.Jm1 + self.Jm2 + self.m1 *(np.inner(self.zeta1,self.zeta1)*np.eye(3,3) - np.outer(self.zeta1,self.zeta1)) + self.m2 * (np.inner(self.zeta2,self.zeta2)*np.eye(3,3) - np.outer(self.zeta2,self.zeta2))
+        self.Jd = self.m1*np.outer(self.zeta1,self.zeta1) + self.m2*np.outer(self.zeta2,self.zeta2) + self.Jm1/2 + self.Jm2/2
 
     def eoms_inertial(self, state,t, ast):
         """Inertial dumbbell equations of motion about an asteroid
@@ -64,9 +65,9 @@ class Dumbbell():
         F1 = self.m1*Ra.dot(U1_grad)
         F2 = self.m2*Ra.dot(U2_grad)
 
-        M1 = self.m1 * attitude.vee_map(np.outer(R.T.dot(U1_grad), Ra.T.dot(rho1)) - np.outer(Ra.T.dot(rho1), U1_grad.dot(R)))
-        M2 = self.m2 * attitude.vee_map(np.outer(R.T.dot(U2_grad), Ra.T.dot(rho2)) - np.outer(Ra.T.dot(rho2), U2_grad.dot(R)))
-
+        M1 = self.m1 * np.cross(Ra.T.dot(rho1),R.T.dot(U1_grad))
+        M2 = self.m2 * np.cross(Ra.T.dot(rho2),R.T.dot(U2_grad))
+      
         pos_dot = vel
         vel_dot = 1/(self.m1+self.m2) *(F1 + F2)
         R_dot = R.dot(attitude.hat_map(ang_vel)).reshape(9)
@@ -80,19 +81,24 @@ class Dumbbell():
 
         pass
 
-    def inertial_kinetic_energy(self,state):
+    def inertial_kinetic_energy(self,vel,ang_vel):
         """Compute the kinetic energy of the dumbbell given the current state
         
         Input:
-            state - nx18 state array
-                pos - 0:3 position in inertial frame (km)
-                vel - 3:6 velocity in inertial frame (km/sec)
-                R - 6:16 rotation matrix from dumbbell frame to inertial frame
-                ang_vel - 16:18 angular velocity of dumbbell frame wrt to inertial frame expressed in dumbbell frame (rad/sec)
+            vel - nx3 velocity in inertial frame (km/sec)
+            ang_vel - nx3 angular velocity of dumbbell frame wrt to inertial frame expressed in dumbbell frame (rad/sec)
 
         Outputs:
             T - nx1 kinetic energy array which should be the same length as state input
 
         """
-        
-        
+        # some constants
+        m = self.m1 + self.m2 # total mass of dumbbell in kg
+        Jd = self.Jd
+
+        KE = np.zeros(vel.shape[0])
+
+        for ii in range(ang_vel.shape[0]):
+            KE[ii] = 1.0/2 * m * vel[ii,:].dot(vel[ii,:]) + 1.0/2 * np.trace(attitude.hat_map(ang_vel[ii,:]).dot(Jd).dot(attitude.hat_map(ang_vel[ii,:]).T))
+
+        return KE
