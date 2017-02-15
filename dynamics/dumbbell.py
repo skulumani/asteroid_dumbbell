@@ -94,5 +94,5 @@ class Dumbbell():
             T - nx1 kinetic energy array which should be the same length as state input
 
         """
-
+        
         
