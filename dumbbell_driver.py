@@ -30,8 +30,8 @@ initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
 # time span
 t0 = 0
-tf = 1e3 # sec
-num_steps = 1e3
+tf = 1e5 # sec
+num_steps = 1e5
 
 time = np.linspace(t0,tf,num_steps)
 
@@ -60,4 +60,6 @@ plt.plot(time,PE+KE, label='Total Energy')
 plt.xlabel('Time')
 plt.ylabel('Energy')
 plt.legend()
+plt.grid(True)
+
 plt.show()
