@@ -6,7 +6,19 @@ def ismember_rows(a, b):
     b.shape = (nRows_b, nCol)
     return the idx where b[idx] == a
     '''
-    indx = np.nonzero(np.all(b == a[:,np.newaxis], axis=2))[1]
+    invalid = -1
+    indx = np.full(a.shape[0],invalid,dtype='long')
+
+    indxa, indxb = np.nonzero(np.all(b == a[:,np.newaxis], axis=2))
+
+    indx[indxa] = indxb
+    indx[indxb] = indxa
+
+    return indx
+
+def ismember(a,b):
+
+    indx = np.nonzero(np.all(b == a[:,np.newaxis], axis=2))[0]
 
     return indx
 
@@ -32,10 +44,11 @@ def ismember_index(a,b):
     
     Actually find the index of elements and their match. 
     """
+    invalid = -1
 
     voida, voidb = map(asvoid,(a,b))
 
-    index = np.full(a.shape[0], -1, dtype='int8')
+    index = np.full(a.shape[0], invalid, dtype='long')
     
     for ii in range(a.shape[0]):
         match = np.where(voida[ii] == voidb)[0]
