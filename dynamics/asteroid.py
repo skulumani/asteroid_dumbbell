@@ -56,7 +56,7 @@ class Asteroid(object):
         else:
             print("Unknown asteroid. Use 'castalia or 'itokawa' only.")
 
-        if int(num_faces) in [2**j for j in range(5,12+1)]:
+        if num_faces in [4092, 2048, 1024, 512, 256, 128, 64, 32]:
             F_key = "F_" + str(num_faces)
             V_key = "V_" + str(num_faces)
         else:
