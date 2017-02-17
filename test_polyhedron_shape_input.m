@@ -4,8 +4,8 @@ clc
 
 addpath(genpath(['.',filesep]));
 
-load('./dynamics/CASTALIA/castalia_model.mat')
-% load('./dynamics/ITOKAWA/itokawa_model.mat')
+% load('./dynamics/CASTALIA/castalia_model.mat')
+load('./dynamics/ITOKAWA/itokawa_model.mat')
 asteroid_params.F = F_512;
 asteroid_params.V = V_512;
 asteroid_params.G = 6.673e-20; % km^3/kg/sec^2
