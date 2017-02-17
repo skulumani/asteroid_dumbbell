@@ -11,7 +11,7 @@ from mpl_toolkits.mplot3d import axes3d
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
-ast = asteroid.Asteroid('castalia',4096)
+ast = asteroid.Asteroid('castalia',4092)
 
 ax = axes3d.Axes3D(plt.figure())
 ax.set_xlim([-ast.axes[0], ast.axes[0]])
