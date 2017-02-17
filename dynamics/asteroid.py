@@ -65,8 +65,8 @@ class Asteroid(object):
         self.F = mat[F_key]
         self.V = mat[V_key]
 
-        print("Using %g faces for %s." % (self.F.shape[0],self.name))
-        print("Polyhedron Model: %g faces, %g vertices." % (self.F.shape[0],self.V.shape[0]))
+        # print("Using %g faces for %s." % (self.F.shape[0],self.name))
+        # print("Polyhedron Model: %g faces, %g vertices." % (self.F.shape[0],self.V.shape[0]))
 
         self.mu = self.G*self.M
         self.sigma = self.sigma/1000*(100/1)**3*(1000/1)**3 # kg/km^3
