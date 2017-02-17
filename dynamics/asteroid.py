@@ -38,7 +38,7 @@ class Asteroid(object):
         if name == 'castalia':
             self.M = 1.4091e12
             self.sigma = 2.1 # g/cm^3
-            self.axes = np.array([1.6130, 0.9810, 0.8260])*1.0e3 / 2.0
+            self.axes = np.array([1.6130, 0.9810, 0.8260]) / 2.0
             self.omega = 2*np.pi/4.07/3600
             
             # self.C20 = -7.275e-2
@@ -49,7 +49,7 @@ class Asteroid(object):
         elif name == 'itokawa':
             self.M = 3.51e10
             self.sigma = 1.9 # # g/cm^3
-            self.axes = np.array([535, 294, 209]) # size in meters
+            self.axes = np.array([535, 294, 209]) / 1.0e3# size in meters
             self.omega = 2*np.pi/12.132/3600
             
             mat = scipy.io.loadmat(dir_path + "/ITOKAWA/itokawa_model.mat")
@@ -411,8 +411,8 @@ class Asteroid(object):
             U_edge = 0
             U_face = 0
             
-            U_grad_edge = np.zeros((3,1))
-            U_grad_face = np.zeros((3,1))
+            U_grad_edge = np.zeros(3)
+            U_grad_face = np.zeros(3)
             
             U_grad_mat_edge = np.zeros((3,3))
             U_grad_mat_face = np.zeros((3,3))
@@ -423,7 +423,7 @@ class Asteroid(object):
                 # face contribution
                 # this can potentially be done completely outside of the for loop
                 U_face = U_face + r_v[Fa[ii],:].dot(F_face[:,:,ii]).dot(r_v[Fa[ii],:].T)*w_face[ii,0]
-                U_grad_face = U_grad_face + F_face[:,:,ii].dot(r_v[Fa[ii],:].T).reshape((3,1))*w_face[ii,0]
+                U_grad_face = U_grad_face + F_face[:,:,ii].dot(r_v[Fa[ii],:].T)*w_face[ii,0]
                 U_grad_mat_face = U_grad_mat_face + F_face[:,:,ii]*w_face[ii]
               
                 # compute contributions for the three edges on this face but ignore if
@@ -453,7 +453,7 @@ class Asteroid(object):
                     e1_lock[ii,0] = ii
                     
                     U1 = 0
-                    U1_grad = np.zeros((3,1))
+                    U1_grad = np.zeros(3)
                     U1_grad_mat = np.zeros((3,3))
 
                 # edge 2
@@ -480,7 +480,7 @@ class Asteroid(object):
                     e2_lock[ii,0] = ii
                     
                     U2 = 0
-                    U2_grad = np.zeros((3,1))
+                    U2_grad = np.zeros(3)
                     U2_grad_mat = np.zeros((3,3))
                 
                 # edge 3
@@ -506,7 +506,7 @@ class Asteroid(object):
                     e3_lock[ii,0] = ii
                     
                     U3 = 0
-                    U3_grad = np.zeros((3,1))
+                    U3_grad = np.zeros(3)
                     U3_grad_mat = np.zeros((3,3))
                 
                 U_edge = U_edge + U1 + U2 + U3
@@ -520,7 +520,7 @@ class Asteroid(object):
             Ulaplace = -G*sigma*np.sum(w_face)
         else:
             U = 0
-            U_grad = np.zeros((3,1))
+            U_grad = np.zeros(3)
             U_grad_mat = np.zeros((3,3))
             Ulaplace = 0
         #     print("INSIDE ASTEROID!")
