@@ -38,7 +38,7 @@ class Asteroid(object):
         if name == 'castalia':
             self.M = 1.4091e12
             self.sigma = 2.1 # g/cm^3
-            self.axes = np.array([1.6130, 0.9810, 0.8260])*1.0e3 / 2.0
+            self.axes = np.array([1.6130, 0.9810, 0.8260]) / 2.0
             self.omega = 2*np.pi/4.07/3600
             
             # self.C20 = -7.275e-2
@@ -49,7 +49,7 @@ class Asteroid(object):
         elif name == 'itokawa':
             self.M = 3.51e10
             self.sigma = 1.9 # # g/cm^3
-            self.axes = np.array([535, 294, 209]) # size in meters
+            self.axes = np.array([535, 294, 209]) / 1.0e3# size in meters
             self.omega = 2*np.pi/12.132/3600
             
             mat = scipy.io.loadmat(dir_path + "/ITOKAWA/itokawa_model.mat")
