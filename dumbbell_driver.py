@@ -1,9 +1,4 @@
 # Run the simulation
-
-import dynamics.asteroid as asteroid
-import dynamics.dumbbell as dumbbell
-import attitude_ref.attitude as attitude
-
 import numpy as np
 from scipy import integrate
 import pdb
@@ -11,6 +6,12 @@ import pdb
 import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+
+import dynamics.asteroid as asteroid
+import dynamics.dumbbell as dumbbell
+import attitude_ref.attitude as attitude
+import plotting
+
 
 # ode options
 RelTol = 1e-9
@@ -30,8 +31,8 @@ initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
 # time span
 t0 = 0
-tf = 1e5 # sec
-num_steps = 1e5
+tf = 1e6 # sec
+num_steps = 1e6
 
 time = np.linspace(t0,tf,num_steps)
 
@@ -47,19 +48,24 @@ KE, PE = dum.inertial_energy(time,state,ast)
 mpl.rcParams['legend.fontsize'] = 10
 
 # trajectory plot
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-ax.plot(pos[:,0],pos[:,1],pos[:,2])
+traj_fig = plt.figure()
+traj_ax = traj_fig.gca(projection='3d')
+traj_ax.set_xlim([-3, 3])
+traj_ax.set_ylim([-3, 3])
+traj_ax.set_zlim([-3, 3])
+# plotting.vertex_plotter(ast, traj_fig)
+
+traj_ax.plot(pos[:,0],pos[:,1],pos[:,2])
 
 # kinetic energy
-plt.figure()
-
-plt.plot(time,KE, label='Kinetic Energy')
-plt.plot(time,PE, label='Potential Energy')
-plt.plot(time,PE+KE, label='Total Energy')
-plt.xlabel('Time')
-plt.ylabel('Energy')
-plt.legend()
-plt.grid(True)
+energy_fig = plt.figure()
+energy_ax = energy_fig.add_subplot(111)
+energy_ax.plot(time,KE, label='Kinetic Energy')
+energy_ax.plot(time,PE, label='Potential Energy')
+energy_ax.plot(time,PE+KE, label='Total Energy')
+energy_ax.set_xlabel('Time')
+energy_ax.set_ylabel('Energy')
+energy_ax.legend()
+energy_ax.grid(True)
 
 plt.show()
