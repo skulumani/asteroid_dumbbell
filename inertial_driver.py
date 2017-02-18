@@ -4,6 +4,7 @@ import attitude_ref.attitude as attitude
 
 import numpy as np
 from scipy import integrate
+import argparse
 
 def inertial_eoms_driver(ast_name,num_faces,tf,num_steps):
     # ode options
@@ -29,13 +30,28 @@ def inertial_eoms_driver(ast_name,num_faces,tf,num_steps):
     return (state, ast, dum)
 
 if __name__ == '__main__':
-    print("This will run a long simulation!")
-    print("Starting the simulation....")
+    parser = argparse.ArgumentParser(description='Inertial EOMs simulator for a dumbbell around an asteroid')
+    parser.add_argument('ast_name', help="String - asteroid name: castalia or itokawa", type=str)
+    parser.add_argument('num_faces', help='Integer - Number of faces in polyhedron model', type=int)
+    parser.add_argument('tf', help='Float - Terminal time for simulation', type=float)
+    parser.add_argument('num_steps', help='Float - Number of steps in integration', type=float)
+    parser.add_argument('file_name', help='String - Filename for npz archive', type=str)
+    args = parser.parse_args()
 
-    (state, ast, dum) = inertial_eoms_driver('castalia',4092,1e7,1e7)
+    print("This will run a long simulation with the following parameters!")
+    print("     ast_name  - %s" % args.ast_name)
+    print("     num_faces  - %s" % args.num_faces)
+    print("     tf        - %s" % args.tf)
+    print("     num_steps - %s" % args.num_steps)
+    print("     file_name - %s" % args.file_name)
+    print("")
+    print("Starting the simulation...")
+
+    (state, ast, dum) = inertial_eoms_driver(args.ast_name,args.num_faces,args.tf,args.num_steps)
 
     print("Finished the simulation...")
     print("Saving to npz file")
-    np.savez('long_inertial_sim',state=state, ast=ast, dum=dum)
+
+    np.savez(args.file_name,state=state, ast=ast, dum=dum)
 
     print("All finished!")

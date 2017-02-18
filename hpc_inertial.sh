@@ -16,8 +16,8 @@
 #SBATCH -J ast_int
 #SBATCH --export=NONE
 
-#SBATCH -t 0-01:00:00
+#SBATCH -t 00-01:00:00
 
 module load anaconda/4.2.0
 
-python3 inertial_driver.py
+python3 inertial_driver.py castalia 4092 1e7 1e7
