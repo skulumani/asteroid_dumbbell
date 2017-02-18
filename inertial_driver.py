@@ -26,7 +26,16 @@ def inertial_eoms_driver(ast_name,num_faces,tf,num_steps):
 
     state = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
 
-    return state
+    return (state, ast, dum)
 
 if __name__ == '__main__':
-    state = inertial_eoms_driver('castalia',32,1e2,1e2)
+    print("This will run a long simulation!")
+    print("Starting the simulation....")
+
+    (state, ast, dum) = inertial_eoms_driver('castalia',4092,1e7,1e7)
+
+    print("Finished the simulation...")
+    print("Saving to npz file")
+    np.savezz('long_inertial_sim',state=state, ast=ast, dum=dum)
+    
+    print("All finished!")
