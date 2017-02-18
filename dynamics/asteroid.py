@@ -61,6 +61,7 @@ class Asteroid(object):
             V_key = "V_" + str(num_faces)
         else:
             print("That number of faces is not possible.")
+            return 1
 
         self.F = mat[F_key]
         self.V = mat[V_key]
