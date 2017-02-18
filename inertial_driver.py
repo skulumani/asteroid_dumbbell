@@ -36,6 +36,6 @@ if __name__ == '__main__':
 
     print("Finished the simulation...")
     print("Saving to npz file")
-    np.savezz('long_inertial_sim',state=state, ast=ast, dum=dum)
-    
+    np.savez('long_inertial_sim',state=state, ast=ast, dum=dum)
+
     print("All finished!")
