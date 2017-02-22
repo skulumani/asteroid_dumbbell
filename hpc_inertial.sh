@@ -20,4 +20,4 @@
 
 module load anaconda/4.2.0
 
-python3 inertial_driver.py castalia 1024 1e6 1e6 20170218_long_inertial
+python3 inertial_driver.py castalia 1024 1e6 1e6 20170222_long_inertial
