@@ -27,7 +27,7 @@ def inertial_eoms_driver(ast_name,num_faces,tf,num_steps):
 
     state = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
 
-    return (state, ast, dum)
+    return (time,state, ast, dum)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Inertial EOMs simulator for a dumbbell around an asteroid')
@@ -47,11 +47,11 @@ if __name__ == '__main__':
     print("")
     print("Starting the simulation...")
 
-    (state, ast, dum) = inertial_eoms_driver(args.ast_name,args.num_faces,args.tf,args.num_steps)
+    (time,state, ast, dum) = inertial_eoms_driver(args.ast_name,args.num_faces,args.tf,args.num_steps)
 
     print("Finished the simulation...")
     print("Saving to npz file")
 
-    np.savez(args.file_name,state=state, ast=ast, dum=dum)
+    np.savez(args.file_name,state=state, ast=ast, dum=dum, time)
 
     print("All finished!")
