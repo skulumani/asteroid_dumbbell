@@ -32,7 +32,7 @@ initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 # time span
 t0 = 0
 tf = 1e6 # sec
-num_steps = 1e6
+num_steps = 1e4
 
 time = np.linspace(t0,tf,num_steps)
 
@@ -53,13 +53,6 @@ plotting.plot_trajectory(pos,traj_fig)
 
 # kinetic energy
 energy_fig = plt.figure()
-energy_ax = energy_fig.add_subplot(111)
-energy_ax.plot(time,KE, label='Kinetic Energy')
-energy_ax.plot(time,PE, label='Potential Energy')
-energy_ax.plot(time,PE+KE, label='Total Energy')
-energy_ax.set_xlabel('Time')
-energy_ax.set_ylabel('Energy')
-energy_ax.legend()
-energy_ax.grid(True)
+plotting.plot_energy(time,KE,PE,energy_fig)
 
 plt.show()

@@ -38,6 +38,21 @@ def plot_trajectory(pos, fig):
 
     return 0
     
+def plot_energy(time,KE, PE, fig):
+    """Plot the energy behavior
+
+    """
+    energy_ax = fig.add_subplot(111)
+    energy_ax.plot(time,KE, label='Kinetic Energy')
+    energy_ax.plot(time,PE, label='Potential Energy')
+    energy_ax.plot(time,PE+KE, label='Total Energy')
+    energy_ax.set_xlabel('Time')
+    energy_ax.set_ylabel('Energy')
+    energy_ax.legend()
+    energy_ax.grid(True)
+
+    return 0
+    
 if __name__ == '__main__':
     ast = asteroid.Asteroid('itokawa',32)
     vertex_plotter(ast,plt.figure())
