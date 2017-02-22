@@ -172,17 +172,17 @@ class Asteroid(object):
         # loop over all the edges to figure out the common edges and calculate E_e
         
         # find common e1 edges
-        e1_ind1b = utilities.ismember_rows(-e1,e1)
-        e1_ind2b = utilities.ismember_rows(-e1,e2)
-        e1_ind3b = utilities.ismember_rows(-e1,e3)
+        e1_ind1b = utilities.ismember_index(-e1,e1)
+        e1_ind2b = utilities.ismember_index(-e1,e2)
+        e1_ind3b = utilities.ismember_index(-e1,e3)
 
-        e2_ind1b = utilities.ismember_rows(-e2,e1)
-        e2_ind2b = utilities.ismember_rows(-e2,e2)
-        e2_ind3b = utilities.ismember_rows(-e2,e3)
+        e2_ind1b = utilities.ismember_index(-e2,e1)
+        e2_ind2b = utilities.ismember_index(-e2,e2)
+        e2_ind3b = utilities.ismember_index(-e2,e3)
 
-        e3_ind1b = utilities.ismember_rows(-e3,e1)
-        e3_ind2b = utilities.ismember_rows(-e3,e2)
-        e3_ind3b = utilities.ismember_rows(-e3,e3)
+        e3_ind1b = utilities.ismember_index(-e3,e1)
+        e3_ind2b = utilities.ismember_index(-e3,e2)
+        e3_ind3b = utilities.ismember_index(-e3,e3)
 
         E1_edge = np.zeros([3,3,num_f])
         E2_edge = np.zeros([3,3,num_f])

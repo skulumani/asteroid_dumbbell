@@ -46,6 +46,9 @@ def ismember_index(a,b):
     """
     invalid = -1
 
+    a[a==-0.0] = 0
+    b[b==-0.0] = 0
+    
     voida, voidb = map(asvoid,(a,b))
 
     index = np.full(a.shape[0], invalid, dtype='long')
