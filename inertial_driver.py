@@ -52,6 +52,6 @@ if __name__ == '__main__':
     print("Finished the simulation...")
     print("Saving to npz file")
 
-    np.savez(args.file_name,state=state, ast=ast, dum=dum, time)
+    np.savez(args.file_name,state=state, ast=ast, dum=dum, time=time)
 
     print("All finished!")
