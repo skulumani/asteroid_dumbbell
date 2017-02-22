@@ -47,15 +47,9 @@ KE, PE = dum.inertial_energy(time,state,ast)
 
 mpl.rcParams['legend.fontsize'] = 10
 
-# trajectory plot
 traj_fig = plt.figure()
-traj_ax = traj_fig.gca(projection='3d')
-traj_ax.set_xlim([-3, 3])
-traj_ax.set_ylim([-3, 3])
-traj_ax.set_zlim([-3, 3])
-# plotting.vertex_plotter(ast, traj_fig)
-
-traj_ax.plot(pos[:,0],pos[:,1],pos[:,2])
+# trajectory plot
+plotting.plot_trajectory(pos,traj_fig)
 
 # kinetic energy
 energy_fig = plt.figure()

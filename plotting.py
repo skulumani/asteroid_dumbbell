@@ -23,7 +23,21 @@ def vertex_plotter(ast, fig):
 
     return 0
 
+def plot_trajectory(pos, fig):
+    """Plot the state trajectory in a 3D view
 
+    """
+
+    traj_ax = fig.gca(projection='3d')
+    traj_ax.set_xlim([-3, 3])
+    traj_ax.set_ylim([-3, 3])
+    traj_ax.set_zlim([-3, 3])
+    # plotting.vertex_plotter(ast, traj_fig)
+
+    traj_ax.plot(pos[:,0],pos[:,1],pos[:,2])
+
+    return 0
+    
 if __name__ == '__main__':
     ast = asteroid.Asteroid('itokawa',32)
     vertex_plotter(ast,plt.figure())
