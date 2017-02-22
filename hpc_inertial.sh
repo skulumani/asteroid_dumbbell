@@ -8,7 +8,7 @@
 #SBATCH --mail-user=skulumani@gwu.edu
 
 #SBATCH -N 1
-#SBATCH -p defq
+#SBATCH -p short
 
 # set the correct directory - cloned via git
 #SBATCH -D /home/skulumani/asteroid_dumbbell
