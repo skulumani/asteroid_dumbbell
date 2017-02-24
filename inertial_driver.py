@@ -29,6 +29,32 @@ def inertial_eoms_driver(ast_name,num_faces,tf,num_steps):
 
     return (time,state, ast, dum)
 
+def compute_energy(file_name):
+    with np.load(file_name, allow_pickle=True) as data:
+
+        ast_name = data['ast_name']
+        num_faces = data['num_faces']
+        time = data['time']
+        state = data['state']
+
+        dum = dumbbell.Dumbbell()
+        ast = asteroid.Asteroid(data['ast_name'],data['num_faces'])
+
+        KE, PE = dum.inertial_energy(time,state,ast)
+
+        
+        
+        # # generate some plots
+        # traj_fig = plt.figure()
+        # plotting.plot_trajectory(state[:,0:3],traj_fig)
+
+        # # kinetic energy
+        # energy_fig = plt.figure()
+        # plotting.plot_energy(time,KE,PE,energy_fig)
+
+    return KE, PE
+
+    # plt.show()
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Inertial EOMs simulator for a dumbbell around an asteroid')
     parser.add_argument('ast_name', help="String - asteroid name: castalia or itokawa", type=str)
@@ -52,6 +78,13 @@ if __name__ == '__main__':
     print("Finished the simulation...")
     print("Saving to npz file")
 
-    np.savez(args.file_name,state=state, ast=ast, dum=dum, time=time, ast_name=args.ast_name, num_steps=args.num_steps,tf=args.tf)
+    np.savez(args.file_name,state=state, ast=ast, dum=dum, time=time, ast_name=args.ast_name, num_steps=args.num_steps,tf=args.tf, num_faces=args.num_faces)
+
+    print("Now working to calculate the KE/PE of the simulation!")
+
+    KE, PE = compute_energy(args.file_name)
+
+    print("Finished with energy computations!")
+    np.savez('energy_' + args.file_name, state=state, ast=ast, dum=dum, time=time, ast_name=args.ast_name, num_steps=args.num_steps,tf=args.tf, num_faces=args.num_faces, KE=KE, PE=PE)
 
     print("All finished!")
