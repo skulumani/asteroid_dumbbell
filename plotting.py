@@ -1,5 +1,5 @@
 import dynamics.asteroid as asteroid
-import attitude_ref.attitude as attitude
+import kinematics.attitude as attitude
 
 import numpy as np
 import scipy as sp

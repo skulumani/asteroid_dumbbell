@@ -1,0 +1,3 @@
+[submodule "kinematics"]
+	path = kinematics
+	url = git@github.com:skulumani/kinematics.git

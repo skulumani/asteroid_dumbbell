@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 import dynamics.asteroid as asteroid
 import dynamics.dumbbell as dumbbell
-import attitude_ref.attitude as attitude
+import kinematics.attitude as attitude
 import plotting
 
 

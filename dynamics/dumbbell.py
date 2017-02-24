@@ -1,5 +1,5 @@
 import numpy as np
-import attitude_ref.attitude as attitude
+import kinematics.attitude as attitude
 import pdb
 
 class Dumbbell():
@@ -44,7 +44,7 @@ class Dumbbell():
         R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
         ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
 
-        Ra = attitude.rot3(-ast.omega*t) # asteroid body frame to inertial frame
+        Ra = attitude.rot3(ast.omega*t, 'c') # asteroid body frame to inertial frame
 
         # unpack parameters for the dumbbell
         J = self.J
@@ -105,7 +105,7 @@ class Dumbbell():
             R = np.reshape(state[ii,6:15],(3,3)) # sc body frame to inertial frame
             ang_vel = state[ii,15:18] # angular velocity of sc wrt inertial frame defined in body frame
 
-            Ra = attitude.rot3(-ast.omega*time[ii]) # asteroid body frame to inertial frame
+            Ra = attitude.rot3(ast.omega*time[ii], 'c') # asteroid body frame to inertial frame
 
             # position of each mass in the inertial frame
             z1 = Ra.T.dot(pos + R.dot(self.zeta1))
