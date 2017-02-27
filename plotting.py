@@ -9,7 +9,7 @@ from mpl_toolkits.mplot3d import axes3d
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
-def vertex_plotter(ast, fig):
+def vertex_plotter(ast, fig=plt.figure()):
 
     ax = axes3d.Axes3D(fig)
 
@@ -23,7 +23,7 @@ def vertex_plotter(ast, fig):
 
     return 0
 
-def plot_trajectory(pos, fig):
+def plot_trajectory(pos, fig=plt.figure()):
     """Plot the state trajectory in a 3D view
 
     """
@@ -38,7 +38,7 @@ def plot_trajectory(pos, fig):
 
     return 0
     
-def plot_energy(time,KE, PE, fig):
+def plot_energy(time,KE, PE, fig=plt.figure()):
     """Plot the energy behavior
 
     """
