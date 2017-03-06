@@ -52,7 +52,7 @@ class Dumbbell():
         rho1 = self.zeta1
         rho2 = self.zeta2
 
-        # position of each mass in the inertial frame
+        # position of each mass in the asteroid frame
         z1 = Ra.T.dot(pos + R.dot(rho1))
         z2 = Ra.T.dot(pos + R.dot(rho2))
 
@@ -77,9 +77,70 @@ class Dumbbell():
 
         return statedot
 
-    def eoms_relative(self,t,state,ast):
+    def eoms_relative(self, state, t, ast):
+        """Relative EOMS - motion of dumbbell wrt to asteroid expressed in asteroid fixed frame
 
-        pass
+        Inputs:
+            t - current time of simulation (sec)
+            state - relative state of dumbbell with respect to asteroid
+            ast - asteroid object
+
+        Output:
+
+        """
+        
+        # unpack the state
+        pos = state[0:3] # location of the COM of dumbbell in asteroid fixed frame
+        vel = state[3:6] # vel of com wrt to asteroid expressed in the asteroid fixed frame
+        R = np.reshape(state[6:15],(3,3)) # sc body frame to asteroid body frame R = R_A^T R_1
+        w = state[15:18] # angular velocity of sc wrt inertial frame and expressed in asteroid fixed frame
+
+        Ra = attitude.rot3(ast.omega*t, 'c') # asteroid body frame to inertial frame
+
+        # unpack parameters for the dumbbell
+        m1 = self.m1
+        m2 = self.m2
+        m = m1 + m2
+        J = self.J
+        Jr = R.dot(J).dot(R.T)
+        Omega = ast.omega*np.array([0,0,1]) # angular velocity vector of asteroid
+
+        # the position of each mass in the asteroid body frame
+        rho1 = self.zeta1
+        rho2 = self.zeta2
+
+        # position of each mass in the asteroid frame
+        z1 = pos + R.dot(rho1)
+        z2 = pos + R.dot(rho2)
+
+        z = pos # position of COM in asteroid frame
+
+        # compute the potential at this state
+        (U1, U1_grad, U1_grad_mat, U1laplace) = ast.polyhedron_potential(z1)
+        (U2, U2_grad, U2_grad_mat, U2laplace) = ast.polyhedron_potential(z2)
+
+        # force due to each mass expressed in asteroid body frame
+        F1 = m1*U1_grad
+        F2 = m2*U2_grad
+        # F_com = (m1+m2)*U_grad_com
+
+        # compute the moments due to each mass
+        M1 = m1 * np.cross(U1_grad, R.dot(rho1))
+        M2 = m2 * np.cross(U2_grad, R.dot(rho2))
+
+        # state derivatives
+        pos_dot = vel - attitude.hat_map(Omega).dot(pos)
+        vel_dot = 1/m * (F1 + F2 - m * attitude.hat_map(Omega).dot(vel))
+        # vel_dot = 1/m * (F_com) 
+        R_dot = attitude.hat_map(w).dot(R) - attitude.hat_map(Omega).dot(R)
+        R_dot = R_dot.reshape(9)
+        w_dot = np.linalg.inv(Jr).dot(M1 + M2 - attitude.hat_map(Omega).dot(Jr).dot(w) 
+                      + attitude.hat_map(w).dot(Jr).dot(w) - Jr.dot(attitude.hat_map(Omega)).dot(w) 
+                      + attitude.hat_map(Omega).dot(Jr).dot(w) - attitude.hat_map(w).dot(Jr).dot(w))
+
+        state_dot = np.hstack((pos_dot,vel_dot,R_dot,w_dot))
+        
+        return state_dot
 
     def inertial_energy(self,time,state, ast):
         """Compute the kinetic and potential energy of the dumbbell given the current state
