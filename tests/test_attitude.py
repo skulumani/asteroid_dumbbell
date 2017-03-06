@@ -1,5 +1,5 @@
 import numpy as np
-import attitude_ref.attitude as attitude
+import kinematics.attitude as attitude
 
 class TestHatAndVeeMap():
     x = np.random.rand(3)
