@@ -62,8 +62,8 @@ class TestDumbbellRelative():
     def test_eoms_relative_size(self):
         np.testing.assert_allclose(self.statedot.shape, (18,))
 
-    def test_eoms_inertial_R_dot(self):
-        np.testing.assert_allclose(self.statedot[6:15], )
+    def test_eoms_relative_R_dot(self):
+        np.testing.assert_allclose(self.statedot[6:15].shape, (9,))
         
     # def test_moment_of_inertia(self):
     #     np.testing.assert_allclose(self.dum.J, np.trace(self.dum.Jd)*np.eye(3,3) - self.dum.Jd)

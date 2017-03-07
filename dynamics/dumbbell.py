@@ -172,10 +172,42 @@ class Dumbbell():
             z1 = Ra.T.dot(pos + R.dot(self.zeta1))
             z2 = Ra.T.dot(pos + R.dot(self.zeta2))
 
-            (U1, U1_grad, U1_grad_mat, U1laplace) = ast.polyhedron_potential(z1)
-            (U2, U2_grad, U2_grad_mat, U2laplace) = ast.polyhedron_potential(z2)
+            (U1, _, _, _) = ast.polyhedron_potential(z1)
+            (U2, _, _, _) = ast.polyhedron_potential(z2)
 
             PE[ii] = -self.m1*U1 - self.m2*U2
             KE[ii] = 1.0/2 * m * vel.dot(vel) + 1.0/2 * np.trace(attitude.hat_map(ang_vel).dot(Jd).dot(attitude.hat_map(ang_vel).T))
+
+        return KE, PE
+
+    def relative_energy(self, time, state, ast):
+        """Compute the KE and PE of the relative equations of motion
+
+        """
+
+        m = self.m1 + self.m2
+        J1 = self.J
+        Jd = self.Jd
+
+        KE = np.zeros(time.shape[0])
+        PE = np.zeros(time.shape[0])
+
+        for ii in range(time.shape[0]):
+            pos = state[ii, 0:3]  # location of the COM wrt asteroid in the asteroid frame
+            vel = state[ii, 3:6]  # vel of COM wrt asteroid in asteroid frame
+            R = np.reshape(state[ii, 6:15], (3, 3))  # sc body frame to asteroid frame
+            ang_vel = state[ii, 15:18]  # angular velocity of sc wrt inertial frame defined in asteroid frame
+
+            # position of each mass in the inertial frame
+            z1 = pos + R.dot(self.zeta1)
+            z2 = pos + R.dot(self.zeta2)
+
+            (U1, _, _, _) = ast.polyhedron_potential(z1)
+            (U2, _, _, _) = ast.polyhedron_potential(z2)
+
+            Jdr = R.dot(Jd).dot(R.T)
+
+            PE[ii] = -self.m1 * U1 - self.m2 * U2
+            KE[ii] = 1/2 * m * vel.dot(vel) + 1/2 * np.trace(attitude.hat_map(ang_vel).dot(Jdr).dot(attitude.hat_map(ang_vel).T))
 
         return KE, PE
