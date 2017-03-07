@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # set output and error output filenames, %j will be replaced by Slurm with the jobid
-#SBATCH -o ast_int_%j.out
-#SBATCH -e ast_int_%j.err 
+#SBATCH -o dbint_%j.out
+#SBATCH -e dbint_%j.err 
 
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=skulumani@gwu.edu
@@ -13,11 +13,11 @@
 # set the correct directory - cloned via git
 #SBATCH -D /home/skulumani/asteroid_dumbbell
 
-#SBATCH -J ast_int
+#SBATCH -J dbint
 #SBATCH --export=NONE
 
-#SBATCH -t 00-19:00:00
+#SBATCH -t 02-00:00:00
 
 module load anaconda/4.2.0
 
-python3 inertial_driver.py castalia 1024 1e6 1e6 castalia_1024_1e6.npz
+python3 inertial_driver.py castalia 256 1e6 1e6 castalia_256_1e6_energy_behavior.npz -m 1
