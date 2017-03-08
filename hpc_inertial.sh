@@ -16,7 +16,7 @@
 #SBATCH -J dbint
 #SBATCH --export=NONE
 
-#SBATCH -t 02-00:00:00
+#SBATCH -t 00-06:00:00
 
 module load anaconda/4.2.0
 
