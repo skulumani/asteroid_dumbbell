@@ -56,17 +56,18 @@ class Asteroid(object):
         else:
             print("Unknown asteroid. Use 'castalia or 'itokawa' only.")
 
-        if int(num_faces) in [2**j for j in range(5,12+1)]:
+        if num_faces in [4092, 2048, 1024, 512, 256, 128, 64, 32]:
             F_key = "F_" + str(num_faces)
             V_key = "V_" + str(num_faces)
         else:
             print("That number of faces is not possible.")
+            return 1
 
         self.F = mat[F_key]
         self.V = mat[V_key]
 
-        print("Using %g faces for %s." % (self.F.shape[0],self.name))
-        print("Polyhedron Model: %g faces, %g vertices." % (self.F.shape[0],self.V.shape[0]))
+        # print("Using %g faces for %s." % (self.F.shape[0],self.name))
+        # print("Polyhedron Model: %g faces, %g vertices." % (self.F.shape[0],self.V.shape[0]))
 
         self.mu = self.G*self.M
         self.sigma = self.sigma/1000*(100/1)**3*(1000/1)**3 # kg/km^3
@@ -101,6 +102,8 @@ class Asteroid(object):
         
         Adds attributes to the class - polyhedron gravity model
         """
+        invalid = -1
+
         G = self.G
         sigma = self.sigma
         F = self.F
@@ -113,9 +116,9 @@ class Asteroid(object):
         # calculate shape parameters
         # calculate vectors for each edge (loop through F and difference the
         # vectors) then store them
-        e1_face_map = np.full([num_f,4],-1, dtype='int8')
-        e2_face_map = np.full([num_f,4],-1, dtype='int8')
-        e3_face_map = np.full([num_f,4],-1, dtype='int8')
+        e1_face_map = np.full([num_f,4],invalid, dtype='long')
+        e2_face_map = np.full([num_f,4],invalid, dtype='long')
+        e3_face_map = np.full([num_f,4],invalid, dtype='long')
 
         F_face = np.zeros([3,3,num_f])
 
@@ -167,7 +170,7 @@ class Asteroid(object):
             F_face[:,:,ii] = np.outer(normal_face[ii,:],normal_face[ii,:])
         
         # loop over all the edges to figure out the common edges and calculate E_e
- 
+        
         # find common e1 edges
         e1_ind1b = utilities.ismember_index(-e1,e1)
         e1_ind2b = utilities.ismember_index(-e1,e2)
@@ -193,27 +196,27 @@ class Asteroid(object):
             e3_face_map[ii,0] = ii
 
             # e1 edge duplicate
-            if e1_ind1b[ii] >= 0:
+            if e1_ind1b[ii] != invalid:
                 e1_face_map[ii,1] = e1_ind1b[ii]
-            elif e1_ind2b[ii] >=0:
+            elif e1_ind2b[ii] != invalid:
                 e1_face_map[ii,2] = e1_ind2b[ii]
-            elif e1_ind3b[ii] >= 0:
+            elif e1_ind3b[ii] != invalid:
                 e1_face_map[ii,3] = e1_ind3b[ii]
 
             # e2 edge duplicate
-            if e2_ind1b[ii] >= 0:
+            if e2_ind1b[ii] != invalid:
                 e2_face_map[ii,1] = e2_ind1b[ii]
-            elif e2_ind2b[ii] >= 0:
+            elif e2_ind2b[ii] != invalid:
                 e2_face_map[ii,2] = e2_ind2b[ii]
-            elif e2_ind3b[ii] >= 0:
+            elif e2_ind3b[ii] != invalid:
                 e2_face_map[ii,3] = e2_ind3b[ii]
             
             # e3 edge duplicate
-            if e3_ind1b[ii] >= 0:
+            if e3_ind1b[ii] != invalid:
                 e3_face_map[ii,1] = e3_ind1b[ii]
-            elif e3_ind2b[ii] >= 0:
+            elif e3_ind2b[ii] != invalid:
                 e3_face_map[ii,2] = e3_ind2b[ii]
-            elif e3_ind3b[ii] >= 0:
+            elif e3_ind3b[ii] != invalid:
                 e3_face_map[ii,3] = e3_ind3b[ii]
 
             # find the edge normals for all edges of the current face
@@ -224,7 +227,7 @@ class Asteroid(object):
             nA3 = e3_normal[e3_face_map[ii,0],:]
 
             # find adjacent face for edge 1
-            col = np.where(e1_face_map[ii,1:] >= 0)[0][0]
+            col = np.where(e1_face_map[ii,1:] != invalid)[0][0]
             face_index = e1_face_map[ii,col+1]
 
             if col == 0: # adjacent face is also edge 1
@@ -240,7 +243,7 @@ class Asteroid(object):
             E1_edge[:,:,ii] = np.outer(nA,nA1) + np.outer(nB,nB1) # second order dyadic tensor
 
             # find adjacent face for edge 2
-            col = np.where(e2_face_map[ii,1:] >= 0)[0][0]
+            col = np.where(e2_face_map[ii,1:] != invalid)[0][0]
             face_index = e2_face_map[ii,col+1]
 
             if col == 0: # adjacent face is also edge 1
@@ -255,7 +258,7 @@ class Asteroid(object):
             E2_edge[:,:,ii] = np.outer(nA,nA2) + np.outer(nB,nB2) # second order dyadic tensor
 
             # find adjacent face for edge 3
-            col = np.where(e3_face_map[ii,1:] >= 0)[0][0]
+            col = np.where(e3_face_map[ii,1:] != invalid)[0][0]
             face_index = e3_face_map[ii,col+1]
 
             if col == 0: # adjacent face is also edge 1
