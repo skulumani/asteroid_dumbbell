@@ -42,12 +42,14 @@ def plot_energy(time,KE, PE, fig=plt.figure()):
     """Plot the energy behavior
 
     """
+
+    E = KE + PE
+    Ediff = np.absolute(E - E[0])
+
     energy_ax = fig.add_subplot(111)
-    energy_ax.plot(time,KE, label='Kinetic Energy')
-    energy_ax.plot(time,PE, label='Potential Energy')
-    energy_ax.plot(time,PE+KE, label='Total Energy')
+    energy_ax.plot(time,Ediff, label=r'$\Delta E$')
     energy_ax.set_xlabel('Time')
-    energy_ax.set_ylabel('Energy')
+    energy_ax.set_ylabel(r'$\Delta E$')
     energy_ax.legend()
     energy_ax.grid(True)
 

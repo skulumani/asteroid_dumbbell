@@ -1,6 +1,7 @@
 import dynamics.asteroid as asteroid
 import dynamics.dumbbell as dumbbell
 import kinematics.attitude as attitude
+import plotting
 
 import numpy as np
 from scipy import integrate
@@ -85,6 +86,46 @@ def inertial_eoms_energy_behavior(ast_name, num_faces, tf, num_steps):
 
     return time_dict, state_dict, KE_dict, PE_dict
 
+
+def inertial_sim_plotter(file_name, mode):
+    """Plot the simulation results
+
+    """
+
+    # load the data
+    with np.load(file_name, allow_pickle=True) as data:
+        if mode == 0:
+            state = data['state']
+            time = data['time']
+            KE = data['KE']
+            PE = data['PE']
+
+            # compute the
+            e_fig = plotting.plt.figure()
+            traj_fig = plotting.plt.figure()
+            plotting.plot_energy(time,KE, PE, e_fig)
+            plotting.plot_trajectory(state[:,0:3], traj_fig)
+
+        elif mode == 1:
+            state_dict = data['state_dict'][()]
+            time_dict = data['time_dict'][()]
+            KE_dict = data['KE_dict'][()]
+            PE_dict = data['PE_dict'][()]
+
+            e_fig = plotting.plt.figure()
+            for tol in state_dict:
+                E = KE_dict[tol] + PE_dict[tol]
+                Ediff = np.absolute(E - E[0])
+
+                plotting.plt.plot(time_dict[tol], Ediff, label=tol)
+
+        else:
+
+            print("Incorrect mode.")
+            return 1
+
+
+    plotting.plt.show()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Inertial EOMs simulator for a dumbbell around an asteroid')
