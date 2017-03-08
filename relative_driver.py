@@ -6,6 +6,11 @@ import numpy as np
 from scipy import integrate
 import argparse
 
+# valid initial condtions for castalia
+# these are in the asteroid fixed frame
+periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
+periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327])
+
 def relative_eoms_driver(ast_name,num_faces,tf,num_steps):
     # ode options
     RelTol = 1e-9
@@ -15,9 +20,9 @@ def relative_eoms_driver(ast_name,num_faces,tf,num_steps):
     dum = dumbbell.Dumbbell()
 
     # set initial state
-    initial_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607]) # km for center of mass in body frame
+    initial_pos = periodic_pos # km for center of mass in body frame
     # km/sec for COM in asteroid fixed frame
-    initial_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
+    initial_vel = periodic_vel
     initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the inertial frame
     initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
@@ -25,9 +30,9 @@ def relative_eoms_driver(ast_name,num_faces,tf,num_steps):
 
     time = np.linspace(0,tf,num_steps)
 
-    state = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
+    state = integrate.odeint(dum.eoms_relative, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
 
-    return (time,state, ast, dum)
+    return (time,state)
 
 def compute_energy(file_name):
     with np.load(file_name, allow_pickle=True) as data:
@@ -40,25 +45,16 @@ def compute_energy(file_name):
         dum = dumbbell.Dumbbell()
         ast = asteroid.Asteroid(data['ast_name'],data['num_faces'])
 
-        KE, PE = dum.inertial_energy(time,state,ast)
-
-        
-        
-        # # generate some plots
-        # traj_fig = plt.figure()
-        # plotting.plot_trajectory(state[:,0:3],traj_fig)
-
-        # # kinetic energy
-        # energy_fig = plt.figure()
-        # plotting.plot_energy(time,KE,PE,energy_fig)
+        KE, PE = dum.relative_energy(time,state,ast)
 
     return KE, PE
 
-def relative_eoms_energy_behavior(ast_name, num_face, tf, num_steps):
+def relative_eoms_energy_behavior(ast_name, num_faces, tf, num_steps):
     """See \Delta E for varying tolerances of the ODE function
 
     """
-    tol_array = np.logspace(1e-4,1e-12,9)
+    tol_array = np.logspace(-4, -12, 9)
+    time_dict = {}
     state_dict = {}
     KE_dict = {}
     PE_dict = {}
@@ -67,9 +63,9 @@ def relative_eoms_energy_behavior(ast_name, num_face, tf, num_steps):
     dum = dumbbell.Dumbbell()
 
     # set initial state
-    initial_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607]) # km for center of mass in body frame
+    initial_pos = periodic_pos # km for center of mass in body frame
     # km/sec for COM in asteroid fixed frame
-    initial_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
+    initial_vel = periodic_vel
     initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the inertial frame
     initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
@@ -77,14 +73,16 @@ def relative_eoms_energy_behavior(ast_name, num_face, tf, num_steps):
     time = np.linspace(0,tf,num_steps)
 
     for tol in tol_array:
+        print('Tolerance - %4.2e' % tol)
         state = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), atol=tol, rtol=tol)
         KE, PE = dum.relative_energy(time, state, ast)
 
+        time_dict[str(tol)] = time
         state_dict[tol] = state
         KE_dict[tol] = KE
         PE_dict[tol] = PE
 
-    return state_dict, KE_dict, PE_dict
+    return time_dict, state_dict, KE_dict, PE_dict
 
 
 if __name__ == '__main__':
@@ -108,7 +106,7 @@ if __name__ == '__main__':
     print("Starting the simulation...")
 
     if args.mode == 0:
-        (time,state, ast, dum) = relative_eoms_driver(args.ast_name,args.num_faces,args.tf,args.num_steps)
+        (time,state) = relative_eoms_driver(args.ast_name,args.num_faces,args.tf,args.num_steps)
 
         print("Finished the simulation...")
         print("Saving to npz file")
@@ -120,15 +118,17 @@ if __name__ == '__main__':
         KE, PE = compute_energy(args.file_name)
 
         print("Finished with energy computations!")
-        np.savez('relative_energy_' + args.file_name, state=state, ast=ast, dum=dum, time=time, ast_name=args.ast_name, num_steps=args.num_steps,tf=args.tf, num_faces=args.num_faces, KE=KE, PE=PE)
+        np.savez('relative_energy_' + args.file_name, state=state, time=time, ast_name=args.ast_name, num_steps=args.num_steps,tf=args.tf, num_faces=args.num_faces, KE=KE, PE=PE)
     elif args.mode == 1:
 
         print("We're running many simulations wiht varying tolerances.")
 
-        state_dict, KE_dict, PE_dict = inertial_eoms_energy_behavior(args.ast_name, args.num_face, args.tf, args.num_steps)
+        time_dict, state_dict, KE_dict, PE_dict = relative_eoms_energy_behavior(args.ast_name, args.num_faces, args.tf, args.num_steps)
 
         print("Finished with simulations. Now saving to data file")
 
-        np.savez('relative_energy_behavior_' + args.file_name, state_dict=state_dict, KE_dict=KE_dict, PE_dict=PE_dict)
+        np.savez('relative_energy_behavior_' + args.file_name, state_dict=state_dict, KE_dict=KE_dict, PE_dict=PE_dict, time_dict=time_dict, ast_name=args.ast_name, num_steps=args.num_steps,tf=args.tf, num_faces=args.num_faces)
         
-    print("All finished!")
+        print("All finished!")
+    else:
+        print("Missing mode argument.")
