@@ -20,4 +20,4 @@
 
 module load anaconda/4.2.0
 
-python3 inertial_driver.py castalia 256 1e6 1e6 castalia_256_1e6_energy_behavior.npz -m 1
+python3 inertial_driver.py castalia 64 1e5 1e5 castalia_64_1e5_energy_behavior.npz -m 0
