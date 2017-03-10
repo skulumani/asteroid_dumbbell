@@ -115,29 +115,81 @@ def relative_test():
 
 
 def eoms_relative_translation(state, t, ast, dum):
-        """Translational equations of motion
+    """Translational equations of motion
 
-        Inputs:
-            state - 
-                pos - 3x1 position vector in asteroid fixed frame
-                vel - 3x1 velocity vector in asteroid fixed frame
+    Inputs:
+        state - 
+            pos - 3x1 position vector in asteroid fixed frame
+            vel - 3x1 velocity vector in asteroid fixed frame
 
-        Outputs:
-            statedot
+    Outputs:
+        statedot
 
-        """
-        # unpack the state
-        pos = state[0:3]
-        vel = state[3:6]
-        # unpack constants
-        omega_hat = attitude.hat_map(np.array([0, 0, ast.omega]))
-        (_, U_grad, _, _) = ast.polyhedron_potential(pos)
+    """
+    # unpack the state
+    pos = state[0:3]
+    vel = state[3:6]
+    # unpack constants
+    omega_hat = attitude.hat_map(np.array([0, 0, ast.omega]))
+    (_, U_grad, _, _) = ast.polyhedron_potential(pos)
 
-        m = dum.m1 + dum.m2
+    m = dum.m1 + dum.m2
+    # state derivatives
+    pos_dot = vel
+    vel_dot = U_grad - 2 * omega_hat.dot(vel) - omega_hat.dot(omega_hat.dot(pos))
+
+    state_dot = np.hstack((pos_dot, vel_dot))
+    
+    return state_dot
+
+def eoms_relative(state, t, ast, dum):
+    # unpack the state
+        pos = state[0:3] # location of the COM of dumbbell in asteroid fixed frame
+        vel = state[3:6] # vel of com wrt to asteroid expressed in the asteroid fixed frame
+        
+        Ra = attitude.rot3(ast.omega*t, 'c') # asteroid body frame to inertial frame
+
+        # unpack parameters for the dumbbell
+        m1 = self.m1
+        m2 = self.m2
+        m = m1 + m2
+        J = self.J
+        Jr = R.dot(J).dot(R.T)
+        Omega = ast.omega*np.array([0,0,1]) # angular velocity vector of asteroid
+
+        # the position of each mass in the asteroid body frame
+        rho1 = self.zeta1
+        rho2 = self.zeta2
+
+        # position of each mass in the asteroid frame
+        z1 = pos + R.dot(rho1)
+        z2 = pos + R.dot(rho2)
+
+        z = pos # position of COM in asteroid frame
+
+        # compute the potential at this state
+        (U1, U1_grad, U1_grad_mat, U1laplace) = ast.polyhedron_potential(z1)
+        (U2, U2_grad, U2_grad_mat, U2laplace) = ast.polyhedron_potential(z2)
+
+        # force due to each mass expressed in asteroid body frame
+        F1 = m1*U1_grad
+        F2 = m2*U2_grad
+        # F_com = (m1+m2)*U_grad_com
+
+        # compute the moments due to each mass
+        M1 = m1 * np.cross(U1_grad, R.dot(rho1))
+        M2 = m2 * np.cross(U2_grad, R.dot(rho2))
+
         # state derivatives
-        pos_dot = vel
-        vel_dot = U_grad - 2 * omega_hat.dot(vel) - omega_hat.dot(omega_hat.dot(pos))
+        pos_dot = vel - attitude.hat_map(Omega).dot(pos)
+        vel_dot = 1/m * (F1 + F2 - m * attitude.hat_map(Omega).dot(vel))
+        # vel_dot = 1/m * (F_com) 
+        R_dot = attitude.hat_map(w).dot(R) - attitude.hat_map(Omega).dot(R)
+        R_dot = R_dot.reshape(9)
+        w_dot = np.linalg.inv(Jr).dot(M1 + M2 - attitude.hat_map(Omega).dot(Jr).dot(w) 
+                      + attitude.hat_map(w).dot(Jr).dot(w) - Jr.dot(attitude.hat_map(Omega)).dot(w) 
+                      + attitude.hat_map(Omega).dot(Jr).dot(w) - attitude.hat_map(w).dot(Jr).dot(w))
 
-        state_dot = np.hstack((pos_dot, vel_dot))
+        state_dot = np.hstack((pos_dot,vel_dot,R_dot,w_dot))
         
         return state_dot
