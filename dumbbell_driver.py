@@ -12,6 +12,23 @@ import dynamics.dumbbell as dumbbell
 import kinematics.attitude as attitude
 import plotting
 
+# ode options
+RelTol = 1e-6
+AbsTol = 1e-6
+
+ast = asteroid.Asteroid('castalia',32)
+dum = dumbbell.Dumbbell()
+
+# time span
+t0 = 0
+tf = 1e5 # sec
+num_steps = 1e5
+
+time = np.linspace(t0,tf,num_steps)
+
+periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607]) 
+periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) 
+
 def inertial_test():
     # set initial state
     initial_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607]) # km for center of mass in body frame
@@ -56,7 +73,7 @@ def relative_test():
     """
     initial_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607]) # km for center of mass in body frame
     # km/sec for COM in asteroid fixed frame
-    initial_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) 
+    initial_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
     initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the asteroid frame
     initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in asteroid body frame
 
@@ -150,22 +167,6 @@ def eoms_relative(state, t, ast, dum):
 
 
 if __name__ == '__main__':
-    # ode options
-    RelTol = 1e-6
-    AbsTol = 1e-6
-
-    ast = asteroid.Asteroid('castalia',32)
-    dum = dumbbell.Dumbbell()
-
-    # time span
-    t0 = 0
-    tf = 1e5 # sec
-    num_steps = 1e5
-
-    time = np.linspace(t0,tf,num_steps)
-
-    periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607]) 
-    periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) 
 
     # state = integrate.odeint(eoms_relative_translation, np.hstack((periodic_pos,periodic_vel)), time, args=(ast,dum,), atol=AbsTol, rtol=RelTol)
 
