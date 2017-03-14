@@ -20,4 +20,4 @@
 
 module load anaconda/4.2.0
 
-python3 relative_driver.py castalia 64 1e5 1e5 castalia_64_1e5_relative_energy_behavior.npz -m 0
+python3 relative_driver.py castalia 64 1e5 1e5 castalia_64_1e5_relative.npz -m 0
