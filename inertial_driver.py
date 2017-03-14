@@ -151,9 +151,9 @@ if __name__ == '__main__':
         (time,state) = inertial_eoms_driver(args.ast_name,args.num_faces,args.tf,args.num_steps)
 
         print("Finished the simulation...")
-        print("Saving to npz file")
+        # print("Saving to npz file")
 
-        np.savez(args.file_name,state=state, time=time, ast_name=args.ast_name, num_steps=args.num_steps,tf=args.tf, num_faces=args.num_faces)
+        # np.savez(args.file_name,state=state, time=time, ast_name=args.ast_name, num_steps=args.num_steps,tf=args.tf, num_faces=args.num_faces)
 
         print("Now working to calculate the KE/PE of the simulation!")
 
