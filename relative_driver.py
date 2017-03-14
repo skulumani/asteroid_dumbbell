@@ -23,7 +23,7 @@ def relative_eoms_driver(ast_name,num_faces,tf,num_steps):
     # set initial state
     initial_pos = periodic_pos # km for center of mass in body frame
     # km/sec for COM in asteroid fixed frame
-    initial_vel = periodic_vel
+    initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
     initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the inertial frame
     initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
@@ -66,7 +66,7 @@ def relative_eoms_energy_behavior(ast_name, num_faces, tf, num_steps):
     # set initial state
     initial_pos = periodic_pos # km for center of mass in body frame
     # km/sec for COM in asteroid fixed frame
-    initial_vel = periodic_vel
+    initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
     initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the inertial frame
     initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
