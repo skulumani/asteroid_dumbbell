@@ -76,7 +76,7 @@ def relative_eoms_energy_behavior(ast_name, num_faces, tf, num_steps):
 
     for tol in tol_array:
         print('Tolerance - %4.2e' % tol)
-        state = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), atol=tol, rtol=tol)
+        state = integrate.odeint(dum.eoms_relative, initial_state, time, args=(ast,), atol=tol, rtol=tol)
         KE, PE = dum.relative_energy(time, state, ast)
 
         time_dict[str(tol)] = time
