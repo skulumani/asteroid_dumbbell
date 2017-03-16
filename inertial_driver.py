@@ -119,6 +119,7 @@ def inertial_sim_plotter(file_name, mode):
 
                 plotting.plt.plot(time_dict[tol], Ediff, label=tol)
 
+            plotting.plt.legend()
         else:
 
             print("Incorrect mode.")

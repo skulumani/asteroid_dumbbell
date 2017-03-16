@@ -80,6 +80,7 @@ dum = dumbbell.Dumbbell()
 
 # convert inertial to relative frame
 inertial2relative_state,_,_ = inertial2relative(inertial_time, inertial_state, ast, dum)
+
 # plot/compare difference in relative frame
 
 

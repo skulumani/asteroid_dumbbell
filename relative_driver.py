@@ -2,6 +2,7 @@ import dynamics.asteroid as asteroid
 import dynamics.dumbbell as dumbbell
 import kinematics.attitude as attitude
 import plotting
+import pdb
 
 import numpy as np
 from scipy import integrate
@@ -79,9 +80,9 @@ def relative_eoms_energy_behavior(ast_name, num_faces, tf, num_steps):
         KE, PE = dum.relative_energy(time, state, ast)
 
         time_dict[str(tol)] = time
-        state_dict[tol] = state
-        KE_dict[tol] = KE
-        PE_dict[tol] = PE
+        state_dict[str(tol)] = state
+        KE_dict[str(tol)] = KE
+        PE_dict[str(tol)] = PE
 
     return time_dict, state_dict, KE_dict, PE_dict
 
@@ -117,6 +118,7 @@ def relative_sim_plotter(file_name, mode):
 
                 plotting.plt.plot(time_dict[tol], Ediff, label=tol)
 
+            plotting.plt.legend()
         else:
 
             print("Incorrect mode.")
