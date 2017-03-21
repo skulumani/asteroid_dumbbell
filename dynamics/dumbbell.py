@@ -125,6 +125,7 @@ class Dumbbell():
         # F_com = (m1+m2)*U_grad_com
 
         # compute the moments due to each mass
+        pdb.set_trace()
         M1 = m1 * np.cross(U1_grad, R.dot(rho1))
         M2 = m2 * np.cross(U2_grad, R.dot(rho2))
 
