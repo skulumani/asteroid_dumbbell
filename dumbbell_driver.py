@@ -32,7 +32,7 @@ periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327
 def inertial_test():
     # time span
     t0 = 0
-    tf = 1e4 # sec
+    tf = 1e1 # sec
     num_steps = 1e4
     time = np.linspace(t0, tf, num_steps)
     dum1 = dumbbell.Dumbbell(m1=1, m2=1, l=0.003)
@@ -45,8 +45,8 @@ def inertial_test():
 
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
-    state = integrate.odeint(dum1.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
-
+    state, info_dict = integrate.odeint(dum1.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol, full_output=True)
+    
     pos = state[:,0:3]
     vel = state[:,3:6]
     R = state[:,6:15]
