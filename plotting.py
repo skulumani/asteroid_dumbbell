@@ -158,7 +158,8 @@ def animate_inertial_trajectory(t, state, ast, dum, filename=''):
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=t.shape[0], interval=1/30*1e3, blit=True)
 
     # Save as mp4. This requires mplayer or ffmpeg to be installed
-    #anim.save('lorentz_attractor.mp4', fps=15, extra_args=['-vcodec', 'libx264'])
+    if filename:
+        anim.save(filename + '.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
 
     plt.show()
 
