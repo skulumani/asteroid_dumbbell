@@ -30,33 +30,39 @@ periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
 periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) 
 
 def inertial_test():
+    # time span
+    t0 = 0
+    tf = 1e4 # sec
+    num_steps = 1e4
+    time = np.linspace(t0, tf, num_steps)
+    dum1 = dumbbell.Dumbbell(m1=1, m2=1, l=0.003)
     # set initial state
     initial_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607]) # km for center of mass in body frame
     # km/sec for COM in asteroid fixed frame
     initial_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
-    initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the inertial frame
+    initial_R = attitude.rot3(np.pi/2, 'c').reshape(9) # transforms from dumbbell body frame to the inertial frame
     initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
-    state = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
+    state = integrate.odeint(dum1.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
 
     pos = state[:,0:3]
     vel = state[:,3:6]
     R = state[:,6:15]
     ang_vel = state[:,15:18]
 
-    KE, PE = dum.inertial_energy(time,state,ast)
-
     mpl.rcParams['legend.fontsize'] = 10
 
     traj_fig = plt.figure()
-    # trajectory plot
     plotting.plot_trajectory(pos,traj_fig)
 
-    # kinetic energy
-    energy_fig = plt.figure()
-    plotting.plot_energy(time,KE,PE,energy_fig)
+    # animation testing
+    plotting.animate_inertial_trajectory(time, state, ast, dum1)
+    # # energy plot
+    # KE, PE = dum.inertial_energy(time,state,ast)
+    # energy_fig = plt.figure()
+    # plotting.plot_energy(time,KE,PE,energy_fig)
 
     plt.show()
 
@@ -164,7 +170,6 @@ def eoms_relative(state, t, ast, dum):
         state_dot = np.hstack((pos_dot,vel_dot))
         
         return state_dot
-
 
 if __name__ == '__main__':
 
