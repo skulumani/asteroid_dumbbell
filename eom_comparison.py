@@ -218,8 +218,8 @@ if __name__ == '__main__':
 
     ast_name = 'castalia'
     num_faces = 64
-    tf = 1e2
-    num_steps = 1e3
+    tf = 1e5
+    num_steps = 1e5
 
     i_time, i_state = id.inertial_eoms_driver(ast_name, num_faces, num_steps, tf)
     r_time, r_state = rd.relative_eoms_driver(ast_name, num_faces, num_steps, tf)
