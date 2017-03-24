@@ -227,5 +227,7 @@ if __name__ == '__main__':
     dum = dumbbell.Dumbbell()
 
     # also compute and compare the energy behavior
+
+    # also look at the animation of both and the converted form as well
     
     plot_comparison(r_time, i_time, r_state, i_state, ast, dum) 
