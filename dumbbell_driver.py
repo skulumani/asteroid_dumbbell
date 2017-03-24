@@ -32,7 +32,7 @@ periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327
 def inertial_test():
     # time span
     t0 = 0
-    tf = 1e1 # sec
+    tf = 1e4 # sec
     num_steps = 1e4
     time = np.linspace(t0, tf, num_steps)
     dum1 = dumbbell.Dumbbell(m1=1, m2=1, l=0.003)
@@ -41,7 +41,7 @@ def inertial_test():
     # km/sec for COM in asteroid fixed frame
     initial_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
     initial_R = attitude.rot3(np.pi/2, 'c').reshape(9) # transforms from dumbbell body frame to the inertial frame
-    initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
+    initial_w = np.array([0,0,0.01]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
@@ -58,11 +58,11 @@ def inertial_test():
     plotting.plot_trajectory(pos,traj_fig)
 
     # animation testing
-    plotting.animate_inertial_trajectory(time, state, ast, dum1)
-    # # energy plot
-    # KE, PE = dum.inertial_energy(time,state,ast)
-    # energy_fig = plt.figure()
-    # plotting.plot_energy(time,KE,PE,energy_fig)
+    # plotting.animate_inertial_trajectory(time, state, ast, dum1)
+    # energy plot
+    KE, PE = dum.inertial_energy(time,state,ast)
+    energy_fig = plt.figure()
+    plotting.plot_energy(time,KE,PE,energy_fig)
 
     plt.show()
 
@@ -191,7 +191,7 @@ def moment_comparison():
     
     inertial_statedot = dum.eoms_inertial(initial_state, 0, ast)
     relative_statedot = dum.eoms_relative(initial_state, 0, ast)
-    
+
 if __name__ == '__main__':
 
     # state = integrate.odeint(eoms_relative_translation, np.hstack((periodic_pos,periodic_vel)), time, args=(ast,dum,), atol=AbsTol, rtol=RelTol)

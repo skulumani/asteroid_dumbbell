@@ -217,8 +217,8 @@ if __name__ == '__main__':
 
     ast_name = 'castalia'
     num_faces = 64
-    tf = 1e3
-    num_steps = 1e6
+    tf = 1e4
+    num_steps = 1e4
 
     i_time, i_state = id.inertial_eoms_driver(ast_name, num_faces, tf, num_steps)
     r_time, r_state = rd.relative_eoms_driver(ast_name, num_faces, tf, num_steps)
@@ -226,4 +226,6 @@ if __name__ == '__main__':
     ast = asteroid.Asteroid(ast_name,num_faces)
     dum = dumbbell.Dumbbell()
 
+    # also compute and compare the energy behavior
+    
     plot_comparison(r_time, i_time, r_state, i_state, ast, dum) 
