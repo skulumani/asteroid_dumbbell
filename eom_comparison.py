@@ -47,7 +47,6 @@ def load_data(inertial_filename, relative_filename, mode):
     inertial_filename = 'data/inertial_energy_castalia_64_1e5_inertial.npz'
     relative_filename = 'data/relative_energy_castalia_64_1e5_relative.npz'
     mode = 0
-
     with np.load(inertial_filename, allow_pickle=True) as data:
         inertial_state = data['state']
         inertial_time = data['time']
@@ -218,11 +217,11 @@ if __name__ == '__main__':
 
     ast_name = 'castalia'
     num_faces = 64
-    tf = 1e5
-    num_steps = 1e5
+    tf = 1e3
+    num_steps = 1e6
 
-    i_time, i_state = id.inertial_eoms_driver(ast_name, num_faces, num_steps, tf)
-    r_time, r_state = rd.relative_eoms_driver(ast_name, num_faces, num_steps, tf)
+    i_time, i_state = id.inertial_eoms_driver(ast_name, num_faces, tf, num_steps)
+    r_time, r_state = rd.relative_eoms_driver(ast_name, num_faces, tf, num_steps)
 
     ast = asteroid.Asteroid(ast_name,num_faces)
     dum = dumbbell.Dumbbell()

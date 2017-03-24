@@ -191,6 +191,7 @@ def moment_comparison():
     
     inertial_statedot = dum.eoms_inertial(initial_state, 0, ast)
     relative_statedot = dum.eoms_relative(initial_state, 0, ast)
+    
 if __name__ == '__main__':
 
     # state = integrate.odeint(eoms_relative_translation, np.hstack((periodic_pos,periodic_vel)), time, args=(ast,dum,), atol=AbsTol, rtol=RelTol)

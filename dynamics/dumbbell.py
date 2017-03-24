@@ -107,7 +107,7 @@ class Dumbbell(object):
         Jr = R.dot(J).dot(R.T)
         Omega = ast.omega*np.array([0,0,1]) # angular velocity vector of asteroid
 
-        # the position of each mass in the asteroid body frame
+        # the position of each mass in the dumbbell body frame
         rho1 = self.zeta1
         rho2 = self.zeta2
 
@@ -128,8 +128,10 @@ class Dumbbell(object):
 
         # compute the moments due to each mass
         # pdb.set_trace()
-        M1 = m1 * np.cross(U1_grad, R.dot(rho1))
-        M2 = m2 * np.cross(U2_grad, R.dot(rho2))
+        # M1 = m1 * np.cross(U1_grad, R.dot(rho1))
+        # M2 = m2 * np.cross(U2_grad, R.dot(rho2))
+        M1 = m1 * np.cross(rho1, R.T.dot(U1_grad))
+        M2 = m2 * np.cross(rho2, R.T.dot(U2_grad))
 
         # state derivatives
         pos_dot = vel - attitude.hat_map(Omega).dot(pos)
