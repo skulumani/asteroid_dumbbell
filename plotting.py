@@ -85,7 +85,7 @@ def animate_inertial_trajectory(t, state, ast, dum, filename=''):
     db_frame = [ax.plot([], [], [], '-', lw=2, c=c)[0] for c in ax_colors]
     db_body = [ax.plot([], [], [], '-', lw=2, c='k')[0]]
 
-    ax.view_init(90,0)
+    # ax.view_init(90,0)
 
     # initialization function: plot the background of each frame
     def init():
@@ -201,7 +201,7 @@ def animate_relative_trajectory(t, state, ast, dum, filename=''):
     db_frame = [ax.plot([], [], [], '-', lw=2, c=c)[0] for c in ax_colors]
     db_body = [ax.plot([], [], [], '-', lw=2, c='k')[0]]
 
-    ax.view_init(90,0)
+    # ax.view_init(90,0)
 
     # initialization function: plot the background of each frame
     def init():
