@@ -69,10 +69,10 @@ def relative_eoms_energy_behavior(ast_name, num_faces, tf, num_steps):
     # km/sec for COM in asteroid fixed frame
     initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
     initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the inertial frame
-    initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
+    initial_w = np.array([0.001,0.001,0.001]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
-    time = np.linspace(0,tf,num_steps)
+    time = np.linspace(0, tf, num_steps)
 
     for tol in tol_array:
         print('Tolerance - %4.2e' % tol)
