@@ -21,8 +21,8 @@ dum = dumbbell.Dumbbell(m1=1, m2=1, l=0.003)
 
 # time span
 t0 = 0
-tf = 1e4 # sec
-num_steps = 1e4
+tf = 1e5 # sec
+num_steps = 1e5
 
 time = np.linspace(t0, tf, num_steps)
 
@@ -38,7 +38,7 @@ initial_w = np.array([0.001,0.001,0.001]) # angular velocity of dumbbell wrt to 
 
 initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
-def inertial_test():
+def inertial_test(filename=''):
     """Run a simulation of the inertial equations of motion
 
     """
@@ -56,7 +56,7 @@ def inertial_test():
     plotting.plot_trajectory(pos, traj_fig)
 
     # animation testing
-    plotting.animate_inertial_trajectory(time, state, ast, dum)
+    plotting.animate_inertial_trajectory(time, state, ast, dum, filename)
 
     # energy plot
     KE, PE = dum.inertial_energy(time, state, ast)
@@ -67,7 +67,7 @@ def inertial_test():
 
     return 0
 
-def relative_test():
+def relative_test(filename=''):
     """Test the relative equations of motion
 
     """
@@ -95,7 +95,7 @@ def relative_test():
     plotting.plot_trajectory(pos, traj_fig)
 
     # animation testing
-    # plotting.animate_relative_trajectory(time, state, ast, dum)
+    plotting.animate_relative_trajectory(time, state, ast, dum, filename)
 
     # kinetic energy
     energy_fig = plt.figure()
