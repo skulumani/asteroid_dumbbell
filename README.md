@@ -26,5 +26,12 @@ There are driver modules for each, which are called:
     * `dumbbell_driver.py` - More driver functions which were used during testing/debuggin
     * `eom_comparison.py` - Functions to allow the comparision between the different EOMS
 
+## Using `mayavi`
+
+There's a conda enviornment which has `mayavi` working correctly.
+You can use the following to duplicate the enviornment
+~~~
+$ conda env create -f mayavi_enviornment.yml
+~~~
 
 

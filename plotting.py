@@ -106,7 +106,7 @@ def animate_inertial_trajectory(t, state, ast, dum, filename=''):
     # animation function.  This is called sequentially
     def animate(ii):
         # multiple time steps per frame
-        ii = (10 * ii) % t.shape[0]
+        ii = (ii) % t.shape[0]
         pos = state[:, 0:3]
         vel = state[:, 3:6]
         Rdb2i = state[:, 6:15]
@@ -161,7 +161,7 @@ def animate_inertial_trajectory(t, state, ast, dum, filename=''):
     if filename:
         anim.save(filename + '.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
 
-    plt.show()
+    plt.show() 
 
 def animate_relative_trajectory(t, state, ast, dum, filename=''):
     """Animate the relative trajectory defined wrt asteroid body fixed frame
@@ -283,7 +283,7 @@ def animate_relative_trajectory(t, state, ast, dum, filename=''):
     plt.show()
 
 if __name__ == '__main__':
-    ast = asteroid.Asteroid('itokawa',32)
+    ast = asteroid.Asteroid('itokawa', 1024)
     vertex_plotter(ast,plt.figure())
 
     plt.show()

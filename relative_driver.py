@@ -99,12 +99,18 @@ def relative_sim_plotter(file_name, mode):
             KE = data['KE']
             PE = data['PE']
 
+            ast_name = data['ast_name'][()]
+            num_faces = data['num_faces'][()]
             # compute the
             e_fig = plotting.plt.figure()
             traj_fig = plotting.plt.figure()
             plotting.plot_energy(time,KE, PE, e_fig)
             plotting.plot_trajectory(state[:,0:3], traj_fig)
 
+            ast = asteroid.Asteroid(ast_name,num_faces)
+            dum = dumbbell.Dumbbell()
+
+            plotting.animate_relative_trajectory(time, state, ast, dum, file_name[:-4])
         elif mode == 1:
             state_dict = data['state_dict'][()]
             time_dict = data['time_dict'][()]
