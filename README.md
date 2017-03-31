@@ -17,3 +17,21 @@ You need to create a mex version of `polyhedron_potential.m`.
 
 In addition, you have to have both `polyhedron_potential_mex_1024.mex` and `polyhedron_potential_mex_4092.mex`
 
+## Usage guide
+
+You can run the simulation for both the inertial and relative equations of motion. 
+There are driver modules for each, which are called:
+    * `inertial_driver.py` - Driver functions to simulate the inertial equations of motion
+    * `relative_driver.py` - Driver functions to simulate the relative equations of motion
+    * `dumbbell_driver.py` - More driver functions which were used during testing/debuggin
+    * `eom_comparison.py` - Functions to allow the comparision between the different EOMS
+
+## Using `mayavi`
+
+There's a conda enviornment which has `mayavi` working correctly.
+You can use the following to duplicate the enviornment
+~~~
+$ conda env create -f mayavi_enviornment.yml
+~~~
+
+

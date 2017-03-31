@@ -16,51 +16,58 @@ import plotting
 RelTol = 1e-6
 AbsTol = 1e-6
 
-ast = asteroid.Asteroid('castalia',32)
-dum = dumbbell.Dumbbell()
+ast = asteroid.Asteroid('castalia', 32)
+dum = dumbbell.Dumbbell(m1=1, m2=1, l=0.003)
 
 # time span
 t0 = 0
 tf = 1e5 # sec
 num_steps = 1e5
 
-time = np.linspace(t0,tf,num_steps)
+time = np.linspace(t0, tf, num_steps)
 
 periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607]) 
 periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) 
 
-def inertial_test():
-    # set initial state
-    initial_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607]) # km for center of mass in body frame
-    # km/sec for COM in asteroid fixed frame
-    initial_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
-    initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the inertial frame
-    initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
+# set initial state
+initial_pos = periodic_pos # km for center of mass in body frame
+# km/sec for COM in asteroid fixed frame
+initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
+initial_R = attitude.rot3(np.pi/2, 'c').reshape(9) # transforms from dumbbell body frame to the inertial frame
+initial_w = np.array([0.001,0.001,0.001]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
-    initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
+initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
-    state = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
+def inertial_test(filename=''):
+    """Run a simulation of the inertial equations of motion
 
-    pos = state[:,0:3]
-    vel = state[:,3:6]
-    R = state[:,6:15]
-    ang_vel = state[:,15:18]
-
-    KE, PE = dum.inertial_energy(time,state,ast)
+    """
+    
+    state, info_dict = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol, full_output=True)
+    
+    pos = state[:, 0:3]
+    vel = state[:, 3:6]
+    R = state[:, 6:15]
+    ang_vel = state[:, 15:18]
 
     mpl.rcParams['legend.fontsize'] = 10
 
     traj_fig = plt.figure()
-    # trajectory plot
-    plotting.plot_trajectory(pos,traj_fig)
+    plotting.plot_trajectory(pos, traj_fig)
 
-    # kinetic energy
+    # animation testing
+    plotting.animate_inertial_trajectory(time, state, ast, dum, filename)
+
+    # energy plot
+    KE, PE = dum.inertial_energy(time, state, ast)
     energy_fig = plt.figure()
-    plotting.plot_energy(time,KE,PE,energy_fig)
+    plotting.plot_energy(time, KE, PE, energy_fig)
 
     plt.show()
 
-def relative_test():
+    return 0
+
+def relative_test(filename=''):
     """Test the relative equations of motion
 
     """
@@ -71,36 +78,32 @@ def relative_test():
         R - transforms vectors in SC body frame to asteroid frame
         W - angular velocity of dumbbell wrt inertial frame in asteroid frame
     """
-    initial_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607]) # km for center of mass in body frame
-    # km/sec for COM in asteroid fixed frame
-    initial_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
-    initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the asteroid frame
-    initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in asteroid body frame
-
-    initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
     state = integrate.odeint(dum.eoms_relative, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
 
-    pos = state[:,0:3]
-    vel = state[:,3:6]
-    R = state[:,6:15]
-    ang_vel = state[:,15:18]
+    pos = state[:, 0:3]
+    vel = state[:, 3:6]
+    R = state[:, 6:15]
+    ang_vel = state[:, 15:18]
 
-    # KE, PE = dum.relative_energy(time,state,ast)
+    KE, PE = dum.relative_energy(time, state, ast)
 
     mpl.rcParams['legend.fontsize'] = 10
 
     traj_fig = plt.figure()
     # trajectory plot
-    plotting.plot_trajectory(pos,traj_fig)
+    plotting.plot_trajectory(pos, traj_fig)
+
+    # animation testing
+    plotting.animate_relative_trajectory(time, state, ast, dum, filename)
 
     # kinetic energy
-    # energy_fig = plt.figure()
-    # plotting.plot_energy(time,KE,PE,energy_fig)
+    energy_fig = plt.figure()
+    plotting.plot_energy(time, KE, PE, energy_fig)
 
     plt.show()
 
-    return state
+    return 0
 
 def eoms_relative_translation(state, t, ast, dum):
     """Translational equations of motion
@@ -165,6 +168,26 @@ def eoms_relative(state, t, ast, dum):
         
         return state_dot
 
+def moment_comparison():
+    # instantiate a dumbbell object
+    ast = asteroid.Asteroid('castalia',32)
+    dum = dumbbell.Dumbbell()
+
+    # initial state for inertial equations of motion
+    # set initial state
+    initial_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607]) # km for center of mass in body frame
+    # km/sec for COM in asteroid fixed frame
+    initial_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
+    initial_R = attitude.rot3(np.pi/2, 'c').reshape(9) # transforms from dumbbell body frame to the inertial frame
+    initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
+
+    initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
+
+    # call each function
+    pdb.set_trace()
+    
+    inertial_statedot = dum.eoms_inertial(initial_state, 0, ast)
+    relative_statedot = dum.eoms_relative(initial_state, 0, ast)
 
 if __name__ == '__main__':
 

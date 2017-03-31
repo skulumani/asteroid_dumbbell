@@ -13,7 +13,7 @@ import argparse
 periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
 periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327])
 
-def relative_eoms_driver(ast_name,num_faces,tf,num_steps):
+def relative_eoms_driver(ast_name, num_faces, tf, num_steps):
     # ode options
     RelTol = 1e-9
     AbsTol = 1e-9
@@ -69,10 +69,10 @@ def relative_eoms_energy_behavior(ast_name, num_faces, tf, num_steps):
     # km/sec for COM in asteroid fixed frame
     initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
     initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the inertial frame
-    initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
+    initial_w = np.array([0.001,0.001,0.001]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
-    time = np.linspace(0,tf,num_steps)
+    time = np.linspace(0, tf, num_steps)
 
     for tol in tol_array:
         print('Tolerance - %4.2e' % tol)
@@ -99,12 +99,18 @@ def relative_sim_plotter(file_name, mode):
             KE = data['KE']
             PE = data['PE']
 
+            ast_name = data['ast_name'][()]
+            num_faces = data['num_faces'][()]
             # compute the
             e_fig = plotting.plt.figure()
             traj_fig = plotting.plt.figure()
             plotting.plot_energy(time,KE, PE, e_fig)
             plotting.plot_trajectory(state[:,0:3], traj_fig)
 
+            ast = asteroid.Asteroid(ast_name,num_faces)
+            dum = dumbbell.Dumbbell()
+
+            plotting.animate_relative_trajectory(time, state, ast, dum, file_name[:-4])
         elif mode == 1:
             state_dict = data['state_dict'][()]
             time_dict = data['time_dict'][()]

@@ -2,22 +2,23 @@ import numpy as np
 import kinematics.attitude as attitude
 import pdb
 
-class Dumbbell():
+class Dumbbell(object):
     """Dumbbell spacecraft model
 
     """
-    def __init__(self):
+    def __init__(self, m1=100.0, m2=100.0, l=0.003):
         """Initialize the dumbbell instance with all of it's properties
             
         """
 
-        self.m1 = 100.0 # kg first mass
-        self.m2 = 100.0 # kg second mass
-        self.l = 0.003 # km rigid link
+        self.m1 = m1 # kg first mass
+        self.m2 = m2 # kg second mass
+        self.l = l # km rigid link
         self.r1 = 0.001 # km radius of each spherical mass 
         self.r2 = 0.001
 
-        self.lcg1 = self.m2/(self.m1+self.m2)*self.l; # distance from m1 to the CG along the b1hat direction
+        self.mratio = self.m2/(self.m1+self.m2)
+        self.lcg1 = self.mratio*self.l; # distance from m1 to the CG along the b1hat direction
         self.lcg2 = self.l - self.lcg1
 
         self.zeta1 = np.array([-self.lcg1,0,0])
@@ -65,15 +66,18 @@ class Dumbbell():
         F1 = self.m1*Ra.dot(U1_grad)
         F2 = self.m2*Ra.dot(U2_grad)
 
+        # pdb.set_trace()
         M1 = self.m1 * np.cross(Ra.T.dot(rho1),R.T.dot(U1_grad))
         M2 = self.m2 * np.cross(Ra.T.dot(rho2),R.T.dot(U2_grad))
-      
+        # M1 = np.zeros(3)
+        # M2 = M1
+        
         pos_dot = vel
         vel_dot = 1/(self.m1+self.m2) *(F1 + F2)
         R_dot = R.dot(attitude.hat_map(ang_vel)).reshape(9)
         ang_vel_dot = np.linalg.inv(J).dot(-np.cross(ang_vel,J.dot(ang_vel)) + M1 + M2)
 
-        statedot = np.hstack((pos_dot,vel_dot,R_dot,ang_vel_dot))
+        statedot = np.hstack((pos_dot, vel_dot, R_dot, ang_vel_dot))
 
         return statedot
 
@@ -105,7 +109,7 @@ class Dumbbell():
         Jr = R.dot(J).dot(R.T)
         Omega = ast.omega*np.array([0,0,1]) # angular velocity vector of asteroid
 
-        # the position of each mass in the asteroid body frame
+        # the position of each mass in the dumbbell body frame
         rho1 = self.zeta1
         rho2 = self.zeta2
 
@@ -125,9 +129,14 @@ class Dumbbell():
         # F_com = (m1+m2)*U_grad_com
 
         # compute the moments due to each mass
-        M1 = m1 * np.cross(U1_grad, R.dot(rho1))
-        M2 = m2 * np.cross(U2_grad, R.dot(rho2))
-
+        # pdb.set_trace()
+        # M1 = m1 * np.cross(U1_grad, R.dot(rho1))
+        # M2 = m2 * np.cross(U2_grad, R.dot(rho2))
+        M1 = m1 * np.cross(rho1, R.T.dot(U1_grad))
+        M2 = m2 * np.cross(rho2, R.T.dot(U2_grad))
+        # M1 = np.zeros(3)
+        # M2 = M1
+        
         # state derivatives
         pos_dot = vel - attitude.hat_map(Omega).dot(pos)
         vel_dot = 1/m * (F1 + F2 - m * attitude.hat_map(Omega).dot(vel))
