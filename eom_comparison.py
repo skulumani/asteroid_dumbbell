@@ -85,9 +85,9 @@ def relative2inertial(time, state, ast, dum):
 
 def load_data(inertial_filename, relative_filename, mode):
     # load simulation data
-    inertial_filename = 'data/inertial_energy_castalia_64_1e5_inertial.npz'
-    relative_filename = 'data/relative_energy_castalia_64_1e5_relative.npz'
-    mode = 0
+    # inertial_filename = 'inertial_energy_test.npz'
+    # relative_filename = 'relative_energy_test.npz'
+    # mode = 0
     with np.load(inertial_filename, allow_pickle=True) as data:
         inertial_state = data['state']
         inertial_time = data['time']

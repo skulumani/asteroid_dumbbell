@@ -34,7 +34,7 @@ initial_pos = periodic_pos # km for center of mass in body frame
 # km/sec for COM in asteroid fixed frame
 initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
 initial_R = attitude.rot3(np.pi/2, 'c').reshape(9) # transforms from dumbbell body frame to the inertial frame
-initial_w = np.array([0.001,0.001,0.001]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
+initial_w = np.array([0.01,0.01,0.01]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
 initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
@@ -56,7 +56,7 @@ def inertial_test(filename=''):
     plotting.plot_trajectory(pos, traj_fig)
 
     # animation testing
-    plotting.animate_inertial_trajectory(time, state, ast, dum, filename)
+    # plotting.animate_inertial_trajectory(time, state, ast, dum, filename)
 
     # energy plot
     KE, PE = dum.inertial_energy(time, state, ast)
