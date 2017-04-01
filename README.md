@@ -31,6 +31,7 @@ There are driver modules for each, which are called:
 There's a conda enviornment which has `mayavi` working correctly.
 You can use the following to duplicate the enviornment
 ~~~
+$ conda env export > env.yml
 $ conda env create -f mayavi_enviornment.yml
 ~~~
 
