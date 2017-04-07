@@ -109,6 +109,7 @@ def relative_sim_plotter(file_name, mode):
 
             ast = asteroid.Asteroid(ast_name,num_faces)
             dum = dumbbell.Dumbbell()
+            print("Tol - %s, DeltaE - %4e" % (tol, (KE + PE)[-1]))
 
             # plotting.animate_relative_trajectory(time, state, ast, dum, file_name[:-4])
         elif mode == 1:
@@ -123,7 +124,8 @@ def relative_sim_plotter(file_name, mode):
                 Ediff = np.absolute(E - E[0])
 
                 plotting.plt.plot(time_dict[tol], Ediff, label=tol)
-
+                print("Tol - %s, DeltaE - %4e" % (tol, E[-1]))
+                
             plotting.plt.legend()
         else:
 

@@ -112,6 +112,9 @@ def inertial_sim_plotter(file_name, mode):
             ast = asteroid.Asteroid(ast_name,num_faces)
             dum = dumbbell.Dumbbell()
             
+            
+            # print out some useful statistics
+            print("Tol - %s, DeltaE - %4e" % (tol, (KE + PE)[-1]))
             # plotting.animate_inertial_trajectory(time, state, ast, dum, file_name[:-4])
         elif mode == 1:
             state_dict = data['state_dict'][()]
@@ -123,7 +126,10 @@ def inertial_sim_plotter(file_name, mode):
             for tol in state_dict:
                 E = KE_dict[tol] + PE_dict[tol]
                 Ediff = np.absolute(E - E[0])
-
+                
+                # print out some useful statistics
+                print("Tol - %s, DeltaE - %4e" % (tol, E[-1]))
+                
                 plotting.plt.plot(time_dict[tol], Ediff, label=tol)
 
             plotting.plt.legend()

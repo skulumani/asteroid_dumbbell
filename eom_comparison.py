@@ -397,7 +397,7 @@ def plot_inertial_comparison(relative_time, inertial_time, relative_state, inert
     for ii in range(9):
         row, col = np.unravel_index(ii, [3,3])
         att_axarr[row,col].plot(inertial_time, inertial_R[:,ii])
-        att_axarr[row,col].plot(relative_time, i2r_R[:,ii])
+        att_axarr[row,col].plot(relative_time, r2i_R[:,ii])
 
     # attitude matrix difference
     attdiff_fig, attdiff_axarr = plt.subplots(3,3, sharex=True, sharey=True)
@@ -426,8 +426,8 @@ def relative_frame_comparision():
 
     ast_name = 'castalia'
     num_faces = 64
-    tf = 1e4
-    num_steps = 1e4
+    tf = 1e3
+    num_steps = 1e3
 
     i_time, i_state = id.inertial_eoms_driver(ast_name, num_faces, tf, num_steps)
     r_time, r_state = rd.relative_eoms_driver(ast_name, num_faces, tf, num_steps)
@@ -452,8 +452,8 @@ def inertial_frame_comparison():
 
     ast_name = 'castalia'
     num_faces = 64
-    tf = 1e4
-    num_steps = 1e4
+    tf = 1e3
+    num_steps = 1e3
 
     i_time, i_state = id.inertial_eoms_driver(ast_name, num_faces, tf, num_steps)
     r_time, r_state = rd.relative_eoms_driver(ast_name, num_faces, tf, num_steps)
@@ -465,7 +465,7 @@ def inertial_frame_comparison():
 
     # also look at the animation of both and the converted form as well
     
-    plot_relative_comparison(r_time, i_time, r_state, i_state, ast, dum) 
+    plot_inertial_comparison(r_time, i_time, r_state, i_state, ast, dum) 
 
     return 0
 
