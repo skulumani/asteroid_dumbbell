@@ -607,11 +607,13 @@ def inertial_frame_comparison():
 
     ast_name = 'castalia'
     num_faces = 64
-    tf = 1e3
-    num_steps = 1e4
+    tf = 1e4
+    num_steps = 1e5
+    
+    initial_w = np.array([0.0, 0.01, 0.0])
 
-    i_time, i_state = id.inertial_eoms_driver(ast_name, num_faces, tf, num_steps)
-    r_time, r_state = rd.relative_eoms_driver(ast_name, num_faces, tf, num_steps)
+    i_time, i_state = id.inertial_eoms_driver(ast_name, num_faces, tf, num_steps, initial_w)
+    r_time, r_state = rd.relative_eoms_driver(ast_name, num_faces, tf, num_steps, initial_w)
 
     ast = asteroid.Asteroid(ast_name,num_faces)
     dum = dumbbell.Dumbbell()
