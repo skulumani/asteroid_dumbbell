@@ -66,7 +66,6 @@ class Dumbbell(object):
         F1 = self.m1*Ra.dot(U1_grad)
         F2 = self.m2*Ra.dot(U2_grad)
 
-        # pdb.set_trace()
         # M1 = self.m1 * np.cross(Ra.T.dot(rho1),R.T.dot(U1_grad))
         # M2 = self.m2 * np.cross(Ra.T.dot(rho2),R.T.dot(U2_grad))
         # M1 = np.zeros(3)
