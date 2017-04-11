@@ -134,11 +134,13 @@ class Dumbbell(object):
         # pdb.set_trace()
         # M1 = m1 * np.cross(U1_grad, R.dot(rho1))
         # M2 = m2 * np.cross(U2_grad, R.dot(rho2))
-        M1 = m1 * np.cross(rho1, R.T.dot(U1_grad))
-        M2 = m2 * np.cross(rho2, R.T.dot(U2_grad))
+        #M1 = m1 * np.cross(rho1, R.T.dot(U1_grad))
+        #M2 = m2 * np.cross(rho2, R.T.dot(U2_grad))
         # M1 = np.zeros(3)
         # M2 = M1
-        
+       
+        M1 = m1 * np.cross(rho1, U1_grad)
+        M2 = m2 * np.cross(rho2, U2_grad)
         # state derivatives
         pos_dot = vel - attitude.hat_map(Omega).dot(pos)
         vel_dot = 1/m * (F1 + F2 - m * attitude.hat_map(Omega).dot(vel))
@@ -149,7 +151,7 @@ class Dumbbell(object):
                       + attitude.hat_map(w).dot(Jr).dot(w) - Jr.dot(attitude.hat_map(Omega)).dot(w) 
                       + attitude.hat_map(Omega).dot(Jr).dot(w) - attitude.hat_map(w).dot(Jr).dot(w))
 
-        state_dot = np.hstack((pos_dot,vel_dot,R_dot,w_dot))
+        state_dot = np.hstack((pos_dot, vel_dot, R_dot, w_dot))
         
         return state_dot
 
