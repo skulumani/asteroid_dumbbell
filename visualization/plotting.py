@@ -1,5 +1,6 @@
 import dynamics.asteroid as asteroid
 import kinematics.attitude as attitude
+import eom_comparison.transform as eom_transform
 
 import numpy as np
 import scipy as sp
@@ -297,8 +298,8 @@ def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, du
 
     """
     # convert simulations into the inertial frame    
-    inertial_state = body2inertial(body_time, body_state, ast, dum) 
-    ast2inertial_state,_,_ = ast2inertial(ast_time, ast_state, ast, dum)
+    inertial_state = eom_transform.body2inertial(body_time, body_state, ast, dum) 
+    ast2inertial_state,_,_ = eom_transform.ast2inertial(ast_time, ast_state, ast, dum)
     
      # extract out the states
     inertial_pos = inertial_state[:,0:3]
@@ -562,6 +563,7 @@ def plot_asteroid_comparision(ast_time, body_time, ast_state, body_state, ast, d
 
     plt.show()
     return 0
+
 if __name__ == '__main__':
     ast = asteroid.Asteroid('itokawa', 1024)
     vertex_plotter(ast,plt.figure())
