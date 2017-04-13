@@ -286,32 +286,6 @@ def inertial_frame_comparison():
 
     ast_name = 'castalia'
     num_faces = 64
-    tf = 1e3
-    num_steps = 1e3
-
-    i_time, i_state = id.inertial_eoms_driver(ast_name, num_faces, tf, num_steps)
-    r_time, r_state = rd.relative_eoms_driver(ast_name, num_faces, tf, num_steps)
-
-    ast = asteroid.Asteroid(ast_name,num_faces)
-    dum = dumbbell.Dumbbell()
-
-    # also compute and compare the energy behavior
-
-    # also look at the animation of both and the converted form as well
-    
-    plot_relative_comparison(r_time, i_time, r_state, i_state, ast, dum) 
-
-    return 0
-    
-def inertial_frame_comparison():
-    """Compare EOMs in the inertial frame
-
-    """
-    import inertial_driver as id
-    import relative_driver as rd
-
-    ast_name = 'castalia'
-    num_faces = 64
     tf = 1e4
     num_steps = 1e5
     
@@ -333,6 +307,30 @@ def inertial_frame_comparison():
     plot_inertial_comparison(r_time, i_time, r_state, i_state, ast, dum) 
 
     return 0
+
+def asteroid_frame_comparison():
+    """Compare EOMs in the asteroid frame
+
+    """
+    import inertial_driver as id
+    import relative_driver as rd
+
+    ast_name = 'castalia'
+    num_faces = 64
+    tf = 1e4
+    num_steps = 1e5
+    
+    initial_w = np.array([0.0, 0.01, 0.0])
+
+    i_time, i_state = id.inertial_eoms_driver(ast_name, num_faces, tf, num_steps, initial_w)
+    r_time, r_state = rd.relative_eoms_driver(ast_name, num_faces, tf, num_steps, initial_w)
+
+    ast = asteroid.Asteroid(ast_name,num_faces)
+    dum = dumbbell.Dumbbell()
+
+    # also compute and compare the energy behavior
+    i_KE, i_PE = dum.inertial_energy(i_time, i_state, ast)
+    r_KE, r_PE = dum.relative_energy(r_time, r_state, ast)
 
 if __name__ == '__main__':
     pass
