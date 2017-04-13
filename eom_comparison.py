@@ -3,17 +3,14 @@
 
 """
 import numpy as np
-from scipy import integrate
-import pdb
 
-import matplotlib as mpl
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
 import dynamics.asteroid as asteroid
 import dynamics.dumbbell as dumbbell
 import kinematics.attitude as attitude
 import plotting
+
 
 def inertial2ast(time, state, ast, dum):
     """Convert inertial state to the asteroid fixed frame
