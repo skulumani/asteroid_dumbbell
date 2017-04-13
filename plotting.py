@@ -282,6 +282,286 @@ def animate_relative_trajectory(t, state, ast, dum, filename=''):
 
     plt.show()
 
+def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, dum):
+    """Compare the EOMS in the inertial frame, everything transformed to the inertial frame
+    
+    Inputs:
+        ast_time - time vector from eoms_relative
+        body_time - time vector from eoms_inertial
+        ast_state - state vector from eoms_relative
+        body_state - state vector from eoms_inertial
+        ast - instance of Asteroid class
+        dum - instance of Dumbbell class
+
+    Outputs:
+
+    """
+    # convert simulations into the inertial frame    
+    inertial_state = body2inertial(body_time, body_state, ast, dum) 
+    ast2inertial_state,_,_ = ast2inertial(ast_time, ast_state, ast, dum)
+    
+     # extract out the states
+    inertial_pos = inertial_state[:,0:3]
+    inertial_vel = inertial_state[:,3:6]
+    inertial_R_sc2inertial = inertial_state[:,6:15]
+    inertial_w = inertial_state[:,15:18]
+   
+    a2i_pos = ast2inertial_state[:,0:3]
+    a2i_vel = ast2inertial_state[:,3:6]
+    a2i_R = ast2inertial_state[:,6:15]
+    a2i_w = ast2inertial_state[:,15:18]
+    
+    # position comparison
+    pos_fig, pos_axarr = plt.subplots(3,1, sharex=True)
+    pos_axarr[0].plot(body_time, inertial_pos[:,0], label='Inertial EOMs')
+    pos_axarr[0].plot(ast_time, a2i_pos[:,0], label='Transformed Relative')
+    pos_axarr[0].set_ylabel(r'$X$ (km)')
+        
+    pos_axarr[1].plot(body_time, inertial_pos[:,1], label='Inertial EOMs')
+    pos_axarr[1].plot(ast_time, a2i_pos[:,1], label='Transformed Relative')
+    pos_axarr[1].set_ylabel(r'$Y$ (km)')
+        
+    pos_axarr[2].plot(body_time, inertial_pos[:,2], label='Inertial EOMs')
+    pos_axarr[2].plot(ast_time, a2i_pos[:,2], label='Transformed Relative')
+    pos_axarr[2].set_ylabel(r'$Z$ (km)')
+     
+    pos_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Position Comparison')
+    plt.legend()  
+
+    posdiff_fig, posdiff_axarr = plt.subplots(3,1, sharex=True)
+    posdiff_axarr[0].plot(body_time, np.absolute(inertial_pos[:,0]-a2i_pos[:,0]))
+    posdiff_axarr[0].set_ylabel(r'$\Delta X$ (km)')
+        
+    posdiff_axarr[1].plot(body_time, np.absolute(inertial_pos[:,1]-a2i_pos[:,1]))
+    posdiff_axarr[1].set_ylabel(r'$\Delta Y$ (km)')
+        
+    posdiff_axarr[2].plot(body_time, np.absolute(inertial_pos[:,2]-a2i_pos[:,2]))
+    posdiff_axarr[2].set_ylabel(r'$\Delta Z$ (km)')
+     
+    posdiff_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Position Difference')
+
+    # velocity comparison
+    vel_fig, vel_axarr = plt.subplots(3,1, sharex=True)
+    vel_axarr[0].plot(body_time, inertial_vel[:,0], label='inertial EOMs')
+    vel_axarr[0].plot(ast_time, a2i_vel[:,0], label='Transformed relative')
+    vel_axarr[0].set_ylabel(r'$\dot X$ (km)')
+        
+    vel_axarr[1].plot(body_time, inertial_vel[:,1], label='inertial EOMs')
+    vel_axarr[1].plot(ast_time, a2i_vel[:,1], label='Transformed relative')
+    vel_axarr[1].set_ylabel(r'$\dot Y$ (km)')
+        
+    vel_axarr[2].plot(body_time, inertial_vel[:,2], label='inertial EOMs')
+    vel_axarr[2].plot(ast_time, a2i_vel[:,2], label='Transformed relative')
+    vel_axarr[2].set_ylabel(r'$\dot Z$ (km)')
+     
+    vel_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Velocity Comparison')
+    plt.legend()
+
+    veldiff_fig, veldiff_axarr = plt.subplots(3,1, sharex=True)
+    veldiff_axarr[0].plot(body_time, np.absolute(inertial_vel[:,0]-a2i_vel[:,0]))
+    veldiff_axarr[0].set_ylabel(r'$\Delta \dot X$ (km)')
+        
+    veldiff_axarr[1].plot(body_time, np.absolute(inertial_vel[:,1]-a2i_vel[:,1]))
+    veldiff_axarr[1].set_ylabel(r'$\Delta \dot Y$ (km)')
+        
+    veldiff_axarr[2].plot(body_time, np.absolute(inertial_vel[:,2]-a2i_vel[:,2]))
+    veldiff_axarr[2].set_ylabel(r'$\Delta \dot Z$ (km)')
+     
+    veldiff_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Velocity Difference')
+
+    # angular velocity comparison
+    angvel_fig, angvel_axarr = plt.subplots(3,1, sharex=True)
+    angvel_axarr[0].plot(body_time, inertial_w[:,0], label='Inertial EOMs')
+    angvel_axarr[0].plot(ast_time, a2i_w[:,0], label='Transformed Relative')
+    angvel_axarr[0].set_ylabel(r'$\dot \Omega_1$ (rad/sec)')
+        
+    angvel_axarr[1].plot(body_time, inertial_w[:,1], label='Inertial EOMs')
+    angvel_axarr[1].plot(ast_time, a2i_w[:,1], label='Transformed Relative')
+    angvel_axarr[1].set_ylabel(r'$\dot \Omega_2$ (rad/sec)')
+        
+    angvel_axarr[2].plot(body_time, inertial_w[:,2], label='Inertial EOMs')
+    angvel_axarr[2].plot(ast_time, a2i_w[:,2], label='Transformed Relative')
+    angvel_axarr[2].set_ylabel(r'$\dot \Omega_3$ (rad/sec)')
+     
+    angvel_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Angular Velocity Comparison')
+    plt.legend()
+
+    angveldiff_fig, angveldiff_axarr = plt.subplots(3,1, sharex=True)
+    angveldiff_axarr[0].plot(body_time, np.absolute(inertial_w[:,0]-a2i_w[:,0]))
+    angveldiff_axarr[0].set_ylabel(r'$\Delta \dot \Omega$ (rad/sec)')
+        
+    angveldiff_axarr[1].plot(body_time, np.absolute(inertial_w[:,1]-a2i_w[:,1]))
+    angveldiff_axarr[1].set_ylabel(r'$\Delta \dot \Omega_2$ (rad/sec)')
+        
+    angveldiff_axarr[2].plot(body_time, np.absolute(inertial_w[:,2]-a2i_w[:,2]))
+    angveldiff_axarr[2].set_ylabel(r'$\Delta \dot \Omega_3$ (rad/sec)')
+     
+    angveldiff_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Angular Velocity Difference')
+
+    # attitude matrix comparison
+    att_fig, att_axarr = plt.subplots(3,3, sharex=True, sharey=True)
+    plt.suptitle('Rotation Matrix')
+    for ii in range(9):
+        row, col = np.unravel_index(ii, [3,3])
+        att_axarr[row,col].plot(body_time, inertial_R_sc2inertial[:,ii])
+        att_axarr[row,col].plot(ast_time, a2i_R[:,ii])
+
+    # attitude matrix difference
+    attdiff_fig, attdiff_axarr = plt.subplots(3,3, sharex=True, sharey=True)
+    plt.suptitle('Rotation Matrix Difference')
+    for ii in range(9):
+        row, col = np.unravel_index(ii, [3,3])
+        attdiff_axarr[row,col].plot(body_time, np.absolute(inertial_R_sc2inertial[:,ii]-a2i_R[:,ii]))
+
+    plt.show()
+
+    return 0
+
+def plot_asteroid_comparision(ast_time, body_time, ast_state, body_state, ast, dum):
+    """Plot the states in the asteroid fixed frame
+    
+    Inputs:
+        ast_time - 
+        body_time
+        ast_state - 
+        body_state
+        ast
+        dum -
+
+    Outputs:
+        
+    """
+
+    # convert simulations into the asteroid frame    
+    int2ast_state = body2ast(body_time, body_state, ast, dum) 
+    
+    # extract out the states
+    i2a_pos = int2ast_state[:,0:3]
+    i2a_vel = int2ast_state[:,3:6]
+    i2a_R_sc2inertial = int2ast_state[:,6:15]
+    i2a_w = inertial_state[:,15:18]
+   
+    ast_pos = ast_state[:,0:3]
+    ast_vel = ast_state[:,3:6]
+    ast_R = ast_state[:,6:15]
+    ast_w = ast_state[:,15:18]
+    
+    # position comparison
+    pos_fig, pos_axarr = plt.subplots(3,1, sharex=True)
+    pos_axarr[0].plot(body_time, inertial_pos[:,0], label='Inertial EOMs')
+    pos_axarr[0].plot(ast_time, a2i_pos[:,0], label='Transformed Relative')
+    pos_axarr[0].set_ylabel(r'$X$ (km)')
+        
+    pos_axarr[1].plot(body_time, inertial_pos[:,1], label='Inertial EOMs')
+    pos_axarr[1].plot(ast_time, a2i_pos[:,1], label='Transformed Relative')
+    pos_axarr[1].set_ylabel(r'$Y$ (km)')
+        
+    pos_axarr[2].plot(body_time, inertial_pos[:,2], label='Inertial EOMs')
+    pos_axarr[2].plot(ast_time, a2i_pos[:,2], label='Transformed Relative')
+    pos_axarr[2].set_ylabel(r'$Z$ (km)')
+     
+    pos_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Position Comparison')
+    plt.legend()  
+
+    posdiff_fig, posdiff_axarr = plt.subplots(3,1, sharex=True)
+    posdiff_axarr[0].plot(body_time, np.absolute(inertial_pos[:,0]-a2i_pos[:,0]))
+    posdiff_axarr[0].set_ylabel(r'$\Delta X$ (km)')
+        
+    posdiff_axarr[1].plot(body_time, np.absolute(inertial_pos[:,1]-a2i_pos[:,1]))
+    posdiff_axarr[1].set_ylabel(r'$\Delta Y$ (km)')
+        
+    posdiff_axarr[2].plot(body_time, np.absolute(inertial_pos[:,2]-a2i_pos[:,2]))
+    posdiff_axarr[2].set_ylabel(r'$\Delta Z$ (km)')
+     
+    posdiff_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Position Difference')
+
+    # velocity comparison
+    vel_fig, vel_axarr = plt.subplots(3,1, sharex=True)
+    vel_axarr[0].plot(body_time, inertial_vel[:,0], label='inertial EOMs')
+    vel_axarr[0].plot(ast_time, a2i_vel[:,0], label='Transformed relative')
+    vel_axarr[0].set_ylabel(r'$\dot X$ (km)')
+        
+    vel_axarr[1].plot(body_time, inertial_vel[:,1], label='inertial EOMs')
+    vel_axarr[1].plot(ast_time, a2i_vel[:,1], label='Transformed relative')
+    vel_axarr[1].set_ylabel(r'$\dot Y$ (km)')
+        
+    vel_axarr[2].plot(body_time, inertial_vel[:,2], label='inertial EOMs')
+    vel_axarr[2].plot(ast_time, a2i_vel[:,2], label='Transformed relative')
+    vel_axarr[2].set_ylabel(r'$\dot Z$ (km)')
+     
+    vel_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Velocity Comparison')
+    plt.legend()
+
+    veldiff_fig, veldiff_axarr = plt.subplots(3,1, sharex=True)
+    veldiff_axarr[0].plot(body_time, np.absolute(inertial_vel[:,0]-a2i_vel[:,0]))
+    veldiff_axarr[0].set_ylabel(r'$\Delta \dot X$ (km)')
+        
+    veldiff_axarr[1].plot(body_time, np.absolute(inertial_vel[:,1]-a2i_vel[:,1]))
+    veldiff_axarr[1].set_ylabel(r'$\Delta \dot Y$ (km)')
+        
+    veldiff_axarr[2].plot(body_time, np.absolute(inertial_vel[:,2]-a2i_vel[:,2]))
+    veldiff_axarr[2].set_ylabel(r'$\Delta \dot Z$ (km)')
+     
+    veldiff_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Velocity Difference')
+
+    # angular velocity comparison
+    angvel_fig, angvel_axarr = plt.subplots(3,1, sharex=True)
+    angvel_axarr[0].plot(body_time, inertial_w[:,0], label='Inertial EOMs')
+    angvel_axarr[0].plot(ast_time, a2i_w[:,0], label='Transformed Relative')
+    angvel_axarr[0].set_ylabel(r'$\dot \Omega_1$ (rad/sec)')
+        
+    angvel_axarr[1].plot(body_time, inertial_w[:,1], label='Inertial EOMs')
+    angvel_axarr[1].plot(ast_time, a2i_w[:,1], label='Transformed Relative')
+    angvel_axarr[1].set_ylabel(r'$\dot \Omega_2$ (rad/sec)')
+        
+    angvel_axarr[2].plot(body_time, inertial_w[:,2], label='Inertial EOMs')
+    angvel_axarr[2].plot(ast_time, a2i_w[:,2], label='Transformed Relative')
+    angvel_axarr[2].set_ylabel(r'$\dot \Omega_3$ (rad/sec)')
+     
+    angvel_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Angular Velocity Comparison')
+    plt.legend()
+
+    angveldiff_fig, angveldiff_axarr = plt.subplots(3,1, sharex=True)
+    angveldiff_axarr[0].plot(body_time, np.absolute(inertial_w[:,0]-a2i_w[:,0]))
+    angveldiff_axarr[0].set_ylabel(r'$\Delta \dot \Omega$ (rad/sec)')
+        
+    angveldiff_axarr[1].plot(body_time, np.absolute(inertial_w[:,1]-a2i_w[:,1]))
+    angveldiff_axarr[1].set_ylabel(r'$\Delta \dot \Omega_2$ (rad/sec)')
+        
+    angveldiff_axarr[2].plot(body_time, np.absolute(inertial_w[:,2]-a2i_w[:,2]))
+    angveldiff_axarr[2].set_ylabel(r'$\Delta \dot \Omega_3$ (rad/sec)')
+     
+    angveldiff_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Angular Velocity Difference')
+
+    # attitude matrix comparison
+    att_fig, att_axarr = plt.subplots(3,3, sharex=True, sharey=True)
+    plt.suptitle('Rotation Matrix')
+    for ii in range(9):
+        row, col = np.unravel_index(ii, [3,3])
+        att_axarr[row,col].plot(body_time, inertial_R_sc2inertial[:,ii])
+        att_axarr[row,col].plot(ast_time, a2i_R[:,ii])
+
+    # attitude matrix difference
+    attdiff_fig, attdiff_axarr = plt.subplots(3,3, sharex=True, sharey=True)
+    plt.suptitle('Rotation Matrix Difference')
+    for ii in range(9):
+        row, col = np.unravel_index(ii, [3,3])
+        attdiff_axarr[row,col].plot(body_time, np.absolute(inertial_R_sc2inertial[:,ii]-a2i_R[:,ii]))
+
+    plt.show()
+    return 0
 if __name__ == '__main__':
     ast = asteroid.Asteroid('itokawa', 1024)
     vertex_plotter(ast,plt.figure())
