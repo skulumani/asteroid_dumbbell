@@ -1,7 +1,7 @@
 import dynamics.asteroid as asteroid
 import dynamics.dumbbell as dumbbell
 import kinematics.attitude as attitude
-import plotting
+import visualization.plotting as plotting
 import pdb
 
 import numpy as np
@@ -13,7 +13,7 @@ import argparse
 periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
 periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327])
 
-def relative_eoms_driver(ast_name, num_faces, tf, num_steps, initial_w=np.array([0.01,0.0,0.0])):
+def relative_eoms_driver(ast_name, num_faces, tf, num_steps, initial_w):
     # ode options
     RelTol = 1e-9
     AbsTol = 1e-9
@@ -26,6 +26,7 @@ def relative_eoms_driver(ast_name, num_faces, tf, num_steps, initial_w=np.array(
     # km/sec for COM in asteroid fixed frame
     initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
     initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the inertial frame
+    # initial_w = np.array([0.01,0.02,0.03]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 

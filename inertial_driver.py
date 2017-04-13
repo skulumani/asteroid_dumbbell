@@ -1,7 +1,7 @@
 import dynamics.asteroid as asteroid
 import dynamics.dumbbell as dumbbell
 import kinematics.attitude as attitude
-import plotting
+import visualization.plotting as plotting
 
 import numpy as np
 from scipy import integrate
