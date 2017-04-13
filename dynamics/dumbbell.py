@@ -224,3 +224,41 @@ class Dumbbell(object):
             KE[ii] = 1/2 * m * vel.dot(vel) + 1/2 * np.trace(attitude.hat_map(ang_vel).dot(Jdr).dot(attitude.hat_map(ang_vel).T))
 
         return KE, PE
+
+    def attitude_controller(self, time, state, ast):
+        """SE(3) Attitude Controller
+
+        """
+        return 0
+
+    def translation_controller(self, time, state, ast):
+        """SE(3) Translational Controller
+
+        """
+        return 0
+
+    def desired_attitude(self, time):
+        """Desired attitude trajectory
+
+        This function will output a desired attitude trajectory. The controller will use this 
+        trajectory in it's computations. The outputs will be the desired attitude matrix and
+        the desired angular velocity:
+
+        Outputs:
+            Rd_sc2int - 3x3 array defining the transformation from the spacecraft frame to the
+                inertial frame
+            w_sc2int - 3 array defining the angular velocity of the spacecraft frame with respect
+                to the inertial frame and defined in the spacecraft fixed frame
+
+        """
+        return 0
+
+    def desired_translation(self, time):
+        """Desired translational trajectory
+
+        This function will output the desired translational states, namely the desired position and
+        velocity. This position and velocity will be defined in the inertial reference frame.
+
+        """
+        
+        return 0
