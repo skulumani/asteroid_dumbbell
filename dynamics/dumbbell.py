@@ -66,13 +66,10 @@ class Dumbbell(object):
         F1 = self.m1*Ra.dot(U1_grad)
         F2 = self.m2*Ra.dot(U2_grad)
 
-        # M1 = self.m1 * np.cross(Ra.T.dot(rho1),R.T.dot(U1_grad))
-        # M2 = self.m2 * np.cross(Ra.T.dot(rho2),R.T.dot(U2_grad))
-        # M1 = np.zeros(3)
-        # M2 = M1
-        
-        M1 = self.m1 * np.cross(rho1, R.T.dot(Ra).dot(U1_grad))
-        M2 = self.m2 * np.cross(rho2, R.T.dot(Ra).dot(U2_grad))
+        # M1 = self.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
+        # M2 = self.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
+        M1 = np.zeros(3)
+        M2 = np.zeros_like(3)
 
         pos_dot = vel
         vel_dot = 1/(self.m1+self.m2) *(F1 + F2)
@@ -128,19 +125,9 @@ class Dumbbell(object):
         # force due to each mass expressed in asteroid body frame
         F1 = m1*U1_grad
         F2 = m2*U2_grad
-        # F_com = (m1+m2)*U_grad_com
 
-        # compute the moments due to each mass
-        # pdb.set_trace()
-        # M1 = m1 * np.cross(U1_grad, R.dot(rho1))
-        # M2 = m2 * np.cross(U2_grad, R.dot(rho2))
-        M1 = m1 * np.cross(rho1, R.T.dot(U1_grad))
-        M2 = m2 * np.cross(rho2, R.T.dot(U2_grad))
-        # M1 = np.zeros(3)
-        # M2 = M1
-       
-        # M1 = m1 * np.cross(rho1, U1_grad)
-        # M2 = m2 * np.cross(rho2, U2_grad)
+        M1 = np.zeros(3)
+        M2 = np.zeros_like(M1)
         # state derivatives
         pos_dot = vel - attitude.hat_map(Wa).dot(pos)
         vel_dot = 1/m * (F1 + F2 - m * attitude.hat_map(Wa).dot(vel))

@@ -178,8 +178,8 @@ def moment_comparison():
     initial_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607]) # km for center of mass in body frame
     # km/sec for COM in asteroid fixed frame
     initial_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
-    initial_R = attitude.rot3(np.pi/2, 'c').reshape(9) # transforms from dumbbell body frame to the inertial frame
-    initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
+    initial_R = attitude.rot3(0, 'c').reshape(9) # transforms from dumbbell body frame to the inertial frame
+    initial_w = np.array([0,10,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
