@@ -142,10 +142,7 @@ class Dumbbell(object):
         # vel_dot = 1/m * (F_com) 
         R_dot = attitude.hat_map(w).dot(R) - attitude.hat_map(Wa).dot(R)
         R_dot = R_dot.reshape(9)
-        w_dot = np.linalg.inv(Jr).dot(M1 + M2 - attitude.hat_map(Wa).dot(Jr).dot(w) 
-                      + attitude.hat_map(w).dot(Jr).dot(w) - Jr.dot(attitude.hat_map(Wa)).dot(w) 
-                      + attitude.hat_map(Wa).dot(Jr).dot(w) - attitude.hat_map(w).dot(Jr).dot(w))
-
+        w_dot = np.linalg.inv(Jr).dot(M1 + M2 - Jr.dot(attitude.hat_map(Wa)).dot(w))
         state_dot = np.hstack((pos_dot, vel_dot, R_dot, w_dot))
         
         return state_dot

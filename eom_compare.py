@@ -26,14 +26,14 @@ ast = asteroid.Asteroid(ast_name,num_faces)
 dum = dumbbell.Dumbbell()
 
 # also compute and compare the energy behavior
-print("Computing inertial energy")
-i_KE, i_PE = dum.inertial_energy(i_time, i_state, ast)
-
-print("Computing asteroid energy")
-r_KE, r_PE = dum.relative_energy(r_time, r_state, ast)
-
-plotting.plot_energy(i_time, i_KE, i_PE)
-# also look at the animation of both and the converted form as well
+# print("Computing inertial energy")
+# i_KE, i_PE = dum.inertial_energy(i_time, i_state, ast)
+# 
+# print("Computing asteroid energy")
+# r_KE, r_PE = dum.relative_energy(r_time, r_state, ast)
+# 
+# plotting.plot_energy(i_time, i_KE, i_PE)
+# # also look at the animation of both and the converted form as well
 
 print("Plot comparison in the inertial frame")
 plotting.plot_inertial_comparison(r_time, i_time, r_state, i_state, ast, dum) 
