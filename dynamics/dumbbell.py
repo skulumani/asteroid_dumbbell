@@ -81,15 +81,23 @@ class Dumbbell(object):
         return statedot
 
     def eoms_relative(self, state, t, ast):
-        """Relative EOMS - motion of dumbbell wrt to asteroid expressed in asteroid fixed frame
+        """Relative EOMS defined in the rotating asteroid frame
+
+        This function defines the motion of a dumbbell spacecraft in orbit around an asteroid.
+        The EOMS are defined relative to the asteroid itself, which is in a state of constant rotation.
+        You need to use this function with scipy.integrate.odeint
 
         Inputs:
             t - current time of simulation (sec)
-            state - relative state of dumbbell with respect to asteroid
+            state - (18,) relative state of dumbbell with respect to asteroid
+                pos - state[0:3] in km position of the dumbbell with respect to the asteroid and defined in the asteroid fixed frame
+                vel - state[3:6] in km/sec is the velocity of dumbbell wrt the asteroid and defined in the asteroid fixed frame
+                R - state[6:15] rotation matrix which converts vectors from the dumbbell frame to the asteroid frame
+                w - state[15:18] rad/sec angular velocity of the dumbbell wrt inertial frame and defined in the asteroid frame
             ast - asteroid object
 
         Output:
-
+            state_dot - (18,) derivative of state. The order is the same as the input state.
         """
         
         # unpack the state
@@ -106,7 +114,7 @@ class Dumbbell(object):
         m = m1 + m2
         J = self.J
         Jr = R.dot(J).dot(R.T)
-        Wa= ast.omega*np.array([0,0,1]) # angular velocity vector of asteroid
+        Wa = ast.omega*np.array([0,0,1]) # angular velocity vector of asteroid
 
         # the position of each mass in the dumbbell body frame
         rho1 = self.zeta1
