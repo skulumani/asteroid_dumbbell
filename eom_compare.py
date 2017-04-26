@@ -15,7 +15,7 @@ num_faces = 64
 tf = 1e2
 num_steps = 1e2
 
-initial_w = np.array([0.01, 0.0, 0.0])
+initial_w = np.array([0.5, 0.5, 0])
 print("Running inertial EOMS")
 i_time, i_state = idriver.inertial_eoms_driver(ast_name, num_faces, tf, num_steps, initial_w)
 
