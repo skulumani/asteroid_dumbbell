@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import dynamics.asteroid as asteroid
 import dynamics.dumbbell as dumbbell
 import kinematics.attitude as attitude
-import plotting
+from visualization import plotting
 
 # ode options
 RelTol = 1e-6
@@ -137,7 +137,7 @@ def eoms_relative(state, t, ast, dum):
     # unpack the state
         pos = state[0:3] # location of the COM of dumbbell in asteroid fixed frame
         vel = state[3:6] # vel of com wrt to asteroid expressed in the asteroid fixed frame
-        
+
         Ra = attitude.rot3(ast.omega*t, 'c') # asteroid body frame to inertial frame
 
         # unpack parameters for the dumbbell
@@ -165,7 +165,7 @@ def eoms_relative(state, t, ast, dum):
         vel_dot = 1/m * (F_com - m * attitude.hat_map(Omega).dot(vel))
 
         state_dot = np.hstack((pos_dot,vel_dot))
-        
+
         return state_dot
 
 def moment_comparison():
