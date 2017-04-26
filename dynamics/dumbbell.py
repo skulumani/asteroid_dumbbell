@@ -109,7 +109,7 @@ class Dumbbell(object):
         m = m1 + m2
         J = self.J
         Jr = R.dot(J).dot(R.T)
-        Omega = ast.omega*np.array([0,0,1]) # angular velocity vector of asteroid
+        Wa= ast.omega*np.array([0,0,1]) # angular velocity vector of asteroid
 
         # the position of each mass in the dumbbell body frame
         rho1 = self.zeta1
@@ -142,14 +142,14 @@ class Dumbbell(object):
         # M1 = m1 * np.cross(rho1, U1_grad)
         # M2 = m2 * np.cross(rho2, U2_grad)
         # state derivatives
-        pos_dot = vel - attitude.hat_map(Omega).dot(pos)
-        vel_dot = 1/m * (F1 + F2 - m * attitude.hat_map(Omega).dot(vel))
+        pos_dot = vel - attitude.hat_map(Wa).dot(pos)
+        vel_dot = 1/m * (F1 + F2 - m * attitude.hat_map(Wa).dot(vel))
         # vel_dot = 1/m * (F_com) 
-        R_dot = attitude.hat_map(w).dot(R) - attitude.hat_map(Omega).dot(R)
+        R_dot = attitude.hat_map(w).dot(R) - attitude.hat_map(Wa).dot(R)
         R_dot = R_dot.reshape(9)
-        w_dot = np.linalg.inv(Jr).dot(M1 + M2 - attitude.hat_map(Omega).dot(Jr).dot(w) 
-                      + attitude.hat_map(w).dot(Jr).dot(w) - Jr.dot(attitude.hat_map(Omega)).dot(w) 
-                      + attitude.hat_map(Omega).dot(Jr).dot(w) - attitude.hat_map(w).dot(Jr).dot(w))
+        w_dot = np.linalg.inv(Jr).dot(M1 + M2 - attitude.hat_map(Wa).dot(Jr).dot(w) 
+                      + attitude.hat_map(w).dot(Jr).dot(w) - Jr.dot(attitude.hat_map(Wa)).dot(w) 
+                      + attitude.hat_map(Wa).dot(Jr).dot(w) - attitude.hat_map(w).dot(Jr).dot(w))
 
         state_dot = np.hstack((pos_dot, vel_dot, R_dot, w_dot))
         
