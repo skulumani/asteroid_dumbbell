@@ -11,10 +11,11 @@ import dynamics.dumbbell as dumbbell
 import kinematics.attitude as attitude
 import visualization.plotting as plotting
 
-import inertial_driver as id
-import relative_driver as rd
+import inertial_driver as idriver
+import relative_driver as rdriver
 
-    
+import pdb
+
 def load_data(inertial_filename, relative_filename, mode):
     """Load saved data and extract out the states
 
@@ -56,12 +57,11 @@ def inertial_frame_comparison(ast_name='castalia', num_faces=64, tf=1e5, num_ste
 
     """
     initial_w = np.array([0.01, 0.0, 0.0])
-    
     print("Running inertial EOMS")
-    i_time, i_state = id.inertial_eoms_driver(ast_name, num_faces, tf, num_steps, initial_w)
+    i_time, i_state = idriver.inertial_eoms_driver(ast_name, num_faces, tf, num_steps, initial_w)
 
     print("Running asteroid EOMs")
-    r_time, r_state = rd.relative_eoms_driver(ast_name, num_faces, tf, num_steps, initial_w)
+    r_time, r_state = rdriver.relative_eoms_driver(ast_name, num_faces, tf, num_steps, initial_w)
 
     ast = asteroid.Asteroid(ast_name,num_faces)
     dum = dumbbell.Dumbbell()
