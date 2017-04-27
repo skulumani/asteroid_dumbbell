@@ -12,8 +12,8 @@ import pdb
 
 ast_name = 'castalia'
 num_faces = 64
-tf = 1e2
-num_steps = 1e2
+tf = 1e3
+num_steps = 1e3
 
 initial_w = np.array([0.0, 0.8, 0])
 print("Running inertial EOMS")
@@ -54,5 +54,5 @@ rh_state_conv = np.hstack((rh_state[:, 0:3], rh_vel, rh_state[:, 6:15], rh_ang_v
 # # also look at the animation of both and the converted form as well
 
 print("Plot comparison in the inertial frame")
-# plotting.plot_inertial_comparison(r_time, i_time, r_state, i_state, ast, dum) 
+plotting.plot_inertial_comparison(r_time, i_time, r_state, i_state, ast, dum) 
 plotting.plot_inertial_comparison(rh_time, i_time, rh_state_conv, i_state, ast, dum)

@@ -66,10 +66,10 @@ class Dumbbell(object):
         F1 = self.m1*Ra.dot(U1_grad)
         F2 = self.m2*Ra.dot(U2_grad)
 
-        # M1 = self.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
-        # M2 = self.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
-        M1 = np.zeros(3)
-        M2 = np.zeros_like(3)
+        M1 = self.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
+        M2 = self.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
+        # M1 = np.zeros(3)
+        # M2 = np.zeros_like(3)
 
         pos_dot = vel
         vel_dot = 1/(self.m1+self.m2) *(F1 + F2)
@@ -134,8 +134,11 @@ class Dumbbell(object):
         F1 = m1*U1_grad
         F2 = m2*U2_grad
 
-        M1 = np.zeros(3)
-        M2 = np.zeros_like(M1)
+        M1 = m1*attitude.hat_map(R.dot(rho1)).dot(U1_grad) 
+        M2 = m2*attitude.hat_map(R.dot(rho2)).dot(U2_grad) 
+
+        # M1 = np.zeros(3)
+        # M2 = np.zeros_like(M1)
         # state derivatives
         pos_dot = vel - attitude.hat_map(Wa).dot(pos)
         vel_dot = 1/m * (F1 + F2 - m * attitude.hat_map(Wa).dot(vel))
@@ -201,8 +204,8 @@ class Dumbbell(object):
         F1 = m1*U1_grad
         F2 = m2*U2_grad
 
-        M1 = np.zeros(3)
-        M2 = np.zeros_like(M1)
+        M1 = m1*attitude.hat_map(R.dot(rho1)).dot(U1_grad) 
+        M2 = m2*attitude.hat_map(R.dot(rho2)).dot(U2_grad) 
 
         vel = lin_mom / (m1 + m2)
         w = np.linalg.inv(Jr).dot(ang_mom)
@@ -211,7 +214,7 @@ class Dumbbell(object):
         lin_mom_dot = F1 + F2 - attitude.hat_map(Wa).dot(lin_mom)
         R_dot = attitude.hat_map(w).dot(R) - attitude.hat_map(Wa).dot(R)
         R_dot = R_dot.reshape(9)
-        ang_mom_dot = M1 + M2 + attitude.hat_map(w).dot(ang_mom) - attitude.hat_map(Wa).dot(ang_mom)
+        ang_mom_dot = M1 + M2  - attitude.hat_map(Wa).dot(ang_mom)
         state_dot = np.hstack((pos_dot, lin_mom_dot, R_dot, ang_mom_dot))
         
         return state_dot
