@@ -156,11 +156,11 @@ class Dumbbell(object):
 
         Inputs:
             t - current time of simulation (sec)
-            state - (18,) relative state of dumbbell with respect to asteroid
+            state - (18,) relative hamiltonian state of dumbbell with respect to asteroid
                 pos - state[0:3] in km position of the dumbbell with respect to the asteroid and defined in the asteroid fixed frame
-                vel - state[3:6] in km/sec is the velocity of dumbbell wrt the asteroid and defined in the asteroid fixed frame
+                lin_mom - state[3:6] in kg km/sec is the linear momentum of dumbbell wrt the asteroid and defined in the asteroid fixed frame
                 R - state[6:15] rotation matrix which converts vectors from the dumbbell frame to the asteroid frame
-                w - state[15:18] rad/sec angular velocity of the dumbbell wrt inertial frame and defined in the asteroid frame
+                ang_mom - state[15:18] J rad/sec angular momentum of the dumbbell wrt inertial frame and defined in the asteroid frame
             ast - asteroid object
 
         Output:
@@ -169,10 +169,10 @@ class Dumbbell(object):
         
         # unpack the state
         pos = state[0:3] # location of the COM of dumbbell in asteroid fixed frame
-        vel = state[3:6] # vel of com wrt to asteroid expressed in the asteroid fixed frame
+        lin_mom = state[3:6] # lin_mom of com wrt to asteroid expressed in the asteroid fixed frame
         R = np.reshape(state[6:15],(3,3)) # sc body frame to asteroid body frame R = R_A^T R_1
-        w = state[15:18] # angular velocity of sc wrt inertial frame and expressed in asteroid fixed frame
-
+        ang_mom = state[15:18] # angular momentum of sc wrt inertial frame and expressed in asteroid fixed frame
+        
         Ra = attitude.rot3(ast.omega*t, 'c') # asteroid body frame to inertial frame
 
         # unpack parameters for the dumbbell
@@ -203,14 +203,16 @@ class Dumbbell(object):
 
         M1 = np.zeros(3)
         M2 = np.zeros_like(M1)
+
+        vel = lin_mom / (m1 + m2)
+        w = np.linalg.inv(Jr).dot(ang_mom)
         # state derivatives
         pos_dot = vel - attitude.hat_map(Wa).dot(pos)
-        vel_dot = 1/m * (F1 + F2 - m * attitude.hat_map(Wa).dot(vel))
-        # vel_dot = 1/m * (F_com) 
+        lin_mom_dot = F1 + F2 - attitude.hat_map(Wa).dot(lin_mom)
         R_dot = attitude.hat_map(w).dot(R) - attitude.hat_map(Wa).dot(R)
         R_dot = R_dot.reshape(9)
-        w_dot = np.linalg.inv(Jr).dot(M1 + M2 - Jr.dot(attitude.hat_map(Wa)).dot(w))
-        state_dot = np.hstack((pos_dot, vel_dot, R_dot, w_dot))
+        ang_mom_dot = M1 + M2 + attitude.hat_map(w).dot(ang_mom) - attitude.hat_map(Wa).dot(ang_mom)
+        state_dot = np.hstack((pos_dot, lin_mom_dot, R_dot, ang_mom_dot))
         
         return state_dot
     def eoms_inertial_control(self, state,t, ast):
