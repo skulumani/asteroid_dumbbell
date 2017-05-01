@@ -13,13 +13,11 @@ import pdb
 periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
 periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327])
 
-def inertial_eoms_driver(ast_name, num_faces, tf, num_steps, initial_w):
+def inertial_eoms_driver(tf, num_steps, initial_w, ast, dum):
     # ode options
     RelTol = 1e-9
     AbsTol = 1e-9
 
-    ast = asteroid.Asteroid(ast_name,num_faces)
-    dum = dumbbell.Dumbbell()
     # set initial state
     initial_pos = periodic_pos # km for center of mass in body frame
     # km/sec for COM in asteroid fixed frame
