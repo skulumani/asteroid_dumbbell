@@ -117,7 +117,7 @@ def ast2inertial(time, state, ast, dum):
         inertial_pos = Ra.dot(ast_pos)
         inertial_vel = Ra.dot(ast_vel)
         inertial_R_sc2int = Ra.dot(R_sc2ast).reshape(9)
-        inertial_w = R_sc2ast.reshape((3, 3)).T.dot(ast_w)
+        inertial_w = Ra.dot(ast_w)
 
         inertial_state[ii, :] = np.hstack((inertial_pos, inertial_vel, inertial_R_sc2int, inertial_w))
 
