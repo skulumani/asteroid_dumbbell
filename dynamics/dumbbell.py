@@ -214,7 +214,7 @@ class Dumbbell(object):
         lin_mom_dot = F1 + F2 - attitude.hat_map(Wa).dot(lin_mom)
         R_dot = attitude.hat_map(w).dot(R) - attitude.hat_map(Wa).dot(R)
         R_dot = R_dot.reshape(9)
-        ang_mom_dot = M1 + M2  - attitude.hat_map(Wa).dot(ang_mom)
+        ang_mom_dot = M1 + M2  - attitude.hat_map(Wa).dot(ang_mom) 
         state_dot = np.hstack((pos_dot, lin_mom_dot, R_dot, ang_mom_dot))
         
         return state_dot
