@@ -12,6 +12,46 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 from matplotlib import animation
 
+def figsize(scale):
+    fig_width_pt = 469.75502                         # Get this from LaTeX using \the\textwidth
+    inches_per_pt = 1.0/72.27                       # Convert pt to inch
+    golden_mean = (np.sqrt(5.0)-1.0)/2.0            # Aesthetic ratio (you could change this)
+    fig_width = fig_width_pt*inches_per_pt*scale    # width in inches
+    fig_height = fig_width*golden_mean              # height in inches
+    fig_size = [fig_width,fig_height]
+    return fig_size
+
+def scale_figsize(wscale, hscale):
+    fig_width_pt = 469.75502
+    fig_height_pt = 650.43001
+    inches_per_pt = 1 / 72.27
+    fig_width = fig_width_pt * inches_per_pt * wscale
+    fig_height = fig_height_pt * inches_per_pt * hscale
+    return (fig_width, fig_height)
+
+# PGF with LaTeX
+pgf_with_latex = {                      # setup matplotlib to use latex for output
+        "pgf.texsystem": "pdflatex",        # change this if using xetex or lautex
+        "text.usetex": True,                # use LaTeX to write all text
+        "font.family": "serif",
+        "font.serif": [],                   # blank entries should cause plots to inherit fonts from the document
+        "font.sans-serif": [],
+        "font.monospace": [],
+        "axes.labelsize": 10,               # LaTeX default is 10pt font.
+        "font.size": 10,
+        "legend.fontsize": 10,               # Make the legend/label fonts a little smaller
+        "xtick.labelsize": 10,
+        "ytick.labelsize": 10,
+        "figure.figsize": figsize(0.9),     # default fig size of 0.9 textwidth
+        "pgf.preamble": [
+            r"\usepackage[utf8x]{inputenc}",    # use utf8 fonts becasue your computer can handle it :)
+            r"\usepackage[T1]{fontenc}",        # plots will be generated using this preamble
+            r"\usepackage{siunitx}",
+            ]
+        }
+
+mpl.rcParams.update(pgf_with_latex)
+
 def vertex_plotter(ast, fig=plt.figure()):
 
     ax = axes3d.Axes3D(fig)
@@ -55,7 +95,8 @@ def plot_energy(time,KE, PE, fig=plt.figure()):
     energy_ax.set_ylabel(r'$\Delta E$')
     energy_ax.legend()
     energy_ax.grid(True)
-
+    
+    plt.show()
     return 0
 
 def animate_inertial_trajectory(t, state, ast, dum, filename=''):
@@ -283,7 +324,7 @@ def animate_relative_trajectory(t, state, ast, dum, filename=''):
 
     plt.show()
 
-def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, dum):
+def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, dum, pgf_save=False, fwidth=0.5):
     """Compare the EOMS in the inertial frame, everything transformed to the inertial frame
     
     Inputs:
@@ -313,7 +354,7 @@ def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, du
     a2i_w = ast2inertial_state[:,15:18]
     
     # position comparison
-    pos_fig, pos_axarr = plt.subplots(3,1, sharex=True)
+    pos_fig, pos_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
     pos_axarr[0].plot(body_time, inertial_pos[:,0], label='Inertial EOMs')
     pos_axarr[0].plot(ast_time, a2i_pos[:,0], label='Transformed Relative')
     pos_axarr[0].set_ylabel(r'$X$ (km)')
@@ -330,7 +371,7 @@ def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, du
     plt.suptitle('Position Comparison')
     plt.legend()  
 
-    posdiff_fig, posdiff_axarr = plt.subplots(3,1, sharex=True)
+    posdiff_fig, posdiff_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
     posdiff_axarr[0].plot(body_time, np.absolute(inertial_pos[:,0]-a2i_pos[:,0]))
     posdiff_axarr[0].set_ylabel(r'$\Delta X$ (km)')
         
@@ -344,7 +385,7 @@ def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, du
     plt.suptitle('Position Difference')
 
     # velocity comparison
-    vel_fig, vel_axarr = plt.subplots(3,1, sharex=True)
+    vel_fig, vel_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
     vel_axarr[0].plot(body_time, inertial_vel[:,0], label='inertial EOMs')
     vel_axarr[0].plot(ast_time, a2i_vel[:,0], label='Transformed relative')
     vel_axarr[0].set_ylabel(r'$\dot X$ (km)')
@@ -361,7 +402,7 @@ def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, du
     plt.suptitle('Velocity Comparison')
     plt.legend()
 
-    veldiff_fig, veldiff_axarr = plt.subplots(3,1, sharex=True)
+    veldiff_fig, veldiff_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
     veldiff_axarr[0].plot(body_time, np.absolute(inertial_vel[:,0]-a2i_vel[:,0]))
     veldiff_axarr[0].set_ylabel(r'$\Delta \dot X$ (km)')
         
@@ -375,7 +416,7 @@ def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, du
     plt.suptitle('Velocity Difference')
 
     # angular velocity comparison
-    angvel_fig, angvel_axarr = plt.subplots(3,1, sharex=True)
+    angvel_fig, angvel_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
     angvel_axarr[0].plot(body_time, inertial_w[:,0], label='Inertial EOMs')
     angvel_axarr[0].plot(ast_time, a2i_w[:,0], label='Transformed Relative')
     angvel_axarr[0].set_ylabel(r'$\dot \Omega_1$ (rad/sec)')
@@ -392,7 +433,7 @@ def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, du
     plt.suptitle('Angular Velocity Comparison')
     plt.legend()
 
-    angveldiff_fig, angveldiff_axarr = plt.subplots(3,1, sharex=True)
+    angveldiff_fig, angveldiff_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
     angveldiff_axarr[0].plot(body_time, np.absolute(inertial_w[:,0]-a2i_w[:,0]))
     angveldiff_axarr[0].set_ylabel(r'$\Delta \dot \Omega$ (rad/sec)')
         
@@ -406,7 +447,7 @@ def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, du
     plt.suptitle('Angular Velocity Difference')
 
     # attitude matrix comparison
-    att_fig, att_axarr = plt.subplots(3,3, sharex=True, sharey=True)
+    att_fig, att_axarr = plt.subplots(3,3, figsize=figsize(fwidth),sharex=True, sharey=True)
     plt.suptitle('Rotation Matrix')
     for ii in range(9):
         row, col = np.unravel_index(ii, [3,3])
@@ -414,14 +455,23 @@ def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, du
         att_axarr[row,col].plot(ast_time, a2i_R[:,ii])
 
     # attitude matrix difference
-    attdiff_fig, attdiff_axarr = plt.subplots(3,3, sharex=True, sharey=True)
+    attdiff_fig, attdiff_axarr = plt.subplots(3,3, figsize=figsize(fwidth),sharex=True, sharey=True)
     plt.suptitle('Rotation Matrix Difference')
     for ii in range(9):
         row, col = np.unravel_index(ii, [3,3])
         attdiff_axarr[row,col].plot(body_time, np.absolute(inertial_R_sc2inertial[:,ii]-a2i_R[:,ii]))
 
-    plt.show()
 
+    # save the figures as pgf if the flag is set
+    if pgf_save:
+        fig_handles = (pos_fig, posdiff_fig, vel_fig, veldiff_fig, angvel_fig, angveldiff_fig, att_fig, attdiff_fig)
+        fig_fnames = ('pos_fig', 'posdiff_fig', 'vel_fig', 'veldiff_fig', 'angvel_fig', 'angveldiff_fig', 'att_fig', 'attdiff_fig')
+
+        for fig, fname in zip(fig_handles, fig_fnames):
+            plt.figure(fig.number)
+            plt.savefig(fname + '.pgf')
+
+    plt.show()
     return 0
 
 def plot_asteroid_comparision(ast_time, body_time, ast_state, body_state, ast, dum):
