@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import dynamics.asteroid as asteroid
 import dynamics.dumbbell as dumbbell
 import kinematics.attitude as attitude
-import plotting
+from visualization import plotting
 
 # ode options
 RelTol = 1e-6
@@ -34,7 +34,7 @@ initial_pos = periodic_pos # km for center of mass in body frame
 # km/sec for COM in asteroid fixed frame
 initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
 initial_R = attitude.rot3(np.pi/2, 'c').reshape(9) # transforms from dumbbell body frame to the inertial frame
-initial_w = np.array([0.001,0.001,0.001]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
+initial_w = np.array([0.01,0.01,0.01]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
 initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
@@ -56,7 +56,7 @@ def inertial_test(filename=''):
     plotting.plot_trajectory(pos, traj_fig)
 
     # animation testing
-    plotting.animate_inertial_trajectory(time, state, ast, dum, filename)
+    # plotting.animate_inertial_trajectory(time, state, ast, dum, filename)
 
     # energy plot
     KE, PE = dum.inertial_energy(time, state, ast)
@@ -137,7 +137,7 @@ def eoms_relative(state, t, ast, dum):
     # unpack the state
         pos = state[0:3] # location of the COM of dumbbell in asteroid fixed frame
         vel = state[3:6] # vel of com wrt to asteroid expressed in the asteroid fixed frame
-        
+
         Ra = attitude.rot3(ast.omega*t, 'c') # asteroid body frame to inertial frame
 
         # unpack parameters for the dumbbell
@@ -165,7 +165,7 @@ def eoms_relative(state, t, ast, dum):
         vel_dot = 1/m * (F_com - m * attitude.hat_map(Omega).dot(vel))
 
         state_dot = np.hstack((pos_dot,vel_dot))
-        
+
         return state_dot
 
 def moment_comparison():
@@ -178,8 +178,8 @@ def moment_comparison():
     initial_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607]) # km for center of mass in body frame
     # km/sec for COM in asteroid fixed frame
     initial_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327]) + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
-    initial_R = attitude.rot3(np.pi/2, 'c').reshape(9) # transforms from dumbbell body frame to the inertial frame
-    initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
+    initial_R = attitude.rot3(0, 'c').reshape(9) # transforms from dumbbell body frame to the inertial frame
+    initial_w = np.array([0,10,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 

@@ -1,7 +1,7 @@
 import dynamics.asteroid as asteroid
 import dynamics.dumbbell as dumbbell
 import kinematics.attitude as attitude
-import plotting
+from visualization import plotting
 
 import numpy as np
 from scipy import integrate
@@ -13,19 +13,16 @@ import pdb
 periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
 periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327])
 
-def inertial_eoms_driver(ast_name,num_faces,tf,num_steps):
+def inertial_eoms_driver(tf, num_steps, initial_w, ast, dum):
     # ode options
     RelTol = 1e-9
     AbsTol = 1e-9
 
-    ast = asteroid.Asteroid(ast_name,num_faces)
-    dum = dumbbell.Dumbbell()
     # set initial state
     initial_pos = periodic_pos # km for center of mass in body frame
     # km/sec for COM in asteroid fixed frame
     initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
     initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the inertial frame
-    initial_w = np.array([0,0,0]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
@@ -68,7 +65,7 @@ def inertial_eoms_energy_behavior(ast_name, num_faces, tf, num_steps):
     # km/sec for COM in asteroid fixed frame
     initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
     initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the inertial frame
-    initial_w = np.array([0.001,0.001,0.001]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
+    initial_w = np.array([0.01,0.02,0.03]) # angular velocity of dumbbell wrt to inertial frame represented in sc body frame
 
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
@@ -112,7 +109,10 @@ def inertial_sim_plotter(file_name, mode):
             ast = asteroid.Asteroid(ast_name,num_faces)
             dum = dumbbell.Dumbbell()
             
-            plotting.animate_inertial_trajectory(time, state, ast, dum, file_name[:-4])
+            
+            # print out some useful statistics
+            print("Tol - %s, DeltaE - %4e" % (tol, (KE + PE)[-1]))
+            # plotting.animate_inertial_trajectory(time, state, ast, dum, file_name[:-4])
         elif mode == 1:
             state_dict = data['state_dict'][()]
             time_dict = data['time_dict'][()]
@@ -123,7 +123,10 @@ def inertial_sim_plotter(file_name, mode):
             for tol in state_dict:
                 E = KE_dict[tol] + PE_dict[tol]
                 Ediff = np.absolute(E - E[0])
-
+                
+                # print out some useful statistics
+                print("Tol - %s, DeltaE - %4e" % (tol, E[-1]))
+                
                 plotting.plt.plot(time_dict[tol], Ediff, label=tol)
 
             plotting.plt.legend()
