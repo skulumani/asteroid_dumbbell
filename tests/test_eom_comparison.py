@@ -1,7 +1,11 @@
 import numpy as np
+from scipy import integrate
+
 from eom_comparison import transform
 from kinematics import attitude as att
 from dynamics import dumbbell, asteroid
+import inertial_driver as idriver
+import relative_driver as rdriver
 
 class TestInertialTransform():
 
@@ -58,3 +62,53 @@ class TestHamiltonRelativeTransform():
 
     def test_eoms_hamilton_relative_to_inertial_scalar_ang_vel(self):
         np.testing.assert_almost_equal(self.R_sc2int.dot(self.body_ang_vel), self.inertial_state[15:18])
+
+class TestInertialandRelativeEOMS():
+    """Compare the inertial and relative eoms against one another
+
+    """
+    RelTol = 1e-9
+    AbsTol = 1e-9
+    ast_name = 'castalia'
+    num_faces = 64
+    tf = 1e2
+    num_steps = 1e2
+    time = np.linspace(0,tf,num_steps)
+
+    periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
+    periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327])
+
+    ast = asteroid.Asteroid(ast_name,num_faces)
+    dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
+
+    # set initial state for inertial EOMs
+    initial_pos = periodic_pos # km for center of mass in body frame
+    initial_vel = periodic_vel +att.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
+    initial_R = att.rot2(np.pi/2).reshape(9) # transforms from dumbbell body frame to the inertial frame
+    initial_w = np.array([0.01, 0.01, 0.01])
+    initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
+
+    i_state = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
+    # (i_time, i_state) = idriver.eom_inertial_driver(initial_state, time, ast, dum, AbsTol=1e-9, RelTol=1e-9)
+
+    initial_lin_mom = (dum.m1 + dum.m2) * (periodic_vel + att.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos))
+    initial_ang_mom = initial_R.reshape((3,3)).dot(dum.J).dot(initial_w)
+    initial_ham_state = np.hstack((initial_pos, initial_lin_mom, initial_R, initial_ang_mom))
+
+    rh_state = integrate.odeint(dum.eoms_hamilton_relative, initial_ham_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
+    
+    # now convert both into the inertial frame
+    istate_ham = transform.eoms_hamilton_relative_to_inertial(time,rh_state,ast, dum) 
+    istate_int = transform.eoms_inertial_to_inertial(time,i_state, ast, dum) 
+    def test_inertial_frame_comparison_pos(self):
+        """Make sure EOMs match in the inertial frame
+        """
+        np.testing.assert_array_almost_equal(self.istate_ham[:, 0:3], self.istate_int[:, 0:3])
+    def test_asteroid_frame_comparison(self):
+        """Make sure EOMs match in the asteroid frame
+        """
+        pass
+    def test_dumbbell_frame_comparison(self):
+        """Make sure the EOMs match in the dumbbell frame
+        """
+        pass
