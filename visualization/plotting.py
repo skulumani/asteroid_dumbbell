@@ -328,9 +328,9 @@ def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, du
     """Compare the EOMS in the inertial frame, everything transformed to the inertial frame
     
     Inputs:
-        ast_time - time vector from eoms_relative
+        ast_time - time vector from eoms_hamilton_relative
         body_time - time vector from eoms_inertial
-        ast_state - state vector from eoms_relative
+        ast_state - state vector from eoms_hamilton_relative
         body_state - state vector from eoms_inertial
         ast - instance of Asteroid class
         dum - instance of Dumbbell class
@@ -339,8 +339,8 @@ def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, du
 
     """
     # convert simulations into the inertial frame    
-    inertial_state = eom_transform.body2inertial(body_time, body_state, ast, dum) 
-    ast2inertial_state,_,_ = eom_transform.ast2inertial(ast_time, ast_state, ast, dum)
+    inertial_state = eom_transform.eoms_inertial_to_inertial(body_time, body_state, ast, dum) 
+    ast2inertial_state = eom_transform.eoms_hamilton_relative_to_inertial(ast_time, ast_state, ast, dum)
     
      # extract out the states
     inertial_pos = inertial_state[:,0:3]
