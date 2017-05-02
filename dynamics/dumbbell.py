@@ -30,6 +30,55 @@ class Dumbbell(object):
         self.J = self.Jm1 + self.Jm2 + self.m1 *(np.inner(self.zeta1,self.zeta1)*np.eye(3,3) - np.outer(self.zeta1,self.zeta1)) + self.m2 * (np.inner(self.zeta2,self.zeta2)*np.eye(3,3) - np.outer(self.zeta2,self.zeta2))
         self.Jd = self.m1*np.outer(self.zeta1,self.zeta1) + self.m2*np.outer(self.zeta2,self.zeta2) + self.Jm1/2 + self.Jm2/2
 
+    def eoms_inertial_ode(self, t, state, ast):
+        """Inertial dumbbell equations of motion about an asteroid
+        
+        Inputs:
+            t - 
+            state -
+            ast - Asteroid class object holding the asteroid gravitational model and
+            other useful parameters
+        """
+        # unpack the state
+        pos = state[0:3] # location of the center of mass in the inertial frame
+        vel = state[3:6] # vel of com in inertial frame
+        R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+        ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
+
+        Ra = attitude.rot3(ast.omega*t, 'c') # asteroid body frame to inertial frame
+
+        # unpack parameters for the dumbbell
+        J = self.J
+
+        rho1 = self.zeta1
+        rho2 = self.zeta2
+
+        # position of each mass in the asteroid frame
+        z1 = Ra.T.dot(pos + R.dot(rho1))
+        z2 = Ra.T.dot(pos + R.dot(rho2))
+
+        z = Ra.T.dot(pos) # position of COM in asteroid frame
+
+        # compute the potential at this state
+        (U1, U1_grad, U1_grad_mat, U1laplace) = ast.polyhedron_potential(z1)
+        (U2, U2_grad, U2_grad_mat, U2laplace) = ast.polyhedron_potential(z2)
+
+        F1 = self.m1*Ra.dot(U1_grad)
+        F2 = self.m2*Ra.dot(U2_grad)
+
+        M1 = self.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
+        M2 = self.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
+        # M1 = np.zeros(3)
+        # M2 = np.zeros_like(3)
+
+        pos_dot = vel
+        vel_dot = 1/(self.m1+self.m2) *(F1 + F2)
+        R_dot = R.dot(attitude.hat_map(ang_vel)).reshape(9)
+        ang_vel_dot = np.linalg.inv(J).dot(-np.cross(ang_vel,J.dot(ang_vel)) + M1 + M2)
+
+        statedot = np.hstack((pos_dot, vel_dot, R_dot, ang_vel_dot))
+
+        return statedot
     def eoms_inertial(self, state,t, ast):
         """Inertial dumbbell equations of motion about an asteroid
         
@@ -150,6 +199,74 @@ class Dumbbell(object):
         
         return state_dot
 
+    def eoms_hamilton_relative_ode(self, t, state, ast):
+        """Hamiltonian form of Relative EOMS defined in the rotating asteroid frame
+
+        This function defines the motion of a dumbbell spacecraft in orbit around an asteroid.
+        The EOMS are defined relative to the asteroid itself, which is in a state of constant rotation.
+        You need to use this function with scipy.integrate.odeint
+
+        Inputs:
+            t - current time of simulation (sec)
+            state - (18,) relative hamiltonian state of dumbbell with respect to asteroid
+                pos - state[0:3] in km position of the dumbbell with respect to the asteroid and defined in the asteroid fixed frame
+                lin_mom - state[3:6] in kg km/sec is the linear momentum of dumbbell wrt the asteroid and defined in the asteroid fixed frame
+                R - state[6:15] rotation matrix which converts vectors from the dumbbell frame to the asteroid frame
+                ang_mom - state[15:18] J rad/sec angular momentum of the dumbbell wrt inertial frame and defined in the asteroid frame
+            ast - asteroid object
+
+        Output:
+            state_dot - (18,) derivative of state. The order is the same as the input state.
+        """
+        
+        # unpack the state
+        pos = state[0:3] # location of the COM of dumbbell in asteroid fixed frame
+        lin_mom = state[3:6] # lin_mom of com wrt to asteroid expressed in the asteroid fixed frame
+        R = np.reshape(state[6:15],(3,3)) # sc body frame to asteroid body frame R = R_A^T R_1
+        ang_mom = state[15:18] # angular momentum of sc wrt inertial frame and expressed in asteroid fixed frame
+        
+        Ra = attitude.rot3(ast.omega*t, 'c') # asteroid body frame to inertial frame
+
+        # unpack parameters for the dumbbell
+        m1 = self.m1
+        m2 = self.m2
+        m = m1 + m2
+        J = self.J
+        Jr = R.dot(J).dot(R.T)
+        Wa = ast.omega*np.array([0,0,1]) # angular velocity vector of asteroid
+
+        # the position of each mass in the dumbbell body frame
+        rho1 = self.zeta1
+        rho2 = self.zeta2
+
+        # position of each mass in the asteroid frame
+        z1 = pos + R.dot(rho1)
+        z2 = pos + R.dot(rho2)
+
+        z = pos # position of COM in asteroid frame
+
+        # compute the potential at this state
+        (U1, U1_grad, U1_grad_mat, U1laplace) = ast.polyhedron_potential(z1)
+        (U2, U2_grad, U2_grad_mat, U2laplace) = ast.polyhedron_potential(z2)
+
+        # force due to each mass expressed in asteroid body frame
+        F1 = m1*U1_grad
+        F2 = m2*U2_grad
+
+        M1 = m1*attitude.hat_map(R.dot(rho1)).dot(U1_grad) 
+        M2 = m2*attitude.hat_map(R.dot(rho2)).dot(U2_grad) 
+
+        vel = lin_mom / (m1 + m2)
+        w = np.linalg.inv(Jr).dot(ang_mom)
+        # state derivatives
+        pos_dot = vel - attitude.hat_map(Wa).dot(pos)
+        lin_mom_dot = F1 + F2 - attitude.hat_map(Wa).dot(lin_mom)
+        R_dot = attitude.hat_map(w).dot(R) - attitude.hat_map(Wa).dot(R)
+        R_dot = R_dot.reshape(9)
+        ang_mom_dot = M1 + M2  - attitude.hat_map(Wa).dot(ang_mom) 
+        state_dot = np.hstack((pos_dot, lin_mom_dot, R_dot, ang_mom_dot))
+        
+        return state_dot
     def eoms_hamilton_relative(self, state, t, ast):
         """Hamiltonian form of Relative EOMS defined in the rotating asteroid frame
 

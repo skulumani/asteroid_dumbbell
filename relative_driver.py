@@ -13,24 +13,27 @@ import argparse
 periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
 periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327])
 
-def relative_hamiltonian_eoms_driver(tf, num_steps, initial_w, ast, dum):
-    # ode options
-    RelTol = 1e-9
-    AbsTol = 1e-9
+def eoms_hamilton_relative_driver(initial_state, time, ast, dum, AbsTol=1e-9, RelTol=1e-9):
 
-    # set initial state
-    initial_pos = periodic_pos # km for center of mass in body frame
-    initial_lin_mom = (dum.m1 + dum.m2) * (periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos))
-    initial_R = np.eye(3,3).reshape(9) # transforms from dumbbell body frame to the asteroid frame
-    initial_ang_mom = initial_R.reshape((3,3)).dot(dum.J).dot(initial_w)
+     # state = integrate.odeint(dum.eoms_hamilton_relative, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
+    # use ode instead of odeint as well
+    solver = integrate.ode(dum.eoms_hamilton_relative_ode)
+    solver.set_integrator('dopri5', atol=AbsTol, rtol=RelTol)
+    solver.set_initial_value(initial_state, 0)
+    solver.set_f_params(ast)
 
-    initial_state = np.hstack((initial_pos, initial_lin_mom, initial_R, initial_ang_mom))
+    state = np.zeros((int(time.shape[0]), int(initial_state.shape[0])))
+    t = np.zeros(int(time.shape[0]))
+    dt = time[1] - time[0]
+    ii = 1
+    while solver.successful() and ii < time.shape[0]:
+        solver.integrate(solver.t + dt)
+        t[ii] = solver.t
+        state[ii, :] = solver.y
 
-    time = np.linspace(0,tf,num_steps)
+        ii = ii + 1
 
-    state = integrate.odeint(dum.eoms_hamilton_relative, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
-
-    return (time,state)
+    return (t, state)
 
 def relative_eoms_driver(tf, num_steps, initial_w, ast, dum):
     # ode options

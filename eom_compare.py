@@ -35,6 +35,7 @@ initial_w = np.array([0.01, 0.01, 0.01])
 initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
 i_state = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
+# (i_time, i_state) = idriver.eom_inertial_driver(initial_state, time, ast, dum, AbsTol=1e-9, RelTol=1e-9)
 
 print("Running hamiltonian asteroid EOMs")
 initial_lin_mom = (dum.m1 + dum.m2) * (periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos))
@@ -42,7 +43,7 @@ initial_ang_mom = initial_R.reshape((3,3)).dot(dum.J).dot(initial_w)
 initial_ham_state = np.hstack((initial_pos, initial_lin_mom, initial_R, initial_ang_mom))
 
 rh_state = integrate.odeint(dum.eoms_hamilton_relative, initial_ham_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
-
+# (rh_time, rh_state) = rdriver.eoms_hamilton_relative_driver(initial_ham_state, time, ast, dum, AbsTol=1e-9, RelTol=1e-9)
 # do the inverse legendre transformation
 rel_lin_mom = rh_state[:, 3:6]
 rel_ang_mom = rh_state[:, 15:18]
