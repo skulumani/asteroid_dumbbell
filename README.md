@@ -35,4 +35,31 @@ $ conda env export > env.yml
 $ conda env create -f mayavi_enviornment.yml
 ~~~
 
+## [Profiling](https://github.com/barbagroup/numba_tutorial_scipy2016/blob/master/notebooks/01.When.where.to.use.Numba.ipynb)
+
+To profile the Python code you can use `cProfile` or `line-profiler`
+~~~
+pip install cProfile line-profiler snakeviz
+~~~
+
+* Use `cProfile` to find which function call is taking the most time out of a bigger script
+~~~
+import cProfile
+cProfile.run('script to execute as a string')
+~~~
+    * You can also do this from within iPython as
+    ~~~
+    %prun -D output.prof function()
+    ~~~
+* Next use snakeviz to visualize it
+~~~
+%load_ext snakeviz
+%snakeviz function()
+~~~
+* Once you have an idea of the slow function you can find specific lines within the function 
+using `line-profiler`
+~~~
+%load_ext line_profiler
+%lprun -T output.txt -f ast.function() script()
+~~~
 
