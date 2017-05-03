@@ -101,9 +101,17 @@ class TestInertialandRelativeEOMS():
     istate_ham = transform.eoms_hamilton_relative_to_inertial(time,rh_state,ast, dum) 
     istate_int = transform.eoms_inertial_to_inertial(time,i_state, ast, dum) 
     def test_inertial_frame_comparison_pos(self):
-        """Make sure EOMs match in the inertial frame
-        """
         np.testing.assert_array_almost_equal(self.istate_ham[:, 0:3], self.istate_int[:, 0:3])
+
+    def test_inertial_frame_comparison_vel(self):
+        np.testing.assert_array_almost_equal(self.istate_ham[:, 3:6], self.istate_int[:, 3:6])
+
+    def test_inertial_frame_comparison_att(self):
+        np.testing.assert_array_almost_equal(self.istate_ham[:, 6:15], self.istate_int[:, 6:15])
+
+    def test_inertial_frame_comparison_ang_vel(self):
+        np.testing.assert_array_almost_equal(self.istate_ham[:, 15:18], self.istate_int[:, 15:18])
+
     def test_asteroid_frame_comparison(self):
         """Make sure EOMs match in the asteroid frame
         """
