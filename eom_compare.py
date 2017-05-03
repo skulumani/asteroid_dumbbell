@@ -67,3 +67,6 @@ rh_state = run_hamilton()
 
 print("Plot comparison in the inertial frame")
 plotting.plot_inertial_comparison(time,time, rh_state, i_state, ast, dum, False, 1)
+
+print("Plot comparison in the asteroid frame")
+plotting.plot_asteroid_comparison(time, time, rh_state, i_state, ast, dum, False, 1)

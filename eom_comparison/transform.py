@@ -408,3 +408,151 @@ def eoms_hamilton_relative_to_inertial(time, state, ast, dum):
 
     return inertial_state
 
+def eoms_inertial_to_asteroid(time, state, ast, dum):
+    """Convert eoms_inertial output into the asteroid rotating frame
+    
+    The eoms_inertial are not completely defined in the inertial frame.
+    The angular velocity needs to be converted. This function eases that issue by simply accpeting
+    the entire state output from eoms_inertial and transforming it.
+
+    Parameters
+    ----------
+    time : nx1 numpy array
+        time array of the simulation
+    state : nx18 numpy array
+        pos - state[0:3] in km position of the dumbbell with respect to the asteroid and defined in the asteroid fixed frame
+        lin_mom - state[3:6] in kg km/sec is the linear momentum of dumbbell wrt the asteroid and defined in the asteroid fixed frame
+        R - state[6:15] rotation matrix which converts vectors from the dumbbell frame to the asteroid frame
+        ang_mom - state[15:18] J rad/sec angular momentum of the dumbbell wrt inertial frame and defined in the asteroid frame
+    ast : Instance of Asteroid class
+    dum : Instance of Dumbbell class
+    
+    Returns
+    -------
+    ast_state : nx18 numpy array 
+        ast_pos - ast_state[:, 0:3] is the position of the sc with respect to the asteroid
+            fixed frame and represented in the asteroid rotating frame
+        ast_vel - ast_state[:, 3:6] is the velocity of the sc with respect to the asteroid and 
+            represented in the asteroid rotating frame
+        ast_R_sc2ast - ast_state[:, 6:15] is the transformation from the sc frame to the inertial
+            frame
+        ast_w - ast_state[:, 15:18] is the angular velocity of the sc with respect to the inertial 
+            frame and defined in the asteroid frame
+    """
+    
+    ast_state = np.zeros(state.shape)
+
+    if state.ndim == 1:
+        inertial_pos = state[0:3]
+        inertial_vel = state[3:6]
+        R_sc2int = state[6:15]
+        body_w = state[15:18]
+
+        Rast2int = attitude.rot3(ast.omega*time, 'c') # asteroid body frame to inertial frame
+        Ra = Rast2int 
+
+        ast_pos = Ra.T.dot(inertial_pos)
+        ast_vel = Ra.T.dot(inertial_vel)
+        R_sc2ast = Ra.T.dot(R_sc2int.reshape((3,3))).reshape(9)
+        ast_w = R_sc2ast.reshape((3,3)).dot(body_w)
+
+        ast_state = np.hstack((ast_pos, ast_vel, R_sc2ast, ast_w))
+    elif state.ndim == 2:
+
+        # transformation between asteroid fixed frame and inertial frame
+        # figure out transformation from inertial frame to relative frame
+        Rast2int = np.zeros((3, 3, time.shape[0]))
+
+        for ii, t in np.ndenumerate(time):
+            Rast2int[:, :, ii] = attitude.rot3(ast.omega*t, 'c')[:, :, np.newaxis] # asteroid body frame to inertial frame
+
+            Ra = np.squeeze(Rast2int[:, :, ii])
+            # convert the relative state to the inertial frame
+            inertial_pos = np.squeeze(state[ii, 0:3])
+            inertial_vel = np.squeeze(state[ii, 3:6])
+            R_sc2int = np.squeeze(state[ii, 6:15].reshape(3, 3))
+            body_w = np.squeeze(state[ii, 15:18])
+
+            ast_pos = Ra.T.dot(inertial_pos)
+            ast_vel = Ra.T.dot(inertial_vel)
+            ast_R_sc2ast = Ra.T.dot(R_sc2int).reshape(9)
+            ast_w = ast_R_sc2ast.reshape((3, 3)).dot(body_w)
+
+            ast_state[ii, :] = np.hstack((ast_pos, ast_vel, ast_R_sc2ast, ast_w))
+
+    return ast_state
+
+def eoms_hamilton_relative_to_asteroid(time, state, ast, dum):
+    """Convert eoms_hamilton_relative to the asteroid rotating frame
+
+    This function will convert the output from the eoms_hamilton_relative into the asteroid frame.
+    Since the equations are defined in the hamiltonian form first the inverse legendre transform 
+    is used followed by a transformation into the asteroid frame. 
+
+    The output of this function along with eoms_inertial_to_asteroid should be in the same frame
+    and allows for easy comparison.
+
+    Parameters
+    ----------
+    time : nx1 numpy array
+        time array of the simulation
+    state : nx18 numpy array
+        pos - state[0:3] in km position of the dumbbell with respect to the asteroid and defined in the asteroid fixed frame
+        lin_mom - state[3:6] in kg km/sec is the linear momentum of dumbbell wrt the asteroid and defined in the asteroid fixed frame
+        R - state[6:15] rotation matrix which converts vectors from the dumbbell frame to the asteroid frame
+        ang_mom - state[15:18] J rad/sec angular momentum of the dumbbell wrt inertial frame and defined in the asteroid frame
+    ast - Instance of Asteroid class
+    dum - Instance of Dumbbell class
+    
+    Returns
+    -------
+    ast_state : nx18 numpy array 
+        ast_pos - ast_state[:, 0:3] is the position of the sc with respect to the asteroid
+            fixed frame and represented in the asteroid frame
+        ast_vel - ast_state[:, 3:6] is the velocity of the sc with respect to the asteroid and 
+            represented in the asteroid fixed frame
+        ast_R_sc2ast - ast_state[:, 6:15] is the transformation from the sc frame to the asteroid
+            frame
+        ast_w - ast_state[:, 15:18] is the angular velocity of the sc with respect to the inertial 
+            frame and defined in the asteroid frame
+    """
+
+    if state.ndim == 1:
+        # first do the inverse legendre transform
+        rel_lin_mom = state[3:6]
+        rel_ang_mom = state[15:18]
+        R = state[6:15].reshape((3,3))
+
+        rh_vel = rel_lin_mom / (dum.m1 + dum.m2)
+
+        Rast2int = attitude.rot3(ast.omega * time, 'c')
+        Ra = Rast2int
+        Jr = R.dot(dum.J).dot(R.T)
+
+        rh_ang_vel = np.linalg.inv(Jr).dot(rel_ang_mom)
+
+        ast_state = np.hstack((state[0:3], rh_vel, R.reshape(9), rh_ang_vel))
+    elif state.ndim == 2:
+        rel_lin_mom = state[:, 3:6]
+        rel_ang_mom = state[:, 15:18]
+
+        rh_vel = rel_lin_mom / (dum.m1 + dum.m2)
+        rh_ang_vel = np.zeros_like(rel_ang_mom)
+
+        Rast2int = np.zeros((3, 3, time.shape[0]))
+
+        ast_state = np.zeros(state.shape)
+
+        for ii, t in np.ndenumerate(time):
+            Rast2int[:, :, ii] = attitude.rot3(ast.omega * t, 'c')[:, :, np.newaxis]
+            Ra = np.squeeze(Rast2int[:, :, ii])
+
+            R = state[ii, 6:15].reshape((3, 3))
+
+            Jr = R.dot(dum.J).dot(R.T)
+            rh_ang_vel[ii, :] = np.linalg.inv(Jr).dot(np.squeeze(rel_ang_mom[ii, :]))
+
+            ast_state[ii, :] = np.hstack((state[ii, 0:3], rh_vel[ii, :], R.reshape((1,9)), rh_ang_vel[ii,:]))
+
+    return ast_state
+
