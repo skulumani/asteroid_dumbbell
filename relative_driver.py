@@ -74,32 +74,22 @@ def relative_sim_plotter(file_name, mode):
     # load the data
     with np.load(file_name, allow_pickle=True) as data:
         if mode == 0:
-            state = data['state']
             time = data['time']
             KE = data['KE']
             PE = data['PE']
 
-            ast_name = data['ast_name'][()]
-            num_faces = data['num_faces'][()]
             # compute the
             e_fig = plotting.plt.figure()
-            traj_fig = plotting.plt.figure()
             plotting.plot_energy(time,KE, PE, e_fig)
-            plotting.plot_trajectory(state[:,0:3], traj_fig)
-
-            ast = asteroid.Asteroid(ast_name,num_faces)
-            dum = dumbbell.Dumbbell()
-            print("Tol - %s, DeltaE - %4e" % (tol, (KE + PE)[-1]))
 
             # plotting.animate_relative_trajectory(time, state, ast, dum, file_name[:-4])
         elif mode == 1:
-            state_dict = data['state_dict'][()]
             time_dict = data['time_dict'][()]
             KE_dict = data['KE_dict'][()]
             PE_dict = data['PE_dict'][()]
 
             e_fig = plotting.plt.figure()
-            for tol in state_dict:
+            for tol in time_dict:
                 E = KE_dict[tol] + PE_dict[tol]
                 Ediff = np.absolute(E - E[0])
 
