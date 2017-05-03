@@ -276,8 +276,8 @@ def eoms_inertial_to_inertial(time, state, ast, dum):
 
     # logic to check if the input is only a single element array
     if state.ndim == 1:
-        inertial_pos = np.squeeze(state[0:3])
-        inertial_vel = np.squeeze(state[3:6])
+        inertial_pos = state[0:3]
+        inertial_vel = state[3:6]
         R_sc2int = state[6:15]
         body_w = state[15:18]
 
@@ -327,15 +327,15 @@ def eoms_hamilton_relative_to_inertial(time, state, ast, dum):
     
     Returns
     -------
-        inertial_state : nx18 numpy array 
-            inertial_pos - inertial_state[:, 0:3] is the position of the sc with respect to the asteroid
-                fixed frame and represented in the inertial frame
-            inertial_vel - inertial_state[:, 3:6] is the velocity of the sc with respect to the asteroid and 
-                represented in the inertial fixed frame
-            inertial_R_sc2int - inertial_state[:, 6:15] is the transformation from the sc frame to the inertial
-                frame
-            inertial_w - inertial_state[:, 15:18] is the angular velocity of the sc with respect to the inertial 
-                frame and defined in the inertial frame
+    inertial_state : nx18 numpy array 
+        inertial_pos - inertial_state[:, 0:3] is the position of the sc with respect to the asteroid
+            fixed frame and represented in the inertial frame
+        inertial_vel - inertial_state[:, 3:6] is the velocity of the sc with respect to the asteroid and 
+            represented in the inertial fixed frame
+        inertial_R_sc2int - inertial_state[:, 6:15] is the transformation from the sc frame to the inertial
+            frame
+        inertial_w - inertial_state[:, 15:18] is the angular velocity of the sc with respect to the inertial 
+            frame and defined in the inertial frame
     """
     if state.ndim == 1:
         # first do the inverse legendre transform
@@ -346,7 +346,6 @@ def eoms_hamilton_relative_to_inertial(time, state, ast, dum):
         rh_ang_vel = np.zeros_like(rel_ang_mom)
 
         Rast2int = attitude.rot3(ast.omega*time, 'c') # asteroid body frame to inertial frame
-        Rint2ast = attitude.rot3(ast.omega*time, 'c')
         Ra = Rast2int 
 
         R = state[6:15].reshape((3,3))    
