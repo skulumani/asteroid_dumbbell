@@ -39,17 +39,23 @@ initial_R = attitude.rot2(np.pi/2).reshape(9) # transforms from dumbbell body fr
 initial_w = np.array([0.01, 0.01, 0.01])
 initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
-i_state = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
-# (i_time, i_state) = idriver.eom_inertial_driver(initial_state, time, ast, dum, AbsTol=1e-9, RelTol=1e-9)
+def run_inertial():
+    i_state = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
+    # (i_time, i_state) = idriver.eom_inertial_driver(initial_state, time, ast, dum, AbsTol=1e-9, RelTol=1e-9)
+    return i_state
 
 print("Running hamiltonian asteroid EOMs")
 initial_lin_mom = (dum.m1 + dum.m2) * (periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos))
 initial_ang_mom = initial_R.reshape((3,3)).dot(dum.J).dot(initial_w)
 initial_ham_state = np.hstack((initial_pos, initial_lin_mom, initial_R, initial_ang_mom))
 
-rh_state = integrate.odeint(dum.eoms_hamilton_relative, initial_ham_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
-# (rh_time, rh_state) = rdriver.eoms_hamilton_relative_driver(initial_ham_state, time, ast, dum, AbsTol=1e-9, RelTol=1e-9)
+def run_hamilton():
+    rh_state = integrate.odeint(dum.eoms_hamilton_relative, initial_ham_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
+    # (rh_time, rh_state) = rdriver.eoms_hamilton_relative_driver(initial_ham_state, time, ast, dum, AbsTol=1e-9, RelTol=1e-9)
+    return rh_state
 
+i_state = run_inertial()
+rh_state = run_hamilton()
 # also compute and compare the energy behavior
 # print("Computing inertial energy")
 # i_KE, i_PE = dum.inertial_energy(time, i_state, ast)
