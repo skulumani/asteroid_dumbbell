@@ -100,6 +100,11 @@ class TestInertialandRelativeEOMS():
     # now convert both into the inertial frame
     istate_ham = transform.eoms_hamilton_relative_to_inertial(time,rh_state,ast, dum) 
     istate_int = transform.eoms_inertial_to_inertial(time,i_state, ast, dum) 
+
+    # also convert both into the asteroid frame and compare
+    astate_ham = transform.eoms_hamilton_relative_to_asteroid(time, rh_state, ast, dum)
+    astate_int = transform.eoms_inertial_to_asteroid(time, i_state, ast, dum)
+
     def test_inertial_frame_comparison_pos(self):
         np.testing.assert_array_almost_equal(self.istate_ham[:, 0:3], self.istate_int[:, 0:3])
 
@@ -112,11 +117,14 @@ class TestInertialandRelativeEOMS():
     def test_inertial_frame_comparison_ang_vel(self):
         np.testing.assert_array_almost_equal(self.istate_ham[:, 15:18], self.istate_int[:, 15:18])
 
-    def test_asteroid_frame_comparison(self):
-        """Make sure EOMs match in the asteroid frame
-        """
-        pass
-    def test_dumbbell_frame_comparison(self):
-        """Make sure the EOMs match in the dumbbell frame
-        """
-        pass
+    def test_asteroid_frame_comparison_pos(self):
+        np.testing.assert_array_almost_equal(self.astate_ham[:, 0:3], self.astate_int[:, 0:3])
+
+    def test_asteroid_frame_comparison_vel(self):
+        np.testing.assert_array_almost_equal(self.astate_ham[:, 3:6], self.astate_int[:, 3:6])
+
+    def test_asteroid_frame_comparison_att(self):
+        np.testing.assert_array_almost_equal(self.astate_ham[:, 6:15], self.astate_int[:, 6:15])
+
+    def test_asteroid_frame_comparison_ang_vel(self):
+        np.testing.assert_array_almost_equal(self.astate_ham[:, 15:18], self.astate_int[:, 15:18])
