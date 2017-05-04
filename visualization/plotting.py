@@ -469,7 +469,7 @@ def plot_inertial_comparison(ast_time, body_time, ast_state, body_state, ast, du
 
         for fig, fname in zip(fig_handles, fig_fnames):
             plt.figure(fig.number)
-            plt.savefig(fname + 'inertial' + '.pgf')
+            plt.savefig('./inertial/' + fname + '_inertial' + '.pgf')
 
     plt.show()
     return 0
@@ -505,7 +505,7 @@ def plot_asteroid_comparison(rh_time, body_time, rh_state, body_state, ast, dum,
     ast_w = ast_state[:,15:18]
     
     # position comparison
-    pos_fig, pos_axarr = plt.subplots(3,1, sharex=True)
+    pos_fig, pos_axarr = plt.subplots(3,1,figsize=figsize(fwidth), sharex=True)
     pos_axarr[0].plot(body_time, i2a_pos[:,0], label='Inertial EOMs')
     pos_axarr[0].plot(rh_time, ast_pos[:,0], label='Transformed Relative')
     pos_axarr[0].set_ylabel(r'$X$ (km)')
@@ -522,7 +522,7 @@ def plot_asteroid_comparison(rh_time, body_time, rh_state, body_state, ast, dum,
     plt.suptitle('Position Comparison')
     plt.legend()  
 
-    posdiff_fig, posdiff_axarr = plt.subplots(3,1, sharex=True)
+    posdiff_fig, posdiff_axarr = plt.subplots(3,1,figsize=figsize(fwidth), sharex=True)
     posdiff_axarr[0].plot(body_time, np.absolute(i2a_pos[:,0]-ast_pos[:,0]))
     posdiff_axarr[0].set_ylabel(r'$\Delta X$ (km)')
         
@@ -536,7 +536,7 @@ def plot_asteroid_comparison(rh_time, body_time, rh_state, body_state, ast, dum,
     plt.suptitle('Position Difference')
 
     # velocity comparison
-    vel_fig, vel_axarr = plt.subplots(3,1, sharex=True)
+    vel_fig, vel_axarr = plt.subplots(3,1,figsize=figsize(fwidth), sharex=True)
     vel_axarr[0].plot(body_time, i2a_vel[:,0], label='inertial EOMs')
     vel_axarr[0].plot(rh_time, ast_vel[:,0], label='Transformed relative')
     vel_axarr[0].set_ylabel(r'$\dot X$ (km)')
@@ -553,7 +553,7 @@ def plot_asteroid_comparison(rh_time, body_time, rh_state, body_state, ast, dum,
     plt.suptitle('Velocity Comparison')
     plt.legend()
 
-    veldiff_fig, veldiff_axarr = plt.subplots(3,1, sharex=True)
+    veldiff_fig, veldiff_axarr = plt.subplots(3,1,figsize=figsize(fwidth), sharex=True)
     veldiff_axarr[0].plot(body_time, np.absolute(i2a_vel[:,0]-ast_vel[:,0]))
     veldiff_axarr[0].set_ylabel(r'$\Delta \dot X$ (km)')
         
@@ -567,7 +567,7 @@ def plot_asteroid_comparison(rh_time, body_time, rh_state, body_state, ast, dum,
     plt.suptitle('Velocity Difference')
 
     # angular velocity comparison
-    angvel_fig, angvel_axarr = plt.subplots(3,1, sharex=True)
+    angvel_fig, angvel_axarr = plt.subplots(3,1,figsize=figsize(fwidth), sharex=True)
     angvel_axarr[0].plot(body_time, i2a_w[:,0], label='Inertial EOMs')
     angvel_axarr[0].plot(rh_time, ast_w[:,0], label='Transformed Relative')
     angvel_axarr[0].set_ylabel(r'$\dot \Omega_1$ (rad/sec)')
@@ -584,7 +584,7 @@ def plot_asteroid_comparison(rh_time, body_time, rh_state, body_state, ast, dum,
     plt.suptitle('Angular Velocity Comparison')
     plt.legend()
 
-    angveldiff_fig, angveldiff_axarr = plt.subplots(3,1, sharex=True)
+    angveldiff_fig, angveldiff_axarr = plt.subplots(3,1,figsize=figsize(fwidth), sharex=True)
     angveldiff_axarr[0].plot(body_time, np.absolute(i2a_w[:,0]-ast_w[:,0]))
     angveldiff_axarr[0].set_ylabel(r'$\Delta \dot \Omega$ (rad/sec)')
         
@@ -598,7 +598,7 @@ def plot_asteroid_comparison(rh_time, body_time, rh_state, body_state, ast, dum,
     plt.suptitle('Angular Velocity Difference')
 
     # attitude matrix comparison
-    att_fig, att_axarr = plt.subplots(3,3, sharex=True, sharey=True)
+    att_fig, att_axarr = plt.subplots(3,3,figsize=figsize(fwidth), sharex=True, sharey=True)
     plt.suptitle('Rotation Matrix')
     for ii in range(9):
         row, col = np.unravel_index(ii, [3,3])
@@ -606,7 +606,7 @@ def plot_asteroid_comparison(rh_time, body_time, rh_state, body_state, ast, dum,
         att_axarr[row,col].plot(rh_time, ast_R[:,ii])
 
     # attitude matrix difference
-    attdiff_fig, attdiff_axarr = plt.subplots(3,3, sharex=True, sharey=True)
+    attdiff_fig, attdiff_axarr = plt.subplots(3,3,figsize=figsize(fwidth), sharex=True, sharey=True)
     plt.suptitle('Rotation Matrix Difference')
     for ii in range(9):
         row, col = np.unravel_index(ii, [3,3])
@@ -619,7 +619,7 @@ def plot_asteroid_comparison(rh_time, body_time, rh_state, body_state, ast, dum,
 
         for fig, fname in zip(fig_handles, fig_fnames):
             plt.figure(fig.number)
-            plt.savefig(fname + 'asteroid' + '.pgf')
+            plt.savefig('./asteroid/' + fname + '_asteroid' + '.pgf')
     plt.show()
     return 0
 
