@@ -8,6 +8,7 @@ from scipy import integrate
 import numpy as np
 import pdb
 import eom_comparison.utilities as eom
+from eom_comparison import transform
 
 import visualization.plotting as plotting
 import dynamics.asteroid as asteroid
@@ -70,3 +71,10 @@ plotting.plot_inertial_comparison(time,time, rh_state, i_state, ast, dum,False, 
 
 print("Plot comparison in the asteroid frame")
 plotting.plot_asteroid_comparison(time, time, rh_state, i_state, ast, dum,False, 0.5)
+
+print("Now animating the inertial motion")
+plotting.animate_inertial_trajectory(time, i_state, ast, dum)
+
+print("Now animating the relative motion")
+ast_state = transform.eoms_hamilton_relative_to_asteroid(time, rh_state, ast, dum)
+plotting.animate_relative_trajectory(time, ast_state, ast, dum)
