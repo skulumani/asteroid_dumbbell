@@ -32,6 +32,10 @@ class Dumbbell(object):
         self.J = self.Jm1 + self.Jm2 + self.m1 *(np.inner(self.zeta1,self.zeta1)*np.eye(3,3) - np.outer(self.zeta1,self.zeta1)) + self.m2 * (np.inner(self.zeta2,self.zeta2)*np.eye(3,3) - np.outer(self.zeta2,self.zeta2))
         self.Jd = self.m1*np.outer(self.zeta1,self.zeta1) + self.m2*np.outer(self.zeta2,self.zeta2) + self.Jm1/2 + self.Jm2/2
 
+        # controller parameters
+        self.kR = 1
+        self.kW = 1
+
     def eoms_inertial_ode(self, t, state, ast):
         """Inertial dumbbell equations of motion about an asteroid
         
@@ -381,22 +385,16 @@ class Dumbbell(object):
         F1 = self.m1*Ra.dot(U1_grad)
         F2 = self.m2*Ra.dot(U2_grad)
 
-        # M1 = self.m1 * np.cross(Ra.T.dot(rho1),R.T.dot(U1_grad))
-        # M2 = self.m2 * np.cross(Ra.T.dot(rho2),R.T.dot(U2_grad))
-        # M1 = np.zeros(3)
-        # M2 = M1
-        
-        M1 = self.m1 * np.cross(rho1, R.T.dot(Ra).dot(U1_grad))
-        M2 = self.m2 * np.cross(rho2, R.T.dot(Ra).dot(U2_grad))
-        
-        # compute the control
-        f_tran = self.translational_controller(self, time, state, ast)
-        m_rot = self.attitude_controller(self, time, state, ast)
+        M1 = self.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
+        M2 = self.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
+
+        # compute the control input
+        u_m = self.attitude_controller(time, state, M1+M2)
 
         pos_dot = vel
-        vel_dot = 1/(self.m1+self.m2) *(F1 + F2 + f_tran)
+        vel_dot = 1/(self.m1+self.m2) *(F1 + F2)
         R_dot = R.dot(attitude.hat_map(ang_vel)).reshape(9)
-        ang_vel_dot = np.linalg.inv(J).dot(-np.cross(ang_vel,J.dot(ang_vel)) + M1 + M2 + m_rot)
+        ang_vel_dot = np.linalg.inv(J).dot(-np.cross(ang_vel,J.dot(ang_vel)) + M1 + M2 + u_m)
 
         statedot = np.hstack((pos_dot, vel_dot, R_dot, ang_vel_dot))
 
@@ -472,25 +470,27 @@ class Dumbbell(object):
 
         return KE, PE
 
-    def attitude_controller(self, time, state, ast):
+    def attitude_controller(self, time, state, ext_moment):
         """SE(3) Attitude Controller
         
         This function will return the control input to track a desired attitude trajectory
 
 
         """
-
         # extract the state
         pos = state[0:3] # location of the center of mass in the inertial frame
         vel = state[3:6] # vel of com in inertial frame
         R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
         ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
         # compute the desired attitude command
-
+        Rd, Rd_dot, ang_vel_d, ang_vel_d_dot = self.desired_attitude(time)
         # determine error between command and current state
-
+        eR = 1/2 * attitude.vee_map(Rd.T.dot(R) - R.T.dot(Rd))
+        eW = ang_vel - R.T.dot(Rd).dot(ang_vel_d)
         # compute attitude input
-
+        u_m = (-self.kR*eR - self.kW*eW + np.cross(ang_vel, self.J.dot(ang_vel)) 
+                - self.J.dot( attitude.hat_map(ang_vel).dot(R.T).dot(Rd).dot(ang_vel_d)-
+                    R.T.dot(Rd).dot(ang_vel_d_dot)) - ext_moment)
         return u_m
 
     def translation_controller(self, time, state, ast):
@@ -523,8 +523,9 @@ class Dumbbell(object):
                 scipy.linalg.expm(alpha * attitude.hat_map(axis)))
 
         ang_vel_d = attitude.vee_map(Rd.T.dot(Rd_dot))
-            
-        return (Rd, Rd_dot, ang_vel_d) 
+        ang_vel_d_dot = np.zeros_like(ang_vel_d)
+
+        return (Rd, Rd_dot, ang_vel_d, ang_vel_d_dot) 
 
     def desired_translation(self, time):
         """Desired translational trajectory
