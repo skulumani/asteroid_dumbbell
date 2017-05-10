@@ -67,3 +67,23 @@ class TestDumbbellRelative():
         
     # def test_moment_of_inertia(self):
     #     np.testing.assert_allclose(self.dum.J, np.trace(self.dum.Jd)*np.eye(3,3) - self.dum.Jd)
+
+class TestDumbbellInertialDesiredAttitude():
+    
+    dum = dumbbell.Dumbbell()
+    alpha = np.random.rand()
+    axis = np.array([1, 0, 0])
+    Rd, Rd_dot, ang_vel_d = dum.desired_attitude(1, alpha, axis)
+
+    def test_desired_rotation_matrix_determinant(self):
+        np.testing.assert_almost_equal(np.linalg.det(self.Rd), 1) 
+    
+    def test_desired_rotation_matrix_orthogonal(self):
+        np.testing.assert_array_almost_equal(self.Rd.T.dot(self.Rd), 
+                np.eye(3,3))
+
+    def test_desired_attitude_satifies_kinematics(self):
+        np.testing.assert_array_almost_equal(self.Rd_dot,
+                self.Rd.dot(attitude.hat_map(self.ang_vel_d)))
+                
+

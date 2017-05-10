@@ -1,4 +1,6 @@
 import numpy as np
+import scipy.linalg
+
 import kinematics.attitude as attitude
 import pdb
 
@@ -472,9 +474,24 @@ class Dumbbell(object):
 
     def attitude_controller(self, time, state, ast):
         """SE(3) Attitude Controller
+        
+        This function will return the control input to track a desired attitude trajectory
+
 
         """
-        return 0
+
+        # extract the state
+        pos = state[0:3] # location of the center of mass in the inertial frame
+        vel = state[3:6] # vel of com in inertial frame
+        R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+        ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
+        # compute the desired attitude command
+
+        # determine error between command and current state
+
+        # compute attitude input
+
+        return u_m
 
     def translation_controller(self, time, state, ast):
         """SE(3) Translational Controller
@@ -487,7 +504,7 @@ class Dumbbell(object):
         """
         return 0
 
-    def desired_attitude(self, time):
+    def desired_attitude(self, time, alpha=2, axis=np.array([0, 1, 0])):
         """Desired attitude trajectory
 
         This function will output a desired attitude trajectory. The controller will use this 
@@ -501,7 +518,13 @@ class Dumbbell(object):
                 to the inertial frame and defined in the spacecraft fixed frame
 
         """
-        return 0
+        Rd = scipy.linalg.expm(alpha * time * attitude.hat_map(axis) ) 
+        Rd_dot = alpha * attitude.hat_map(axis).dot(
+                scipy.linalg.expm(alpha * attitude.hat_map(axis)))
+
+        ang_vel_d = attitude.vee_map(Rd.T.dot(Rd_dot))
+            
+        return (Rd, Rd_dot, ang_vel_d) 
 
     def desired_translation(self, time):
         """Desired translational trajectory
