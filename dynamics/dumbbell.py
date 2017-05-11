@@ -40,8 +40,8 @@ class Dumbbell(object):
         self.zeta = - np.log(OS) / np.sqrt(np.pi**2 + np.log(OS)**2)
         self.wn = 4 / self.zeta / Ts
 
-        self.kR = 1
-        self.kW = 1
+        self.kR = self.wn**2 
+        self.kW = 2 * self.zeta * self.wn 
         
         self.kx =  (self.m1 + self.m2) * self.wn**2
         self.kv = (self.m1 + self.m2) * 2 * self.zeta * self.wn

@@ -16,7 +16,7 @@ AbsTol = 1e-9
 ast_name = 'castalia'
 num_faces = 64
 tf = 1e2
-num_steps = 1e3
+num_steps = 1e2
 time = np.linspace(0,tf,num_steps)
 
 periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
