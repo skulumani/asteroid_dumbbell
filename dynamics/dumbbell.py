@@ -33,8 +33,18 @@ class Dumbbell(object):
         self.Jd = self.m1*np.outer(self.zeta1,self.zeta1) + self.m2*np.outer(self.zeta2,self.zeta2) + self.Jm1/2 + self.Jm2/2
 
         # controller parameters
+        OS = 5/100
+        Tp = 5
+        Ts = 10
+
+        self.zeta = - np.log(OS) / np.sqrt(np.pi**2 + np.log(OS)**2)
+        self.wn = 4 / self.zeta / Ts
+
         self.kR = 1
         self.kW = 1
+        
+        self.kx =  (self.m1 + self.m2) * self.wn**2
+        self.kv = (self.m1 + self.m2) * 2 * self.zeta * self.wn
 
     def eoms_inertial_ode(self, t, state, ast):
         """Inertial dumbbell equations of motion about an asteroid
@@ -389,10 +399,11 @@ class Dumbbell(object):
         M2 = self.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
 
         # compute the control input
-        u_m = self.attitude_controller(time, state, M1+M2)
+        u_m = self.attitude_controller(t, state, M1+M2)
+        u_f = self.translation_controller(t, state, F1+F2)
 
         pos_dot = vel
-        vel_dot = 1/(self.m1+self.m2) *(F1 + F2)
+        vel_dot = 1/(self.m1+self.m2) *(F1 + F2 + u_f)
         R_dot = R.dot(attitude.hat_map(ang_vel)).reshape(9)
         ang_vel_dot = np.linalg.inv(J).dot(-np.cross(ang_vel,J.dot(ang_vel)) + M1 + M2 + u_m)
 
@@ -493,16 +504,34 @@ class Dumbbell(object):
                     R.T.dot(Rd).dot(ang_vel_d_dot)) - ext_moment)
         return u_m
 
-    def translation_controller(self, time, state, ast):
+    def translation_controller(self, time, state, ext_force):
         """SE(3) Translational Controller
 
         Inputs:
 
         Outputs:
-            f - force command in the dumbbell frame
+            u_f - force command in the dumbbell frame
 
         """
-        return 0
+
+        # extract the state
+        pos = state[0:3] # location of the center of mass in the inertial frame
+        vel = state[3:6] # vel of com in inertial frame
+        R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+        ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
+      
+        m = self.m1 + self.m2
+
+        # figure out the desired trajectory
+        x_des, xd_des, xdd_des = self.desired_translation(time)
+
+        # compute the error
+        ex = pos - x_des
+        ev = vel - xd_des
+        # compute the control
+        u_f = - self.kx * ex - self.kv * ev - ext_force + m * xdd_des
+
+        return u_f
 
     def desired_attitude(self, time, alpha=2, axis=np.array([0, 1, 0])):
         """Desired attitude trajectory
@@ -534,5 +563,8 @@ class Dumbbell(object):
         velocity. This position and velocity will be defined in the inertial reference frame.
 
         """
-        
-        return 0
+        x_des = np.array([1, 1, 1])
+        xd_des = np.array([0, 0, 0])
+        xdd_des = np.array([0, 0, 0])
+
+        return (x_des, xd_des, xdd_des)

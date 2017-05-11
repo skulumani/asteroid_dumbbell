@@ -95,4 +95,11 @@ class TestDumbbellInertialAttitudeController():
 
     def test_control_moment_size(self):
         np.testing.assert_equal(self.u_m.shape, (3,))
+
+class TestDumbbellInertialTranslationalController():
     
+    dum = dumbbell.Dumbbell()
+    u_f = dum.translation_controller(t, state, np.zeros(3))
+
+    def test_control_force_size(self):
+        np.testing.assert_equal(self.u_f.shape, (3,))
