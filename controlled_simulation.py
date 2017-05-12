@@ -15,8 +15,8 @@ RelTol = 1e-9
 AbsTol = 1e-9
 ast_name = 'castalia'
 num_faces = 64
-tf = 1e2
-num_steps = 1e2
+tf = 1e3
+num_steps = 1e3
 time = np.linspace(0,tf,num_steps)
 
 periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
@@ -33,3 +33,4 @@ initial_w = np.array([0.01, 0.01, 0.01])
 initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
 i_state = integrate.odeint(dum.eoms_inertial_control, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
+plotting.animate_inertial_trajectory(time, i_state, ast, dum)
