@@ -34,8 +34,8 @@ class Dumbbell(object):
 
         # controller parameters
         OS = 5/100
-        Tp = 5
-        Ts = 10
+        Tp = 250 
+        Ts = 500 
 
         self.zeta = - np.log(OS) / np.sqrt(np.pi**2 + np.log(OS)**2)
         self.wn = 4 / self.zeta / Ts
@@ -533,7 +533,7 @@ class Dumbbell(object):
 
         return u_f
 
-    def desired_attitude(self, time, alpha=2, axis=np.array([0, 1, 0])):
+    def desired_attitude(self, time, alpha=2*np.pi/500, axis=np.array([0, 1, 0])):
         """Desired attitude trajectory
 
         This function will output a desired attitude trajectory. The controller will use this 
@@ -549,7 +549,7 @@ class Dumbbell(object):
         """
         Rd = scipy.linalg.expm(alpha * time * attitude.hat_map(axis) ) 
         Rd_dot = alpha * attitude.hat_map(axis).dot(
-                scipy.linalg.expm(alpha * attitude.hat_map(axis)))
+                    scipy.linalg.expm(alpha * attitude.hat_map(axis)))
 
         ang_vel_d = attitude.vee_map(Rd.T.dot(Rd_dot))
         ang_vel_d_dot = np.zeros_like(ang_vel_d)

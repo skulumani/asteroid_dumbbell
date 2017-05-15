@@ -148,7 +148,7 @@ def animate_inertial_trajectory(t, state, ast, dum, filename=''):
     # animation function.  This is called sequentially
     def animate(ii):
         # multiple time steps per frame
-        ii = (100*ii) % t.shape[0]
+        ii = (ii) % t.shape[0]
         pos = state[:, 0:3]
         vel = state[:, 3:6]
         Rdb2i = state[:, 6:15]
@@ -267,7 +267,7 @@ def animate_relative_trajectory(t, state, ast, dum, filename=''):
     # animation function.  This is called sequentially
     def animate(ii):
         # multiple time steps per frame
-        ii = (100* ii) % t.shape[0]
+        ii = (ii) % t.shape[0]
         pos = state[:, 0:3]
         vel = state[:, 3:6]
         Rdb2a = state[:, 6:15]
