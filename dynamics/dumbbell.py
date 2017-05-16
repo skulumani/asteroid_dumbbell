@@ -540,7 +540,7 @@ class Dumbbell(object):
 
         return u_f
 
-    def desired_attitude(self, time, alpha=2*np.pi/500, axis=np.array([0, 1, 0])):
+    def desired_attitude(self, time, alpha=2*np.pi/100, axis=np.array([0, 1, 0])):
         """Desired attitude trajectory
 
         This function will output a desired attitude trajectory. The controller will use this 
@@ -556,22 +556,22 @@ class Dumbbell(object):
         """
         Rd = scipy.linalg.expm(alpha * time * attitude.hat_map(axis) ) 
         Rd_dot = alpha * attitude.hat_map(axis).dot(
-                    scipy.linalg.expm(alpha * attitude.hat_map(axis)))
+                    scipy.linalg.expm(alpha * time * attitude.hat_map(axis)))
 
         ang_vel_d = attitude.vee_map(Rd.T.dot(Rd_dot))
         ang_vel_d_dot = np.zeros_like(ang_vel_d)
 
         return (Rd, Rd_dot, ang_vel_d, ang_vel_d_dot) 
 
-    def desired_translation(self, time):
+    def desired_translation(self, time, alpha=2*np.pi/100):
         """Desired translational trajectory
 
         This function will output the desired translational states, namely the desired position and
         velocity. This position and velocity will be defined in the inertial reference frame.
 
         """
-        x_des = np.array([1, 1, 1])
-        xd_des = np.array([0, 0, 0])
-        xdd_des = np.array([0, 0, 0])
+        x_des = np.array([1.5, 0.2*np.cos(alpha * time), 0.5*np.sin(alpha * time)])
+        xd_des = np.array([0, - alpha * 0.2 * np.sin(alpha * time), alpha * 0.5 * np.cos(alpha * time)])
+        xdd_des = np.array([0, - alpha**2 * 0.2 * np.cos(alpha * time), - alpha**2 * 0.5 * np.sin(alpha * time)])
 
         return (x_des, xd_des, xdd_des)
