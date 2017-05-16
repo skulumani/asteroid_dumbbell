@@ -33,18 +33,25 @@ class Dumbbell(object):
         self.Jd = self.m1*np.outer(self.zeta1,self.zeta1) + self.m2*np.outer(self.zeta2,self.zeta2) + self.Jm1/2 + self.Jm2/2
 
         # controller parameters
-        OS = 5/100
-        Tp = 250 
-        Ts = 500 
+        OS_translation = 5/100
+        Tp_translation = 5
+        Ts_translation = 10 
 
-        self.zeta = - np.log(OS) / np.sqrt(np.pi**2 + np.log(OS)**2)
-        self.wn = 4 / self.zeta / Ts
+        OS_rotation = 5/100
+        Tp_rotation = 5
+        Ts_rotation = 10
 
-        self.kR = self.wn**2 
-        self.kW = 2 * self.zeta * self.wn 
+        self.zeta_translation = - np.log(OS_translation) / np.sqrt(np.pi**2 + np.log(OS_translation)**2)
+        self.wn_translation = 4 / self.zeta_translation / Ts_translation
+
+        self.zeta_rotation = - np.log(OS_rotation) / np.sqrt(np.pi**2 + np.log(OS_rotation)**2)
+        self.wn_rotation = 4 / self.zeta_rotation / Ts_rotation
+
+        self.kR = self.wn_rotation**2 
+        self.kW = 2 * self.zeta_rotation * self.wn_rotation 
         
-        self.kx =  (self.m1 + self.m2) * self.wn**2
-        self.kv = (self.m1 + self.m2) * 2 * self.zeta * self.wn
+        self.kx =  (self.m1 + self.m2) * self.wn_translation**2
+        self.kv = (self.m1 + self.m2) * 2 * self.zeta_translation * self.wn_translation
 
     def eoms_inertial_ode(self, t, state, ast):
         """Inertial dumbbell equations of motion about an asteroid
