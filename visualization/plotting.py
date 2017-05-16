@@ -767,7 +767,7 @@ def plot_controlled_inertial(time, state, ast, dum, pgf_save=False, fwidth=0.5):
 
         for fig, fname in zip(fig_handles, fig_fnames):
             plt.figure(fig.number)
-            plt.savefig('./inertial/' + fname + '_inertial' + '.pgf')
+            plt.savefig(fname + '.pgf')
 
     plt.show()
     return 0
