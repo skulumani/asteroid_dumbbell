@@ -1,4 +1,6 @@
 import numpy as np
+import scipy.linalg
+
 import kinematics.attitude as attitude
 
 class TestHatAndVeeMap():
@@ -46,3 +48,46 @@ class TestEulerRot():
         mat = attitude.rot3(self.angle)
         np.testing.assert_allclose(np.linalg.det(mat), 1)
 
+class TestExponentialMap():
+    angle = (2*np.pi - 0) * np.random.rand(1) + 0
+    t = (100 - 0) * np.random.rand(1) + 0 
+    alpha = np.random.rand(1)
+
+    axis = np.random.rand(3)
+    axis = axis / np.linalg.norm(axis)
+
+    def test_expm_rot1_equivalent(self):
+        R = scipy.linalg.expm(self.angle * attitude.hat_map(np.array([1, 0, 0])))
+        R1 = attitude.rot1(self.angle)
+        np.testing.assert_almost_equal(R.T.dot(R1), np.eye(3,3))
+
+    def test_expm_rot2_equivalent(self):
+        R = scipy.linalg.expm(self.angle * attitude.hat_map(np.array([0, 1, 0])))
+        R2 = attitude.rot2(self.angle)
+        np.testing.assert_almost_equal(R.T.dot(R2), np.eye(3,3))
+
+    def test_expm_rot3_equivalent(self):
+        R = scipy.linalg.expm(self.angle * attitude.hat_map(np.array([0, 0, 1])))
+        R3 = attitude.rot3(self.angle)
+        np.testing.assert_almost_equal(R.T.dot(R3), np.eye(3,3))
+
+    def test_expm_rot1_derivative(self):
+        axis = np.array([1, 0, 0])
+        R_dot = self.alpha * attitude.hat_map(axis).dot(
+                    scipy.linalg.expm(self.alpha * self.t * attitude.hat_map(axis)))
+        R1_dot = attitude.rot1(self.alpha * self.t).dot(attitude.hat_map(self.alpha * axis))
+        np.testing.assert_almost_equal(R_dot, R1_dot)
+
+    def test_expm_rot2_derivative(self):
+        axis = np.array([0, 1, 0])
+        R_dot = self.alpha * attitude.hat_map(axis).dot(
+                    scipy.linalg.expm(self.alpha * self.t * attitude.hat_map(axis)))
+        R2_dot = attitude.rot2(self.alpha * self.t).dot(attitude.hat_map(self.alpha * axis))
+        np.testing.assert_almost_equal(R_dot, R2_dot)
+
+    def test_expm_rot3_derivative(self):
+        axis = np.array([0, 0, 1])
+        R_dot = self.alpha * attitude.hat_map(axis).dot(
+                    scipy.linalg.expm(self.alpha * self.t * attitude.hat_map(axis)))
+        R3_dot = attitude.rot3(self.alpha * self.t).dot(attitude.hat_map(self.alpha * axis))
+        np.testing.assert_almost_equal(R_dot, R3_dot)
