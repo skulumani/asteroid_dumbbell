@@ -63,3 +63,12 @@ using `line-profiler`
 %lprun -T output.txt -f ast.function() script()
 ~~~
 
+## SPICE in Python
+
+There seems to be several attemps to get SPICE working in Python.
+Use one of the following
+
+* [SETI/pds-tools](https://github.com/SETI/pds-tools)
+* [DaRasch/spiceminer](https://github.com/DaRasch/spiceminer)
+* [rca/PySPICE](https://github.com/DaRasch/spiceminer)
+* [AndrewAnnex/SpiceyPy](https://github.com/AndrewAnnex/SpiceyPy) - this one seems to be the most up to date version
