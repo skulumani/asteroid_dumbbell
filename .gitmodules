@@ -1,3 +1,7 @@
 [submodule "kinematics"]
 	path = kinematics
 	url = git@github.com:skulumani/kinematics.git
+[submodule "landing"]
+        path = landing
+        url = git@github.com:skulumani/landing.git
+
