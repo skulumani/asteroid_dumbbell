@@ -117,9 +117,9 @@ class Asteroid(object):
         # calculate shape parameters
         # calculate vectors for each edge (loop through F and difference the
         # vectors) then store them
-        e1_face_map = np.full([num_f,4],invalid, dtype='long')
-        e2_face_map = np.full([num_f,4],invalid, dtype='long')
-        e3_face_map = np.full([num_f,4],invalid, dtype='long')
+        e1_face_map = np.full([num_f,4],invalid, dtype='int')
+        e2_face_map = np.full([num_f,4],invalid, dtype='int')
+        e3_face_map = np.full([num_f,4],invalid, dtype='int')
 
         F_face = np.zeros([3,3,num_f])
 

@@ -109,13 +109,13 @@ def animate_inertial_trajectory(t, state, ast, dum, filename=''):
     fig = plt.figure()
     ax = axes3d.Axes3D(fig)
 
-    ax.set_xlim3d([-2.0, 2.0])
+    ax.set_xlim3d([np.min(state[:,0]) - 1, np.max(state[:,0]) + 1])
     ax.set_xlabel('X')
 
-    ax.set_ylim3d([-2.0, 2.0])
+    ax.set_ylim3d([np.min(state[:,1]) - 1, np.max(state[:,1]) + 1])
     ax.set_ylabel('Y')
 
-    ax.set_zlim3d([-2.0, 2.0])
+    ax.set_zlim3d([np.min(state[:,2]) - 1, np.max(state[:, 2]) + 1])
     ax.set_zlabel('Z')
 
     ax_colors = ['r', 'g', 'b'] # b1, b2, b3

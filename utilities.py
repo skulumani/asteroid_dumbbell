@@ -76,7 +76,7 @@ def ismember_index(a,b):
     
     voida, voidb = map(asvoid,(a,b))
 
-    index = np.full(a.shape[0], invalid, dtype='long')
+    index = np.full(a.shape[0], invalid, dtype='int')
     
     for ii in range(a.shape[0]):
         match = np.where(voida[ii] == voidb)[0]
