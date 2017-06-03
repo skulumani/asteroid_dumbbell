@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import sys
 
@@ -32,7 +32,7 @@ def ismember_rows(a, b):
     return the idx where b[idx] == a
     '''
     invalid = -1
-    indx = np.full(a.shape[0],invalid,dtype='long')
+    indx = np.full(a.shape[0],invalid,dtype='int')
 
     indxa, indxb = np.nonzero(np.all(b == a[:,np.newaxis], axis=2))
 

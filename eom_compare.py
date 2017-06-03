@@ -4,6 +4,7 @@ This module will simulate a dumbbell around an asteroid using both the inertial
 and relative equations of motion. The motion is then compared to ensure that both
 are valid.
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 from scipy import integrate
 import numpy as np
 import pdb

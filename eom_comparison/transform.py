@@ -10,6 +10,7 @@ It will be able to convert between:
     principle moments of inertia
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 
 import kinematics.attitude as attitude
