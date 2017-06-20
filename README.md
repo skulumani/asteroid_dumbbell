@@ -79,5 +79,5 @@ Use one of the following
 * [Another Blender module link](https://gist.github.com/alexlee-gk/3790bf5916649082d9d6)
 * [Building Blender](https://wiki.blender.org/index.php/Dev:Doc/Building_Blender/Linux/Ubuntu/CMake)
 * [Blender Python API](https://docs.blender.org/api/blender_python_api_current/info_quickstart.html)
-
+* [Blender Dependencies](https://wiki.blender.org/index.php/Dev:Doc/Building_Blender/Linux/Dependencies_From_Source)
 
