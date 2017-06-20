@@ -72,3 +72,12 @@ Use one of the following
 * [DaRasch/spiceminer](https://github.com/DaRasch/spiceminer)
 * [rca/PySPICE](https://github.com/DaRasch/spiceminer)
 * [AndrewAnnex/SpiceyPy](https://github.com/AndrewAnnex/SpiceyPy) - this one seems to be the most up to date version
+
+## Blender Setup links
+
+* [Blender as Python Module](https://wiki.blender.org/index.php/User:Ideasman42/BlenderAsPyModule)
+* [Another Blender module link](https://gist.github.com/alexlee-gk/3790bf5916649082d9d6)
+* [Building Blender](https://wiki.blender.org/index.php/Dev:Doc/Building_Blender/Linux/Ubuntu/CMake)
+* [Blender Python API](https://docs.blender.org/api/blender_python_api_current/info_quickstart.html)
+
+
