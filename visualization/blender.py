@@ -37,13 +37,19 @@ radians = np.arange(0, 2*np.pi, 1*np.pi/180)
 
 itokawa.location.z = 2
 
+# camera.location.y = -2
+# camera.location.z = 2
+# camera.rotation_euler.x = -90
+# camera.rotation_euler.y = 0
+# camera.rotation_euler.z = 0
+
 lamp.location.x = 0
 lamp.location.y = 0 
 lamp.location.z = 5
 for rad in radians:
     cube.location.x = np.sin(rad)
     itokawa.rotation_euler.z = rad * 180 / np.pi
-
+    # camera.location.x = np.sin(rad)
     scene.render.filepath = os.path.join(output_path, 'cube_' + str(rad) + '.png')
     bpy.ops.render.render(write_still=True)
 
