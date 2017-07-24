@@ -10,6 +10,14 @@ import os
 import bpy
 import numpy as np
 
+def look_at(obj_camera, point):
+    loc_camera = obj_camera.matrix_world.to_translation()
+
+    direction = point - loc_camera
+
+    rot_quat = direction.to_track_quat('-Z', 'Y')
+    obj_camera.rotation_euler = rot_quat.to_euler()
+
 scene = bpy.context.scene
 
 output_path = 'visualization/blender'
@@ -32,6 +40,9 @@ itokawa = bpy.data.objects['itokawa_low']
 layers = [False] * 32
 layers[0] = True
 
+bpy.types.UnitSettings.system = 'METRIC'
+bpy.types.UnitSettings.scale_length = 1e3
+
 # delete the cube
 radians = np.arange(0, 2*np.pi, 1*np.pi/180)
 
@@ -46,11 +57,12 @@ itokawa.location.z = 2
 lamp.location.x = 0
 lamp.location.y = 0 
 lamp.location.z = 5
-for rad in radians:
+for ii,rad in enumerate(radians):
     cube.location.x = np.sin(rad)
     itokawa.rotation_euler.z = rad * 180 / np.pi
-    # camera.location.x = np.sin(rad)
-    scene.render.filepath = os.path.join(output_path, 'cube_' + str(rad) + '.png')
+    camera.location.x = np.sin(rad)
+    look_at(camera, itokawa.matrix_world.to_translation())
+    scene.render.filepath = os.path.join(output_path, 'cube_' + str(ii)  + '.png')
     bpy.ops.render.render(write_still=True)
 
 for object in bpy.data.objects:
