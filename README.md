@@ -81,3 +81,9 @@ Use one of the following
 * [Blender Python API](https://docs.blender.org/api/blender_python_api_current/info_quickstart.html)
 * [Blender Dependencies](https://wiki.blender.org/index.php/Dev:Doc/Building_Blender/Linux/Dependencies_From_Source)
 
+To build and install Blender as a Python module:
+
+* Ensure you're using the `asteroid` conda enviornment and Python 3.5
+* Run `utilities/build_blender.sh` and hope for the best
+* Run `py.test` and make sure all the tests pass
+
