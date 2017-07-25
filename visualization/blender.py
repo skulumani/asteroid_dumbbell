@@ -8,6 +8,7 @@ Hopefully this works
 """
 import os
 import bpy
+import mathutils
 import numpy as np
 
 import pdb
@@ -80,7 +81,7 @@ def load_asteroid(asteroid):
     bpy.types.UnitSettings.scale_length = 1e3
 
     # delete the cube
-    radians = np.arange(0, 2*np.pi, 1*np.pi/180)
+    radians = np.arange(0, 2*np.pi, 0.1*np.pi/180)
 
     itokawa.location.z = 2
 
@@ -117,16 +118,21 @@ def reset_scene():
         for id_data in bpy_data_iter:
             bpy_data_iter.remove(id_data)
 
-def blender_init():
+def blender_init(render_engine='BLENDER'):
     """Initialize blender scene and render settings
 
     """
+    # setup the scene
     bpy.ops.wm.read_homefile()
     # start new empty scene
     scene = bpy.context.scene
     
-    # delete the default cube
+    # delete the cube
     bpy.data.objects['Cube'].select = True
+    bpy.ops.object.delete()
+    
+    # delete default lamp
+    bpy.data.objects['Lamp'].select = True
     bpy.ops.object.delete()
 
     # set scene render options
@@ -137,11 +143,27 @@ def blender_init():
     bpy.types.UnitSettings.system = 'METRIC'
     bpy.types.UnitSettings.scale_length = 1e3
 
-    output_path = 'visualization/blender'
+    scene.render.resolution_x = 537
+    scene.render.resolution_y = 244
+    scene.render.resolution_percentage = 100
+    if render_engine == 'BLENDER':
+        scene.render.engine = 'BLENDER_RENDER'
+    else:
+        scene.render.engine = 'CYCLES'
+
+    # setup the camera
+    camera_obj = bpy.data.objects['Camera']
+    camera = bpy.data.cameras['Camera']
+    camera.angle_x = np.deg2rad(2.93)
+    camera.angle_y = np.deg2rad(2.25)
+    camera.lens = 167.35 # focal length in mm
+
+    # setup the lamp 
+    lamp = bpy.data.lamps.new('Lamp', 'SUN')
+    lamp_obj = bpy.data.objects.new('Lamp', lamp)
+    scene.objects.link(lamp_obj)
     
-    # add a camera to the scene
-    camera = bpy.data.objects['Camera']
-    lamp = bpy.data.objects['Lamp']
+    return (camera_obj, camera, lamp_obj, lamp, scene)
 
 def blender_example():
     """
@@ -156,12 +178,16 @@ def blender_example():
     # delete the cube
     bpy.data.objects['Cube'].select = True
     bpy.ops.object.delete()
+    
+    # delete default lamp
+    bpy.data.objects['Lamp'].select = True
+    bpy.ops.object.delete()
 
     output_path = 'visualization/blender'
 
 
     # import OBJ model
-    bpy.ops.import_scene.obj(filepath='data/itokawa_high.obj')
+    bpy.ops.import_scene.obj(filepath='data/itokawa_low.obj')
 
     # add a ground plane
     # add_plane = bpy.ops.mesh.primitive_plane_add
@@ -178,20 +204,28 @@ def blender_example():
     scene.render.engine = 'BLENDER_RENDER'
     # scene.render.engine = 'CYCLES'
 
+    bpy.data.worlds['World'].horizon_color = [0, 0, 0]
+
     camera_obj = bpy.data.objects['Camera']
     camera = bpy.data.cameras['Camera']
-    lamp_obj = bpy.data.objects['Lamp']
-    itokawa_obj = bpy.data.objects['itokawa_high']
+
+    # new sun lamp
+    lamp = bpy.data.lamps.new('Lamp', 'SUN')
+    lamp_obj = bpy.data.objects.new('Lamp', lamp)
+    scene.objects.link(lamp_obj)
+
+    itokawa_obj = bpy.data.objects['itokawa_low']
     itokawa_obj.scale = [1,1,1]
     
     bpy.types.UnitSettings.system = 'METRIC'
     bpy.types.UnitSettings.scale_length = 1e3
-    bpy.data.worlds['World'].horizon_color = [0, 0, 0]
 
     # delete the cube
-    radians = np.arange(0, 2*np.pi, 10*np.pi/180)
+    time = np.arange(0, 12.132*3600, 1)
 
-    itokawa_obj.location.z = 2
+    itokawa_obj.location.x = 0
+    itokawa_obj.location.y = 0
+    itokawa_obj.location.z = 0
     
     # set camera properties to match NEAR MSI
     camera.angle_x = np.deg2rad(2.93)
@@ -201,18 +235,24 @@ def blender_example():
     camera.lens = 167.35 # focal length in mm
 
     camera_obj.location.x = 0
-    camera_obj.location.y = -2
-    camera_obj.location.z = 2
+    camera_obj.location.y = 4
+    camera_obj.location.z = 0
     # camera.rotation_euler.x = -90
     # camera.rotation_euler.y = 0
     # camera.rotation_euler.z = 0
 
     lamp_obj.location.x = 0
-    lamp_obj.location.y = 0 
-    lamp_obj.location.z = 5
-    for ii,rad in enumerate(radians):
-        itokawa_obj.rotation_euler.z = rad * 180 / np.pi
-        camera_obj.location.x = np.sin(rad)
+    lamp_obj.location.y = 5
+    lamp_obj.location.z = 0
+
+    lamp_obj.rotation_mode = 'QUATERNION'
+    lamp_obj.rotation_quaternion = itokawa_obj.location.to_track_quat('Z', 'Y')
+
+    for ii, t in enumerate(time):
+        itokawa_obj.rotation_euler.z = 360 / (12.132 * 3600) * t
+        camera_obj.location.x = 3 * np.sin(360 / (12.132 * 3600) * 2 * t)
+        camera_obj.location.y = 3 * np.cos(360 / (12.132 * 3600) * 2 * t)
+
         look_at(camera_obj, itokawa_obj.matrix_world.to_translation())
         scene.render.filepath = os.path.join(output_path, 'cube_' + str(ii)  + '.png')
         bpy.ops.render.render(write_still=True)
