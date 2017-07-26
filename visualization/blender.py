@@ -13,6 +13,7 @@ import numpy as np
 
 import pdb
 
+output_path = 'visualization/blender'
 
 def look_at(camera, point):
     r"""Ensure camera is pointing at object
@@ -69,9 +70,15 @@ def load_asteroid(asteroid):
     # import OBJ model
     bpy.ops.import_scene.obj(filepath='data/itokawa_low.obj')
 
-    itokawa = bpy.data.objects['itokawa_low']
-    
+    itokawa_obj = bpy.data.objects['itokawa_low']
+    itokawa_obj.scale = [1, 1, 1] 
+
+    itokawa_obj.location.x = 0
+    itokawa_obj.location.y = 0
+    itokawa_obj.location.z = 0
     # set the material properties for the asteroid to match something realistic
+    
+    return itokawa_obj
 
 def reset_scene():
     """Reset blender
@@ -114,6 +121,7 @@ def blender_init(render_engine='BLENDER'):
     # scene.render.filepath = 'visualization/blender/'
     scene.render.engine = 'BLENDER_RENDER'
     
+    bpy.data.worlds['World'].horizon_color = [0, 0, 0]
     bpy.types.UnitSettings.system = 'METRIC'
     bpy.types.UnitSettings.scale_length = 1e3
 
@@ -157,9 +165,6 @@ def blender_example():
     bpy.data.objects['Lamp'].select = True
     bpy.ops.object.delete()
 
-    output_path = 'visualization/blender'
-
-
     # import OBJ model
     bpy.ops.import_scene.obj(filepath='data/itokawa_low.obj')
 
@@ -195,7 +200,7 @@ def blender_example():
     bpy.types.UnitSettings.scale_length = 1e3
 
     # delete the cube
-    time = np.arange(0, 12.132*3600, 1)
+    time = np.arange(0, 12.132*3600, 3600)
 
     itokawa_obj.location.x = 0
     itokawa_obj.location.y = 0
@@ -240,7 +245,7 @@ def blender_example():
     # bpy.ops.import_scene.obj('../data/itokawa_low.obj')
     # bpy.ops.render.render(write_still=True)
 
-def driver(sc_pos=[2,0,0], R_sc2ast=np.eye((3,3)), ast_state):
+def driver(sc_pos=[2,0,0], R_sc2ast=np.eye(3), filename='test'):
     """Driver for blender animation
 
     """
@@ -249,5 +254,19 @@ def driver(sc_pos=[2,0,0], R_sc2ast=np.eye((3,3)), ast_state):
     camera_obj, camera, lamp_obj, lamp, scene = blender_init('CYCLES')
 
     # load the wavefront asteroid
+    itokawa_obj = load_asteroid('itokawa_low')
+
+    # move camera and asteroid 
+    camera_obj.location.x = sc_pos[0]
+    camera_obj.location.y = sc_pos[1]
+    camera_obj.location.z = sc_pos[2]
+
+    rot_quat = mathutils.Matrix(R_sc2ast).to_quaternion()
+    # camera_obj.rotation_quaternion = rot_quat
+    look_at(camera_obj, itokawa_obj.matrix_world.to_translation())
 
     # render an image from the spacecraft at this state
+    scene.render.filepath = os.path.join(output_path + '/' + filename + '.png')
+    bpy.ops.render.render(write_still=True)
+    pdb.set_trace()
+
