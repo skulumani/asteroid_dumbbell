@@ -15,6 +15,43 @@ import pdb
 
 output_path = 'visualization/blender'
 
+def print_object_locations():
+    for object in bpy.data.objects:
+        print("{0} is at: {1}".format(object.name, str(object.location)))
+
+def center_camera(camera_obj, center):
+    """Ensure camera center is aligned with the LOS vector to center
+
+    center should be a mathutils Vector object
+    """
+
+    cmat = camera_obj.matrix_world
+    camera_z = mathutils.Vector([cmat[i][2] for i in range(3)])
+    
+    cam_loc_cur = camera_obj.location
+    cam_loc_new = (cam_loc_cur - center).dot(camera_z) / camera_z.dot(camera_z) * camera_z + center
+
+    camera_obj.location = cam_loc_new
+
+def cylinder_between(x1, y1, z1, x2, y2, z2, r):
+
+    dx = x2 - x1
+    dy = y2 - y1
+    dz = z2 - z1    
+    dist = np.sqrt(dx**2 + dy**2 + dz**2)
+
+    bpy.ops.mesh.primitive_cylinder_add(
+        radius = r, 
+        depth = dist,
+        location = (dx/2 + x1, dy/2 + y1, dz/2 + z1)   
+    ) 
+
+    phi = np.arctan2(dy, dx) 
+    theta = np.arccos(dz/dist) 
+
+    bpy.context.object.rotation_euler[1] = theta 
+    bpy.context.object.rotation_euler[2] = phi 
+
 def look_at(camera, point):
     r"""Ensure camera is pointing at object
 
@@ -60,6 +97,11 @@ def look_at(camera, point):
 
     rot_quat = direction.to_track_quat('-Z', 'Y')
     camera.rotation_euler = rot_quat.to_euler()
+
+def camera_track_to(camera_obj, target):
+    # create empty object at target
+
+    # set camera to track constraint
 
 def load_asteroid(asteroid):
     """Load the desired asteroid
@@ -161,9 +203,9 @@ def blender_example():
     bpy.data.objects['Cube'].select = True
     bpy.ops.object.delete()
     
-    # delete default lamp
-    bpy.data.objects['Lamp'].select = True
-    bpy.ops.object.delete()
+    # # delete default lamp
+    # bpy.data.objects['Lamp'].select = True
+    # bpy.ops.object.delete()
 
     # import OBJ model
     bpy.ops.import_scene.obj(filepath='data/itokawa_low.obj')
@@ -176,31 +218,40 @@ def blender_example():
     # bpy.ops.object.lamp_add()
 
     # set scene render options
-    scene.render.resolution_x = 537
-    scene.render.resolution_y = 244
+    scene.render.resolution_x = 800
+    scene.render.resolution_y = 600
     scene.render.resolution_percentage = 100
     # scene.render.filepath = 'visualization/blender/'
     scene.render.engine = 'BLENDER_RENDER'
     # scene.render.engine = 'CYCLES'
 
-    bpy.data.worlds['World'].horizon_color = [0, 0, 0]
 
     camera_obj = bpy.data.objects['Camera']
     camera = bpy.data.cameras['Camera']
 
     # new sun lamp
-    lamp = bpy.data.lamps.new('Lamp', 'SUN')
-    lamp_obj = bpy.data.objects.new('Lamp', lamp)
-    scene.objects.link(lamp_obj)
+    # lamp = bpy.data.lamps.new('Lamp', 'SUN')
+    # lamp_obj = bpy.data.objects.new('Lamp', lamp)
+    # scene.objects.link(lamp_obj)
+    # lamp_obj.select = True
+    # scene.objects.active = lamp_obj
+    
+    lamp_obj = bpy.data.objects['Lamp']
 
     itokawa_obj = bpy.data.objects['itokawa_low']
     itokawa_obj.scale = [1,1,1]
     
     bpy.types.UnitSettings.system = 'METRIC'
     bpy.types.UnitSettings.scale_length = 1e3
+    bpy.data.worlds['World'].horizon_color = [0, 0, 0]
+
+    # draw cylinders for axes
+    cylinder_between(0, 0, 0, 5, 0, 0, 0.01)
+    cylinder_between(0, 0, 0, 0, 5, 0, 0.01)
+    cylinder_between(0, 0, 0, 0, 0, 5, 0.01)
 
     # delete the cube
-    time = np.arange(0, 12.132*3600, 3600)
+    time = np.arange(0, 100, 1)
 
     itokawa_obj.location.x = 0
     itokawa_obj.location.y = 0
@@ -214,27 +265,30 @@ def blender_example():
     camera.lens = 167.35 # focal length in mm
 
     camera_obj.location.x = 0
-    camera_obj.location.y = 4
+    camera_obj.location.y = -2
     camera_obj.location.z = 0
     # camera.rotation_euler.x = -90
     # camera.rotation_euler.y = 0
     # camera.rotation_euler.z = 0
 
-    lamp_obj.location.x = 0
-    lamp_obj.location.y = 5
-    lamp_obj.location.z = 0
+    lamp_obj.location.x = 1
+    lamp_obj.location.y = 0
+    lamp_obj.location.z = 5
 
-    lamp_obj.rotation_mode = 'QUATERNION'
-    lamp_obj.rotation_quaternion = itokawa_obj.location.to_track_quat('Z', 'Y')
+    # lamp_obj.rotation_mode = 'QUATERNION'
+    # lamp_obj.rotation_quaternion = itokawa_obj.location.to_track_quat('Z', 'Y')
 
     for ii, t in enumerate(time):
-        itokawa_obj.rotation_euler.z = 360 / (12.132 * 3600) * t
-        camera_obj.location.x = 3 * np.sin(360 / (12.132 * 3600) * 2 * t)
-        camera_obj.location.y = 3 * np.cos(360 / (12.132 * 3600) * 2 * t)
+        # itokawa_obj.rotation_euler.z = 360 / (12.132 * 3600) * t
+        camera_obj.location.x = 10 * np.cos(t * 2*np.pi/100)
+        camera_obj.location.y = 10 * np.sin(t * 2*np.pi/100)
+        camera_obj.location.z = 0
 
         look_at(camera_obj, itokawa_obj.matrix_world.to_translation())
+        # center_camera(camera_obj, mathutils.Vector([0, 0, 0]))
+
         scene.render.filepath = os.path.join(output_path, 'cube_' + str(ii)  + '.png')
-        bpy.ops.render.render(write_still=True)
+        bpy.ops.render.render(write_still=True, use_viewport=True)
 
     for object in bpy.data.objects:
         print(object.name + " is at location " + str(object.location))
@@ -244,6 +298,7 @@ def blender_example():
     print(itokawa_obj.dimensions)
     # bpy.ops.import_scene.obj('../data/itokawa_low.obj')
     # bpy.ops.render.render(write_still=True)
+
 
 def driver(sc_pos=[2,0,0], R_sc2ast=np.eye(3), filename='test'):
     """Driver for blender animation
