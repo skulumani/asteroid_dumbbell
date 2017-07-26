@@ -13,8 +13,6 @@ import numpy as np
 
 import pdb
 
-for object in bpy.data.objects:
-    print(object.name + " is at location " + str(object.location))
 
 def look_at(camera, point):
     r"""Ensure camera is pointing at object
@@ -71,33 +69,9 @@ def load_asteroid(asteroid):
     # import OBJ model
     bpy.ops.import_scene.obj(filepath='data/itokawa_low.obj')
 
-    camera = bpy.data.objects['Camera']
-    lamp = bpy.data.objects['Lamp']
     itokawa = bpy.data.objects['itokawa_low']
-    layers = [False] * 32
-    layers[0] = True
-
-    bpy.types.UnitSettings.system = 'METRIC'
-    bpy.types.UnitSettings.scale_length = 1e3
-
-    # delete the cube
-    radians = np.arange(0, 2*np.pi, 0.1*np.pi/180)
-
-    itokawa.location.z = 2
-
-    lamp.location.x = 0
-    lamp.location.y = 0 
-    lamp.location.z = 5
-    for ii,rad in enumerate(radians):
-        cube.location.x = np.sin(rad)
-        itokawa.rotation_euler.z = rad * 180 / np.pi
-        camera.location.x = np.sin(rad)
-        look_at(camera, itokawa.matrix_world.to_translation())
-        scene.render.filepath = os.path.join(output_path, 'cube_' + str(ii)  + '.png')
-        bpy.ops.render.render(write_still=True)
-
-    for object in bpy.data.objects:
-        print(object.name + " is at location " + str(object.location))
+    
+    # set the material properties for the asteroid to match something realistic
 
 def reset_scene():
     """Reset blender
@@ -265,3 +239,15 @@ def blender_example():
     print(itokawa_obj.dimensions)
     # bpy.ops.import_scene.obj('../data/itokawa_low.obj')
     # bpy.ops.render.render(write_still=True)
+
+def driver(sc_pos=[2,0,0], R_sc2ast=np.eye((3,3)), ast_state):
+    """Driver for blender animation
+
+    """
+    
+    # initialize the scene
+    camera_obj, camera, lamp_obj, lamp, scene = blender_init('CYCLES')
+
+    # load the wavefront asteroid
+
+    # render an image from the spacecraft at this state
