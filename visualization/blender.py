@@ -8,30 +8,47 @@ Hopefully this works
 """
 import os
 import bpy
-import mathutils
 import numpy as np
-
-import pdb
 
 output_path = 'visualization/blender'
 
+
 def print_object_locations():
+    r"""Print out object properties for all the objects in a Blender scene
+
+    This function will output all the positions of the objects in the scene.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    None
+
+    Other Parameters
+    ----------------
+    None
+
+    See Also
+    --------
+
+    Notes
+    -----
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    References
+    ----------
+
+    .. [1] Blender Python API - https://docs.blender.org/api/2.78b/
+
+    """
     for object in bpy.data.objects:
         print("{0} is at: {1}".format(object.name, str(object.location)))
 
-def center_camera(camera_obj, center):
-    """Ensure camera center is aligned with the LOS vector to center
-
-    center should be a mathutils Vector object
-    """
-
-    cmat = camera_obj.matrix_world
-    camera_z = mathutils.Vector([cmat[i][2] for i in range(3)])
-    
-    cam_loc_cur = camera_obj.location
-    cam_loc_new = (cam_loc_cur - center).dot(camera_z) / camera_z.dot(camera_z) * camera_z + center
-
-    camera_obj.location = cam_loc_new
 
 def cylinder_between(x1, y1, z1, x2, y2, z2, r):
 
@@ -98,11 +115,6 @@ def look_at(camera, point):
     rot_quat = direction.to_track_quat('-Z', 'Y')
     camera.rotation_euler = rot_quat.to_euler()
 
-def camera_track_to(camera_obj, target):
-    # create empty object at target
-
-    # set camera to track constraint
-    pass
 
 def load_asteroid(asteroid='itokawa_low'):
     """Load the desired asteroid
@@ -144,7 +156,46 @@ def reset_scene():
 
 def blender_init(render_engine='BLENDER', resolution=[537,244],
                  fov=[2.93,2.235],focal_length=167.35):
-    """Initialize blender scene and render settings
+    r"""Initialize the Blender scene for a camera around an asteroid
+
+    This function will initialize the objects for a scene involving a camera, asteroid, and light source
+
+    Parameters
+    ----------
+    render_engine : string
+        Option to choose the type of rendering engine
+            'BLENDER' - Default Blender render - fast
+            'CYCLES' - Better rendering at the expense of speed/computation
+    resolution : list or array_like
+        The x,y pixel resolution of the resulting output image.
+        The default matches the MSI camera on NEAR
+    fov : list or array_like
+        Field of View of the camera sensor in degrees - default is chosen to math NEAR 
+    focal_length : float
+        Focal length of camera in millimeters
+
+    Returns
+    -------
+    camera : Blender camera
+        Camera which lets you set camera properties
+    camera_obj : Blender object
+        Camera object - move it/rotation
+    lamp : Blender Lamp
+        Use to set lamp specific properties
+    lamp_obj : Blender object
+        Use to move and position
+    itokawa_obj : Blender object
+        Asteroid object
+    scene : Blender scene
+        Use to set general parameters for rendering
+
+    See Also
+    --------
+    blender_example : Example for rendering an image 
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
 
     """
     # setup the scene
@@ -210,8 +261,7 @@ def blender_init(render_engine='BLENDER', resolution=[537,244],
 
 def blender_example():
     """
-
-    Each Blender Unit is 1 km
+    Example to render an image
 
     """
 
