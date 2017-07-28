@@ -104,16 +104,16 @@ def camera_track_to(camera_obj, target):
     # set camera to track constraint
     pass
 
-def load_asteroid(asteroid):
+def load_asteroid(asteroid='itokawa_low'):
     """Load the desired asteroid
 
     doc
     """
 
     # import OBJ model
-    bpy.ops.import_scene.obj(filepath='data/itokawa_low.obj')
+    bpy.ops.import_scene.obj(filepath=os.path.join('data',asteroid + '.obj'))
 
-    itokawa_obj = bpy.data.objects['itokawa_low']
+    itokawa_obj = bpy.data.objects[asteroid]
     itokawa_obj.scale = [1, 1, 1] 
 
     itokawa_obj.location.x = 0
@@ -142,7 +142,8 @@ def reset_scene():
         for id_data in bpy_data_iter:
             bpy_data_iter.remove(id_data)
 
-def blender_init(render_engine='BLENDER'):
+def blender_init(render_engine='BLENDER', resolution=[537,244],
+                 fov=[2.93,2.235],focal_length=167.35):
     """Initialize blender scene and render settings
 
     """
@@ -155,21 +156,20 @@ def blender_init(render_engine='BLENDER'):
     bpy.data.objects['Cube'].select = True
     bpy.ops.object.delete()
     
-    # delete default lamp
-    bpy.data.objects['Lamp'].select = True
-    bpy.ops.object.delete()
-
-    # set scene render options
-    scene.render.resolution_percentage = 100
-    # scene.render.filepath = 'visualization/blender/'
-    scene.render.engine = 'BLENDER_RENDER'
+    # empty object for camera tracking purposes
+    empty = bpy.data.objects.new('Empty', None)
+    bpy.context.scene.objects.link(empty)
+    bpy.context.scene.update()
     
+    itokawa_obj = load_asteroid(asteroid='itokawa_low')
+
+    # render options
     bpy.data.worlds['World'].horizon_color = [0, 0, 0]
     bpy.types.UnitSettings.system = 'METRIC'
     bpy.types.UnitSettings.scale_length = 1e3
 
-    scene.render.resolution_x = 537
-    scene.render.resolution_y = 244
+    scene.render.resolution_x = resolution[0]
+    scene.render.resolution_y = resolution[1]
     scene.render.resolution_percentage = 100
     if render_engine == 'BLENDER':
         scene.render.engine = 'BLENDER_RENDER'
@@ -179,16 +179,34 @@ def blender_init(render_engine='BLENDER'):
     # setup the camera
     camera_obj = bpy.data.objects['Camera']
     camera = bpy.data.cameras['Camera']
-    camera.angle_x = np.deg2rad(2.93)
-    camera.angle_y = np.deg2rad(2.25)
-    camera.lens = 167.35 # focal length in mm
+    camera.angle_x = np.deg2rad(fov[0])
+    camera.angle_y = np.deg2rad(fov[1])
+    camera.lens = focal_length# focal length in mm
+    
+    cam_con = camera_obj.constraints.new('TRACK_TO')
+    cam_con.target = itokawa_obj
+    cam_con.track_axis = 'TRACK_NEGATIVE_Z'
+    cam_con.up_axis = 'UP_Y'
 
     # setup the lamp 
-    lamp = bpy.data.lamps.new('Lamp', 'SUN')
-    lamp_obj = bpy.data.objects.new('Lamp', lamp)
-    scene.objects.link(lamp_obj)
+    lamp = bpy.data.lamps['Lamp']
+    lamp_obj = bpy.data.objects['Lamp']
+    lamp.type = 'SUN'
+    lamp.energy = 0.8
+    lamp.use_specular = False
+    lamp.use_diffuse = True
     
-    return (camera_obj, camera, lamp_obj, lamp, scene)
+    # use spiceypy here to determine location of the light source
+    lamp_obj.location.x = 5
+    lamp_obj.location.y = 0
+    lamp_obj.location.z = 1
+    
+    lamp_con = lamp_obj.constraints.new('TRACK_TO')
+    lamp_con.target = itokawa_obj
+    lamp_con.track_axis = 'TRACK_NEGATIVE_Z'
+    lamp_con.up_axis = 'UP_Y'
+
+    return (camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene)
 
 def blender_example():
     """
@@ -261,7 +279,7 @@ def blender_example():
     # cylinder_between(0, 0, 0, 0, 0, 5, 0.01)
 
     # delete the cube
-    num_steps = 1000
+    num_steps = 10
     time = np.arange(0, num_steps, 1)
 
     itokawa_obj.location.x = 0
@@ -324,22 +342,18 @@ def driver(sc_pos=[2,0,0], R_sc2ast=np.eye(3), filename='test'):
     """
     
     # initialize the scene
-    camera_obj, camera, lamp_obj, lamp, scene = blender_init('CYCLES')
-
-    # load the wavefront asteroid
-    itokawa_obj = load_asteroid('itokawa_low')
+    camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene = blender_init('CYCLES')
 
     # move camera and asteroid 
     camera_obj.location.x = sc_pos[0]
     camera_obj.location.y = sc_pos[1]
     camera_obj.location.z = sc_pos[2]
 
-    rot_quat = mathutils.Matrix(R_sc2ast).to_quaternion()
-    # camera_obj.rotation_quaternion = rot_quat
-    look_at(camera_obj, itokawa_obj.matrix_world.to_translation())
+    # rot_quat = mathutils.Matrix(R_sc2ast).to_quaternion()
+    # # camera_obj.rotation_quaternion = rot_quat
+    # look_at(camera_obj, itokawa_obj.matrix_world.to_translation())
 
     # render an image from the spacecraft at this state
     scene.render.filepath = os.path.join(output_path + '/' + filename + '.png')
     bpy.ops.render.render(write_still=True)
-    pdb.set_trace()
 
