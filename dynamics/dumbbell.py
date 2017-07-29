@@ -491,12 +491,50 @@ class Dumbbell(object):
         return KE, PE
 
     def attitude_controller(self, time, state, ext_moment):
-        """SE(3) Attitude Controller
+        r"""Geometric attitude controller on SO(3)
+
+        This function will determine an attitude control input for a rigid spacecraft around an asteroid.
+        The function is setup to work for a vehicle defined in the inertial frame relative to an asteroid.
+
+        Parameters
+        ----------
+        self : dumbbell instance
+            Instance of dumbbell class with all of it's parameters
+        time : float
+            Current time for simulation which is used in the desired attitude trajectory
+        state : array_like (18,)
+            numpy array defining the state of the dumbbell
+            position - position of the center of mass wrt to the inertial frame
+            and defined in the inertial frame (3,)
+            velocity - velocity of the center of mass wrt to teh inertial frame
+            and defined in the inertial frame (3,)
+            R_b2i - rotation matrix which transforms vectors from the body
+            frame to the inertial frame (9,)
+            angular_velocity - angular velocity of the body frame with respect
+            to the inertial frame and defined in the body frame (3,)
+        ext_moment : array_like (3,)
+            External moment in the body fixed frame
+
+        Returns
+        -------
+        u_m : array_like (3,)
+            Body fixed control moment
+
+        Author
+        ------
+        Shankar Kulumani		GWU		skulumani@gwu.edu
+
+        References
+        ----------
         
-        This function will return the control input to track a desired attitude trajectory
+        .. [1] LEE, Taeyoung, LEOK, Melvin y MCCLAMROCH, N Harris. "Control of
+        Complex Maneuvers for a Quadrotor UAV Using Geometric Methods on Se
+        (3)". arXiv preprint arXiv:1003.2005. 2010, 
 
+        Examples
+        --------
 
-        """
+        """ 
         # extract the state
         pos = state[0:3] # location of the center of mass in the inertial frame
         vel = state[3:6] # vel of com in inertial frame
