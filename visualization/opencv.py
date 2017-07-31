@@ -20,12 +20,14 @@ def harris_corner_detector(filename):
     dst = cv2.dilate(dst, None)
 
     # threshold for an optimal value
-    img[dst > 0.01 * dst.max()] = [0, 0, 255]
+    corner_test = dst > 0.01 * dst.max()
+    corners = np.asarray(np.where(corner_test)).T
+    img[corner_test] = [0, 0, 255]
     
     imgplot = plt.imshow(img)
     plt.show()
     
-    return dst
+    return corners
 
 def refined_harris_corner_detector(filename):
     img = cv2.imread(filename)
@@ -54,13 +56,18 @@ def refined_harris_corner_detector(filename):
     plt.imshow(img)
     plt.show()
 
-    return res[:, 2:3]
+    return corners
 
-def shi_tomasi_corner_detector(filename):
+def shi_tomasi_corner_detector(filename, num_features=25):
+    """
+    Output :
+        corners - pixel locations of 'good' features to track
+    """
+
     img = cv2.imread(filename)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    corners = cv2.goodFeaturesToTrack(gray, 25, 0.01, 10)
+    corners = cv2.goodFeaturesToTrack(gray, num_features, 0.01, 10)
     corners = np.int0(corners)
 
     for i in corners:
@@ -70,4 +77,7 @@ def shi_tomasi_corner_detector(filename):
     plt.imshow(img)
     plt.show()
 
-    return corners
+    return np.squeeze(corners)
+
+# TODO - write function that will compare all of the feature detectors
+
