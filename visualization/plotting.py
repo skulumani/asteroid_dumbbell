@@ -53,7 +53,7 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
 
 mpl.rcParams.update(pgf_with_latex)
 
-def vertex_plotter(ast, fig=plt.figure()):
+def vertex_plotter(ast, fig):
 
     ax = axes3d.Axes3D(fig)
 
@@ -67,7 +67,7 @@ def vertex_plotter(ast, fig=plt.figure()):
 
     return 0
 
-def plot_trajectory(pos, fig=plt.figure()):
+def plot_trajectory(pos, fig):
     """Plot the state trajectory in a 3D view
 
     """
@@ -82,7 +82,7 @@ def plot_trajectory(pos, fig=plt.figure()):
 
     return 0
     
-def plot_energy(time,KE, PE, fig=plt.figure()):
+def plot_energy(time,KE, PE, fig):
     """Plot the energy behavior
 
     """
