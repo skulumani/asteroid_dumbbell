@@ -30,8 +30,8 @@ cd "$HOME/blender-git"
 mkdir build
 cd build
 cmake ../blender \ 
-    -DPYTHON_VERSION=3.5
-    -DPYTHON_ROOT_DIR=$HOME/anaconda3/envs/asteroid
+    -DPYTHON_VERSION=3.5 \
+    -DPYTHON_ROOT_DIR=$HOME/anaconda3/envs/asteroid \
     -DWITH_PYTHON_INSTALL=OFF \
     -DWITH_PLAYER=OFF \
     -DWITH_PYTHON_MODULE=ON \
