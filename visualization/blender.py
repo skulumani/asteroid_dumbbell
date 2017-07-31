@@ -9,7 +9,7 @@ Hopefully this works
 import os
 import bpy
 import numpy as np
-
+import pdb
 output_path = 'visualization/blender'
 
 
@@ -390,7 +390,9 @@ def driver(sc_pos=[2,0,0], R_sc2ast=np.eye(3), filename='test'):
     """Driver for blender animation
 
     """
-    
+   
+    # TODO - Implement attitude pointing instead of a camera constraint
+
     # initialize the scene
     camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene = blender_init('CYCLES')
 
@@ -406,4 +408,20 @@ def driver(sc_pos=[2,0,0], R_sc2ast=np.eye(3), filename='test'):
     # render an image from the spacecraft at this state
     scene.render.filepath = os.path.join(output_path + '/' + filename + '.png')
     bpy.ops.render.render(write_still=True)
+
+def vertical_landing():
+    """Test with a vertical descent to the surface
+
+    Use to track motion between imagery
+
+    """
+
+    # define the trajectory
+    radius = np.arange(10,1, -0.1)
+    theta = np.deg2rad(315)
+    pdb.set_trace()
+    for ii,r in enumerate(radius):
+        sc_pos = np.array([r*np.cos(theta), r*np.sin(theta), 0])
+        
+        driver(sc_pos=sc_pos, R_sc2ast=np.eye(3), filename='test'+str(ii))
 
