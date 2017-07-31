@@ -25,7 +25,7 @@ def harris_corner_detector(filename):
     imgplot = plt.imshow(img)
     plt.show()
     
-    return dst.T
+    return dst
 
 def refined_harris_corner_detector(filename):
     img = cv2.imread(filename)
@@ -54,7 +54,7 @@ def refined_harris_corner_detector(filename):
     plt.imshow(img)
     plt.show()
 
-    return res[:, 2:3].T
+    return res[:, 2:3]
 
 def shi_tomasi_corner_detector(filename):
     pass
