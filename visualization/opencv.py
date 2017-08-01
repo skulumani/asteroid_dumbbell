@@ -89,6 +89,40 @@ def shi_tomasi_corner_detector(filename, num_features=25, plot=False):
 
     return np.squeeze(corners)
 
+def sift(filename, plot=False):
+    img = cv2.imread(filename)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    sift = cv2.xfeatures2d.SIFT_create()
+    kp, des = sift.detectAndCompute(gray, None)
+
+    if plot:
+        img = cv2.drawKeypoints(gray, kp, img, flags=0)
+        plt.imshow(img)
+        plt.show()
+    
+    corners = []
+    for point in kp:
+        x, y = point.pt
+        corners.append([x, y])
+
+    return np.array(corners)
+
+def surf(filename, plot=False):
+    img = cv2.imread(filename)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    surf = cv2.xfeatures2d.SURF_create(400)
+    
+    kp, des = surf.detectAndCompute(gray, None)
+
+    corners = []
+    for point in kp:
+        x, y = point.pt
+        corners.append([x, y])
+
+    return np.array(corners)
+
 def orb(filename, plot=False):
     img = cv2.imread(filename)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
