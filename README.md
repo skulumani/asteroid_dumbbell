@@ -10,6 +10,20 @@ This will ensure that pushes are sent to both:
 * [Github](https://github.com/skulumani/asteroid_dumbbell)
 * [Bitbucket](https://bitbucket.org/shankarkulumani/asteroid_dumbbell)
 
+## Building OpenCV
+
+There is a `bash` script, `utilities/build_opencv.sh` which will build OpenCV for Python
+
+* Make sure you install the asteroid env - `conda env create -n asteroid -f asteroid.yml` or update `conda env update -n asteroid -f asteroid.yml`
+* Run `build_opencv.sh`
+* Check and make sure `cv2.so` is located in `$HOME/anaconda3/envs/asteroid/lib/python3.5/site-packages`
+
+Some other helpful links:
+
+* [Ubuntu 16.04](http://www.pyimagesearch.com/2016/10/24/ubuntu-16-04-how-to-install-opencv/)
+* [Ubuntu 16.04](https://www.learnopencv.com/install-opencv3-on-ubuntu/)
+* [OpenCV SO](https://stackoverflow.com/questions/18561910/opencv-python-cant-use-surf-sift)
+
 ## MEX Guide
 
 Look in [Mex Guide](./docs/mex_guide.md) to learn how to compile a mex function.
