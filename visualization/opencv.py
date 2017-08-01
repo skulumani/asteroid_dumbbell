@@ -23,11 +23,11 @@ def harris_corner_detector(filename):
     corner_test = dst > 0.01 * dst.max()
     corners = np.asarray(np.where(corner_test)).T
     img[corner_test] = [0, 0, 255]
-    
+
     imgplot = plt.imshow(img)
     plt.show()
     
-    return corners
+    return np.vstack((corners[:,1], corners[:,0])).T
 
 def refined_harris_corner_detector(filename):
     img = cv2.imread(filename)
@@ -80,4 +80,18 @@ def shi_tomasi_corner_detector(filename, num_features=25):
     return np.squeeze(corners)
 
 # TODO - write function that will compare all of the feature detectors
+
+def compare_feature_detection(filename):
+    corners_harris = harris_corner_detector(filename)
+    corners_harris_refined = refined_harris_corner_detector(filename)
+    corners_shi = shi_tomasi_corner_detector(filename)
+
+    img = mpimage.imread(filename)
+
+    fig, ax = plt.subplots()
+    ax.imshow(img)
+    ax.plot(corners_harris[:,0], corners_harris[:, 1], 'rx', label='Harris Corners')
+    ax.plot(corners_harris_refined[:,0],corners_harris_refined[:, 1], 'gx', label='Harris Refined')
+    ax.plot(corners_shi[:,0], corners_shi[:,1], 'bx', label='Shi-Tomasi')
+    plt.show()
 
