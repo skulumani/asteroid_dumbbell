@@ -132,28 +132,99 @@ def orb(filename, plot=False):
    
     if plot:
         img2 = img
-        cv2.drawKeypoints(img, kp, img2, color=(0, 255, 0), flags=0)
+        img = cv2.drawKeypoints(gray, kp, img, color=(0, 255, 0), flags=0)
         plt.figure()
         plt.imshow(img2)
         plt.show()
 
-    return kp, des
+    corners = []
+    for point in kp:
+        x, y = point.pt
+        corners.append([x, y])
+
+    return np.array(corners)
+
+def fast(filename, plot=False):
+    """FAST feature detector
+    """
+
+    img = cv2.imread(filename)
+
+    fast = cv2.FastFeatureDetector_create()
+
+    kp = fast.detect(img, None)
+
+    if plot:
+        img2 = cv2.drawKeypoints(img, kp, None, color=(255, 0, 0))
+
+        plt.figure()
+        plt.imshow(img2)
+        plt.show()
+
+    corners = []
+    for point in kp:
+        x, y = point.pt
+        corners.append([x, y])
+
+    return np.array(corners)
+
+def brief(filename):
+    """Get feature descriptors faster 
+    """
+
+    img = cv2.imread(filename)
+
+    star = cv2.xfeatures2d.StarDetector_create()
+
+    brief = cv2.xfeatures2d.BriefDescriptorExtractor_create()
+
+    kp = star.detect(img, None)
+
+    kp, des = brief.compute(img, kp)
+
+    corners = []
+    for point in kp:
+        x, y = point.pt
+        corners.append([x, y])
+
+    return np.array(corners)
 
 def compare_feature_detection(filename):
     corners_harris = harris_corner_detector(filename)
     corners_harris_refined = refined_harris_corner_detector(filename)
     corners_shi = shi_tomasi_corner_detector(filename)
-    kp, des = orb(filename)
+    corners_orb = orb(filename)
+    corners_sift = sift(filename)
+    corners_fast = fast(filename)
+    corners_surf = surf(filename)
 
-    img = cv2.imread(filename)
-    cv2.drawKeypoints(img, kp, img, color=(255,255,0), flags=0)
+    corners = (corners_harris,
+               corners_harris_refined,
+               corners_shi,
+               corners_orb,
+               corners_sift,
+               corners_surf,
+               corners_fast)
+
+    labels = ('Harris Corners',
+              'Harris Refined',
+              'Shi-Tomasi',
+              'Orb',
+              'SIFT',
+              'SURF',
+              'FAST')
+
+    img = mpimage.imread(filename)
+    
+    cmap = plt.get_cmap('gnuplot')
+    colors = [cmap(i) for i in np.linspace(0, 1, len(corners))]
 
     fig, ax = plt.subplots()
     ax.imshow(img)
+    
+    for corner, label in zip(corners, labels):
+        ax.plot(corner[:,0], corner[:, 1], '.', label=label)
 
-    ax.plot(corners_harris[:,0], corners_harris[:, 1], 'rx', label='Harris Corners')
-    ax.plot(corners_harris_refined[:,0],corners_harris_refined[:, 1], 'gx', label='Harris Refined')
-    ax.plot(corners_shi[:,0], corners_shi[:,1], 'bx', label='Shi-Tomasi')
-    plt.legend()
+    plt.legend(loc='best')
     plt.show()
 
