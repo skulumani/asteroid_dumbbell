@@ -9,7 +9,7 @@ import pdb
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimage
 
-def harris_corner_detector(filename):
+def harris_corner_detector(filename, plot=False):
     img = cv2.imread(filename)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -22,14 +22,15 @@ def harris_corner_detector(filename):
     # threshold for an optimal value
     corner_test = dst > 0.01 * dst.max()
     corners = np.asarray(np.where(corner_test)).T
-    img[corner_test] = [0, 0, 255]
-
-    imgplot = plt.imshow(img)
-    plt.show()
+    
+    if plot:
+        img[corner_test] = [0, 0, 255]
+        imgplot = plt.imshow(img)
+        plt.show()
     
     return np.vstack((corners[:,1], corners[:,0])).T
 
-def refined_harris_corner_detector(filename):
+def refined_harris_corner_detector(filename, plot=False):
     img = cv2.imread(filename)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -53,12 +54,13 @@ def refined_harris_corner_detector(filename):
     img[res[:, 1], res[:, 0]] = [0, 0, 255]
     img[res[:, 3], res[:, 2]] = [0, 255, 0]
 
-    plt.imshow(img)
-    plt.show()
+    if plot:
+        plt.imshow(img)
+        plt.show()
 
     return corners
 
-def shi_tomasi_corner_detector(filename, num_features=25):
+def shi_tomasi_corner_detector(filename, num_features=25, plot=False):
     """
     Output :
         corners - pixel locations of 'good' features to track
