@@ -15,6 +15,7 @@ import pdb
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimage
 
+
 def harris_corner_detector(filename, plot=False):
     img = cv2.imread(filename)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
