@@ -72,34 +72,44 @@ def shi_tomasi_corner_detector(filename, num_features=25, plot=False):
     corners = cv2.goodFeaturesToTrack(gray, num_features, 0.01, 10)
     corners = np.int0(corners)
 
-    for i in corners:
-        x, y = i.ravel()
-        cv2.circle(img, (x,y), 3, 255, -1)
+    if plot:
+        for i in corners:
+            x, y = i.ravel()
+            cv2.circle(img, (x,y), 3, 255, -1)
 
-    plt.imshow(img)
-    plt.show()
+        plt.imshow(img)
+        plt.show()
 
     return np.squeeze(corners)
 
-def sift(filename):
+def orb(filename, plot=False):
     img = cv2.imread(filename)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    orb = cv2.ORB_create()
+    kp, des = orb.detectAndCompute(gray, None)
+   
+    if plot:
+        img2 = img
+        cv2.drawKeypoints(img, kp, img2, color=(0, 255, 0), flags=0)
+        plt.figure()
+        plt.imshow(img2)
+        plt.show()
 
-    sift = cv2.SIFT()
-    kp, des = sift.detectAndCompute(gray, None)
-
-    img = cv2.drawKeypoints(gray, kp)
-    cv2.imwrite('sift.jpg', img)
+    return kp, des
 
 def compare_feature_detection(filename):
     corners_harris = harris_corner_detector(filename)
     corners_harris_refined = refined_harris_corner_detector(filename)
     corners_shi = shi_tomasi_corner_detector(filename)
+    kp, des = orb(filename)
 
-    img = mpimage.imread(filename)
+    img = cv2.imread(filename)
+    cv2.drawKeypoints(img, kp, img, color=(255,255,0), flags=0)
 
     fig, ax = plt.subplots()
     ax.imshow(img)
+
     ax.plot(corners_harris[:,0], corners_harris[:, 1], 'rx', label='Harris Corners')
     ax.plot(corners_harris_refined[:,0],corners_harris_refined[:, 1], 'gx', label='Harris Refined')
     ax.plot(corners_shi[:,0], corners_shi[:,1], 'bx', label='Shi-Tomasi')
