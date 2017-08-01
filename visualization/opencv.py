@@ -79,7 +79,15 @@ def shi_tomasi_corner_detector(filename, num_features=25):
 
     return np.squeeze(corners)
 
-# TODO - write function that will compare all of the feature detectors
+def sift(filename):
+    img = cv2.imread(filename)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    sift = cv2.SIFT()
+    kp, des = sift.detectAndCompute(gray, None)
+
+    img = cv2.drawKeypoints(gray, kp)
+    cv2.imwrite('sift.jpg', img)
 
 def compare_feature_detection(filename):
     corners_harris = harris_corner_detector(filename)
@@ -93,5 +101,6 @@ def compare_feature_detection(filename):
     ax.plot(corners_harris[:,0], corners_harris[:, 1], 'rx', label='Harris Corners')
     ax.plot(corners_harris_refined[:,0],corners_harris_refined[:, 1], 'gx', label='Harris Refined')
     ax.plot(corners_shi[:,0], corners_shi[:,1], 'bx', label='Shi-Tomasi')
+    plt.legend()
     plt.show()
 
