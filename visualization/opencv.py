@@ -1,4 +1,10 @@
 """Module to test image processing of simulated imagery
+
+OpenCV 3.2.0 Examples
+
+Follows the documentation 
+
+.. [1] http://docs.opencv.org/3.2.0/d6/d00/tutorial_py_root.html
 """
 
 import cv2
