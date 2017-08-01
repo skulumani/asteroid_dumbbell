@@ -106,7 +106,7 @@ def sift(filename, plot=False):
         x, y = point.pt
         corners.append([x, y])
 
-    return np.array(corners)
+    return kp, des, np.array(corners)
 
 def surf(filename, plot=False):
     img = cv2.imread(filename)
@@ -142,7 +142,7 @@ def orb(filename, plot=False):
         x, y = point.pt
         corners.append([x, y])
 
-    return np.array(corners)
+    return kp, des, np.array(corners)
 
 def fast(filename, plot=False):
     """FAST feature detector
@@ -193,8 +193,8 @@ def compare_feature_detection(filename):
     corners_harris = harris_corner_detector(filename)
     corners_harris_refined = refined_harris_corner_detector(filename)
     corners_shi = shi_tomasi_corner_detector(filename)
-    corners_orb = orb(filename)
-    corners_sift = sift(filename)
+    _, _, corners_orb = orb(filename)
+    _, _, corners_sift = sift(filename)
     corners_fast = fast(filename)
     corners_surf = surf(filename)
 
@@ -227,4 +227,55 @@ def compare_feature_detection(filename):
 
     plt.legend(loc='best')
     plt.show()
+
+def orb_brute_force_matching(filename1, filename2, plot=False):
+    """Use Brute Force matching between Orb features in two images
+    """
+
+    img1 = cv2.imread(filename1) # query image
+    img2 = cv2.imread(filename2) # train image
+
+    # orb detector, keypoint and descriptors
+    kp1, des1, _ = orb(filename1)
+    kp2, des2, _ = orb(filename2)
+
+    # get keypoints and descriptors for both images with ORB
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+
+    # find matches
+    matches = bf.match(des1, des2)
+    matches = sorted(matches, key = lambda x:x.distance)  # best matches are earlier
+   
+    if plot:
+        img3 = cv2.drawMatches(img1, kp1, img2, kp2, matches[:10], None, flags=2)
+        plt.imshow(img3)
+        plt.show()
+
+    return matches
+
+def sift_ratio_test_matching(filename1, filename2, plot=False):
+    img1 = cv2.imread(filename1)
+    img2 = cv2.imread(filename2)
+
+    kp1, des1, _ = sift(filename1)
+    kp2, des2, _ = sift(filename2)
+
+    # Brute force matching
+    bf = cv2.BFMatcher()
+    matches = bf.knnMatch(des1, des2, k=2)
+
+    # apply ratio test
+    good = []
+    for m, n in matches:
+        if m.distance < 0.75 * n.distance:
+            good.append([m])
+
+    # cv2.drawMatches expects lists of lists as matches
+    if plot:
+        img3 = cv2.drawMatchesKnn(img1, kp1, img2, kp2, good, None, flags=2)
+        plt.imshow(img3)
+        plt.show()
+
+    return good 
+
 
