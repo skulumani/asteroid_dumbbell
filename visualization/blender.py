@@ -386,6 +386,40 @@ def blender_example():
     # bpy.ops.import_scene.obj('../data/itokawa_low.obj')
     # bpy.ops.render.render(write_still=True)
 
+def blender_render(name, scene, save_file=False):
+    """Call this function to render the current scene and output the pixels
+
+    If you want you can save to a file as well
+    """
+    
+    if save_file:
+        scene.render.filepath = os.path.join(output_path + '/' + name + '.png')
+        bpy.ops.render.render(write_still=True)
+
+    else:
+        # need to modify the source for this to work
+        # https://blender.stackexchange.com/questions/69230/python-render-script-different-outcome-when-run-in-background/81240#81240
+        bpy.context.scene.use_nodes = True
+        tree = bpy.context.scene.node_tree
+        links = tree.links
+
+        # clear default nodes
+        for n in tree.nodes:
+            tree.nodes.remove(n)
+
+        # create input render layer node
+        rl = tree.nodes.new('CompositorNodeRLayers')
+        
+        # output node
+        v = tree.nodes.new('CompositorNodeViewer')
+        v.use_alpha = True
+
+        # create a link
+        links.new(rl.outputs[0], v.inputs[0])
+
+        bpy.ops.render.render()
+
+        img_data = bpy.data.images['Viewer Node'].pixels
 
 def driver(sc_pos=[2,0,0], R_sc2ast=np.eye(3), filename='test'):
     """Driver for blender animation
@@ -407,6 +441,7 @@ def driver(sc_pos=[2,0,0], R_sc2ast=np.eye(3), filename='test'):
     # look_at(camera_obj, itokawa_obj.matrix_world.to_translation())
 
     # render an image from the spacecraft at this state
+    # blender_render(filename,scene, True)
     scene.render.filepath = os.path.join(output_path + '/' + filename + '.png')
     bpy.ops.render.render(write_still=True)
 
