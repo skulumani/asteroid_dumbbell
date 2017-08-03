@@ -427,6 +427,10 @@ def driver(sc_pos=[2,0,0], R_sc2ast=np.eye(3), filename='test'):
     """
    
     # TODO - Implement attitude pointing instead of a camera constraint
+    # R_sc2bcam = mathutils.Matrix(
+    #     (0, 1, 0),
+    #     (0, 0, 1),
+    #     (1, 0, 0))
 
     # initialize the scene
     camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene = blender_init('CYCLES')
