@@ -253,7 +253,7 @@ def blender_init(render_engine='BLENDER', resolution=[537,244],
     lamp.use_diffuse = True
     
     # use spiceypy here to determine location of the light source
-    lamp_obj.location.x = 5
+    lamp_obj.location.x = -5
     lamp_obj.location.y = 0
     lamp_obj.location.z = 1
     
@@ -425,16 +425,17 @@ def blender_render(name, scene, save_file=False):
 
         img_data = bpy.data.images['Viewer Node'].pixels
 
-def driver(sc_pos=[2,0,0], R_sc2ast=np.eye(3), filename='test'):
+
+def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), filename='test'):
     """Driver for blender animation
 
     """
    
     # TODO - Implement attitude pointing instead of a camera constraint
-    # R_sc2bcam = mathutils.Matrix(
-    #     (0, 1, 0),
-    #     (0, 0, 1),
-    #     (1, 0, 0))
+    R_sc2bcam = mathutils.Matrix(
+        ((0, -1, 0),
+        (0, 0, 1),
+        (-1, 0, 0)))
 
     # initialize the scene
     camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene = blender_init('CYCLES')
@@ -444,8 +445,11 @@ def driver(sc_pos=[2,0,0], R_sc2ast=np.eye(3), filename='test'):
     camera_obj.location.y = sc_pos[1]
     camera_obj.location.z = sc_pos[2]
     
-    # rot_quat = mathutils.Matrix(R_sc2ast).to_quaternion()
-    # # camera_obj.rotation_quaternion = rot_quat
+    R = R_sc2ast.dot(np.array(R_sc2bcam).T)
+    rot_euler = mathutils.Matrix(R_sc2ast).to_euler('XYZ')
+    pdb.set_trace()
+    camera_obj.rotation_euler = rot_euler
+    bpy.context.scene.update()
     # look_at(camera_obj, itokawa_obj.matrix_world.to_translation())
 
     # render an image from the spacecraft at this state
