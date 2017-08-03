@@ -135,6 +135,7 @@ def load_asteroid(asteroid='itokawa_low'):
 
     itokawa_obj.rotation_euler = mathutils.Euler((0, 0, 0), 'XYZ')
 
+    bpy.context.scene.update()
     # set the material properties for the asteroid to match something realistic
     
     return itokawa_obj
