@@ -414,4 +414,73 @@ def sift_feature_homography(filename1=image_files[index], filename2=image_files[
     plt.imshow(img3, 'gray')
     plt.show()
 
-    print(M) 
+def drawepilines(img1, img2, lines, pts1, pts2):
+    # now find the epilines
+    r, c = img1.shape
+    img1 = cv2.cvtColor(img1, cv2.COLOR_GRAY2BGR)
+    img2 = cv2.cvtColor(img2, cv2.COLOR_GRAY2BGR)
+    for r, pt1, pt2 in zip(lines, pts1, pts2):
+        color = tuple(np.random.randint(0, 255, 3).tolist())
+        x0, y0 = map(int, [0, -r[2]/r[1] ])
+        x1, y1 = map(int, [c, -(r[2] + r[0]*c)/r[1] ])
+        img1 = cv2.line(img1, (x0, y0), (x1, y1), color, 1)
+        img1 = cv2.circle(img1, tuple(pt1), 5, color, -1)
+        img2 = cv2.circle(img2, tuple(pt2), 5, color, -1)
+
+    return img1, img2
+
+
+def sift_epipolar(filename1=image_files[index], filename2=image_files[index+10]):
+    """Compute epipolar geometry given two images
+    """
+
+    img1 = cv2.imread(filename1, 0)
+    img2 = cv2.imread(filename2, 0)
+    
+    # use sift to get features in both images
+    kp1, des1, _ = sift(filename1)
+    kp2, des2, _ = sift(filename2)
+
+    # FLANN parameters
+    FLANN_INDEX_KDTREE = 0
+    index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+    search_params = dict(checks = 50)
+
+    flann = cv2.FlannBasedMatcher(index_params, search_params)
+    matches = flann.knnMatch(des1, des2, k=2)
+
+    good = []
+    pts1 = []
+    pts2 = []
+
+    # ratio test for determining matches
+    for i, (m, n) in enumerate(matches):
+        if m.distance < 0.2 * n.distance:
+            good.append(m)
+            pts2.append(kp2[m.trainIdx].pt)
+            pts1.append(kp1[m.queryIdx].pt)
+
+    # find teh fundamental matrix
+    pts1 = np.int32(pts1)
+    pts2 = np.int32(pts2)
+    F, mask = cv2.findFundamentalMat(pts1, pts2, cv2.FM_LMEDS)
+
+    # select only inlier points
+    pts1 = pts1[mask.ravel()==1]
+    pts2 = pts2[mask.ravel()==1]
+    
+    # now find epilines in both images and draw them
+    # draw lines from first image to second image on the first image
+    lines1 = cv2.computeCorrespondEpilines(pts2.reshape(-1, 1, 2), 2, F)
+    lines1 = lines1.reshape(-1, 3)
+    img5, img6 = drawepilines(img1, img2, lines1, pts1, pts2)
+
+    # draw lines from image 2 to first image on the second image
+    lines2 = cv2.computeCorrespondEpilines(pts1.reshape(-1, 1, 2), 1, F)
+    lines2 = lines2.reshape(-1, 3)
+    img3, img4 = drawepilines(img2, img1, lines2, pts2, pts1)
+
+    plt.subplots(121), plt.imshow(img5)
+    plt.subplots(122), plt.imshow(img3)
+    plt.show()
+
