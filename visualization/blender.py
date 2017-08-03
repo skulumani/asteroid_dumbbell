@@ -9,6 +9,7 @@ Hopefully this works
 import os
 import bpy
 import numpy as np
+import mathutils
 import pdb
 output_path = 'visualization/blender'
 
