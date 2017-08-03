@@ -238,10 +238,10 @@ def blender_init(render_engine='BLENDER', resolution=[537,244],
     camera.angle_y = np.deg2rad(fov[1])
     camera.lens = focal_length# focal length in mm
     
-    cam_con = camera_obj.constraints.new('TRACK_TO')
-    cam_con.target = itokawa_obj
-    cam_con.track_axis = 'TRACK_NEGATIVE_Z'
-    cam_con.up_axis = 'UP_Y'
+    # cam_con = camera_obj.constraints.new('TRACK_TO')
+    # cam_con.target = itokawa_obj
+    # cam_con.track_axis = 'TRACK_NEGATIVE_Z'
+    # cam_con.up_axis = 'UP_Y'
 
     # setup the lamp 
     lamp = bpy.data.lamps['Lamp']
