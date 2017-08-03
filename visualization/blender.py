@@ -455,9 +455,8 @@ def vertical_landing():
     # define the trajectory
     radius = np.arange(10,1, -0.1)
     theta = np.deg2rad(315)
-    pdb.set_trace()
     for ii,r in enumerate(radius):
         sc_pos = np.array([r*np.cos(theta), r*np.sin(theta), 0])
         
-        driver(sc_pos=sc_pos, R_sc2ast=np.eye(3), filename='test'+str(ii))
+        driver(sc_pos=sc_pos, R_sc2ast=np.eye(3), filename='test'+str.zfill(str(ii),2))
 
