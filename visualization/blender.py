@@ -132,6 +132,9 @@ def load_asteroid(asteroid='itokawa_low'):
     itokawa_obj.location.x = 0
     itokawa_obj.location.y = 0
     itokawa_obj.location.z = 0
+
+    itokawa_obj.rotation_euler = mathutils.Euler((0, 0, 0), 'XYZ')
+
     # set the material properties for the asteroid to match something realistic
     
     return itokawa_obj
@@ -439,7 +442,7 @@ def driver(sc_pos=[2,0,0], R_sc2ast=np.eye(3), filename='test'):
     camera_obj.location.x = sc_pos[0]
     camera_obj.location.y = sc_pos[1]
     camera_obj.location.z = sc_pos[2]
-
+    
     # rot_quat = mathutils.Matrix(R_sc2ast).to_quaternion()
     # # camera_obj.rotation_quaternion = rot_quat
     # look_at(camera_obj, itokawa_obj.matrix_world.to_translation())
