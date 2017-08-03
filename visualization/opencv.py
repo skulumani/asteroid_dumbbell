@@ -402,7 +402,7 @@ def sift_feature_homography(filename1=image_files[index], filename2=image_files[
         img2 = cv2.polylines(img2, [np.int32(dst)], True, 2255, 3, cv2.LINE_AA)
 
     else:
-        print("Not enough matches are found - {0}/{1}".format((len(good), MIN_MATCH_COUNT)))
+        print("Not enough matches are found - {0}/{1}".format(len(good), MIN_MATCH_COUNT))
         matchesMask = None
 
     draw_params = dict(matchColor = (0, 255, 0), # draw matches in green
