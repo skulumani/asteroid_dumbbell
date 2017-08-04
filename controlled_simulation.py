@@ -14,11 +14,11 @@ import relative_driver as rdriver
 
 RelTol = 1e-9
 AbsTol = 1e-9
-ast_name = 'castalia'
+ast_name = 'itokawa'
 num_faces = 64
 tf = 1e3
 num_steps = 1e3
-time = np.linspace(0,tf,num_steps)
+time = np.linspace(0,int(tf),int(num_steps))
 
 periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
 periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327])
