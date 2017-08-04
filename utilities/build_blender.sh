@@ -3,6 +3,8 @@
 # this will clone and install the blender source and also build blender as a
 # module
 
+echo "Make sure you've installed the asteroid conda environment!!!"
+
 if [ -d "$HOME/blender-git" ]; then
     echo "Blender source directory already exits"
     cd "$HOME/blender-git/blender"
@@ -29,14 +31,13 @@ cd "$HOME/blender-git"
 # compile blender module for python from source
 mkdir build
 cd build
-cmake ../blender \ 
+cmake ../blender -DCMAKE_INSTALL_PREFIX=$HOME/anaconda3/envs/asteroid/lib/python3.5/site-packages \
     -DPYTHON_VERSION=3.5 \
     -DPYTHON_ROOT_DIR=$HOME/anaconda3/envs/asteroid \
     -DWITH_PYTHON_INSTALL=OFF \
     -DWITH_PLAYER=OFF \
     -DWITH_PYTHON_MODULE=ON \
     -DWITH_INSTALL_PORTABLE=ON \
-    -DCMAKE_INSTALL_PREFIX=$HOME/anaconda3/envs/asteroid/lib/python3.5/site-packages
 
 make -j8
 make install
