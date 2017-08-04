@@ -392,6 +392,72 @@ class Dumbbell(object):
         state_dot = np.hstack((pos_dot, lin_mom_dot, R_dot, ang_mom_dot))
         
         return state_dot
+
+    def eoms_inertial_control_ode(self, t, state, ast):
+        """Inertial dumbbell equations of motion about an asteroid with body
+        fixed control capability
+       
+       This method must be used with the scipy.integrate.ode class instead of the 
+       more convienent scipy.integrate.odeint.
+
+        Inputs:
+            t - Current simulation time step
+            state - (18,) array which defines the state of the vehicle 
+                pos - (3,) position of the dumbbell with respect to the
+                asteroid center of mass and expressed in the inertial frame
+                vel - (3,) velocity of the dumbbell with respect to the
+                asteroid center of mass and expressed in the inertial frame
+                R - (9,) attitude of the dumbbell with defines the
+                transformation of a vector in the dumbbell frame to the
+                inertial frame ang_vel - (3,) angular velocity of the dumbbell
+                with respect to the inertial frame and represented in the
+                dumbbell frame
+            ast - Asteroid class object holding the asteroid gravitational
+            model and other useful parameters
+        """
+        # unpack the state
+        pos = state[0:3] # location of the center of mass in the inertial frame
+        vel = state[3:6] # vel of com in inertial frame
+        R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+        ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
+
+        Ra = attitude.rot3(ast.omega*t, 'c') # asteroid body frame to inertial frame
+
+        # unpack parameters for the dumbbell
+        J = self.J
+
+        rho1 = self.zeta1
+        rho2 = self.zeta2
+
+        # position of each mass in the asteroid frame
+        z1 = Ra.T.dot(pos + R.dot(rho1))
+        z2 = Ra.T.dot(pos + R.dot(rho2))
+
+        z = Ra.T.dot(pos) # position of COM in asteroid frame
+
+        # compute the potential at this state
+        (U1, U1_grad, U1_grad_mat, U1laplace) = ast.polyhedron_potential(z1)
+        (U2, U2_grad, U2_grad_mat, U2laplace) = ast.polyhedron_potential(z2)
+
+        F1 = self.m1*Ra.dot(U1_grad)
+        F2 = self.m2*Ra.dot(U2_grad)
+
+        M1 = self.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
+        M2 = self.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
+
+        # compute the control input
+        u_m = self.attitude_controller(t, state, M1+M2)
+        u_f = self.translation_controller(t, state, F1+F2)
+
+        pos_dot = vel
+        vel_dot = 1/(self.m1+self.m2) *(F1 + F2 + u_f)
+        R_dot = R.dot(attitude.hat_map(ang_vel)).reshape(9)
+        ang_vel_dot = np.linalg.inv(J).dot(-np.cross(ang_vel,J.dot(ang_vel)) + M1 + M2 + u_m)
+
+        statedot = np.hstack((pos_dot, vel_dot, R_dot, ang_vel_dot))
+
+        return statedot
+
     def eoms_inertial_control(self, state,t, ast):
         """Inertial dumbbell equations of motion about an asteroid with body fixed control capability
         
