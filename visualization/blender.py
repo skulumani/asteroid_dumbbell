@@ -261,7 +261,8 @@ def blender_init(render_engine='BLENDER', resolution=[537,244],
     lamp_con.target = itokawa_obj
     lamp_con.track_axis = 'TRACK_NEGATIVE_Z'
     lamp_con.up_axis = 'UP_Y'
-
+    
+    bpy.context.scene.update()
     return (camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene)
 
 def blender_example():
@@ -426,28 +427,62 @@ def blender_render(name, scene, save_file=False):
         img_data = bpy.data.images['Viewer Node'].pixels
 
 
-def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), filename='test'):
-    """Driver for blender animation
+def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), sun_position=[-5, 0, 0], filename='test'):
+    r"""This will generate a blender render given a camera position and orientation
 
-    """
-   
-    # TODO - Implement attitude pointing instead of a camera constraint
-    R_sc2bcam = mathutils.Matrix(
-        ((0, -1, 0),
-        (0, 0, 1),
-        (-1, 0, 0)))
+    Generate a single image given a known position and orientation of the camera/spacecraft
+
+    Parameters
+    ----------
+    sc_pos : (3,) array_like and float
+        Position of the spacecraft/camera in the inertial frame (blender world coordinates)
+        The units are in kilometers (1 Blender unit is 1 km)
+    R_sc2ast : (3, 3) numpy array of float
+        Rotation matrix which transforms vectors in teh spacecraft body frame to the inertial frame.
+        The camera is rotated to be assumed to point along the body frame +X axis
+    filename : string
+        Name of PNG file to save the rendered image
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    To transform vectors from the camera frame to the inertial/world frame
+
+    .. math:: R_{I2B} = R_{S2I} * R_{B2S} 
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    References
+    ----------
+    This relies on the Blender Python Module.
+
+    .. [1] https://wiki.blender.org/index.php/User:Ideasman42/BlenderAsPyModule 
+    .. [2] Look at utilities/build_blender.sh for automatic building 
+
+    Examples
+    --------
+    An example of how to use the function
+
+    """  
+    # fixed rotation from SC frame to camera frame
+    R_sc2bcam = np.array([[0, -1, 0], 
+                          [0, 0, 1],
+                          [-1, 0, 0]])
 
     # initialize the scene
     camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene = blender_init('CYCLES')
 
     # move camera and asteroid 
-    camera_obj.location.x = sc_pos[0]
-    camera_obj.location.y = sc_pos[1]
-    camera_obj.location.z = sc_pos[2]
-    
-    R = R_sc2ast.dot(np.array(R_sc2bcam).T)
-    rot_euler = mathutils.Matrix(R_sc2ast).to_euler('XYZ')
-    pdb.set_trace()
+    camera_obj.location = sc_pos
+    lamp_obj.location = sun_position
+
+    R_i2bcam = R_sc2ast.T.dot(np.array(R_sc2bcam.T))
+    rot_euler = mathutils.Matrix(R_i2bcam).to_euler('XYZ')
     camera_obj.rotation_euler = rot_euler
     bpy.context.scene.update()
     # look_at(camera_obj, itokawa_obj.matrix_world.to_translation())
