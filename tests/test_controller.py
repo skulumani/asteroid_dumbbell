@@ -55,11 +55,12 @@ class TestInertialDesiredAttitudeBodyFixedHovering():
         dot_product = np.dot(self.Rd[:, 0], pos / np.linalg.norm(pos))
         np.testing.assert_almost_equal(dot_product, -1)
 
-    def test_z_axis_aligned_with_inertial_z_vector(self):
-        pass
+    def test_z_axis_aligned_with_positive_pole(self):
+        bodyz_inertial = self.Rd[:,2]
+        z_inertial = np.array([0, 0, 1])
+        angle = np.arccos(np.dot(bodyz_inertial, z_inertial))
+        np.testing.assert_array_less(angle, np.pi/2)
 
-    def test_y_axis_in_the_equatorial_plane(self):
-        pass
 
 class TestInertialAttitudeController():
     """Test the attitude controller for the inertial eoms
