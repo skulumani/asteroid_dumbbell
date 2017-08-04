@@ -63,11 +63,11 @@ def eoms_controlled_blender(t, state, dum, ast):
     (U1, U1_grad, U1_grad_mat, U1laplace) = ast.polyhedron_potential(z1)
     (U2, U2_grad, U2_grad_mat, U2laplace) = ast.polyhedron_potential(z2)
 
-    F1 = self.m1*Ra.dot(U1_grad)
-    F2 = self.m2*Ra.dot(U2_grad)
+    F1 = dum.m1*Ra.dot(U1_grad)
+    F2 = dum.m2*Ra.dot(U2_grad)
 
-    M1 = self.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
-    M2 = self.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
+    M1 = dum.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
+    M2 = dum.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
     
     # generate image at this current state
 
@@ -76,11 +76,11 @@ def eoms_controlled_blender(t, state, dum, ast):
 
 
     # compute the control input
-    u_m = self.attitude_controller(t, state, M1+M2)
-    u_f = self.translation_controller(t, state, F1+F2)
+    u_m = dum.attitude_controller(t, state, M1+M2)
+    u_f = dum.translation_controller(t, state, F1+F2)
 
     pos_dot = vel
-    vel_dot = 1/(self.m1+self.m2) *(F1 + F2 + u_f)
+    vel_dot = 1/(dum.m1+dum.m2) *(F1 + F2 + u_f)
     R_dot = R.dot(attitude.hat_map(ang_vel)).reshape(9)
     ang_vel_dot = np.linalg.inv(J).dot(-np.cross(ang_vel,J.dot(ang_vel)) + M1 + M2 + u_m)
 
@@ -115,10 +115,10 @@ initial_w = np.array([0.01, 0.01, 0.01])
 initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
 # instantiate ode object
-system = integrate.ode(dum.eoms_inertial_control_ode)
+system = integrate.ode(eoms_controlled_blender)
 system.set_integrator('lsoda', atol=AbsTol, rtol=RelTol, nsteps=1000)
 system.set_initial_value(initial_state, t0)
-system.set_f_params(ast)
+system.set_f_params(dum, ast)
 
 i_state = np.zeros((num_steps+1, 18))
 time = np.zeros(num_steps+1)
