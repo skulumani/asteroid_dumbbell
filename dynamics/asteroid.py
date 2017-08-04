@@ -103,6 +103,8 @@ class Asteroid(object):
         
         Adds attributes to the class - polyhedron gravity model
         """
+        print("Computing polyhedron shape parameters")
+
         invalid = -1
 
         G = self.G
