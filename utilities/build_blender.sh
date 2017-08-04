@@ -2,6 +2,7 @@
 
 # this will clone and install the blender source and also build blender as a
 # module
+BLENDER_VERSION="v2.78c"
 
 echo "Make sure you've installed the asteroid conda environment!!!"
 read -p "Press Enter to continue"
@@ -9,6 +10,7 @@ read -p "Press Enter to continue"
 if [ -d "$HOME/blender-git" ]; then
     echo "Blender source directory already exits"
     cd "$HOME/blender-git/blender"
+    git checkout master
     git pull --rebase
 else
     mkdir -p "$HOME/blender-git"
@@ -18,6 +20,8 @@ else
     git submodule update --init --recursive
     git submodule foreach git checkout master
 fi
+
+read -p "Press enter to continue"
 
 # update submodules
 git submodule foreach git pull --rebase origin master
