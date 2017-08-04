@@ -4,6 +4,7 @@
 # module
 
 echo "Make sure you've installed the asteroid conda environment!!!"
+read -p "Press Enter to continue"
 
 if [ -d "$HOME/blender-git" ]; then
     echo "Blender source directory already exits"
@@ -28,6 +29,10 @@ sudo apt-get install git build-essential cmake cmake-curses-gui
 cd "$HOME/blender-git"
 /bin/bash "$HOME/blender-git/blender/build_files/build_environment/install_deps.sh"
 
+# now build blender
+echo "Now we're going to build blender"
+read -p "Press Enter to continue"
+
 # compile blender module for python from source
 mkdir build
 cd build
@@ -40,6 +45,13 @@ cmake ../blender -DCMAKE_INSTALL_PREFIX=$HOME/anaconda3/envs/asteroid/lib/python
     -DWITH_INSTALL_PORTABLE=ON \
 
 make -j8
+
+echo "Now we're going to install Blender Python module"
+read -p "Press enter to continue"
+
 make install
+
+echo "All done!"
+
 
 

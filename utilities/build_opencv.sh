@@ -4,6 +4,9 @@
 # Make sure you create the asteroid conda enviornment first before running this script
 OPENCV_VERSION=3.2.0
 
+echo "This will download and build OpenCV"
+read -p "Press ENTER to continue"
+
 if [ -d "$HOME/opencv" ]; then
     echo "OpenCV source already exists"
     cd "$HOME/opencv"
@@ -57,6 +60,7 @@ cd build
 
 echo "This might install it in a weird location"
 echo "Make sure cv2.so is in $HOME/anacona/envs/asteroid/lib/python3.5/site-packages"
+read -p "Press enter to continue"
 
 # call cmake
 cmake \
