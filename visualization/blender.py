@@ -165,7 +165,7 @@ def reset_scene():
             bpy_data_iter.remove(id_data)
 
 def blender_init(render_engine='BLENDER', resolution=[537,244],
-                 fov=[2.93,2.235],focal_length=167.35):
+                 fov=[2.93,2.235],focal_length=167.35, asteroid_name='itokawa_low'):
     r"""Initialize the Blender scene for a camera around an asteroid
 
     This function will initialize the objects for a scene involving a camera, asteroid, and light source
@@ -222,7 +222,7 @@ def blender_init(render_engine='BLENDER', resolution=[537,244],
     bpy.context.scene.objects.link(empty)
     bpy.context.scene.update()
     
-    itokawa_obj = load_asteroid(asteroid='itokawa_low')
+    itokawa_obj = load_asteroid(asteroid=asteroid_name)
 
     # render options
     bpy.data.worlds['World'].horizon_color = [0, 0, 0]
