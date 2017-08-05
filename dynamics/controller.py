@@ -54,7 +54,7 @@ def attitude_controller(time, state, ext_moment, dum):
     R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
     ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
     # compute the desired attitude command
-    Rd, Rd_dot, ang_vel_d, ang_vel_d_dot = desired_attitude(time)
+    Rd, Rd_dot, ang_vel_d, ang_vel_d_dot = body_fixed_hovering_attitude(time, state)
     # determine error between command and current state
     eR = 1/2 * attitude.vee_map(Rd.T.dot(R) - R.T.dot(Rd))
     eW = ang_vel - R.T.dot(Rd).dot(ang_vel_d)

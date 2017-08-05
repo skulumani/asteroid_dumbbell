@@ -9,8 +9,7 @@ import numpy as np
 import pdb
 
 import visualization.plotting as plotting
-import dynamics.asteroid as asteroid
-import dynamics.dumbbell as dumbbell
+from dynamics import asteroid, dumbbell, controller
 from kinematics import attitude
 
 import inertial_driver as idriver
@@ -76,8 +75,8 @@ def eoms_controlled_blender(t, state, dum, ast):
 
 
     # compute the control input
-    u_m = dum.attitude_controller(t, state, M1+M2)
-    u_f = dum.translation_controller(t, state, F1+F2)
+    u_m = controller.attitude_controller(t, state, M1+M2, dum)
+    u_f = controller.translation_controller(t, state, F1+F2, dum)
 
     pos_dot = vel
     vel_dot = 1/(dum.m1+dum.m2) *(F1 + F2 + u_f)
