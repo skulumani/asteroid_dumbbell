@@ -13,12 +13,13 @@ import mathutils
 import pdb
 import h5py
 import cv2
+from kinematics import attitude
 output_path = 'visualization/blender'
 
 # fixed rotation from SC frame to camera frame
 R_sc2bcam = np.array([[0, -1, 0], 
-                        [0, 0, 1],
-                        [-1, 0, 0]])
+                      [0, 0, 1],
+                      [-1, 0, 0]])
 
 def print_object_locations():
     r"""Print out object properties for all the objects in a Blender scene
@@ -244,7 +245,8 @@ def blender_init(render_engine='BLENDER', resolution=[537,244],
     camera.angle_x = np.deg2rad(fov[0])
     camera.angle_y = np.deg2rad(fov[1])
     camera.lens = focal_length# focal length in mm
-    
+    camera_obj.rotation_mode = 'XYZ'
+
     # cam_con = camera_obj.constraints.new('TRACK_TO')
     # cam_con.target = itokawa_obj
     # cam_con.track_axis = 'TRACK_NEGATIVE_Z'
@@ -590,11 +592,16 @@ def gen_image(sc_pos, R_sc2inertial, theta_ast,
     lamp_obj.location = sun_position
     
     # rotate asteroid
+    itokawa_obj.location = [0, 0, 0]
     itokawa_obj.rotation_euler = mathutils.Euler((0, 0, theta_ast), 'XYZ')
 
     # rotate the camera
-    R_i2bcam = R_sc2inertial.T.dot(np.array(R_sc2bcam.T))
-    rot_euler = mathutils.Matrix(R_i2bcam).to_euler('XYZ')
+    R_i2bcam = R_sc2inertial.dot(R_sc2bcam.T)
+
+    # rot_euler = mathutils.Matrix(R_i2bcam).to_euler('XYZ')
+    # rot_euler = mathutils.Matrix(R_sc2inertial.dot(R_sc2bcam.T)).to_euler('XYZ')
+    rot_euler = mathutils.Matrix((R_sc2inertial.dot(R_sc2bcam.T))).to_euler('XYZ')
+
     camera_obj.rotation_euler = rot_euler
     bpy.context.scene.update()
 
