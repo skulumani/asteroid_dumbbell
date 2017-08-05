@@ -3,6 +3,10 @@
 # this will clone and install the blender source and also build blender as a
 # module
 BLENDER_VERSION="v2.78c"
+BLENDER_COMMIT="09eac0159db"
+
+ANACONDA_PATH="/home/shankar/anaconda3/envs"
+ANACONDA_ENV="asteroid"  # change to the specific anaconda enviornment you want
 
 echo "Make sure you've installed the asteroid conda environment!!!"
 read -p "Press Enter to continue"
@@ -40,9 +44,9 @@ read -p "Press Enter to continue"
 # compile blender module for python from source
 mkdir build
 cd build
-cmake ../blender -DCMAKE_INSTALL_PREFIX=$HOME/anaconda3/envs/asteroid/lib/python3.5/site-packages \
+cmake ../blender -DCMAKE_INSTALL_PREFIX=$HOME/anaconda3/envs/${ANACONDA_ENV}/lib/python3.5/site-packages \
     -DPYTHON_VERSION=3.5 \
-    -DPYTHON_ROOT_DIR=$HOME/anaconda3/envs/asteroid \
+    -DPYTHON_ROOT_DIR=$HOME/anaconda3/envs/${ANACONDA_ENV}\
     -DWITH_PYTHON_INSTALL=OFF \
     -DWITH_PLAYER=OFF \
     -DWITH_PYTHON_MODULE=ON \
