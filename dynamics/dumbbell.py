@@ -68,12 +68,12 @@ class Dumbbell(object):
 
         # controller parameters
         OS_translation = 5/100
-        Tp_translation = 5
-        Ts_translation = 10 
+        Tp_translation = 50
+        Ts_translation = 1000
 
         OS_rotation = 5/100
-        Tp_rotation = 5
-        Ts_rotation = 10
+        Tp_rotation = 50
+        Ts_rotation = 100
         
         self.zeta_translation = - np.log(OS_translation) / np.sqrt(np.pi**2 + np.log(OS_translation)**2)
         self.wn_translation = 4.0 / self.zeta_translation / Ts_translation
