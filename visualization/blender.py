@@ -486,7 +486,7 @@ def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), theta_ast=0, sun_position=[-5, 0
     """  
 
     # initialize the scene
-    camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene = blender_init('CYCLES')
+    camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene = blender_init('BLENDER')
 
     # move camera and asteroid 
     camera_obj.location = sc_pos
