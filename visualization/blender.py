@@ -427,7 +427,7 @@ def blender_render(name, scene, save_file=False):
         img_data = bpy.data.images['Viewer Node'].pixels
 
 
-def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), sun_position=[-5, 0, 0], filename='test'):
+def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), theta_ast=0, sun_position=[-5, 0, 0], filename='test'):
     r"""This will generate a blender render given a camera position and orientation
 
     Generate a single image given a known position and orientation of the camera/spacecraft
@@ -440,6 +440,8 @@ def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), sun_position=[-5, 0, 0], filenam
     R_sc2ast : (3, 3) numpy array of float
         Rotation matrix which transforms vectors in teh spacecraft body frame to the inertial frame.
         The camera is rotated to be assumed to point along the body frame +X axis
+    theta_ast : float
+        Angle of rotation about z axis of the asteroid at current time
     filename : string
         Name of PNG file to save the rendered image
 
@@ -480,7 +482,11 @@ def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), sun_position=[-5, 0, 0], filenam
     # move camera and asteroid 
     camera_obj.location = sc_pos
     lamp_obj.location = sun_position
+    
+    # rotate asteroid
+    itokawa_obj.rotation_euler = mathutils.Euler((0, 0, theta_ast), 'XYZ')
 
+    # rotate the camera
     R_i2bcam = R_sc2ast.T.dot(np.array(R_sc2bcam.T))
     rot_euler = mathutils.Matrix(R_i2bcam).to_euler('XYZ')
     camera_obj.rotation_euler = rot_euler
