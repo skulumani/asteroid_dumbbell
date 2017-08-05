@@ -516,20 +516,21 @@ def vertical_landing():
     
 
     radius = np.arange(-10, -1, 0.1)
-    theta = np.linspace(0, -np.pi/2, len(radius))
-    with h5py.File('./data/img_data.hdf5', 'a') as img_data:
+    theta = np.linspace(0, np.pi/2, len(radius))
+    with h5py.File('./data/img_data.hdf5', 'w') as img_data:
         # define a dataset to store all the imagery
-        vert_landing = img_data.create_dataset("vertical_landing", (244, 537, 3, len(radius)))
+        vert_landing = img_data.create_dataset("vertical_landing", (244, 537, 3, len(radius)), dtype='uint8')
         # define the trajectory
         for ii,r in enumerate(radius):
             sc_pos = np.array([r, 0, 0])
-            driver(sc_pos=sc_pos, R_sc2ast=np.eye(3), theta_ast=-theta[ii], filename='test')
+            driver(sc_pos=sc_pos, R_sc2ast=np.eye(3), theta_ast=theta[ii], filename='test')
             
             # read the image and store in HDF5 file
             img = cv2.imread('./visualization/blender/test.png')
 
             vert_landing[:, :, :, ii] = img
         # close the file
+
 def gen_image(sc_pos, R_sc2inertial, theta_ast, 
               camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene, 
               sun_position=[-5, 0, 1], filename='test'):
@@ -612,3 +613,4 @@ def gen_image(sc_pos, R_sc2inertial, theta_ast,
     img = cv2.imread(os.path.join(output_path + '/' + filename + '.png'))
 
     return img
+
