@@ -12,6 +12,8 @@ import visualization.plotting as plotting
 from dynamics import asteroid, dumbbell, controller
 from kinematics import attitude
 
+from visualization import blender
+
 import inertial_driver as idriver
 import relative_driver as rdriver
 
@@ -68,15 +70,15 @@ def eoms_controlled_blender(t, state, dum, ast):
     M1 = dum.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
     M2 = dum.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
     
-    # generate image at this current state
-
+    # generate image at this current state only at a specifc time
+    blender.driver(pos, R, ast.omega * t, [5, 0, 1], 'test' + str.zfill(str(t), 4))
     # use the imagery to figure out motion and pass to the controller instead
     # of the true state
 
 
     # compute the control input
-    u_m = controller.attitude_controller(t, state, M1+M2, dum)
-    u_f = controller.translation_controller(t, state, F1+F2, dum)
+    u_m = controller.attitude_controller(t, state, M1+M2, dum, ast)
+    u_f = controller.translation_controller(t, state, F1+F2, dum, ast)
 
     pos_dot = vel
     vel_dot = 1/(dum.m1+dum.m2) *(F1 + F2 + u_f)
@@ -91,9 +93,10 @@ RelTol = 1e-6
 AbsTol = 1e-6
 ast_name = 'itokawa'
 num_faces = 64
-tf = 1e3
-num_steps = 1e3
-time = np.linspace(0,int(tf),int(num_steps))
+t0 = 0
+dt = 1
+tf = 3600
+num_steps = 3600
 
 periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
 periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327])
@@ -101,15 +104,11 @@ periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327
 ast = asteroid.Asteroid(ast_name,num_faces)
 dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
 
-t0 = 0
-tf = 1e2
-dt = 1
-num_steps = 100
 
 # set initial state for inertial EOMs
-initial_pos = periodic_pos # km for center of mass in body frame
+initial_pos = np.array([2.550, 0, 0]) # km for center of mass in body frame
 initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
-initial_R = attitude.rot2(np.pi/2).reshape(9) # transforms from dumbbell body frame to the inertial frame
+initial_R = attitude.rot3(np.pi).reshape(9) # transforms from dumbbell body frame to the inertial frame
 initial_w = np.array([0.01, 0.01, 0.01])
 initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
