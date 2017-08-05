@@ -17,7 +17,7 @@ from visualization import blender
 
 import inertial_driver as idriver
 import relative_driver as rdriver
-
+import datetime
 def eoms_controlled_blender(t, state, dum, ast):
     """Inertial dumbbell equations of motion about an asteroid 
     
@@ -89,6 +89,14 @@ def eoms_controlled_blender(t, state, dum, ast):
     statedot = np.hstack((pos_dot, vel_dot, R_dot, ang_vel_dot))
 
     return statedot
+
+
+# simulation parameters
+output_path = './visualization/blender'
+asteroid_name = 'itokawa_low'
+# create a HDF5 dataset
+hdf5_path = './data/itokawa_landing/{}_controlled_vertical_landing.hdf5'.format(
+    datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
 
 RelTol = 1e-6
 AbsTol = 1e-6
