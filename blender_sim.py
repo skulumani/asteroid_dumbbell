@@ -129,7 +129,7 @@ while system.successful() and system.t < tf:
     i_state[ii, :] = (system.integrate(system.t + dt))
     # generate the view of the asteroid at this state
     if int(time[ii]) % 10 == 0:
-        blender.driver(i_state[ii,0:3], i_state[ii,6:15].reshape((3,3)), ast.omega * time[ii], [5, 0, 1], 'test' + str.zfill(str(time[ii]), 6))
+        blender.driver(i_state[ii,0:3], i_state[ii,6:15].reshape((3,3)), -ast.omega * time[ii], [-5, 0, 1], 'test' + str.zfill(str(time[ii]), 6))
 
     # do some image processing and visual odometry
     ii += 1
