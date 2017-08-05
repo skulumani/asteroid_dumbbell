@@ -113,8 +113,9 @@ periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327
 ast = asteroid.Asteroid(ast_name,num_faces)
 dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
 
-# create a HDF5 dataset
-hdf5_path = './data/controlled_vertical_landing.hdf5'
+# instantiate the blender scene once
+camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene = blender.blender_init(render_engine='CYCLES', asteroid_name='itokawa_low')
+
 # set initial state for inertial EOMs
 initial_pos = np.array([2.550, 0, 0]) # km for center of mass in body frame
 initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
@@ -131,9 +132,9 @@ system.set_f_params(dum, ast)
 i_state = np.zeros((num_steps+1, 18))
 time = np.zeros(num_steps+1)
 
-with hd5py.File(hdf5_path) as image_data:
+with h5py.File(hdf5_path) as image_data:
     # create a dataset
-    images = image_data.create_dataset('controlled_vertical_landing_tenth', (244, 537, 3, num_steps/10))
+    images = image_data.create_dataset('controlled_vertical_landing_hundreth', (244, 537, 3, num_steps/100))
       
     ii = 1
     while system.successful() and system.t < tf:
@@ -142,11 +143,12 @@ with hd5py.File(hdf5_path) as image_data:
         time[ii] = (system.t + dt)
         i_state[ii, :] = (system.integrate(system.t + dt))
         # generate the view of the asteroid at this state
-        if int(time[ii]) % 10 == 0:
-            blender.driver(i_state[ii,0:3], i_state[ii,6:15].reshape((3,3)), -ast.omega * time[ii], [-5, 0, 1], 'test')
-            img = cv2.imread('./visualization/blender/test.png')
-
-            images[:, :, :, ii] = img
+        if int(time[ii]) % 100 == 0:
+            img = blender.gen_image(i_state[ii,0:3], i_state[ii,6:15].reshape((3,3)), 
+                            -ast.omega * time[ii],
+                            camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene,
+                            [5, 0, 1], 'test')
+            images[:, :, :, ii//100 - 1] = img
 
         # do some image processing and visual odometry
         ii += 1
