@@ -432,6 +432,7 @@ def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), theta_ast=0, sun_position=[-5, 0
 
     Generate a single image given a known position and orientation of the camera/spacecraft
 
+
     Parameters
     ----------
     sc_pos : (3,) array_like and float
@@ -454,6 +455,10 @@ def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), theta_ast=0, sun_position=[-5, 0
     To transform vectors from the camera frame to the inertial/world frame
 
     .. math:: R_{I2B} = R_{S2I} * R_{B2S} 
+
+    Rotation operations in blender are from the object/body frame to the inertial frame. 
+    Therefore, in order to rotate an object with respect to the inertial frame you'll need to use the transpose.
+    Blender uses the same standard as most of the dynamics/papers, except for visualization we want the opposite.
 
     Author
     ------
@@ -510,6 +515,5 @@ def vertical_landing():
     theta = np.linspace(0, -np.pi/2, len(radius))
     for ii,r in enumerate(radius):
         sc_pos = np.array([r, 0, 0])
-        
-        driver(sc_pos=sc_pos, R_sc2ast=np.eye(3), theta_ast=theta[ii], filename='test'+str.zfill(str(ii),2))
+        driver(sc_pos=sc_pos, R_sc2ast=np.eye(3), theta_ast=-theta[ii], filename='test'+str.zfill(str(ii),2))
 
