@@ -11,6 +11,7 @@ import bpy
 import numpy as np
 import mathutils
 import pdb
+import h5py, cv2
 output_path = 'visualization/blender'
 
 
@@ -509,11 +510,20 @@ def vertical_landing():
     Use to track motion between imagery
 
     """
+    
 
-    # define the trajectory
     radius = np.arange(-10, -1, 0.1)
     theta = np.linspace(0, -np.pi/2, len(radius))
-    for ii,r in enumerate(radius):
-        sc_pos = np.array([r, 0, 0])
-        driver(sc_pos=sc_pos, R_sc2ast=np.eye(3), theta_ast=-theta[ii], filename='test'+str.zfill(str(ii),2))
+    with h5py.File('./data/img_data.hdf5', 'a') as img_data:
+        # define a dataset to store all the imagery
+        vert_landing = img_data.create_dataset("vertical_landing", (244, 537, 3, len(radius)))
+        # define the trajectory
+        for ii,r in enumerate(radius):
+            sc_pos = np.array([r, 0, 0])
+            driver(sc_pos=sc_pos, R_sc2ast=np.eye(3), theta_ast=-theta[ii], filename='test')
+            
+            # read the image and store in HDF5 file
+            img = cv2.imread('./visualization/blender/test.png')
 
+            vert_landing[:, :, :, ii] = img
+        # close the file

@@ -7,6 +7,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from scipy import integrate
 import numpy as np
 import pdb
+import h5py, cv2
 
 import visualization.plotting as plotting
 from dynamics import asteroid, dumbbell, controller
@@ -104,7 +105,8 @@ periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327
 ast = asteroid.Asteroid(ast_name,num_faces)
 dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
 
-
+# create a HDF5 dataset
+hdf5_path = './data/controlled_vertical_landing.hdf5'
 # set initial state for inertial EOMs
 initial_pos = np.array([2.550, 0, 0]) # km for center of mass in body frame
 initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
@@ -121,15 +123,22 @@ system.set_f_params(dum, ast)
 i_state = np.zeros((num_steps+1, 18))
 time = np.zeros(num_steps+1)
 
-ii = 1
-while system.successful() and system.t < tf:
-    # integrate the system and save state to an array
-    
-    time[ii] = (system.t + dt)
-    i_state[ii, :] = (system.integrate(system.t + dt))
-    # generate the view of the asteroid at this state
-    if int(time[ii]) % 10 == 0:
-        blender.driver(i_state[ii,0:3], i_state[ii,6:15].reshape((3,3)), -ast.omega * time[ii], [-5, 0, 1], 'test' + str.zfill(str(time[ii]), 6))
+with hd5py.File(hdf5_path) as image_data:
+    # create a dataset
+    images = image_data.create_dataset('controlled_vertical_landing_tenth', (244, 537, 3, num_steps/10))
+      
+    ii = 1
+    while system.successful() and system.t < tf:
+        # integrate the system and save state to an array
+        
+        time[ii] = (system.t + dt)
+        i_state[ii, :] = (system.integrate(system.t + dt))
+        # generate the view of the asteroid at this state
+        if int(time[ii]) % 10 == 0:
+            blender.driver(i_state[ii,0:3], i_state[ii,6:15].reshape((3,3)), -ast.omega * time[ii], [-5, 0, 1], 'test')
+            img = cv2.imread('./visualization/blender/test.png')
 
-    # do some image processing and visual odometry
-    ii += 1
+            images[:, :, :, ii] = img
+
+        # do some image processing and visual odometry
+        ii += 1
