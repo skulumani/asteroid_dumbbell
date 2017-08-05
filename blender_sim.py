@@ -97,7 +97,9 @@ asteroid_name = 'itokawa_low'
 # create a HDF5 dataset
 hdf5_path = './data/itokawa_landing/{}_controlled_vertical_landing.hdf5'.format(
     datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
-
+dataset_name = 'landing'
+render = 'BLENDER'
+image_modulus = 10
 RelTol = 1e-6
 AbsTol = 1e-6
 ast_name = 'itokawa'
@@ -114,7 +116,7 @@ ast = asteroid.Asteroid(ast_name,num_faces)
 dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
 
 # instantiate the blender scene once
-camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene = blender.blender_init(render_engine='CYCLES', asteroid_name='itokawa_low')
+camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene = blender.blender_init(render_engine=render, asteroid_name=asteroid_name)
 
 # set initial state for inertial EOMs
 initial_pos = np.array([2.550, 0, 0]) # km for center of mass in body frame
@@ -134,7 +136,7 @@ time = np.zeros(num_steps+1)
 
 with h5py.File(hdf5_path) as image_data:
     # create a dataset
-    images = image_data.create_dataset('controlled_vertical_landing_hundreth', (244, 537, 3, num_steps/100))
+    images = image_data.create_dataset(dataset_name, (244, 537, 3, num_steps/image_modulus), dtype='uint8')
       
     ii = 1
     while system.successful() and system.t < tf:
@@ -143,12 +145,12 @@ with h5py.File(hdf5_path) as image_data:
         time[ii] = (system.t + dt)
         i_state[ii, :] = (system.integrate(system.t + dt))
         # generate the view of the asteroid at this state
-        if int(time[ii]) % 100 == 0:
+        if int(time[ii]) % image_modulus== 0:
             img = blender.gen_image(i_state[ii,0:3], i_state[ii,6:15].reshape((3,3)), 
-                            -ast.omega * time[ii],
+                            ast.omega * time[ii],
                             camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene,
                             [5, 0, 1], 'test')
-            images[:, :, :, ii//100 - 1] = img
+            images[:, :, :, ii//image_modulus- 1] = img
 
         # do some image processing and visual odometry
         ii += 1
