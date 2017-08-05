@@ -14,6 +14,10 @@ import pdb
 import h5py, cv2
 output_path = 'visualization/blender'
 
+# fixed rotation from SC frame to camera frame
+R_sc2bcam = np.array([[0, -1, 0], 
+                        [0, 0, 1],
+                        [-1, 0, 0]])
 
 def print_object_locations():
     r"""Print out object properties for all the objects in a Blender scene
@@ -477,10 +481,6 @@ def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), theta_ast=0, sun_position=[-5, 0
     An example of how to use the function
 
     """  
-    # fixed rotation from SC frame to camera frame
-    R_sc2bcam = np.array([[0, -1, 0], 
-                          [0, 0, 1],
-                          [-1, 0, 0]])
 
     # initialize the scene
     camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene = blender_init('CYCLES')
