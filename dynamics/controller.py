@@ -86,7 +86,9 @@ def translation_controller(time, state, ext_force, dum, ast):
     x_des, xd_des, xdd_des = linear_x_descent_translation(time, ast=ast,final_pos=[0.550, 0, 0],
                                                           initial_pos=[2.550, 0, 0], 
                                                           descent_tf=3600)
-
+    # x_des, xd_des, xdd_des = fixed_translation(time, ast=ast,final_pos=[0.550, 0, 0],
+    #                                                       initial_pos=[2.550, 0, 0], 
+    #                                                       descent_tf=3600)
     # compute the error
     ex = pos - x_des
     ev = vel - xd_des
@@ -173,7 +175,6 @@ def linear_x_descent_translation(time, ast, final_pos=[0.550, 0, 0],
     omega_ast_dot_vec = np.zeros(3)
 
     Ra2i = attitude.rot3(omega_ast * time, 'c')
-
     # determine desired position and velocity in the body fixed frame at this current time input
     # we'll use a simple linear interpolation between initial and final states
     xslope =(final_pos[0] - initial_pos[0]) / (descent_tf) 
@@ -190,3 +191,65 @@ def linear_x_descent_translation(time, ast, final_pos=[0.550, 0, 0],
     # output
     return inertial_pos, inertial_vel, inertial_accel 
     
+def fixed_attitude(time, state):
+    """Desired attitude to ensure that the x axis is always pointing at the origin (asteroid)
+
+    """
+    # extract out the states
+    pos = state[0:3] # location of the center of mass in the inertial frame
+    vel = state[3:6] # vel of com in inertial frame
+    R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+    ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
+
+    Rd = attitude.rot3(np.pi, 'c')
+    Rd_dot = np.zeros_like(Rd)
+    ang_vel_d = np.zeros(3) 
+    ang_vel_d_dot = np.zeros(3) 
+
+    return (Rd, Rd_dot, ang_vel_d, ang_vel_d_dot)
+
+def fixed_translation(time, ast, final_pos=[0.550, 0, 0], 
+                                 initial_pos=[2.550, 0, 0], 
+                                 descent_tf=3600):
+    """Desired translational states for vertical landing on asteroid
+    
+    Inputs :
+    --------
+    
+    """
+    # rotation state of the asteroid - assume all simulations start with asteroid aligned with the inertial frame
+    omega_ast = ast.omega
+    omega_ast_dot = 0
+
+    omega_ast_vec = np.array([0, 0, omega_ast])
+    omega_ast_dot_vec = np.zeros(3)
+
+    inertial_pos = np.array([0, 2.5, 0])
+    inertial_vel = np.zeros(3)
+    inertial_accel = np.zeros(3) 
+
+    # output
+    return inertial_pos, inertial_vel, inertial_accel 
+
+def approaching_translation(time, ast, final_pos=[0.550, 0, 0], 
+                                 initial_pos=[2.550, 0, 0], 
+                                 descent_tf=3600):
+    """Desired translational states for vertical landing on asteroid
+    
+    Inputs :
+    --------
+    
+    """
+    # rotation state of the asteroid - assume all simulations start with asteroid aligned with the inertial frame
+    omega_ast = ast.omega
+    omega_ast_dot = 0
+
+    omega_ast_vec = np.array([0, 0, omega_ast])
+    omega_ast_dot_vec = np.zeros(3)
+
+    inertial_pos = np.array([-0.0005 * time + initial_pos[0], 0, 0])
+    inertial_vel = np.zeros(3)
+    inertial_accel = np.zeros(3) 
+
+    # output
+    return inertial_pos, inertial_vel, inertial_accel 
