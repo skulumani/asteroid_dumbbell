@@ -95,8 +95,8 @@ ast_name = 'itokawa'
 num_faces = 64
 t0 = 0
 dt = 1
-tf = 10
-num_steps = 10
+tf = 3600
+num_steps = 3600
 
 periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
 periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327])
@@ -128,7 +128,7 @@ while system.successful() and system.t < tf:
     time[ii] = (system.t + dt)
     i_state[ii, :] = (system.integrate(system.t + dt))
     # generate the view of the asteroid at this state
-    blender.driver(i_state[ii,0:3], i_state[ii,6:15].reshape((3,3)), ast.omega * time[ii], [5, 0, 1], 'test' + str.zfill(str(time[ii]), 4))
+    blender.driver(i_state[ii,0:3], i_state[ii,6:15].reshape((3,3)), ast.omega * time[ii], [5, 0, 1], 'test' + str.zfill(str(time[ii]), 6))
 
     # do some image processing and visual odometry
     ii += 1
