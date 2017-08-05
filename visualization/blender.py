@@ -11,7 +11,8 @@ import bpy
 import numpy as np
 import mathutils
 import pdb
-import h5py, cv2
+import h5py
+import cv2
 output_path = 'visualization/blender'
 
 # fixed rotation from SC frame to camera frame
