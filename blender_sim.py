@@ -1,6 +1,9 @@
 """Simulation of controlled dumbbell around Itokawa with 
 simulated imagery using Blender
 
+This will generate the imagery of Itokawa from a spacecraft following 
+a vertical descent onto the surface.
+
 4 August 2017 - Shankar Kulumani
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
