@@ -16,6 +16,7 @@ import cv2
 from kinematics import attitude
 output_path = 'visualization/blender'
 
+from visualization import blender_camera
 # fixed rotation from SC frame to camera frame
 R_sc2bcam = np.array([[0, -1, 0], 
                       [0, 0, 1],
@@ -598,7 +599,7 @@ def gen_image(sc_pos, R_sc2inertial, theta_ast,
 
     # rotate the camera
     R_i2bcam = R_sc2inertial.dot(R_sc2bcam.T)
-
+    R_blender = R_sc2inertial.dot(R_sc2bcam.T)
     # rot_euler = mathutils.Matrix(R_i2bcam).to_euler('XYZ')
     # rot_euler = mathutils.Matrix(R_sc2inertial.dot(R_sc2bcam.T)).to_euler('XYZ')
     rot_euler = mathutils.Matrix((R_sc2inertial.dot(R_sc2bcam.T))).to_euler('XYZ')
@@ -606,11 +607,12 @@ def gen_image(sc_pos, R_sc2inertial, theta_ast,
     camera_obj.rotation_euler = rot_euler
     bpy.context.scene.update()
 
+    RT = blender_camera.get_3x4_RT_matrix_from_blender(camera_obj)
     # render an image from the spacecraft at this state
     # blender_render(filename,scene, True)
     scene.render.filepath = os.path.join(output_path + '/' + filename + '.png')
     bpy.ops.render.render(write_still=True)
     img = cv2.imread(os.path.join(output_path + '/' + filename + '.png'))
 
-    return img
+    return img, np.array(RT), R_blender
 
