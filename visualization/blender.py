@@ -612,7 +612,7 @@ def gen_image(sc_pos, R_sc2inertial, theta_ast,
     # blender_render(filename,scene, True)
     scene.render.filepath = os.path.join(output_path + '/' + filename + '.png')
     bpy.ops.render.render(write_still=True)
-    img = cv2.imread(os.path.join(output_path + '/' + filename + '.png'))
+    img = cv2.imread(os.path.join(output_path + '/' + filename + '.png')) # read as color BGR in OpenCV
 
     return img, np.array(RT), R_blender
 
