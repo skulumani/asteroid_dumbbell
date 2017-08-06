@@ -98,7 +98,7 @@ asteroid_name = 'itokawa_low'
 hdf5_path = './data/itokawa_landing/{}_controlled_vertical_landing.hdf5'.format(
     datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
 dataset_name = 'landing'
-render = 'BLENDER'
+render = 'CYCLES'
 image_modulus = 10
 RelTol = 1e-6
 AbsTol = 1e-6
