@@ -104,8 +104,8 @@ asteroid_name = 'itokawa_low'
 hdf5_path = './data/itokawa_landing/{}_controlled_vertical_landing.hdf5'.format(
     datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
 dataset_name = 'landing'
-render = 'CYCLES'
-image_modulus = 10
+render = 'BLENDER'
+image_modulus = 100
 RelTol = 1e-6
 AbsTol = 1e-6
 ast_name = 'itokawa'
@@ -142,6 +142,7 @@ system.set_f_params(dum, ast)
 
 i_state = np.zeros((num_steps+1, 18))
 time = np.zeros(num_steps+1)
+i_state[0, :] = initial_state
 
 with h5py.File(hdf5_path) as image_data:
     # create a dataset
