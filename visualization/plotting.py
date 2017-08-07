@@ -9,6 +9,7 @@ import scipy as sp
 import pdb
 
 import matplotlib as mpl
+mpl.use('agg')
 from mpl_toolkits.mplot3d import axes3d
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
