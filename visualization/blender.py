@@ -524,10 +524,11 @@ def vertical_landing():
         # define the trajectory
         for ii,r in enumerate(radius):
             sc_pos = np.array([r, 0, 0])
-            driver(sc_pos=sc_pos, R_sc2ast=np.eye(3), theta_ast=theta[ii], filename='test')
+            filename = 'test' + str.zfill(str(ii), 4)
+            driver(sc_pos=sc_pos, R_sc2ast=np.eye(3), theta_ast=theta[ii], filename=filename)
             
             # read the image and store in HDF5 file
-            img = cv2.imread('./visualization/blender/test.png')
+            img = cv2.imread('./visualization/blender/' + filename + '.png')
 
             vert_landing[:, :, :, ii] = img
         # close the file
