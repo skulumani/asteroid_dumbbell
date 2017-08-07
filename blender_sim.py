@@ -249,6 +249,7 @@ def blender_traverse_then_land_sim():
 
 
             # do some image processing and visual odometry
+            print(system.t)
             ii += 1
 
         image_data.create_dataset('K', data=K)
