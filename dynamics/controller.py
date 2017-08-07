@@ -64,6 +64,95 @@ def attitude_controller(time, state, ext_moment, dum, ast):
                 R.T.dot(Rd).dot(ang_vel_d_dot)) - ext_moment)
     return u_m
 
+def attitude_traverse_then_land_controller(time, state, ext_moment, dum, ast):
+    r"""Geometric attitude controller on SO(3)
+
+    This function will determine an attitude control input for a rigid spacecraft around an asteroid.
+    The function is setup to work for a vehicle defined in the inertial frame relative to an asteroid.
+
+    Parameters
+    ----------
+    self : dumbbell instance
+        Instance of dumbbell class with all of it's parameters
+    time : float
+        Current time for simulation which is used in the desired attitude trajectory
+    state : array_like (18,)
+        numpy array defining the state of the dumbbell
+        position - position of the center of mass wrt to the inertial frame
+        and defined in the inertial frame (3,)
+        velocity - velocity of the center of mass wrt to teh inertial frame
+        and defined in the inertial frame (3,)
+        R_b2i - rotation matrix which transforms vectors from the body
+        frame to the inertial frame (9,)
+        angular_velocity - angular velocity of the body frame with respect
+        to the inertial frame and defined in the body frame (3,)
+    ext_moment : array_like (3,)
+        External moment in the body fixed frame
+
+    Returns
+    -------
+    u_m : array_like (3,)
+        Body fixed control moment
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    References
+    ----------
+    
+    .. [1] LEE, Taeyoung, LEOK, Melvin y MCCLAMROCH, N Harris. "Control of
+    Complex Maneuvers for a Quadrotor UAV Using Geometric Methods on Se
+    (3)". arXiv preprint arXiv:1003.2005. 2010, 
+
+    Examples
+    --------
+
+    """ 
+    # extract the state
+    pos = state[0:3] # location of the center of mass in the inertial frame
+    vel = state[3:6] # vel of com in inertial frame
+    R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+    ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
+    # compute the desired attitude command
+    Rd, Rd_dot, ang_vel_d, ang_vel_d_dot = body_fixed_pointing_attitude(time, state)
+    # determine error between command and current state
+    eR = 1/2 * attitude.vee_map(Rd.T.dot(R) - R.T.dot(Rd))
+    eW = ang_vel - R.T.dot(Rd).dot(ang_vel_d)
+    # compute attitude input
+    u_m = (-dum.kR*eR -dum.kW*eW + np.cross(ang_vel,dum.J.dot(ang_vel)) 
+            -dum.J.dot( attitude.hat_map(ang_vel).dot(R.T).dot(Rd).dot(ang_vel_d)-
+                R.T.dot(Rd).dot(ang_vel_d_dot)) - ext_moment)
+    return u_m
+def translation_traverse_then_land_controller(time, state, ext_force, dum, ast):
+    """SE(3) Translational Controller
+
+    Inputs:
+
+    Outputs:
+        u_f - force command in the dumbbell frame
+
+    """
+
+    # extract the state
+    pos = state[0:3] # location of the center of mass in the inertial frame
+    vel = state[3:6] # vel of com in inertial frame
+    R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+    ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
+    
+    m = dum.m1 + dum.m2
+
+    # figure out the desired trajectory
+    x_des, xd_des, xdd_des = traverse_then_land_vertically(time, ast=ast,final_pos=[0.550, 0, 0],
+                                                          initial_pos=[2.550, 0, 0], 
+                                                          descent_tf=3600)
+    # compute the error
+    ex = pos - x_des
+    ev = vel - xd_des
+    # compute the control
+    u_f = -dum.kx * ex -dum.kv * ev - ext_force + m * xdd_des
+
+    return u_f
 def translation_controller(time, state, ext_force, dum, ast):
     """SE(3) Translational Controller
 
@@ -157,6 +246,49 @@ def body_fixed_pointing_attitude(time, state):
     ang_vel_d_dot = np.zeros(3) 
 
     return (Rd, Rd_dot, ang_vel_d, ang_vel_d_dot)
+
+def traverse_then_land_vertically(time, ast, final_pos=[0.550, 0, 0], 
+                                 initial_pos=[2.550, 0, 0], 
+                                 descent_tf=3600):
+    """Desired translational states for vertical landing on asteroid
+   
+    First the spacecraft will traverse horizontally in the equatorial plane over the asteroid fixed x axis, then descend vertically
+
+    Inputs :
+    --------
+    
+    """
+    if time < descent_tf:
+        # linear interpolation between whatever the current state is and the landing staging point
+        omega = np.pi/2 / descent_tf
+        inertial_pos = 2.550 * np.array([  np.sin(omega * time), -np.cos(omega * time), 0])
+        inertial_vel = 2.550 * omega * np.array([np.cos(omega * time), np.sin(omega * time), 0])
+        inertial_accel = 2.550 * omega**2 * np.array([-np.sin(omega * time), np.cos(omega *  time), 0])
+    
+    else:
+        # rotation state of the asteroid - assume all simulations start with asteroid aligned with the inertial frame
+        omega_ast = ast.omega
+        omega_ast_dot = 0
+
+        omega_ast_vec = np.array([0, 0, omega_ast])
+        omega_ast_dot_vec = np.zeros(3)
+
+        Ra2i = attitude.rot3(omega_ast * (time - descent_tf), 'c')
+        # determine desired position and velocity in the body fixed frame at this current time input
+        # we'll use a simple linear interpolation between initial and final states
+        xslope =(final_pos[0] - initial_pos[0]) / (descent_tf)  # how long for teh descent
+        xdes =  xslope * (time - descent_tf) + initial_pos[0]
+        
+        body_pos_des = np.array([xdes, 0, 0])
+        body_vel_des = np.array([xslope, 0, 0])
+        body_acc_des = np.zeros(3)
+        # transform this body position/velocity into the inertial frame
+        inertial_pos = Ra2i.dot(body_pos_des)
+        inertial_vel = body_vel_des + np.cross(omega_ast_vec, body_pos_des)
+        inertial_accel = body_acc_des + 2 * np.cross(omega_ast_vec, body_vel_des) + np.cross(omega_ast_vec, np.cross(omega_ast_vec, body_pos_des))
+
+    # output
+    return inertial_pos, inertial_vel, inertial_accel 
 
 def linear_x_descent_translation(time, ast, final_pos=[0.550, 0, 0], 
                                  initial_pos=[2.550, 0, 0], 
