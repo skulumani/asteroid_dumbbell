@@ -617,3 +617,15 @@ def gen_image(sc_pos, R_sc2inertial, theta_ast,
 
     return img, np.array(RT), R_blender
 
+
+def write_h5py_to_png(hdf5_path, dataset_name, output_path):
+    sim_data = h5py.File(hdf5_path, 'r')
+
+    images = sim_data[dataset_name]
+
+    num_images = images.shape[3]
+
+    for ii in range(num_images):
+        cv.imwrite(output_path + '/test' + str.zfill(str(ii), 6) + '.png', images[:, :, :, ii])
+
+    print("Finished extracting all the images")
