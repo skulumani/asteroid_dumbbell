@@ -934,7 +934,7 @@ def h5py_plotter(images):
         else:
             img.set_data(images[:, :, :, ii])
 
-        plt.pause(0.1)
+        plt.pause(0.01)
         plt.draw()
 
 if __name__ == '__main__':
