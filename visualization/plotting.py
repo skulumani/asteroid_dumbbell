@@ -7,6 +7,7 @@ import eom_comparison.transform as eom_transform
 import numpy as np
 import scipy as sp
 import pdb
+import os
 
 import matplotlib as mpl
 mpl.use('agg')
@@ -775,11 +776,11 @@ def plot_controlled_inertial(time, state, ast, dum, pgf_save=False, fwidth=0.5):
     plt.show()
     return 0
 
-def plot_controlled_blender_inertial(time, state, ast, dum, pgf_save=False, fwidth=0.5):
+def plot_controlled_blender_inertial(time, state, ast, dum, pgf_save, fwidth,
+                                     desired_translation_func, desired_attitude_func):
     """Plot the state and desired command for the controlled system generated using Blender Sim
 
     """
-
     pos = state[:,0:3]
     vel = state[:,3:6]
     R = state[:,6:15]
@@ -795,13 +796,20 @@ def plot_controlled_blender_inertial(time, state, ast, dum, pgf_save=False, fwid
     ang_vel_d_des = np.zeros_like(ang_vel_des)
 
     for ii, t in enumerate(time):
-        x_des[ii,:], xd_des[ii, :], xdd_des[ii, :] = controller.linear_x_descent_translation(t, ast, final_pos=[0.55, 0, 0])
-        Rd, Rd_dot, wd, wd_dot = controller.body_fixed_pointing_attitude(t, state[ii, :])
+        x_des[ii,:], xd_des[ii, :], xdd_des[ii, :] = desired_translation_func(t, ast, final_pos=[0.55, 0, 0], initial_pos=[2.550, 0, 0], descent_tf=3600)
+        Rd, Rd_dot, wd, wd_dot = desired_attitude_func(t, state[ii, :])
          
         R_des[ii, :] = Rd.reshape(-1)
         Rd_des[ii,:] = Rd_dot.reshape(-1)
         ang_vel_des[ii, :] = wd
         ang_vel_d_des[ii, :] = wd_dot
+
+    # three dimensional plot of the trajectory
+    traj_fig, traj_ax = plt.subplots(1, figsize=figsize(fwidth))
+    traj_ax.set_xlabel(r'$X$ (km)')
+    traj_ax.set_ylabel(r'$Y$ (km)')
+    traj_ax.plot(pos[:, 0], pos[:, 1])
+    traj_ax.axis('equal') 
 
     # position comparison
     pos_fig, pos_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
@@ -882,7 +890,7 @@ def plot_controlled_blender_inertial(time, state, ast, dum, pgf_save=False, fwid
     angvel_axarr[2].set_xlabel('Time (sec)')
     plt.suptitle('Angular Velocity Comparison')
     plt.legend()
-
+    
     angveldiff_fig, angveldiff_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
     angveldiff_axarr[0].plot(time, np.absolute(w[:,0]-ang_vel_des[:,0]))
     angveldiff_axarr[0].set_ylabel(r'$\Delta \dot \Omega$ (rad/sec)')
@@ -914,12 +922,15 @@ def plot_controlled_blender_inertial(time, state, ast, dum, pgf_save=False, fwid
 
     # save the figures as pgf if the flag is set
     if pgf_save:
-        fig_handles = (pos_fig, posdiff_fig, vel_fig, veldiff_fig, angvel_fig, angveldiff_fig, att_fig, attdiff_fig)
-        fig_fnames = ('pos_fig', 'posdiff_fig', 'vel_fig', 'veldiff_fig', 'angvel_fig', 'angveldiff_fig', 'att_fig', 'attdiff_fig')
+        fig_handles = (traj_fig, pos_fig, posdiff_fig, vel_fig, veldiff_fig, angvel_fig, angveldiff_fig, att_fig, attdiff_fig)
+        fig_fnames = ('traj_fig', 'pos_fig', 'posdiff_fig', 'vel_fig', 'veldiff_fig', 'angvel_fig', 'angveldiff_fig', 'att_fig', 'attdiff_fig')
+        output_path = '/tmp'
+        extension = '.eps'
 
         for fig, fname in zip(fig_handles, fig_fnames):
             plt.figure(fig.number)
-            plt.savefig(fname + '.pgf')
+            # plt.savefig(fname + '.pgf')
+            plt.savefig(os.path.join(output_path, fname + extension))
 
     plt.show()
     return 0
