@@ -121,4 +121,15 @@ Use one of the following
 * [rca/PySPICE](https://github.com/DaRasch/spiceminer)
 * [AndrewAnnex/SpiceyPy](https://github.com/AndrewAnnex/SpiceyPy) - this one seems to be the most up to date version
 
+## Creating a movie from a bunch of images
 
+Use this command to create a movie with `ffmpeg`
+
+~~~
+ffmpeg -framerate 60 -i test%06d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" output.mp4 
+~~~
+
+Some additional information:
+
+* [Even dimensions](https://stackoverflow.com/questions/20847674/ffmpeg-libx264-height-not-divisible-by-2)
+* [FFMPEG Images to Video](https://askubuntu.com/questions/610903/how-can-i-create-a-video-file-from-a-set-of-jpg-images)
