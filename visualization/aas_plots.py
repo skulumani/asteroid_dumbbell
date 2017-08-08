@@ -66,6 +66,8 @@ with h5py.File('./data/itokawa_landing/cycles_high_7200.hdf5', 'r') as sim_data:
 
     # draw the true and estimated trajectory
     # create animation
-    plotting.plot_controlled_blender_inertial(time, i_state, ast, dum, True, 1, 
-                                              controller.traverse_then_land_vertically,
-                                              controller.body_fixed_pointing_attitude)
+    # plotting.plot_controlled_blender_inertial(time, i_state, ast, dum, True, 1, 
+    #                                           controller.traverse_then_land_vertically,
+    #                                           controller.body_fixed_pointing_attitude)
+
+    plotting.animate_inertial_trajectory(time, i_state, ast, dum, 3600)

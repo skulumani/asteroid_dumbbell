@@ -103,7 +103,7 @@ def plot_energy(time,KE, PE, fig):
     plt.show()
     return 0
 
-def animate_inertial_trajectory(t, state, ast, dum, filename=''):
+def animate_inertial_trajectory(t, state, ast, dum, t0=0, filename=''):
     """Animate inertial trajectory
 
     Plot the motion of the dumbbell around the asteroid
@@ -159,7 +159,7 @@ def animate_inertial_trajectory(t, state, ast, dum, filename=''):
         w = state[:, 15:18]
 
         # convert the asteroid body frame to the inertial frame and plot
-        Ra2i = attitude.rot3(ast.omega*t[ii], 'c')
+        Ra2i = attitude.rot3(ast.omega*(t[ii] - t0), 'c')
 
         for jj, tup in enumerate(zip(ast_frame, db_frame, db_masses)):
             ast_line, db_line, db_pt = tup
