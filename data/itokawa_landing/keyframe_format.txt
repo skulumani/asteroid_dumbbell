@@ -1,0 +1,6 @@
+## Keyframe format
+
+The keyframe format is the same the TUM RGB dataset, which is defined [here](https://vision.in.tum.de/data/datasets/rgbd-dataset/file_formats).
+
+The documentation that shows that that ORB-SLAM format is in fact following this guideline is given at this [comment](https://github.com/raulmur/ORB_SLAM2/issues/12).
+
