@@ -10,7 +10,8 @@ import pdb
 import os
 
 import matplotlib as mpl
-mpl.use('agg')
+if mpl.get_backend() != 'Qt5Agg':
+    mpl.use('agg')
 from mpl_toolkits.mplot3d import axes3d
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
@@ -56,19 +57,22 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
 
 mpl.rcParams.update(pgf_with_latex)
 
-def vertex_plotter(ast, fig):
+def vertex_plotter(ast, fig, angle=0):
 
     ax = axes3d.Axes3D(fig)
 
     for ii in np.arange(len(ast.F)):
         facet = [ast.asteroid_grav.get('V1')[ii,:], ast.asteroid_grav.get('V2')[ii,:], ast.asteroid_grav.get('V3')[ii,:]]
+        facet = [attitude.rot3(angle, 'c').dot(f) for f in facet]
         tri = axes3d.art3d.Poly3DCollection([facet])
         tri.set_color('g')    
         tri.set_edgecolor('k')
+        tri.set_alpha(0.5)
+        tri.set_linewidth(0.1)
         tri.set_alpha(1.0)
         ax.add_collection3d(tri)
 
-    return 0
+    return ax
 
 def plot_trajectory(pos, fig):
     """Plot the state trajectory in a 3D view
@@ -103,7 +107,7 @@ def plot_energy(time,KE, PE, fig):
     plt.show()
     return 0
 
-def animate_inertial_trajectory(t, state, ast, dum, t0=0, filename=''):
+def animate_inertial_trajectory(t, state, ast, dum, t0=0, save_fig=False):
     """Animate inertial trajectory
 
     Plot the motion of the dumbbell around the asteroid
@@ -204,8 +208,8 @@ def animate_inertial_trajectory(t, state, ast, dum, t0=0, filename=''):
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=t.shape[0], interval=1/30*1e3, blit=True)
 
     # Save as mp4. This requires mplayer or ffmpeg to be installed
-    if filename:
-        anim.save(filename + '.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
+    if save_fig:
+        anim.save(os.path.join('/tmp', filename + '.mp4'), fps=30, extra_args=['-vcodec', 'libx264'])
 
     plt.show() 
 
@@ -794,6 +798,9 @@ def plot_controlled_blender_inertial(time, state, ast, dum, pgf_save, fwidth,
     Rd_des = np.zeros_like(R_des)
     ang_vel_des = np.zeros_like(x_des)
     ang_vel_d_des = np.zeros_like(ang_vel_des)
+    R_ast2int = np.zeros_like(R_des)
+    u_f = np.zeros_like(pos)
+    u_m = np.zeros_like(pos)
 
     for ii, t in enumerate(time):
         x_des[ii,:], xd_des[ii, :], xdd_des[ii, :] = desired_translation_func(t, ast, final_pos=[0.55, 0, 0], initial_pos=[2.550, 0, 0], descent_tf=3600)
@@ -803,14 +810,35 @@ def plot_controlled_blender_inertial(time, state, ast, dum, pgf_save, fwidth,
         Rd_des[ii,:] = Rd_dot.reshape(-1)
         ang_vel_des[ii, :] = wd
         ang_vel_d_des[ii, :] = wd_dot
+        
+        # the cycles_high_7200 simulation starts off with Itokawa at Ra2i = attitude.rot3(ast.omega * (t-3600), 'c')
+        R_ast2int[ii, :] = attitude.rot3(ast.omega * (t - 3600), 'c').reshape(9)
 
     # three dimensional plot of the trajectory
-    traj_fig, traj_ax = plt.subplots(1, figsize=figsize(fwidth))
+    frame_indicies = np.linspace(time[0], time[-1], 6, dtype=int)
+
+    traj_fig = plt.figure(figsize=figsize(fwidth))
+    traj_ax = vertex_plotter(asteroid.Asteroid('itokawa', 1024), traj_fig, ast.omega*3600)
+    
     traj_ax.set_xlabel(r'$X$ (km)')
     traj_ax.set_ylabel(r'$Y$ (km)')
     traj_ax.plot(pos[:, 0], pos[:, 1])
-    traj_ax.axis('equal') 
 
+    # plot the body frame x, y axis at the specified frame times
+    for fi in frame_indicies:
+        x_axis = R[fi, :].reshape((3, 3))[:, 0]
+        y_axis = R[fi, :].reshape((3, 3))[:, 1]
+        com = pos[fi, :]
+
+        # draw x axis
+        traj_ax.plot([com[0], com[0]+0.5*x_axis[0]],[com[1], com[1]+0.5*x_axis[1]], 'r')
+        # draw y axis
+        # traj_ax.plot([com[0], com[0]+0.5*y_axis[0]],[com[1], com[1]+0.5*y_axis[1]], 'b')
+        
+    traj_ax.set_xlim3d(min(pos[:, 0]), max(pos[:, 0]))
+    traj_ax.set_ylim3d(min(pos[:, 1]), max(pos[:, 1]))
+    traj_ax.view_init(elev=90, azim=180) 
+    traj_ax.set_axis_off()
     # position comparison
     pos_fig, pos_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
     pos_axarr[0].plot(time,pos[:,0], label='Actual')
