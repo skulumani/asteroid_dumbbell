@@ -822,7 +822,7 @@ def plot_controlled_blender_inertial(time, state, ast, dum, pgf_save, fwidth,
     
     traj_ax.set_xlabel(r'$X$ (km)')
     traj_ax.set_ylabel(r'$Y$ (km)')
-    traj_ax.plot(pos[:, 0], pos[:, 1])
+    traj_ax.plot(pos[:, 0], pos[:, 1], pos[:, 2])
 
     # plot the body frame x, y axis at the specified frame times
     for fi in frame_indicies:
@@ -831,7 +831,7 @@ def plot_controlled_blender_inertial(time, state, ast, dum, pgf_save, fwidth,
         com = pos[fi, :]
 
         # draw x axis
-        traj_ax.plot([com[0], com[0]+0.5*x_axis[0]],[com[1], com[1]+0.5*x_axis[1]], 'r')
+        traj_ax.plot([com[0], com[0]+0.5*x_axis[0]],[com[1], com[1]+0.5*x_axis[1]],[com[2], com[2] + 0.5*x_axis[2]], 'r')
         # draw y axis
         # traj_ax.plot([com[0], com[0]+0.5*y_axis[0]],[com[1], com[1]+0.5*y_axis[1]], 'b')
         
