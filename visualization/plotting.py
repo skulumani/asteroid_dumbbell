@@ -958,7 +958,8 @@ def plot_controlled_blender_inertial(time, state, ast, dum, pgf_save, fwidth,
         for fig, fname in zip(fig_handles, fig_fnames):
             plt.figure(fig.number)
             # plt.savefig(fname + '.pgf')
-            plt.savefig(os.path.join(output_path, fname + extension))
+            plt.savefig(os.path.join(output_path, fname + extension), 
+                        bbox_inches='tight')
 
     plt.show()
     return 0
