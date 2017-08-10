@@ -844,15 +844,18 @@ def plot_controlled_blender_inertial(time, state, ast, dum, pgf_save, fwidth,
     pos_axarr[0].plot(time,pos[:,0], label='Actual')
     pos_axarr[0].plot(time, x_des[:,0], label='Desired')
     pos_axarr[0].set_ylabel(r'$X$ (km)')
+    pos_axarr[0].grid()
         
     pos_axarr[1].plot(time, pos[:,1], label='Actual')
     pos_axarr[1].plot(time, x_des[:,1], label='Desired')
     pos_axarr[1].set_ylabel(r'$Y$ (km)')
-        
+    pos_axarr[1].grid()
+
     pos_axarr[2].plot(time, pos[:,2], label='Actual')
     pos_axarr[2].plot(time, x_des[:,2], label='Desired')
     pos_axarr[2].set_ylabel(r'$Z$ (km)')
-     
+    pos_axarr[2].grid()
+
     pos_axarr[2].set_xlabel('Time (sec)')
     plt.suptitle('Position Comparison')
     plt.legend()  
