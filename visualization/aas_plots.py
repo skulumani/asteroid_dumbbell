@@ -132,18 +132,21 @@ def plot_keyframe_trajectory(time, i_state, R_ast2int, R_bcam2i, save_fig=False,
     kf_comp_fig, kf_comp_ax = plt.subplots(3, 1, figsize=plotting.figsize(1), sharex=True)
     kf_comp_ax[0].plot(kf_time, kf_traj[:, 0], 'b-*', label='Estimate')
     kf_comp_ax[0].plot(kf_time, kf_traj_true[:, 0], 'r-*', label='True')
+    kf_comp_ax[0].set_ylim(0, 3)
     kf_comp_ax[0].set_ylabel(r'$X$ (km)')
 
     kf_comp_ax[1].plot(kf_time, kf_traj[:, 1], 'b-*', label='Estimate')
     kf_comp_ax[1].plot(kf_time, kf_traj_true[:, 1], 'r-*', label='True')
+    kf_comp_ax[1].set_ylim(-2, 1)
     kf_comp_ax[1].set_ylabel(r'$Y$ (km)')
 
     kf_comp_ax[2].plot(kf_time, kf_traj[:, 2], 'b-*', label='Estimate')
     kf_comp_ax[2].plot(kf_time, kf_traj_true[:, 2], 'r-*', label='True')
+    kf_comp_ax[2].set_ylim(-0.5, 2.5)
     kf_comp_ax[2].set_ylabel(r'$Z$ (km)')
 
     kf_comp_ax[2].set_xlabel('Time (sec)')
-    plt.legend()
+    plt.legend(loc='best')
 
     if save_fig:
         plt.figure(kf_comp_fig.number)
