@@ -17,7 +17,10 @@ from kinematics import attitude
 output_path = 'visualization/blender'
 
 from visualization import blender_camera
+
 # fixed rotation from SC frame to camera frame
+# the camera in Blender is aligned with teh -z axis (view direction)
+# blender cam x axis, y axis are aligned with teh spacecraft x, y axes
 R_sc2bcam = np.array([[0, -1, 0], 
                       [0, 0, 1],
                       [-1, 0, 0]])
@@ -60,6 +63,25 @@ def print_object_locations():
 
 
 def cylinder_between(x1, y1, z1, x2, y2, z2, r):
+    """Draw a cylinder between points in Blender
+
+    Given an already setup Blender scene, this function will draw a cyclinder
+    between two points.
+
+    Inputs :
+    --------
+    x1, y1, z1 : float
+        Start of cyclinder in the blender world frame
+    x2, y2, z2 : float
+        End of cyclinder in blender world/inertial frame
+    r : float
+        radius of the cyclinder
+
+    Returns :
+    ---------
+    None
+
+    """
 
     dx = x2 - x1
     dy = y2 - y1
@@ -128,7 +150,21 @@ def look_at(camera, point):
 def load_asteroid(asteroid='itokawa_low'):
     """Load the desired asteroid
 
-    doc
+    Import the wavefront model of an asteroid
+
+    Parameters : 
+    ------------
+    asteroid : string
+        Filename and object name of the asteroid. 
+        The wavefront file should be in the subdirectory ./data/
+        You can generate new models by using the SBMT tool
+        http://sbmt.jhuapl.edu/index.html
+
+    Returns :
+    ---------
+    itokawa_obj : blender object
+        Blender object that defines the asteroid
+
     """
 
     # import OBJ model
@@ -149,7 +185,10 @@ def load_asteroid(asteroid='itokawa_low'):
     return itokawa_obj
 
 def reset_scene():
-    """Reset blender
+    """Reset blender scene and remove all objects
+
+    This function will reset the blender scene and delete all the objects
+
     """
     bpy.ops.wm.read_factory_settings(use_empty=True)
 
@@ -167,11 +206,15 @@ def reset_scene():
         for id_data in bpy_data_iter:
             bpy_data_iter.remove(id_data)
 
-def blender_init(render_engine='BLENDER', resolution=[537,244],
-                 fov=[2.93,2.235],focal_length=167.35, asteroid_name='itokawa_low'):
+def blender_init(render_engine='BLENDER', 
+                 resolution=[537,244],
+                 fov=[2.93,2.235],
+                 focal_length=167.35, 
+                 asteroid_name='itokawa_low'):
     r"""Initialize the Blender scene for a camera around an asteroid
 
-    This function will initialize the objects for a scene involving a camera, asteroid, and light source
+    This function will initialize the objects for a scene involving a camera,
+    asteroid, and light source
 
     Parameters
     ----------
@@ -247,7 +290,8 @@ def blender_init(render_engine='BLENDER', resolution=[537,244],
     camera.angle_y = np.deg2rad(fov[1])
     camera.lens = focal_length# focal length in mm
     camera_obj.rotation_mode = 'XYZ'
-
+    
+    # this sets a constraint for the camera to track a specific object
     # cam_con = camera_obj.constraints.new('TRACK_TO')
     # cam_con.target = itokawa_obj
     # cam_con.track_axis = 'TRACK_NEGATIVE_Z'
@@ -275,9 +319,10 @@ def blender_init(render_engine='BLENDER', resolution=[537,244],
     return (camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene)
 
 def blender_example():
-    """
-    Example to render an image
-
+    """Example to render an image
+    
+    This is a function that will render and image from Blender. 
+    It serves as a benchmark that should hopefully always work
     """
 
     bpy.ops.wm.read_homefile() 
@@ -397,13 +442,17 @@ def blender_example():
     
     print("Itokawa Size: ", end='')
     print(itokawa_obj.dimensions)
-    # bpy.ops.import_scene.obj('../data/itokawa_low.obj')
-    # bpy.ops.render.render(write_still=True)
+
+    return 0
 
 def blender_render(name, scene, save_file=False):
     """Call this function to render the current scene and output the pixels
+    
+    This function will render an image or save the image data to a variable.
 
-    If you want you can save to a file as well
+    In order to save to pixels you need to modify the source code for Blender 
+    and recompile
+
     """
     
     if save_file:
@@ -436,8 +485,12 @@ def blender_render(name, scene, save_file=False):
         img_data = bpy.data.images['Viewer Node'].pixels
 
 
-def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), theta_ast=0, sun_position=[-5, 0, 0], filename='test'):
-    r"""This will generate a blender render given a camera position and orientation
+def driver(sc_pos=[-2,0,0], 
+           R_sc2ast=np.eye(3), 
+           theta_ast=0, 
+           sun_position=[-5, 0, 0], 
+           filename='test'):
+    r"""Generate a blender render given a camera position and orientation
 
     Generate a single image given a known position and orientation of the camera/spacecraft
 
@@ -465,9 +518,11 @@ def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), theta_ast=0, sun_position=[-5, 0
 
     .. math:: R_{I2B} = R_{S2I} * R_{B2S} 
 
-    Rotation operations in blender are from the object/body frame to the inertial frame. 
-    Therefore, in order to rotate an object with respect to the inertial frame you'll need to use the transpose.
-    Blender uses the same standard as most of the dynamics/papers, except for visualization we want the opposite.
+    Rotation operations in blender are from the object/body frame to the
+    inertial frame.  Therefore, in order to rotate an object with respect to
+    the inertial frame you'll need to use the transpose.  Blender uses the same
+    standard as most of the dynamics/papers, except for visualization we want
+    the opposite.
 
     Author
     ------
@@ -509,9 +564,10 @@ def driver(sc_pos=[-2,0,0], R_sc2ast=np.eye(3), theta_ast=0, sun_position=[-5, 0
     bpy.ops.render.render(write_still=True)
 
 def vertical_landing():
-    """Test with a vertical descent to the surface
+    """Example of vertical descent to surface
 
-    Use to track motion between imagery
+    This function just generates a bunch of images as the camera moves
+    toward the surface
 
     """
     
@@ -540,8 +596,7 @@ def gen_image(sc_pos, R_sc2inertial, theta_ast,
     orientation
 
     Generate a single image given a known position and orientation of the
-    camera/spacecraft
-
+    camera/spacecraft. The image is returned as an output.
 
     Parameters
     ----------
@@ -559,7 +614,11 @@ def gen_image(sc_pos, R_sc2inertial, theta_ast,
 
     Returns
     -------
-    None
+    img : np.array_
+        Blender saves an image then OpenCV reads it and passes it back,
+        same image is overwritten the next step
+
+
 
     Notes
     -----
@@ -584,9 +643,6 @@ def gen_image(sc_pos, R_sc2inertial, theta_ast,
     .. [1] https://wiki.blender.org/index.php/User:Ideasman42/BlenderAsPyModule 
     .. [2] Look at utilities/build_blender.sh for automatic building 
 
-    Examples
-    --------
-    An example of how to use the function
 
     """  
     
@@ -619,6 +675,25 @@ def gen_image(sc_pos, R_sc2inertial, theta_ast,
 
 
 def write_h5py_to_png(hdf5_path, dataset_name, output_path):
+    """Write a series of images to PNGs from HDF5 file
+    
+    The simulation will save all the image data into a HDF5 file. 
+    This function will read the dataset and save each one to a different image
+
+    Parameters :
+    ------------
+    hdf5_path : string
+        Path to the HDF5 file to read
+    dataset_name : string
+        Name of the images in the HDF5 file
+    output_path : string
+        Where to save all the images
+
+    Returns :
+    ---------
+    None
+
+    """
     sim_data = h5py.File(hdf5_path, 'r')
 
     images = sim_data[dataset_name]
@@ -630,3 +705,5 @@ def write_h5py_to_png(hdf5_path, dataset_name, output_path):
         print("Saving image {0}/{1}".format(ii, num_images))
 
     print("Finished extracting all the images")
+
+    return 0
