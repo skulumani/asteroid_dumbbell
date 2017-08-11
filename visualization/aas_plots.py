@@ -1,15 +1,18 @@
+"""Generate the plots for 2017 AAS Fall Conference
+"""
+
 import cv2
 from visualization import opencv, plotting
 from dynamics import asteroid, dumbbell, controller
-from kinematics  import attitude
+from kinematics import attitude
 import argparse
 import numpy as np
 
 from mpl_toolkits.mplot3d import axes3d
 import matplotlib.pyplot as plt
 import pdb
-import matplotlib.pyplot as plt
 import h5py
+
 
 def printname(name):
     print(name)
