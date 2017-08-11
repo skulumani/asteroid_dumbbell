@@ -6,8 +6,8 @@ Simulation to test the motion of a dumbbell spacecraft around an asteroid
 
 This code is written in Python and uses:
 
-    * [Blender](www.blender.org)
-    * [OpenCV](www.opencv.org)
+* [Blender](www.blender.org)
+* [OpenCV](www.opencv.org)
 
 To set it all up properly you must first install [Anaconda](www.anaconda.org) and clone the `asteroid` environment:
 
@@ -52,18 +52,6 @@ Some other helpful links:
 * [Ubuntu 16.04](http://www.pyimagesearch.com/2016/10/24/ubuntu-16-04-how-to-install-opencv/)
 * [Ubuntu 16.04](https://www.learnopencv.com/install-opencv3-on-ubuntu/)
 * [OpenCV SO](https://stackoverflow.com/questions/18561910/opencv-python-cant-use-surf-sift)
-
-## MEX Guide
-
-Originally this code was written using Matlab. 
-Now it's even better an all in Python. 
-The asteroid polyhedron gravity model is not compiled so it's a little slower as compared to the Matlab MEX. 
-It's something that I still need to look at.
-
-Look in [Mex Guide](./docs/mex_guide.md) to learn how to compile a mex function.
-You need to create a mex version of `polyhedron_potential.m`. 
-
-In addition, you have to have both `polyhedron_potential_mex_1024.mex` and `polyhedron_potential_mex_4092.mex`
 
 ## Usage guide
 
