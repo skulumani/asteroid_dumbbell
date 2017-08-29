@@ -82,10 +82,15 @@ def eoms_controlled_blender(t, state, dum, ast):
     # use the imagery to figure out motion and pass to the controller instead
     # of the true state
 
-
+    # calculate the desired attitude and translational trajectory
+    des_att_tuple = controller.body_fixed_pointing_attitude(t, state)
+    des_tran_tuple = controller.traverse_then_land_vertically(t, ast, final_pos=[0.550, 0, 0],
+                                                              initial_pos=[2.550, 0, 0],
+                                                              descent_tf=3600)
+    # input trajectory and compute the control inputs
     # compute the control input
-    u_m = controller.attitude_controller(t, state, M1+M2, dum, ast)
-    u_f = controller.translation_controller(t, state, F1+F2, dum, ast)
+    u_m = controller.attitude_controller(t, state, M1+M2, dum, ast, des_att_tuple)
+    u_f = controller.translation_controller(t, state, F1+F2, dum, ast, des_tran_tuple)
 
     pos_dot = vel
     vel_dot = 1/(dum.m1+dum.m2) *(F1 + F2 + u_f)

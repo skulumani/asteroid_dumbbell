@@ -3,7 +3,7 @@ import numpy as np
 import scipy.linalg
 import pdb
 
-def attitude_controller(time, state, ext_moment, dum, ast):
+def attitude_controller(time, state, ext_moment, dum, ast, des_att_tuple):
     r"""Geometric attitude controller on SO(3)
 
     This function will determine an attitude control input for a rigid spacecraft around an asteroid.
@@ -11,8 +11,6 @@ def attitude_controller(time, state, ext_moment, dum, ast):
 
     Parameters
     ----------
-    self : dumbbell instance
-        Instance of dumbbell class with all of it's parameters
     time : float
         Current time for simulation which is used in the desired attitude trajectory
     state : array_like (18,)
@@ -27,6 +25,15 @@ def attitude_controller(time, state, ext_moment, dum, ast):
         to the inertial frame and defined in the body frame (3,)
     ext_moment : array_like (3,)
         External moment in the body fixed frame
+    dum : Dumbbell Instance
+        Instance of a dumbbell which defines the shape and MOI
+    ast : Asteroid Instance
+        Holds the asteroid model and polyhedron potential
+    des_att_tuple : Desired attitude tuple
+        des_att_tuple[0] - Rd desired attitude
+        des_att_tuple[1] - Rd_dot desired attitude derivative
+        des_att_tuple[2] - ang_vel_d angular velocity
+        des_att_tuple[3] - ang_vel_d_dot angular velocity desired derivative
 
     Returns
     -------
@@ -53,8 +60,12 @@ def attitude_controller(time, state, ext_moment, dum, ast):
     vel = state[3:6] # vel of com in inertial frame
     R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
     ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
-    # compute the desired attitude command
-    Rd, Rd_dot, ang_vel_d, ang_vel_d_dot = body_fixed_pointing_attitude(time, state)
+
+    Rd = des_att_tuple[0]
+    Rd_dot = des_att_tuple[1]
+    ang_vel_d = des_att_tuple[2]
+    ang_vel_d_dot = des_att_tuple[3]
+
     # determine error between command and current state
     eR = 1/2 * attitude.vee_map(Rd.T.dot(R) - R.T.dot(Rd))
     eW = ang_vel - R.T.dot(Rd).dot(ang_vel_d)
@@ -63,6 +74,60 @@ def attitude_controller(time, state, ext_moment, dum, ast):
             -dum.J.dot( attitude.hat_map(ang_vel).dot(R.T).dot(Rd).dot(ang_vel_d)-
                 R.T.dot(Rd).dot(ang_vel_d_dot)) - ext_moment)
     return u_m
+
+def translation_controller(time, state, ext_force, dum, ast, des_tran_tuple):
+    """SE(3) Translational Controller
+
+    Parameters
+    ----------
+    time : float
+        Current time for simulation which is used in the desired attitude trajectory
+    state : array_like (18,)
+        numpy array defining the state of the dumbbell
+        position - position of the center of mass wrt to the inertial frame
+        and defined in the inertial frame (3,)
+        velocity - velocity of the center of mass wrt to teh inertial frame
+        and defined in the inertial frame (3,)
+        R_b2i - rotation matrix which transforms vectors from the body
+        frame to the inertial frame (9,)
+        angular_velocity - angular velocity of the body frame with respect
+        to the inertial frame and defined in the body frame (3,)
+    ext_force : array_like (3,)
+        External force in the inertial frame
+    dum : Dumbbell Instance
+        Instance of a dumbbell which defines the shape and MOI
+    ast : Asteroid Instance
+        Holds the asteroid model and polyhedron potential
+    des_tran_tuple : Desired translational tuple
+        des_tran_tuple [0] - Rd desired attitude
+        des_tran_tuple [1] - Rd_dot desired attitude derivative
+        des_tran_tuple [2] - ang_vel_d angular velocity
+        des_tran_tuple [3] - ang_vel_d_dot angular velocity desired derivative
+
+    """
+
+    # extract the state
+    pos = state[0:3] # location of the center of mass in the inertial frame
+    vel = state[3:6] # vel of com in inertial frame
+    R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+    ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
+    
+    m = dum.m1 + dum.m2
+    
+    x_des = des_tran_tuple[0]
+    xd_des = des_tran_tuple[1]
+    xdd_des = des_tran_tuple[2]
+
+    # x_des, xd_des, xdd_des = fixed_translation(time, ast=ast,final_pos=[0.550, 0, 0],
+    #                                                       initial_pos=[2.550, 0, 0], 
+    #                                                       descent_tf=3600)
+    # compute the error
+    ex = pos - x_des
+    ev = vel - xd_des
+    # compute the control
+    u_f = -dum.kx * ex -dum.kv * ev - ext_force + m * xdd_des
+
+    return u_f
 
 def attitude_traverse_then_land_controller(time, state, ext_moment, dum, ast):
     r"""Geometric attitude controller on SO(3)
@@ -146,38 +211,6 @@ def translation_traverse_then_land_controller(time, state, ext_force, dum, ast):
     x_des, xd_des, xdd_des = traverse_then_land_vertically(time, ast=ast,final_pos=[0.550, 0, 0],
                                                           initial_pos=[2.550, 0, 0], 
                                                           descent_tf=3600)
-    # compute the error
-    ex = pos - x_des
-    ev = vel - xd_des
-    # compute the control
-    u_f = -dum.kx * ex -dum.kv * ev - ext_force + m * xdd_des
-
-    return u_f
-def translation_controller(time, state, ext_force, dum, ast):
-    """SE(3) Translational Controller
-
-    Inputs:
-
-    Outputs:
-        u_f - force command in the dumbbell frame
-
-    """
-
-    # extract the state
-    pos = state[0:3] # location of the center of mass in the inertial frame
-    vel = state[3:6] # vel of com in inertial frame
-    R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
-    ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
-    
-    m = dum.m1 + dum.m2
-
-    # figure out the desired trajectory
-    x_des, xd_des, xdd_des = linear_x_descent_translation(time, ast=ast,final_pos=[0.550, 0, 0],
-                                                          initial_pos=[2.550, 0, 0], 
-                                                          descent_tf=3600)
-    # x_des, xd_des, xdd_des = fixed_translation(time, ast=ast,final_pos=[0.550, 0, 0],
-    #                                                       initial_pos=[2.550, 0, 0], 
-    #                                                       descent_tf=3600)
     # compute the error
     ex = pos - x_des
     ev = vel - xd_des
