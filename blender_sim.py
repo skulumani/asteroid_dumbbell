@@ -270,7 +270,7 @@ def blender_vertical_landing_sim():
         datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
     dataset_name = 'landing'
     render = 'BLENDER'
-    image_modulus = 100
+    image_modulus = 200
     RelTol = 1e-6
     AbsTol = 1e-6
     ast_name = 'itokawa'
@@ -323,15 +323,15 @@ def blender_vertical_landing_sim():
             time[ii] = (system.t + dt)
             i_state[ii, :] = (system.integrate(system.t + dt))
             # generate the view of the asteroid at this state
-            if int(time[ii]) % image_modulus== 0:
-                img, RT, R = blender.gen_image(i_state[ii,0:3], i_state[ii,6:15].reshape((3,3)), 
+            if int(time[ii]) % image_modulus == 0:
+                img, RT, R = blender.gen_image(i_state[ii,0:3], i_state[ii,6:15].reshape((3, 3)),
                                 ast.omega * time[ii],
                                 camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene,
                                 [5, 0, 1], 'test')
 
-                images[:, :, :, ii//image_modulus - 1] = img
-                RT_blender[ii//image_modulus -1, :] = RT.reshape(12)
-                R_i2bcam[ii//image_modulus -1, :] = R.reshape(9)
+                images[:, :, :, ii // image_modulus - 1] = img
+                RT_blender[ii // image_modulus - 1, :] = RT.reshape(12)
+                R_i2bcam[ii // image_modulus - 1, :] = R.reshape(9)
 
 
             # do some image processing and visual odometry
