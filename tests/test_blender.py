@@ -15,9 +15,9 @@ def test_anaconda_enviornment():
     np.testing.assert_equal(sys.prefix, asteroid_env)
 
 def test_blender_version():
-    req_version = (2, 79, 0)
+    req_version = (2, 78, 6)
     cur_version = bpy.app.version
-    np.testing.assert_equal(cur_version, req_version)
+    np.testing.assert_equal(cur_version[0:1], req_version[0:1])
 
 def test_blender_installed():
     result = bpy.ops.render.render(write_still=True)
