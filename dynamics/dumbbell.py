@@ -724,7 +724,7 @@ class Dumbbell(object):
         Inputs:
 
         Outputs:
-            u_f - force command in the dumbbell frame
+            u_f - force command in the inertial frame
 
         """
 
