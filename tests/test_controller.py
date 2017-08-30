@@ -80,3 +80,15 @@ class TestDumbbellInertialTranslationalController():
 
     def test_control_force_size(self):
         np.testing.assert_equal(self.u_f.shape, (3,))
+
+class TestDumbbellAsteroidTranslationalController():
+    
+    # this assumes we're dealing with the asteroid fixed dynamics - so the state
+    # is defined in the asteroid fixed frame.
+
+    dum = dumbbell.Dumbbell()
+    des_tran_tuple = controller.asteroid_circumnavigate(0, ast)
+    u_f = controller.translation_controller_asteroid(t, state, np.zeros(3), dum, ast, des_tran_tuple)
+
+    def test_control_force_size(self):
+        np.testing.assert_equal(self.u_f.shape, (3,))

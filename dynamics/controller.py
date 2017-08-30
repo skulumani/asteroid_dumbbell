@@ -129,6 +129,79 @@ def translation_controller(time, state, ext_force, dum, ast, des_tran_tuple):
 
     return u_f
 
+def translation_controller_asteroid(time, state, ext_force, dum, ast, des_tran_tuple):
+    """SE(3) Translational Controller
+    
+    This function determines the control input for the dumbbell with the equations
+    of motion defined in the asteroid fixed frame. 
+    Use this with eoms_relative
+
+    Parameters
+    ----------
+    time : float
+        Current time for simulation which is used in the desired attitude trajectory
+    state : array_like (18,)
+        numpy array defining the state of the dumbbell
+        position - position of the center of mass wrt to the asteroid com
+        and defined in the asteroid frame (3,)
+        velocity - velocity of the center of mass wrt to teh asteroid com
+        and defined in the asteroid frame (3,)
+        R_b2i - rotation matrix which transforms vectors from the body
+        frame to the asteroid frame (9,)
+        angular_velocity - angular velocity of the body frame with respect
+        to the inertial frame and defined in the asteroid frame (3,)
+    ext_force : array_like (3,)
+        External force in the asteroid frame
+    dum : Dumbbell Instance
+        Instance of a dumbbell which defines the shape and MOI
+    ast : Asteroid Instance
+        Holds the asteroid model and polyhedron potential
+    des_tran_tuple : Desired translational tuple defined with respect to the asteroid frame
+        des_tran_tuple [0] - Rd desired attitude
+        des_tran_tuple [1] - Rd_dot desired attitude derivative
+        des_tran_tuple [2] - ang_vel_d angular velocity
+        des_tran_tuple [3] - ang_vel_d_dot angular velocity desired derivative
+
+    """
+
+    # extract the state
+    pos = state[0:3] # location of the center of mass in the asteroid frame
+    vel = state[3:6] # vel of com in asteroid frame
+    R = np.reshape(state[6:15],(3,3)) # sc body frame to asteroid frame
+    ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in asteroid frame
+    
+    m = dum.m1 + dum.m2
+    Wa = ast.omega*np.array([0,0,1]) # angular velocity vector of asteroid
+
+    x_des = des_tran_tuple[0]
+    xd_des = des_tran_tuple[1]
+    xdd_des = des_tran_tuple[2]
+
+    # compute the error
+    ex = pos - x_des
+    ev = vel - xd_des
+    # compute the control
+    u_f = -dum.kx * ex - dum.kv * ev - ext_force + m * xdd_des + m * attitude.hat_map(Wa).dot(vel)
+
+    return u_f
+
+def asteroid_circumnavigate(time, state, tf=3600*6):
+    """Desired translation for circumnavaigation in asteroid frame
+
+    This function will define the translational states for the dumbbell, 
+    which is defined relative to the asteroid fixed frame.
+    The states will define a path that will circumnavigate the asteroid in a 
+    desired amount of time
+
+    Parameters
+    ----------
+    time : float
+        Current simulation time
+    state : np.array (18,)
+        
+        
+    """
+
 def attitude_traverse_then_land_controller(time, state, ext_moment, dum, ast):
     r"""Geometric attitude controller on SO(3)
 
@@ -418,3 +491,4 @@ def approaching_translation(time, ast, final_pos=[0.550, 0, 0],
 
     # output
     return inertial_pos, inertial_vel, inertial_accel 
+
