@@ -197,15 +197,6 @@ def asteroid_circumnavigate(time, tf=3600*6, loops=2):
     ----------
     time : float
         Current simulation time
-    state : np.array (18,)
-        pos - state[0:3] in km position of the dumbbell with respect to the
-        asteroid and defined in the asteroid fixed frame
-        vel - state[3:6] in km/sec is the velocity of dumbbell wrt the asteroid
-        and defined in the asteroid fixed frame
-        R - state[6:15] rotation matrix which converts vectors from the
-        dumbbell frame to the asteroid frame
-        w - state[15:18] rad/sec angular velocity of the dumbbell wrt inertial
-        frame and defined in the asteroid frame
     tf : int
         Time in seconds to do the entire trajectory.         
     loops : int
