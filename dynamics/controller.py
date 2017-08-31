@@ -185,7 +185,7 @@ def translation_controller_asteroid(time, state, ext_force, dum, ast, des_tran_t
 
     return u_f
 
-def asteroid_circumnavigate(time, state, tf=3600*6):
+def asteroid_circumnavigate(time, tf=3600*6, loops=2):
     """Desired translation for circumnavaigation in asteroid frame
 
     This function will define the translational states for the dumbbell, 
@@ -198,9 +198,33 @@ def asteroid_circumnavigate(time, state, tf=3600*6):
     time : float
         Current simulation time
     state : np.array (18,)
-        
-        
+        pos - state[0:3] in km position of the dumbbell with respect to the
+        asteroid and defined in the asteroid fixed frame
+        vel - state[3:6] in km/sec is the velocity of dumbbell wrt the asteroid
+        and defined in the asteroid fixed frame
+        R - state[6:15] rotation matrix which converts vectors from the
+        dumbbell frame to the asteroid frame
+        w - state[15:18] rad/sec angular velocity of the dumbbell wrt inertial
+        frame and defined in the asteroid frame
+    tf : int
+        Time in seconds to do the entire trajectory.         
+    loops : int
+        Number of loops around asteroid to complete
+    
+    Returns
+    -------
+     
     """
+    freq = 2 * np.pi * loops / tf
+    dist = 3
+
+    x_des = np.array([dist * np.cos(freq * time), dist * np.sin(freq * time), 0])
+    xd_des = np.array([dist * freq * -np.sin(freq * time), dist * freq *
+                       np.cos(freq * time), 0])
+    xdd_des = np.array([dist * freq**2 * -np.cos(freq * time), dist * freq**2 *
+                        -np.sin(freq * time), 0])
+
+    return x_des, xd_des, xdd_des
 
 def attitude_traverse_then_land_controller(time, state, ext_moment, dum, ast):
     r"""Geometric attitude controller on SO(3)
