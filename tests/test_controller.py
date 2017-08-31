@@ -104,3 +104,21 @@ class TestDumbbellAsteroidTranslationalController():
     def test_desired_translation_xdd_des_size(self):
         xdd_des = self.des_tran_tuple[2]
         np.testing.assert_equal(xdd_des.shape, (3,))
+
+class TestAsteroidRotationalController():
+    """Test the attitude control for the asteroid fixed frame
+    """
+
+    des_att_tuple = controller.asteroid_pointing(0, state)
+    u_m = controller.attitude_controller(0, state, np.zeros(3), dum, ast, des_att_tuple)
+
+    def test_desired_attitude_Rd_size(self):
+        Rd = self.des_att_tuple[0]
+        np.testing.assert_equal(Rd.shape, (3, 3))
+
+    def test_desired_attitude_Rd_SO3(self):
+        Rd = self.des_att_tuple[0]
+        attitude.test_rot_mat_in_special_orthogonal_group(Rd)
+
+    def test_control_moment_size(self):
+       np.testing.assert_equal(self.u_m.shape, (3,))

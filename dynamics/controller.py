@@ -185,6 +185,84 @@ def translation_controller_asteroid(time, state, ext_force, dum, ast, des_tran_t
 
     return u_f
 
+def attitude_controller_asteroid(time, state, ext_moment, dum, ast, des_att_tuple):
+    r"""Geometric attitude controller on SO(3)
+
+    This function will determine an attitude control input for a rigid
+    spacecraft around an asteroid.
+    The function is setup to work for a vehicle defined in the asteroid frame
+    and the control input is assumed to be defined in the asteroid fixed frame.
+
+    Parameters
+    ----------
+    time : float
+        Current time for simulation which is used in the desired attitude trajectory
+    state : array_like (18,)
+        numpy array defining the state of the dumbbell
+        position - position of the center of mass wrt to the asteroid com
+        and defined in the asteroid frame (3,)
+        velocity - velocity of the center of mass wrt to teh asteroid com
+        and defined in the asteroid frame (3,)
+        R_b2i - rotation matrix which transforms vectors from the body
+        frame to the asteroid frame (9,)
+        angular_velocity - angular velocity of the body frame with respect
+        to the inertial frame and defined in the asteroid frame (3,)
+    ext_moment : array_like (3,)
+        External moment in the asteroid fixed frame
+    dum : Dumbbell Instance
+        Instance of a dumbbell which defines the shape and MOI
+    ast : Asteroid Instance
+        Holds the asteroid model and polyhedron potential
+    des_att_tuple : Desired attitude tuple for asteroid frame dyanmics
+        des_att_tuple[0] - Rd desired attitude
+        des_att_tuple[1] - Rd_dot desired attitude derivative
+        des_att_tuple[2] - ang_vel_d angular velocity
+        des_att_tuple[3] - ang_vel_d_dot angular velocity desired derivative
+
+    Returns
+    -------
+    u_m : array_like (3,)
+        asteroid fixed control moment
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    References
+    ----------
+    
+    .. [1] LEE, Taeyoung, LEOK, Melvin y MCCLAMROCH, N Harris. "Control of
+    Complex Maneuvers for a Quadrotor UAV Using Geometric Methods on Se
+    (3)". arXiv preprint arXiv:1003.2005. 2010, 
+
+    Examples
+    --------
+
+    """ 
+    # extract the state
+    pos = state[0:3] # location of the center of mass in the asteroid frame
+    vel = state[3:6] # vel of com in asteroid frame
+    R = np.reshape(state[6:15],(3,3)) # sc body frame to asteriod frame
+    ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in asteriod frame
+
+    J = dum.J
+    Jr = R.dot(J).dot(R.T)
+    Wa = ast.omega*np.array([0,0,1]) # angular velocity vector of asteroid
+
+    Rd = des_att_tuple[0]
+    Rd_dot = des_att_tuple[1]
+    ang_vel_d = des_att_tuple[2]
+    ang_vel_d_dot = des_att_tuple[3]
+
+    # determine error between command and current state
+    eR = 1/2 * attitude.vee_map(Rd.T.dot(R) - R.T.dot(Rd))
+    eW = ang_vel - R.T.dot(Rd).dot(ang_vel_d)
+    # compute attitude input
+    u_m = (-dum.kR*eR -dum.kW*eW + Jr.dot(attitude.hat_map(Wa).dot(ang_vel))
+            -Jr.dot(attitude.hat_map(ang_vel).dot(R.T).dot(Rd).dot(ang_vel_d)
+                -R.T.dot(Rd).dot(ang_vel_d_dot)) - ext_moment)
+    return u_m
+
 def asteroid_circumnavigate(time, tf=3600*6, loops=2):
     """Desired translation for circumnavaigation in asteroid frame
 
