@@ -382,7 +382,8 @@ def traverse_then_land_vertically(time, ast, final_pos=[0.550, 0, 0],
                                  descent_tf=3600):
     """Desired translational states for vertical landing on asteroid
    
-    First the spacecraft will traverse horizontally in the equatorial plane over the asteroid fixed x axis, then descend vertically
+    First the spacecraft will traverse horizontally in the equatorial plane
+    over the asteroid fixed x axis, then descend vertically
 
     Inputs :
     --------
