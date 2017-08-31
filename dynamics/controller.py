@@ -217,6 +217,58 @@ def asteroid_circumnavigate(time, tf=3600*6, loops=2):
 
     return x_des, xd_des, xdd_des
 
+def asteroid_pointing(time, state):
+    """Point the spacecraft x axis toward the asteroid, in asteroid fixed frame
+
+    Parameters
+    ----------
+    time : float
+        Simulation time in seconds
+    state : np.array (18,)
+        pos - state[0:3] in km position of the dumbbell with respect to the
+        asteroid and defined in the asteroid fixed frame
+        vel - state[3:6] in km/sec is the velocity of dumbbell wrt the asteroid
+        and defined in the asteroid fixed frame
+        R - state[6:15] rotation matrix which converts vectors from the
+        dumbbell frame to the asteroid frame
+        w - state[15:18] rad/sec angular velocity of the dumbbell wrt inertial
+        frame and defined in the asteroid frame
+
+    Returns
+    -------
+    Rd : np.array (3,3)
+        Desired attitude - spacecraft to asteroid fixed frame
+    Rd_dot: np.array (3,3)
+        Derivative of desired attitude
+    ang_vel_d : np.array (3,)
+        Desired angular velocity - spacecraft wrt inertial frame defined in the
+        asteroid fixed frame
+    ang_vel_d_dot : np.array (3,)
+        Derivative of desired angular velocity
+
+    """
+    # extract out the states
+    pos = state[0:3] # location of the center of mass in the asteroid frame
+    vel = state[3:6] # vel of com in asteroid frame
+    R = np.reshape(state[6:15],(3,3)) # sc body frame to asteroid frame
+    ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in asteroid frame
+
+    # compute the desired attitude to ensure that the body fixed x axis is pointing at the origin/asteroid
+    # each column of the rotation matrix is the i-th body fixed axis as represented in the asteroid frame
+    b1_des = - pos / np.linalg.norm(pos)
+    b3_des = np.array([0, 0, 1]) - (np.array([0, 0, 1]).dot(b1_des) * b1_des)   # ensure the body z axis is always parallel with the asteroid/inertial z axis
+    b3_des = b3_des / np.linalg.norm(b3_des)
+    b2_des = np.cross(b3_des, b1_des)
+
+    Rd = np.stack((b1_des, b2_des, b3_des), axis=1)
+
+    Rd_dot = np.zeros((3,3))
+
+    ang_vel_d = np.zeros(3) 
+    ang_vel_d_dot = np.zeros(3) 
+
+    return (Rd, Rd_dot, ang_vel_d, ang_vel_d_dot)
+
 def attitude_traverse_then_land_controller(time, state, ext_moment, dum, ast):
     r"""Geometric attitude controller on SO(3)
 
