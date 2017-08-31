@@ -17,9 +17,9 @@ state = np.hstack((pos,vel, R, ang_vel))
  
 ast = asteroid.Asteroid('castalia',32)
 
+dum = dumbbell.Dumbbell()
 class TestInertialDesiredAttitude():
     
-    dum = dumbbell.Dumbbell()
     alpha = np.random.rand()
     axis = np.array([1, 0, 0])
     Rd, Rd_dot, ang_vel_d, ang_vel_d_dot = controller.desired_attitude(1, alpha, axis)
@@ -37,7 +37,6 @@ class TestInertialDesiredAttitude():
  
 class TestInertialDesiredAttitudeBodyFixedHovering():
     
-    dum = dumbbell.Dumbbell()
     Rd, Rd_dot, ang_vel_d, ang_vel_d_dot = controller.body_fixed_pointing_attitude(1, state)
 
     def test_desired_rotation_matrix_determinant(self):
@@ -65,7 +64,6 @@ class TestInertialDesiredAttitudeBodyFixedHovering():
 class TestInertialAttitudeController():
     """Test the attitude controller for the inertial eoms
     """
-    dum = dumbbell.Dumbbell()
     des_att_tuple = controller.body_fixed_pointing_attitude(1, state)
     u_m = controller.attitude_controller(t, state, np.zeros(3), dum, ast, des_att_tuple)
 
@@ -74,7 +72,6 @@ class TestInertialAttitudeController():
 
 class TestDumbbellInertialTranslationalController():
     
-    dum = dumbbell.Dumbbell()
     des_tran_tuple = controller.traverse_then_land_vertically(0, ast)
     u_f = controller.translation_controller(t, state, np.zeros(3), dum, ast, des_tran_tuple)
 
@@ -86,7 +83,6 @@ class TestDumbbellAsteroidTranslationalController():
     # this assumes we're dealing with the asteroid fixed dynamics - so the state
     # is defined in the asteroid fixed frame.
 
-    dum = dumbbell.Dumbbell()
     des_tran_tuple = controller.asteroid_circumnavigate(0)
     u_f = controller.translation_controller_asteroid(t, state, np.zeros(3), dum, ast, des_tran_tuple)
 
