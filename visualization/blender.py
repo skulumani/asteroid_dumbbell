@@ -674,6 +674,90 @@ def gen_image(sc_pos, R_sc2inertial, theta_ast,
     return img, np.array(RT), R_blender
 
 
+def gen_image_fixed_ast(sc_pos, R_sc2inertial, camera_obj, camera, 
+                        lamp_obj, lamp, itokawa_obj, scene, 
+                        sun_position=[-5, 0, 1], filename='test'):
+    r"""This will generate a blender render given a camera position and
+    orientation
+
+    Generate a single image given a known position and orientation of the
+    camera/spacecraft. The image is returned as an output.
+
+    Parameters
+    ----------
+    sc_pos : (3,) array_like and float Position of the spacecraft/camera in the
+    inertial frame (blender world coordinates) The units are in kilometers (1
+    Blender unit is 1 km)
+    R_sc2ast : (3, 3) numpy array of float
+        Rotation matrix which transforms vectors in teh spacecraft body frame
+        to the inertial frame.
+        The camera is rotated to be assumed to point along the body frame +X axis
+    theta_ast : float
+        Angle of rotation about z axis of the asteroid at current time
+    filename : string
+        Name of PNG file to save the rendered image
+
+    Returns
+    -------
+    img : np.array_
+        Blender saves an image then OpenCV reads it and passes it back,
+        same image is overwritten the next step
+
+
+
+    Notes
+    -----
+    To transform vectors from the camera frame to the inertial/world frame
+
+    .. math:: R_{I2B} = R_{S2I} * R_{B2S} 
+
+    Rotation operations in blender are from the object/body frame to the
+    inertial frame.  Therefore, in order to rotate an object with respect to
+    the inertial frame you'll need to use the transpose.  Blender uses the same
+    standard as most of the dynamics/papers, except for visualization we want
+    the opposite.
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    References
+    ----------
+    This relies on the Blender Python Module.
+
+    .. [1] https://wiki.blender.org/index.php/User:Ideasman42/BlenderAsPyModule 
+    .. [2] Look at utilities/build_blender.sh for automatic building 
+
+
+    """  
+    
+    # move camera and asteroid 
+    camera_obj.location = sc_pos
+    lamp_obj.location = sun_position
+    
+    # rotate asteroid
+    itokawa_obj.location = [0, 0, 0]
+    itokawa_obj.rotation_euler = mathutils.Euler((0, 0, 0), 'XYZ')
+
+    # rotate the camera
+    R_i2bcam = R_sc2inertial.dot(R_sc2bcam.T)
+    R_blender = R_sc2inertial.dot(R_sc2bcam.T)
+    # rot_euler = mathutils.Matrix(R_i2bcam).to_euler('XYZ')
+    # rot_euler = mathutils.Matrix(R_sc2inertial.dot(R_sc2bcam.T)).to_euler('XYZ')
+    rot_euler = mathutils.Matrix((R_sc2inertial.dot(R_sc2bcam.T))).to_euler('XYZ')
+
+    camera_obj.rotation_euler = rot_euler
+    bpy.context.scene.update()
+
+    RT = blender_camera.get_3x4_RT_matrix_from_blender(camera_obj)
+    # render an image from the spacecraft at this state
+    # blender_render(filename,scene, True)
+    scene.render.filepath = os.path.join(output_path + '/' + filename + '.png')
+    bpy.ops.render.render(write_still=True)
+    img = cv2.imread(os.path.join(output_path + '/' + filename + '.png')) # read as color BGR in OpenCV
+
+    return img, np.array(RT), R_blender
+
 def write_h5py_to_png(hdf5_path, dataset_name, output_path):
     """Write a series of images to PNGs from HDF5 file
     
