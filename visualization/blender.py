@@ -146,6 +146,16 @@ def look_at(camera, point):
     rot_quat = direction.to_track_quat('-Z', 'Y')
     camera.rotation_euler = rot_quat.to_euler()
 
+def camera_constraints(camera_obj, target_obj):
+    """Create a constraint to point the camera at a specific object
+
+    """
+
+    # this sets a constraint for the camera to track a specific object
+    cam_con = camera_obj.constraints.new('TRACK_TO')
+    cam_con.target = target_obj
+    cam_con.track_axis = 'TRACK_NEGATIVE_Z'
+    cam_con.up_axis = 'UP_Y'
 
 def load_asteroid(asteroid='itokawa_low'):
     """Load the desired asteroid
@@ -291,11 +301,6 @@ def blender_init(render_engine='BLENDER',
     camera.lens = focal_length# focal length in mm
     camera_obj.rotation_mode = 'XYZ'
     
-    # this sets a constraint for the camera to track a specific object
-    # cam_con = camera_obj.constraints.new('TRACK_TO')
-    # cam_con.target = itokawa_obj
-    # cam_con.track_axis = 'TRACK_NEGATIVE_Z'
-    # cam_con.up_axis = 'UP_Y'
 
     # setup the lamp 
     lamp = bpy.data.lamps['Lamp']
