@@ -40,8 +40,8 @@ def blender_asteroid_frame_sim(gen_images=False):
     num_faces = 64
     t0 = 0
     dt = 1
-    tf = 3600 * 6
-    num_steps = 3600 * 6
+    tf = 3600 * 1
+    num_steps = 3600 * 1
 
     ast = asteroid.Asteroid(ast_name,num_faces)
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
@@ -85,19 +85,21 @@ def blender_asteroid_frame_sim(gen_images=False):
                                                     12)) 
             R_i2bcam = image_data.create_dataset('R_i2bcam',
                                                  (num_steps/image_modulus, 9))
-        
+       
         ii = 1
         while system.successful() and system.t < tf:
             # integrate the system and save state to an array
-            
             time[ii] = (system.t + dt)
             i_state[ii, :] = (system.integrate(system.t + dt))
             # generate the view of the asteroid at this state
             if int(time[ii]) % image_modulus== 0 and gen_images:
-                img, RT, R = blender.gen_image(i_state[ii,0:3], i_state[ii,6:15].reshape((3,3)), 
-                                ast.omega * (time[ii] - 3600),
-                                camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene,
-                                [5, 0, 1], 'test')
+                img, RT, R = blender.gen_image_fixed_ast(i_state[ii,0:3], 
+                                                         i_state[ii,6:15].reshape((3,3)),
+                                                         ast.omega * (time[ii] - 3600),
+                                                         camera_obj, camera,
+                                                         lamp_obj, lamp,
+                                                         itokawa_obj, scene,
+                                                         [5, 0, 1], 'test')
 
                 images[:, :, :, ii//image_modulus - 1] = img
                 RT_blender[ii//image_modulus -1, :] = RT.reshape(12)

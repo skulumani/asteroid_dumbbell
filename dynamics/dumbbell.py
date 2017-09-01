@@ -72,8 +72,8 @@ class Dumbbell(object):
         Ts_translation = 200
 
         OS_rotation = 5/100
-        Tp_rotation = 10
-        Ts_rotation = 20
+        Tp_rotation = 1
+        Ts_rotation = 2
         
         self.zeta_translation = - np.log(OS_translation) / np.sqrt(np.pi**2 + np.log(OS_translation)**2)
         self.wn_translation = 4.0 / self.zeta_translation / Ts_translation

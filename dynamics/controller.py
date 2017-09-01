@@ -295,7 +295,39 @@ def asteroid_circumnavigate(time, tf=3600*6, loops=2):
 
     return x_des, xd_des, xdd_des
 
-def asteroid_pointing(time, state):
+def inertial_circumnavigate(time, tf=3600*6, loops=2):
+    """Desired translation for circumnavigation in inertial frame
+
+    This function will define the translational states for the dumbbell, 
+    which is defined relative to the inertial fixed frame.
+    The states will define a path that will circumnavigate the asteroid in a 
+    desired amount of time
+
+    Parameters
+    ----------
+    time : float
+        Current simulation time
+    tf : int
+        Time in seconds to do the entire trajectory.         
+    loops : int
+        Number of loops around asteroid to complete
+    
+    Returns
+    -------
+     
+    """
+    freq = 2 * np.pi * loops / tf
+    dist = 3
+
+    x_des = np.array([dist * np.cos(freq * time), dist * np.sin(freq * time), 0])
+    xd_des = np.array([dist * freq * -np.sin(freq * time), dist * freq *
+                       np.cos(freq * time), 0])
+    xdd_des = np.array([dist * freq**2 * -np.cos(freq * time), dist * freq**2 *
+                        -np.sin(freq * time), 0])
+
+    return x_des, xd_des, xdd_des
+
+def asteroid_pointing(time, state, ast):
     """Point the spacecraft x axis toward the asteroid, in asteroid fixed frame
 
     Parameters
@@ -330,7 +362,7 @@ def asteroid_pointing(time, state):
     vel = state[3:6] # vel of com in asteroid frame
     R = np.reshape(state[6:15],(3,3)) # sc body frame to asteroid frame
     ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in asteroid frame
-
+    
     # compute the desired attitude to ensure that the body fixed x axis is pointing at the origin/asteroid
     # each column of the rotation matrix is the i-th body fixed axis as represented in the asteroid frame
     b1_des = - pos / np.linalg.norm(pos)

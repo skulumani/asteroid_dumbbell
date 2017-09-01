@@ -18,6 +18,7 @@ state = np.hstack((pos,vel, R, ang_vel))
 ast = asteroid.Asteroid('castalia',32)
 
 dum = dumbbell.Dumbbell()
+
 class TestInertialDesiredAttitude():
     
     alpha = np.random.rand()
@@ -105,7 +106,7 @@ class TestAsteroidRotationalController():
     """Test the attitude control for the asteroid fixed frame
     """
 
-    des_att_tuple = controller.asteroid_pointing(0, state)
+    des_att_tuple = controller.asteroid_pointing(0, state, ast)
     u_m = controller.attitude_controller(0, state, np.zeros(3), dum, ast, des_att_tuple)
 
     def test_desired_attitude_Rd_size(self):
