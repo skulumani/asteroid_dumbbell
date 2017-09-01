@@ -88,7 +88,7 @@ def eoms_controlled_relative_blender_ode(t, state, dum, ast):
     
     return state_dot
 
-def eoms_controlled_inertial_circumnavigate(t, state, dum, ast):
+def eoms_controlled_inertial_circumnavigate(t, state, dum, ast, tf, loops):
     """Inertial dumbbell equations of motion about an asteroid 
     
     This method must be used with the scipy.integrate.ode class instead of the
@@ -148,7 +148,7 @@ def eoms_controlled_inertial_circumnavigate(t, state, dum, ast):
 
     # calculate the desired attitude and translational trajectory
     des_att_tuple = controller.body_fixed_pointing_attitude(t, state)
-    des_tran_tuple = controller.inertial_circumnavigate(t, 3600, 1)
+    des_tran_tuple = controller.inertial_circumnavigate(t, tf, loops)
     # input trajectory and compute the control inputs
     # compute the control input
     u_m = controller.attitude_controller(t, state, M1+M2, dum, ast, des_att_tuple)

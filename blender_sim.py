@@ -346,7 +346,7 @@ def blender_inertial_circumnavigate(gen_images=False):
     """
     # simulation parameters
     output_path = './visualization/blender'
-    asteroid_name = 'itokawa_low'
+    asteroid_name = 'itokawa_high'
     # create a HDF5 dataset
     hdf5_path = './data/asteroid_circumnavigate/{}_inertial_no_ast_rotation.hdf5'.format(
         datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
@@ -375,7 +375,7 @@ def blender_inertial_circumnavigate(gen_images=False):
     K = blender_camera.get_calibration_matrix_K_from_blender(camera)
 
     # set initial state for inertial EOMs
-    initial_pos = np.array([2.550, 0, 0]) # km for center of mass in body frame
+    initial_pos = np.array([3, 0, 0]) # km for center of mass in body frame
     initial_vel = periodic_vel + attitude.hat_map(ast.omega*np.array([0,0,1])).dot(initial_pos)
     initial_R = attitude.rot3(np.pi).reshape(9) # transforms from dumbbell body frame to the inertial frame
     initial_w = np.array([0.01, 0.01, 0.01])
@@ -385,7 +385,7 @@ def blender_inertial_circumnavigate(gen_images=False):
     system = integrate.ode(eoms.eoms_controlled_inertial_circumnavigate)
     system.set_integrator('lsoda', atol=AbsTol, rtol=RelTol, nsteps=1000)
     system.set_initial_value(initial_state, t0)
-    system.set_f_params(dum, ast)
+    system.set_f_params(dum, ast, 3600, 1)
 
     i_state = np.zeros((num_steps+1, 18))
     time = np.zeros(num_steps+1)
@@ -412,7 +412,6 @@ def blender_inertial_circumnavigate(gen_images=False):
                 #                 [5, 0, 1], 'test')
                 img, RT, R = blender.gen_image_fixed_ast(i_state[ii,0:3], 
                                                          i_state[ii,6:15].reshape((3,3)),
-                                                         ast.omega * (time[ii] - 3600),
                                                          camera_obj, camera,
                                                          lamp_obj, lamp,
                                                          itokawa_obj, scene,

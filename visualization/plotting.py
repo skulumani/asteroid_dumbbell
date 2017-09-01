@@ -10,8 +10,7 @@ import pdb
 import os
 
 import matplotlib as mpl
-if mpl.get_backend() != 'Qt5Agg':
-    mpl.use('agg')
+mpl.use('TkAgg')
 from mpl_toolkits.mplot3d import axes3d
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors

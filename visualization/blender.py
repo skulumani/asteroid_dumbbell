@@ -7,7 +7,7 @@ Then you can try and API instructions at https://docs.blender.org/api/2.78b/info
 Hopefully this works
 """
 import os
-import bpy
+import bpy, _cycles
 import numpy as np
 import mathutils
 import pdb
@@ -269,6 +269,11 @@ def blender_init(render_engine='BLENDER',
     # start new empty scene
     scene = bpy.context.scene
     
+    # set cuda device if available
+    if len(_cycles.available_devices()) > 1:
+        bpy.context.user_preferences.addons['cycles'].preferences.compute_device_type = 'CUDA'
+        bpy.context.user_preferences.addons['cycles'].preferences.devices[0].use = True
+
     # delete the cube
     bpy.data.objects['Cube'].select = True
     bpy.ops.object.delete()
