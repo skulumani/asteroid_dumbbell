@@ -966,6 +966,197 @@ def plot_controlled_blender_inertial(time, state, ast, dum, pgf_save, fwidth,
 
     plt.show()
     return 0
+
+def plot_controlled_blender_asteroid(time, state, ast, dum, pgf_save, fwidth,
+                                     desired_translation_func, desired_attitude_func):
+    """Plot state from blender_sim_asteroid 
+    
+    This will plot the asteroid state from the asteroid frame blender sim
+
+    """
+    pos = state[:,0:3] # position in the asteroid frame
+    vel = state[:,3:6] # velocity in the asteroid frame
+    R = state[:,6:15] # sc to asteroid transformation
+    w = state[:,15:18] # angular vel of sc wrt inertial rep in the asteroid frame
+
+    # compute the desired states using the dumbbell object
+    x_des = np.zeros((time.shape[0], 3))
+    xd_des = np.zeros((time.shape[0], 3))
+    xdd_des = np.zeros((time.shape[0], 3))
+
+    R_des = np.zeros((time.shape[0], 9))
+    Rd_des = np.zeros_like(R_des)
+    ang_vel_des = np.zeros_like(x_des)
+    ang_vel_d_des = np.zeros_like(ang_vel_des)
+    R_ast2int = np.zeros_like(R_des)
+
+    u_f = np.zeros_like(pos)
+    u_m = np.zeros_like(pos)
+
+    for ii, t in enumerate(time):
+        x_des[ii,:], xd_des[ii, :], xdd_des[ii, :] = desired_translation_func(t)
+        Rd, Rd_dot, wd, wd_dot = desired_attitude_func(t, state[ii, :])
+         
+        R_des[ii, :] = Rd.reshape(-1)
+        Rd_des[ii,:] = Rd_dot.reshape(-1)
+        ang_vel_des[ii, :] = wd
+        ang_vel_d_des[ii, :] = wd_dot
+        
+        R_ast2int[ii, :] = attitude.rot3(ast.omega * (t), 'c').reshape(9)
+
+    # three dimensional plot of the trajectory
+    frame_indicies = np.linspace(time[0], time[-1], 6, dtype=int)
+
+    traj_fig = plt.figure(figsize=figsize(fwidth))
+    traj_ax = vertex_plotter(asteroid.Asteroid('itokawa', 1024), traj_fig, ast.omega*3600)
+    
+    traj_ax.set_xlabel(r'$X$ (km)')
+    traj_ax.set_ylabel(r'$Y$ (km)')
+    traj_ax.plot(pos[:, 0], pos[:, 1], pos[:, 2])
+    # plot the pointing direction at frame_indicies
+    for fi in frame_indicies:
+        x_axis = R[fi, :].reshape((3, 3))[:, 0]
+        y_axis = R[fi, :].reshape((3, 3))[:, 1]
+        com = pos[fi, :]
+
+        # draw x axis
+        traj_ax.plot([com[0], com[0]+0.5*x_axis[0]],[com[1], com[1]+0.5*x_axis[1]],[com[2], com[2] + 0.5*x_axis[2]], 'r')
+        # draw y axis
+        # traj_ax.plot([com[0], com[0]+0.5*y_axis[0]],[com[1], com[1]+0.5*y_axis[1]], 'b')
+
+    traj_ax.set_xlim3d(min(pos[:, 0]), max(pos[:, 0]))
+    traj_ax.set_ylim3d(min(pos[:, 1]), max(pos[:, 1]))
+    traj_ax.view_init(elev=90, azim=180) 
+    traj_ax.set_axis_off()
+
+    # position comparison
+    pos_fig, pos_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
+    pos_axarr[0].plot(time,pos[:,0], label='Actual')
+    pos_axarr[0].plot(time, x_des[:,0], label='Desired')
+    pos_axarr[0].set_ylabel(r'$X$ (km)')
+    pos_axarr[0].grid()
+        
+    pos_axarr[1].plot(time, pos[:,1], label='Actual')
+    pos_axarr[1].plot(time, x_des[:,1], label='Desired')
+    pos_axarr[1].set_ylabel(r'$Y$ (km)')
+    pos_axarr[1].grid()
+
+    pos_axarr[2].plot(time, pos[:,2], label='Actual')
+    pos_axarr[2].plot(time, x_des[:,2], label='Desired')
+    pos_axarr[2].set_ylabel(r'$Z$ (km)')
+    pos_axarr[2].grid()
+
+    pos_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Position Comparison')
+    plt.legend()  
+
+    posdiff_fig, posdiff_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
+    posdiff_axarr[0].plot(time, np.absolute(pos[:,0]-x_des[:,0]))
+    posdiff_axarr[0].set_ylabel(r'$\Delta X$ (km)')
+        
+    posdiff_axarr[1].plot(time, np.absolute(pos[:,1]-x_des[:,1]))
+    posdiff_axarr[1].set_ylabel(r'$\Delta Y$ (km)')
+        
+    posdiff_axarr[2].plot(time, np.absolute(pos[:,2]-x_des[:,2]))
+    posdiff_axarr[2].set_ylabel(r'$\Delta Z$ (km)')
+     
+    posdiff_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Position Difference')
+
+    # velocity comparison
+    vel_fig, vel_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
+    vel_axarr[0].plot(time, vel[:,0], label='Actual')
+    vel_axarr[0].plot(time, xd_des[:,0], label='Desired')
+    vel_axarr[0].set_ylabel(r'$\dot X$ (km)')
+        
+    vel_axarr[1].plot(time, vel[:,1], label='Actual')
+    vel_axarr[1].plot(time, xd_des[:,1], label='Desired')
+    vel_axarr[1].set_ylabel(r'$\dot Y$ (km)')
+        
+    vel_axarr[2].plot(time, vel[:,2], label='Actual')
+    vel_axarr[2].plot(time, xd_des[:,2], label='Desired')
+    vel_axarr[2].set_ylabel(r'$\dot Z$ (km)')
+     
+    vel_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Velocity Comparison')
+    plt.legend()
+
+    veldiff_fig, veldiff_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
+    veldiff_axarr[0].plot(time, np.absolute(vel[:,0]-xd_des[:,0]))
+    veldiff_axarr[0].set_ylabel(r'$\Delta \dot X$ (km)')
+        
+    veldiff_axarr[1].plot(time, np.absolute(vel[:,1]-xd_des[:,1]))
+    veldiff_axarr[1].set_ylabel(r'$\Delta \dot Y$ (km)')
+        
+    veldiff_axarr[2].plot(time, np.absolute(vel[:,2]-xd_des[:,2]))
+    veldiff_axarr[2].set_ylabel(r'$\Delta \dot Z$ (km)')
+     
+    veldiff_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Velocity Difference')
+
+    # angular velocity comparison
+    angvel_fig, angvel_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
+    angvel_axarr[0].plot(time, w[:,0], label='Actual')
+    angvel_axarr[0].plot(time, ang_vel_des[:,0], label='Desired')
+    angvel_axarr[0].set_ylabel(r'$\dot \Omega_1$ (rad/sec)')
+        
+    angvel_axarr[1].plot(time, w[:,1], label='Actual')
+    angvel_axarr[1].plot(time, ang_vel_des[:,1], label='Desired')
+    angvel_axarr[1].set_ylabel(r'$\dot \Omega_2$ (rad/sec)')
+        
+    angvel_axarr[2].plot(time, w[:,2], label='Actual')
+    angvel_axarr[2].plot(time, ang_vel_des[:,2], label='Desired')
+    angvel_axarr[2].set_ylabel(r'$\dot \Omega_3$ (rad/sec)')
+     
+    angvel_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Angular Velocity Comparison')
+    plt.legend()
+    
+    angveldiff_fig, angveldiff_axarr = plt.subplots(3,1, figsize=figsize(fwidth),sharex=True)
+    angveldiff_axarr[0].plot(time, np.absolute(w[:,0]-ang_vel_des[:,0]))
+    angveldiff_axarr[0].set_ylabel(r'$\Delta \dot \Omega$ (rad/sec)')
+        
+    angveldiff_axarr[1].plot(time, np.absolute(w[:,1]-ang_vel_des[:,1]))
+    angveldiff_axarr[1].set_ylabel(r'$\Delta \dot \Omega_2$ (rad/sec)')
+        
+    angveldiff_axarr[2].plot(time, np.absolute(w[:,2]-ang_vel_des[:,2]))
+    angveldiff_axarr[2].set_ylabel(r'$\Delta \dot \Omega_3$ (rad/sec)')
+     
+    angveldiff_axarr[2].set_xlabel('Time (sec)')
+    plt.suptitle('Angular Velocity Difference')
+
+    # attitude matrix comparison
+    att_fig, att_axarr = plt.subplots(3,3, figsize=figsize(fwidth),sharex=True, sharey=True)
+    plt.suptitle('Rotation Matrix')
+    for ii in range(9):
+        row, col = np.unravel_index(ii, [3,3])
+        att_axarr[row,col].plot(time, R[:,ii])
+        att_axarr[row,col].plot(time, R_des[:,ii])
+
+    # attitude matrix difference
+    attdiff_fig, attdiff_axarr = plt.subplots(3,3, figsize=figsize(fwidth),sharex=True, sharey=True)
+    plt.suptitle('Rotation Matrix Difference')
+    for ii in range(9):
+        row, col = np.unravel_index(ii, [3,3])
+        attdiff_axarr[row,col].plot(time, np.absolute(R[:,ii]-R_des[:,ii]))
+
+
+    # save the figures as pgf if the flag is set
+    if pgf_save:
+        fig_handles = (traj_fig, pos_fig, posdiff_fig, vel_fig, veldiff_fig, angvel_fig, angveldiff_fig, att_fig, attdiff_fig)
+        fig_fnames = ('traj_fig', 'pos_fig', 'posdiff_fig', 'vel_fig', 'veldiff_fig', 'angvel_fig', 'angveldiff_fig', 'att_fig', 'attdiff_fig')
+        output_path = '/tmp'
+        extension = '.eps'
+
+        for fig, fname in zip(fig_handles, fig_fnames):
+            plt.figure(fig.number)
+            # plt.savefig(fname + '.pgf')
+            plt.savefig(os.path.join(output_path, fname + extension), 
+                        bbox_inches='tight')
+
+    plt.show()
+    return 0
+
 def h5py_plotter(images):
     """Input a big array of images and plot them using imshow
 
