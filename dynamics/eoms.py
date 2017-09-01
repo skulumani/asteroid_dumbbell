@@ -79,11 +79,11 @@ def eoms_controlled_relative_blender_ode(t, state, dum, ast):
 
     # state derivatives
     pos_dot = vel - attitude.hat_map(Wa).dot(pos)
-    vel_dot = 1/m * (F1 + F2 - m * attitude.hat_map(Wa).dot(vel))
+    vel_dot = 1/m * (F1 + F2 - m * attitude.hat_map(Wa).dot(vel) + u_f)
     # vel_dot = 1/m * (F_com) 
     R_dot = attitude.hat_map(w).dot(R) - attitude.hat_map(Wa).dot(R)
     R_dot = R_dot.reshape(9)
-    w_dot = np.linalg.inv(Jr).dot(M1 + M2 - Jr.dot(attitude.hat_map(Wa)).dot(w))
+    w_dot = np.linalg.inv(Jr).dot(M1 + M2 - Jr.dot(attitude.hat_map(Wa)).dot(w) + u_m)
     state_dot = np.hstack((pos_dot, vel_dot, R_dot, w_dot))
     
     return state_dot
