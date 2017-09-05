@@ -216,6 +216,7 @@ def reset_scene():
         for id_data in bpy_data_iter:
             bpy_data_iter.remove(id_data)
 
+        
 def blender_init(render_engine='BLENDER', 
                  resolution=[537,244],
                  fov=[2.93,2.235],
@@ -273,6 +274,8 @@ def blender_init(render_engine='BLENDER',
     if len(_cycles.available_devices()) > 1:
         bpy.context.user_preferences.addons['cycles'].preferences.compute_device_type = 'CUDA'
         bpy.context.user_preferences.addons['cycles'].preferences.devices[0].use = True
+
+        bpy.context.scene.cycles.device = 'GPU'
 
     # delete the cube
     bpy.data.objects['Cube'].select = True
