@@ -346,6 +346,16 @@ def create_plots(filename, plot_flags):
             plot_keyframe_original(time, i_state, R_ast2int, R_bcam2i_vector,
                                    plot_flags.save_plots, fwidth=1,
                                    filename='/tmp/keyframe_estimate.eps')
+        
+        if plot_flags.blender_png:  # generate blender images
+            output_path = './visualization/blender'
+            num_images = images.shape[3]
+
+            for ii in range(num_images):
+                cv2.imwrite(output_path + '/test' + str.zfill(str(ii), 6) + '.png', images[:, :, :, ii])
+                print("Saving image {0}/{1}".format(ii, num_images))
+
+            print("Finished extracting all the images")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate plots from hdf simulation output')
