@@ -359,8 +359,9 @@ def blender_inertial_circumnavigate(gen_images=False):
     num_faces = 64
     t0 = 0
     dt = 1
-    tf = 3600
-    num_steps = 3600
+    tf = 3600 * 2
+    num_steps = 3600 * 2
+    loops = 2
 
     periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
     periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327])
@@ -385,7 +386,7 @@ def blender_inertial_circumnavigate(gen_images=False):
     system = integrate.ode(eoms.eoms_controlled_inertial_circumnavigate)
     system.set_integrator('lsoda', atol=AbsTol, rtol=RelTol, nsteps=1000)
     system.set_initial_value(initial_state, t0)
-    system.set_f_params(dum, ast, 3600, 1)
+    system.set_f_params(dum, ast, tf, loops)
 
     i_state = np.zeros((num_steps+1, 18))
     time = np.zeros(num_steps+1)
