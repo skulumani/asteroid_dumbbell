@@ -21,9 +21,9 @@ import os
 image_path = 'blender'
 image_files = [f for f in os.listdir('./visualization/blender') if
                os.path.isfile(os.path.join('./visualization/blender', f))]
-image_files = sorted(image_files, key=lambda x:int(x.split('.')[0][-2:]))
+# image_files = sorted(image_files, key=lambda x:int(x.split('.')[0][-2:]))
 image_files = [os.path.join('./visualization/blender/', f) for f in image_files]
-index = 19
+index = 0
 def harris_corner_detector(filename=image_files[index], plot=False):
     img = cv2.imread(filename)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -448,7 +448,7 @@ def compare_feature_detection_image(img):
 
     plt.legend(loc='best')
     plt.show()
-def orb_brute_force_matching(filename1=image_files[index],filename2=image_files[index+1], plot=False):
+def orb_brute_force_matching(filename1,filename2, plot=False):
     """Use Brute Force matching between Orb features in two images
     """
 
@@ -805,7 +805,7 @@ def drawepilines(img1, img2, lines, pts1, pts2):
     return img1, img2
 
 
-def sift_epipolar(filename1=image_files[index], filename2=image_files[index+10]):
+def sift_epipolar(filename1, filename2):
     """Compute epipolar geometry given two images
     """
 
