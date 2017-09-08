@@ -171,6 +171,110 @@ def plot_keyframe_original(time, i_state, R_ast2int, R_bcam2i, save_fig=False,
 
     plt.show()
 
+def plot_keyframe_original_asteroid(time, state, R_bcam2a, save_fig=False,
+                             fwidth=1, filename='/tmp/estimate.eps',
+                             kf_path='./data/asteroid_circumnavigate/asteroid_fixed_circumnavigate.txt'):
+    """Plot keyframe trajectory without any transformation
+
+    The asteroid is assumed to be not rotating. Therefore the input state is 
+    actually already in the asteroid frame
+    """
+    # convert inertial position into asteriod fixed frame
+    asteroid_pos = state[:, 0:3]
+
+    # first determine the scale of the keyframe translations
+    kf_data = np.loadtxt(kf_path)
+    kf_time = kf_data[:, 0].astype(dtype='int') # time of keyframe, matches image/time vector
+    kf_traj = kf_data[:, 1:4] # postiion of each frame relative to the first
+    kf_quat = kf_data[:, 4:8] # rotation from first keyframe to current
+    
+    Rcam2ast = attitude.rot3(np.deg2rad(0)).dot(np.array([[1, 0, 0],
+                         [0, 0, 1],
+                         [0, 1, 0]]))
+
+    kf_traj = Rcam2ast.dot(kf_traj.T).T
+    
+    # need R at time of first frame and then the asteroid to inertial - dumbbell to ast needed
+    R0_s2i = state[kf_time[0], 6:15].reshape((3, 3))
+
+    R0_s2a = (R0_s2i)
+    
+    kf_traj = R0_s2a.dot(kf_traj.T).T
+
+    kf_R_first2cur = np.zeros((len(kf_time), 9))
+    # transform each quaternion to a rotation matrix
+    for ii,q in enumerate(kf_quat):
+        kf_R_first2cur[ii, :] = R0_s2a.dot(Rcam2ast.dot(attitude.quattodcm(q))).reshape(-1)
+
+    # determine scale of translation between keyframe points
+    kf_diff = np.diff(kf_traj, axis=0)
+    kf_scale = np.sqrt(np.sum(kf_diff ** 2, axis=1))
+    
+    # find true positions at the same time as keyframes
+    kf_traj_true = asteroid_pos[kf_time[0]:kf_time[-1], :]
+    kf_scale_true = np.sqrt(np.sum(kf_traj_true ** 2, axis=1))
+    scale = kf_scale_true[0]
+    Rb2a = R_bcam2a[kf_time[0], :].reshape((3,3))
+    
+    # scale and translate
+    kf_traj = scale * kf_traj + asteroid_pos[kf_time[0], :]
+    
+    # translate kf_traj
+    difference = kf_traj[0, :] - kf_traj_true[0, :]
+    kf_traj = kf_traj - difference
+    # plot keyframe motion without any modifications
+    kf_orig_fig = plt.figure()
+    kf_orig_ax = axes3d.Axes3D(kf_orig_fig)
+    
+    kf_orig_ax.set_zlim3d(-1, 1)
+    kf_orig_ax.set_xlim3d(-4, 4)
+    kf_orig_ax.set_ylim3d(-4, 4)
+    kf_orig_ax.plot(kf_traj[:,0], kf_traj[:, 1], kf_traj[:, 2], 'b-*')
+
+
+    # plot the viewing direction
+    length = 0.3
+    for ii, R in enumerate(kf_R_first2cur):
+        view_axis = R.reshape((3,3))[:, 2]
+        kf_orig_ax.plot([kf_traj[ii, 0], kf_traj[ii, 0] + length * view_axis[0]], 
+                        [kf_traj[ii, 1], kf_traj[ii, 1] + length * view_axis[1]],
+                        [kf_traj[ii, 2], kf_traj[ii, 2] + length * view_axis[2]],
+                        'r')
+
+    kf_orig_ax.plot(kf_traj_true[:, 0], kf_traj_true[:, 1], kf_traj_true[:, 2], 'r')
+    kf_orig_ax.set_title('Keyframe Original')
+    kf_orig_ax.set_xlabel('X')
+    kf_orig_ax.set_ylabel('Y')
+    kf_orig_ax.set_zlabel('Z')
+
+    # plot the components
+    kf_comp_fig, kf_comp_ax = plt.subplots(3, 1, figsize=plotting.figsize(1), sharex=True)
+    kf_comp_ax[0].plot(kf_time, kf_traj[:, 0], 'b-*', label='Estimate')
+    kf_comp_ax[0].plot(time[kf_time[0]:kf_time[-1]], kf_traj_true[:, 0], 'r-', label='True')
+    kf_comp_ax[0].set_ylim(-4, 4)
+    kf_comp_ax[0].set_ylabel(r'$X$ (km)')
+    kf_comp_ax[0].grid()
+
+    kf_comp_ax[1].plot(kf_time, kf_traj[:, 1], 'b-*', label='Estimate')
+    kf_comp_ax[1].plot(time[kf_time[0]:kf_time[-1]], kf_traj_true[:, 1], 'r-', label='True')
+    kf_comp_ax[1].set_ylim(-4, 4)
+    kf_comp_ax[1].set_ylabel(r'$Y$ (km)')
+    kf_comp_ax[1].grid()
+
+    kf_comp_ax[2].plot(kf_time, kf_traj[:, 2], 'b-*', label='Estimate')
+    kf_comp_ax[2].plot(time[kf_time[0]:kf_time[-1]], kf_traj_true[:, 2], 'r-', label='True')
+    kf_comp_ax[2].set_ylim(-1, 1)
+    kf_comp_ax[2].set_ylabel(r'$Z$ (km)')
+    kf_comp_ax[2].grid()
+
+    kf_comp_ax[2].set_xlabel('Time (sec)')
+    plt.legend(loc='best')
+
+    if save_fig:
+        plt.figure(kf_comp_fig.number)
+        plt.savefig(filename)
+
+    plt.show()
 def plot_keyframe_trajectory(time, i_state, R_ast2int, R_bcam2i, save_fig=False,
                              fwidth=1, filename='/tmp/estimate.eps',
                              kf_path='./data/itokawa_landing/cycles_high_7200_keyframe_poses.txt'):
@@ -343,7 +447,7 @@ def create_plots(filename, plot_flags):
             # plot_keyframe_trajectory(time, i_state, R_ast2int, R_bcam2i_vector, 
             #                          plot_flags.save_plots, fwidth=1, 
             #                          filename='/tmp/keyframe_estimate.eps')
-            plot_keyframe_original(time, i_state, R_ast2int, R_bcam2i_vector,
+            plot_keyframe_original_asteroid(time, i_state, R_bcam2i_vector,
                                    plot_flags.save_plots, fwidth=1,
                                    filename='/tmp/keyframe_estimate.eps')
         
