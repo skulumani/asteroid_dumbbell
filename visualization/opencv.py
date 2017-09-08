@@ -17,14 +17,7 @@ import matplotlib.image as mpimage
 
 import os
 
-# get all image files in the directory
-image_path = 'blender'
-image_files = [f for f in os.listdir('./visualization/blender') if
-               os.path.isfile(os.path.join('./visualization/blender', f))]
-# image_files = sorted(image_files, key=lambda x:int(x.split('.')[0][-2:]))
-image_files = [os.path.join('./visualization/blender/', f) for f in image_files]
-index = 0
-def harris_corner_detector(filename=image_files[index], plot=False):
+def harris_corner_detector(filename, plot=False):
     img = cv2.imread(filename)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -68,7 +61,7 @@ def harris_corner_detector_image(img, plot=False):
     return np.vstack((corners[:,1], corners[:,0])).T
 
 
-def refined_harris_corner_detector(filename=image_files[index], plot=False):
+def refined_harris_corner_detector(filename, plot=False):
     img = cv2.imread(filename)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -129,7 +122,7 @@ def refined_harris_corner_detector_image(img, plot=False):
 
     return corners
 
-def shi_tomasi_corner_detector(filename=image_files[index], num_features=25, plot=False):
+def shi_tomasi_corner_detector(filename, num_features=25, plot=False):
     """
     Output :
         corners - pixel locations of 'good' features to track
@@ -173,7 +166,7 @@ def shi_tomasi_corner_detector_image(img, num_features=25, plot=False):
         plt.show()
 
     return np.squeeze(corners)
-def sift(filename=image_files[index], plot=False):
+def sift(filename, plot=False):
     img = cv2.imread(filename)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -212,7 +205,7 @@ def sift_image(img, plot=False):
 
     return kp, des, np.array(corners)
 
-def surf(filename=image_files[index], plot=False):
+def surf(filename, plot=False):
     img = cv2.imread(filename)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -242,7 +235,7 @@ def surf_image(img, plot=False):
         corners.append([x, y])
 
     return np.array(corners)
-def orb(filename=image_files[index], plot=False):
+def orb(filename, plot=False):
     img = cv2.imread(filename)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     
@@ -282,7 +275,7 @@ def orb_image(img, plot=False):
         corners.append([x, y])
 
     return kp, des, np.array(corners)
-def fast(filename=image_files[index], plot=False):
+def fast(filename, plot=False):
     """FAST feature detector
     """
 
@@ -329,7 +322,7 @@ def fast_image(img, plot=False):
 
     return np.array(corners)
 
-def brief(filename=image_files[index]):
+def brief(filename):
     """Get feature descriptors faster 
     """
 
@@ -369,7 +362,7 @@ def brief_image(img):
         corners.append([x, y])
 
     return np.array(corners)
-def compare_feature_detection(filename=image_files[index]):
+def compare_feature_detection(filename):
     corners_harris = harris_corner_detector(filename)
     corners_harris_refined = refined_harris_corner_detector(filename)
     corners_shi = shi_tomasi_corner_detector(filename)
@@ -495,7 +488,7 @@ def orb_brute_force_matching_image(img1, img2, plot=False):
         plt.show()
 
     return matches
-def sift_ratio_test_matching(filename1=image_files[index],filename2=image_files[index+1], plot=False):
+def sift_ratio_test_matching(filename1,filename2, plot=False):
     img1 = cv2.imread(filename1)
     img2 = cv2.imread(filename2)
 
@@ -542,7 +535,7 @@ def sift_ratio_test_matching_image(img1, img2, ratio=0.5, plot=False):
         plt.show()
 
     return good 
-def sift_flann_matching(filename1=image_files[index], filename2=image_files[index+1], plot=False): 
+def sift_flann_matching(filename1, filename2, plot=False): 
     img1 = cv2.imread(filename1)
     img2 = cv2.imread(filename2)
 
@@ -615,7 +608,7 @@ def sift_flann_matching_image(img1, img2, ratio, plot=False):
         plt.show(block=False)
 
     return matches
-def orb_flann_matching(filename1=image_files[index], filename2=image_files[index+1], plot=False): 
+def orb_flann_matching(filename1, filename2, plot=False): 
     img1 = cv2.imread(filename1)
     img2 = cv2.imread(filename2)
 
@@ -692,7 +685,7 @@ def orb_flann_matching_image(img1, img2, ratio=0.5, plot=False):
         plt.show()
 
     return matches
-def sift_feature_homography(filename1=image_files[index], filename2=image_files[index+1]):
+def sift_feature_homography(filename1, filename2):
     MIN_MATCH_COUNT = 10
 
     img1 = cv2.imread(filename1)

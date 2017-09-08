@@ -70,7 +70,7 @@ def eoms_controlled_relative_blender_ode(t, state, dum, ast):
     M2 = m2*attitude.hat_map(R.dot(rho2)).dot(U2_grad) 
     
     des_tran_tuple = controller.asteroid_circumnavigate(t, 3600, 1)
-    des_att_tuple = controller.asteroid_pointing(t, state)
+    des_att_tuple = controller.asteroid_pointing(t, state, ast)
 
     u_f = controller.translation_controller_asteroid(t, state, F1 + F2,
                                                      dum, ast, des_tran_tuple)
