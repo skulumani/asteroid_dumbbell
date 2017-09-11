@@ -76,7 +76,7 @@ def plot_keyframe_original(time, i_state, R_ast2int, R_bcam2i, save_fig=False,
     kf_traj = kf_data[:, 1:4] # postiion of each frame relative to the first
     kf_quat = kf_data[:, 4:8] # rotation from first keyframe to current
     
-    Rcam2ast = attitude.rot3(np.deg2rad(-60)).dot(np.array([[1, 0, 0],
+    Rcam2ast = attitude.rot3(np.deg2rad(-90)).dot(np.array([[1, 0, 0],
                          [0, 0, 1],
                          [0, 1, 0]]))
 
@@ -174,7 +174,7 @@ def plot_keyframe_original(time, i_state, R_ast2int, R_bcam2i, save_fig=False,
 def plot_keyframe_original_asteroid(time, state, R_bcam2a, save_fig=False,
                              fwidth=1, filename='/tmp/estimate.eps',
                              kf_path='./data/asteroid_circumnavigate/asteroid_fixed_circumnavigate.txt'):
-    """Plot keyframe trajectory without any transformation
+    """Plot keyframe trajectory and scale to match truth
 
     The asteroid is assumed to be not rotating. Therefore the input state is 
     actually already in the asteroid frame
@@ -188,7 +188,7 @@ def plot_keyframe_original_asteroid(time, state, R_bcam2a, save_fig=False,
     kf_traj = kf_data[:, 1:4] # postiion of each frame relative to the first
     kf_quat = kf_data[:, 4:8] # rotation from first keyframe to current
     
-    Rcam2ast = attitude.rot3(np.deg2rad(0)).dot(np.array([[1, 0, 0],
+    Rcam2ast = attitude.rot3(np.deg2rad(-90)).dot(np.array([[1, 0, 0],
                          [0, 0, 1],
                          [0, 1, 0]]))
 
@@ -270,6 +270,21 @@ def plot_keyframe_original_asteroid(time, state, R_bcam2a, save_fig=False,
     kf_comp_ax[2].set_xlabel('Time (sec)')
     plt.legend(loc='best')
 
+    # compute the difference in the components
+    traj_diff = np.absolute(asteroid_pos[kf_time, :] - kf_traj)
+    kf_diff_fig, kf_diff_ax = plt.subplots(3, 1, figsize=plotting.figsize(1), sharex=True)
+    kf_diff_ax[0].plot(kf_time, traj_diff[:, 0], 'b-*')
+    kf_diff_ax[0].set_ylabel(r'$X$ (km)')
+    kf_diff_ax[0].grid()
+    kf_diff_ax[1].plot(kf_time, traj_diff[:, 1], 'b-*')
+    kf_diff_ax[1].set_ylabel(r'$Y$ (km)')
+    kf_diff_ax[1].grid()
+    kf_diff_ax[2].plot(kf_time, traj_diff[:, 2], 'b-*')
+    kf_diff_ax[2].set_ylabel(r'$Z$ (km)')
+    kf_diff_ax[2].grid()
+    
+    kf_diff_ax[2].set_xlabel(r'Time (sec)')
+    kf_diff_ax[0].set_title('Difference between ORBSLAM estimate and truth')
     if save_fig:
         plt.figure(kf_comp_fig.number)
         plt.savefig(filename)
