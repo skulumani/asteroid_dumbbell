@@ -295,6 +295,40 @@ def asteroid_circumnavigate(time, tf=3600*6, loops=2):
 
     return x_des, xd_des, xdd_des
 
+def inertial_lissajous_yz_plane(time, tf=3600*6, loops=2, x=3):
+    """Do a lissajous curve in the yz, x=3 plane
+
+    This function will define the translational states for the dumbbell, 
+    which is defined relative to the inertial fixed frame.
+    It is a series of lissajous curves in the yz plane at a desired value of
+    x.
+
+    Parameters
+    ----------
+    time : float
+        Current simulation time
+    tf : int
+        Time in seconds to do the entire trajectory.         
+    loops : int
+        Number of loops around asteroid to complete
+    x : float
+       Location of the lissajous curve in the x axis 
+    
+    Returns
+    -------
+     
+    """
+    freq = 2 * np.pi * loops / tf
+    dist = 3
+
+    x_des = np.array([x, dist * np.cos(freq * time), dist * np.sin(freq * time)])
+    xd_des = np.array([0, dist * freq * -np.sin(freq * time), dist * freq *
+                       np.cos(freq * time)])
+    xdd_des = np.array([0, dist * freq**2 * -np.cos(freq * time), dist * freq**2 *
+                        -np.sin(freq * time)])
+
+    return x_des, xd_des, xdd_des
+
 def inertial_circumnavigate(time, tf=3600*6, loops=2):
     """Desired translation for circumnavigation in inertial frame
 
