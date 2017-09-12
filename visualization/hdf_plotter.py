@@ -401,8 +401,14 @@ def plot_keyframe_trajectory(time, i_state, R_ast2int, R_bcam2i, save_fig=False,
 
 
 def create_plots(filename, plot_flags):
-    desired_attitude_func = controller.body_fixed_pointing_attitude
-    desired_translation_func = controller.inertial_circumnavigate
+
+    # logic to change the desired controller function
+    if plot_flags.mission == 'lissajous':
+        desired_attitude_func = controller.body_fixed_pointing_attitude
+        desired_translation_func = controller.inertial_lissajous_yz_plane
+    elif plot_flags.mission == 'circumnavigate':
+        desired_attitude_func = controller.body_fixed_pointing_attitude
+        desired_translation_func = controller.inertial_circumnavigate
 
     # load the h5py file with all the imagery and simulation data
     with h5py.File(filename, 'r') as sim_data:
@@ -480,6 +486,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate plots from hdf simulation output')
     parser.add_argument('filename', type=str, help='Filename of hdf file')
     parser.add_argument("frame", help="Reference frame - asteroid or inertial", action="store")
+    parser.add_argument("mission", help="Misison to plot - lissajous or circumnavigate", action='store')
     parser.add_argument("--feature_matching", help="Generate feature matching example", action="store_true")
     parser.add_argument("--simulation_plots", help="Generate plots of the simulation",
                         action="store_true")
