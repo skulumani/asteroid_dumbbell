@@ -269,13 +269,6 @@ def blender_init(render_engine='BLENDER',
     bpy.ops.wm.read_homefile()
     # start new empty scene
     scene = bpy.context.scene
-    
-    # set cuda device if available
-    if len(_cycles.available_devices()) > 1:
-        bpy.context.user_preferences.addons['cycles'].preferences.compute_device_type = 'CUDA'
-        bpy.context.user_preferences.addons['cycles'].preferences.devices[0].use = True
-
-        bpy.context.scene.cycles.device = 'GPU'
 
     # delete the cube
     bpy.data.objects['Cube'].select = True
@@ -328,6 +321,12 @@ def blender_init(render_engine='BLENDER',
     lamp_con.track_axis = 'TRACK_NEGATIVE_Z'
     lamp_con.up_axis = 'UP_Y'
     
+    # set cuda device if available
+    if len(_cycles.available_devices()) > 1:
+        bpy.context.user_preferences.addons['cycles'].preferences.compute_device_type = 'CUDA'
+        bpy.context.user_preferences.addons['cycles'].preferences.devices[0].use = True
+        bpy.context.scene.cycles.device = 'GPU'
+
     bpy.context.scene.update()
     return (camera_obj, camera, lamp_obj, lamp, itokawa_obj, scene)
 
