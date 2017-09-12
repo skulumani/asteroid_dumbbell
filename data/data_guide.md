@@ -9,3 +9,7 @@
     
     * the keyframes generated from this data set is defined in asteroid_fixed_circumnavigate.txt.
     Use the `more_keyframes` branch of ORB_SLAM2
+
+### Lissajous Curve
+1. 2017-09-11T22:30:43_inertial_no_ast_rotation_lissajous.hdf5 - loop in the x=3 plane while looking at asteroid
+
