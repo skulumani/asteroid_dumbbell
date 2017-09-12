@@ -119,3 +119,27 @@ class TestAsteroidRotationalController():
 
     def test_control_moment_size(self):
        np.testing.assert_equal(self.u_m.shape, (3,))
+
+class TestDumbbellAsteroidTranslationalLissajous():
+    
+    # this assumes we're dealing with the asteroid fixed dynamics - so the state
+    # is defined in the asteroid fixed frame.
+
+    des_tran_tuple = controller.inertial_lissajous_yz_plane(0)
+    u_f = controller.translation_controller_asteroid(t, state, np.zeros(3), dum, ast, des_tran_tuple)
+
+    def test_control_force_size(self):
+        np.testing.assert_equal(self.u_f.shape, (3,))
+
+    def test_desired_translation_x_des_size(self):
+        xd = self.des_tran_tuple[0]
+        np.testing.assert_equal(xd.shape, (3,))
+
+    def test_desired_translation_xd_des_size(self):
+        xd_des = self.des_tran_tuple[1]
+        np.testing.assert_equal(xd_des.shape, (3,))
+
+    def test_desired_translation_xdd_des_size(self):
+        xdd_des = self.des_tran_tuple[2]
+        np.testing.assert_equal(xdd_des.shape, (3,))
+
