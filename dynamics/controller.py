@@ -329,6 +329,53 @@ def inertial_lissajous_yz_plane(time, tf=3600*6, loops=2, x=3):
 
     return x_des, xd_des, xdd_des
 
+def inertial_quarter_equatorial_plane(time, tf=3600*6, loops=2):
+    """Move back and forth in the positive xy, equatorial quadrant
+
+    Defines the desired translational states to move back and forth in the
+    positive xy quadrant around the equatorial plane of the asteroid.
+    By repeatedly viewing the same side of the asteroid, hopefully it'll have 
+    very good localization.
+
+    Parameters
+    ----------
+    time : float
+        Current simulation time
+    tf : int
+        Time in seconds to do the entire trajectory.         
+    loops : int
+        Number of loops of the area to accomplish
+    
+    Returns
+    -------
+     
+    """
+
+    dist = 3
+    
+    # logic to switch directions
+    time_for_quarter = tf / loops / 2
+    freq = np.pi / 2 / time_for_quarter
+    stage = time // time_for_quarter
+    
+    time = time % time_for_quarter
+    if stage == 0 or (stage % 2) == 0:  # ccw
+        
+        x_des = np.array([dist * np.cos(freq * time), dist * np.sin(freq * time),0 ])
+        xd_des = np.array([-dist * freq * np.sin(freq * time), dist * freq * np.cos(freq * time), 
+                        0])
+        xdd_des = np.array([ dist * freq**2 * -np.cos(freq * time), dist * freq**2 *
+                            -np.sin(freq * time), 0])
+    else: # clockwise
+        time = time_for_quarter - (time)
+        x_des = np.array([dist * np.cos(freq * time), dist * np.sin(freq * time),0 ])
+        xd_des = np.array([-dist * freq * np.sin(freq * time), dist * freq * np.cos(freq * time), 
+                        0])
+        xdd_des = np.array([ dist * freq**2 * -np.cos(freq * time), dist * freq**2 *
+                            -np.sin(freq * time), 0])
+
+    return x_des, xd_des, xdd_des
+
 def inertial_circumnavigate(time, tf=3600*6, loops=2):
     """Desired translation for circumnavigation in inertial frame
 
