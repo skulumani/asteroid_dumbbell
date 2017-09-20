@@ -539,9 +539,9 @@ def blender_inertial_quarter_equatorial(gen_images=False):
     num_faces = 64
     t0 = 0
     dt = 1
-    tf = 3600 * 2
-    num_steps = 3600 * 2
-    loops = 2
+    tf = 3600 * 4
+    num_steps = 3600 * 4
+    loops = 4
 
     periodic_pos = np.array([1.495746722510590,0.000001002669660,0.006129720493607])
     periodic_vel = np.array([0.000000302161724,-0.000899607989820,-0.000000013286327])
