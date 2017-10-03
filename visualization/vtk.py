@@ -3,9 +3,10 @@
 """
 
 import vtk
+import numpy as np
 from vtk.util.colors import tomato
 
-def vtk_test():
+def vtk_example():
     # generate a polygon data for a cube
     cube = vtk.vtkCubeSource()
 
@@ -78,5 +79,23 @@ def vtk_cylinder():
     # start the event loop
     iren.Start()
 
+def vtk_distance():
+    p0 = (0, 0, 0)
+    p1 = (1, 1, 1)
+
+    distSquared = vtk.vtkMath.Distance2BetweenPoints(p0, p1)
+    dist = np.sqrt(distSquared)
+
+    print("p0 = {}".format(p0))
+    print("p1 = {}".format(p1))
+    print("distance squared = {}".format(distSquared))
+    print("distance = {}".format(dist))
+
+def vtk_plywriter():
+    """Write to ply writer
+    """
+
+
 if __name__ == '__main__':
     vtk_cylinder()
+    vtk_distance()
