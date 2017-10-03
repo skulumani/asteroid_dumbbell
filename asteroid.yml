@@ -205,17 +205,23 @@ dependencies:
 - zict=0.1.2=py35_0
 - zlib=1.2.8=3
 - pip:
+  - astro==0.1.2
   - backports.shutil-get-terminal-size==1.0.0
   - et-xmlfile==1.0.1
   - ipython-genutils==0.2.0
   - jupyter-client==5.0.1
   - jupyter-console==5.1.0
   - jupyter-core==4.3.0
+  - kinematics==0.0.1
+  - logbook==1.1.0
   - mathutils==2.78
   - neovim==0.1.13
   - neovim-remote==1.7.4
   - prompt-toolkit==1.0.14
+  - ratelimiter==1.2.0
+  - represent==1.5.1
   - rope-py3k==0.9.4.post1
+  - spacetrack==0.13.0
   - spiceypy==2.0.0
   - tables==3.3.0
 prefix: /home/shankar/anaconda3/envs/asteroid
