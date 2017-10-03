@@ -59,7 +59,7 @@ mkdir build
 cd build
 
 echo "This might install it in a weird location"
-echo "Make sure cv2.so is in $HOME/anacona/envs/asteroid/lib/python3.5/site-packages"
+echo "Make sure cv2.so is in $HOME/anaconda/envs/asteroid/lib/python3.5/site-packages"
 read -p "Press enter to continue"
 
 # call cmake

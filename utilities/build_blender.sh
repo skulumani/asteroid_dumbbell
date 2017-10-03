@@ -14,15 +14,16 @@ read -p "Press Enter to continue"
 if [ -d "$HOME/blender-git" ]; then
     echo "Blender source directory already exits"
     cd "$HOME/blender-git/blender"
-    git checkout master
-    git pull --rebase
+    git checkout ${BLENDER_VERSION}
+    # git pull --rebase
 else
     mkdir -p "$HOME/blender-git"
     cd "$HOME/blender-git"
     git clone https://git.blender.org/blender.git
     cd blender
-    git submodule update --init --recursive
-    git submodule foreach git checkout master
+    git checkout ${BLENDER_VERSION}
+    # git submodule update --init --recursive
+    # git submodule foreach git checkout master
 fi
 
 read -p "Press enter to continue"
