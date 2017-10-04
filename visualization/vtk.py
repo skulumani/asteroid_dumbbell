@@ -95,6 +95,7 @@ def vtk_plywriter():
     """Write to ply writer
     """
 
+    filename = 'writeply.ply'
 
 if __name__ == '__main__':
     vtk_cylinder()
