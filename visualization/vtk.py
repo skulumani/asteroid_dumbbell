@@ -6,6 +6,7 @@ import vtk
 import numpy as np
 from vtk.util.colors import tomato
 
+
 def vtk_example():
     # generate a polygon data for a cube
     cube = vtk.vtkCubeSource()
@@ -39,6 +40,7 @@ def vtk_example():
     render_window.Render()
     interactor.Start()
 
+
 def vtk_cylinder():
     # create a polygon cylinder
     cylinder = vtk.vtkCylinderSource()
@@ -56,7 +58,7 @@ def vtk_cylinder():
     cylinderActor.RotateY(-45.0)
 
     # create the graphics structure.
-    # create the render window 
+    # create the render window
     ren = vtk.vtkRenderer()
     renWin = vtk.vtkRenderWindow()
     renWin.AddRenderer(ren)
@@ -79,6 +81,7 @@ def vtk_cylinder():
     # start the event loop
     iren.Start()
 
+
 def vtk_distance():
     p0 = (0, 0, 0)
     p1 = (1, 1, 1)
@@ -91,11 +94,87 @@ def vtk_distance():
     print("distance squared = {}".format(distSquared))
     print("distance = {}".format(dist))
 
+
 def vtk_plywriter():
     """Write to ply writer
     """
 
-    filename = 'writeply.ply'
+    filename = '/tmp/writeply.ply'
+
+    sphereSource = vtk.vtkSphereSource()
+    sphereSource.Update()
+
+    plyWriter = vtk.vtkPLYWriter()
+    plyWriter.SetFileName(filename)
+    plyWriter.SetInputConnection(sphereSource.GetOutputPort())
+    plyWriter.Write()
+
+    # read and display for verification
+    reader = vtk.vtkPLYReader()
+    reader.SetFileName(filename)
+    reader.Update()
+
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputConnection(reader.GetOutputPort())
+
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    renderer = vtk.vtkRenderer()
+    renderWindow = vtk.vtkRenderWindow()
+    renderWindow.AddRenderer(renderer)
+    renderWindowInteractor = vtk.vtkRenderWindowInteractor()
+    renderWindowInteractor.SetRenderWindow(renderWindow)
+
+    renderer.AddActor(actor)
+    renderer.SetBackground(0.3, 0.6, 0.3)
+
+    renderWindow.Render()
+    renderWindowInteractor.Start()
+
+
+def vtk_stlwriter():
+    filename = '/tmp/test.stl'
+
+    sphereSource = vtk.vtkSphereSource()
+    sphereSource.Update()
+
+    # write the stl file to a disk
+    stlWriter = vtk.vtkSTLWriter()
+    stlWriter.SetFileName(filename)
+    stlWriter.SetInputConnection(sphereSource.GetOutputPort())
+    stlWriter.Write()
+
+    # read and display for verification
+    reader = vtk.vtkSTLReader()
+    reader.SetFileName(filename)
+
+    mapper = vtk.vtkPolyDataMapper()
+    if vtk.VTK_MAJOR_VERSION <= 5:
+        mapper.SetInput(reader.GetOutput())
+    else:
+        mapper.SetInputConnection(reader.GetOutputPort())
+
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    # create a rendering window and renderer
+    ren = vtk.vtkRenderer()
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(ren)
+
+    # create a renderwindowinteractor
+    iren = vtk.vtkRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
+
+    # assign actor to the renderer
+    ren.AddActor(actor)
+
+    # enable user interface interactor
+    iren.Initialize()
+    renWin.Render()
+    iren.Start()
+
 
 if __name__ == '__main__':
     vtk_cylinder()
