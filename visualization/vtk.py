@@ -175,6 +175,30 @@ def vtk_stlwriter():
     renWin.Render()
     iren.Start()
 
+def vtk_stlreader(filename='/tmp/test.stl'):
+    reader = vtk.vtkSTLReader()
+    reader.SetFileName(filename)
+
+    mapper = vtk.vtkPolyDataMapper()
+    if vtk.VTK_MAJOR_VERSION <= 5:
+        mapper.SetInput(reader.GetOutput())
+    else:
+        mapper.SetInputConnection(reader.GetOutputPort())
+
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    ren = vtk.vtkRenderer()
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(ren)
+
+    iren = vtk.vtkRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
+
+    ren.AddActor(actor)
+    iren.Initialize()
+    renWin.Render()
+    iren.Start()
 
 if __name__ == '__main__':
     vtk_cylinder()
