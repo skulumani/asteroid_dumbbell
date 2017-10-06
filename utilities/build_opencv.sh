@@ -51,6 +51,7 @@ sudo apt-get -y install \
     libx264-dev \
     libgtk-3-dev \
     libatlas-base-dev \
+    libxt-dev \
     gfortran python2.7-dev python3.5-dev 
 
 # now build opencv
