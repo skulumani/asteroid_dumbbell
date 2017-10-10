@@ -53,6 +53,14 @@ Some other helpful links:
 * [Ubuntu 16.04](https://www.learnopencv.com/install-opencv3-on-ubuntu/)
 * [OpenCV SO](https://stackoverflow.com/questions/18561910/opencv-python-cant-use-surf-sift)
 
+### Building PCL
+
+There's another `bash` script, `utilities/build_pcl.sh` which will build Point Cloud Library. 
+
+* Make sure you install the asteroid env - `conda env create -n asteroid -f asteroid.yml`
+* `bash utilities/build_pcl.sh`
+* Run the tests
+
 ## Usage guide
 
 You can run the simulation for both the inertial and relative equations of motion. 
@@ -62,14 +70,6 @@ There are driver modules for each, which are called:
     * `dumbbell_driver.py` - More driver functions which were used during testing/debuggin
     * `eom_comparison.py` - Functions to allow the comparision between the different EOMS
 
-## Using `mayavi`
-
-There's a conda enviornment which has `mayavi` working correctly.
-You can use the following to duplicate the enviornment
-~~~
-$ conda env export > env.yml
-$ conda env create -f mayavi_enviornment.yml
-~~~
 
 ## [Profiling](https://github.com/barbagroup/numba_tutorial_scipy2016/blob/master/notebooks/01.When.where.to.use.Numba.ipynb)
 
