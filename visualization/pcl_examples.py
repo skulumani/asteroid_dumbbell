@@ -5,10 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+from mayavi import mlab
 import pdb
 import pcl
 
-def segment_cyl_plane(filename='./data/table_scene_mug_stereo_textured.pcd'):
+def segment_cyl_plane(filename='./data/point_clouds/table_scene_mug_stereo_textured.pcd'):
     """Segment and create a cloud
     
     https://github.com/strawlab/python-pcl/blob/master/examples/segment_cyl_plane.py
@@ -40,7 +41,7 @@ def segment_cyl_plane(filename='./data/table_scene_mug_stereo_textured.pcd'):
     print(model)
 
     cloud_plane = cloud_filtered.extract(indices, negative=False)
-    pcl.save(cloud_plane, './data/plane.pcd')
+    pcl.save(cloud_plane, './data/point_clouds/plane.pcd')
     
     cloud_cyl = cloud_filtered.extract(indices, negative=True)
 
@@ -57,7 +58,7 @@ def segment_cyl_plane(filename='./data/table_scene_mug_stereo_textured.pcd'):
     print(model)
 
     cloud_cylinder = cloud_cyl.extract(indices, negative=False)
-    pcl.save(cloud_cylinder, './data/cylinder.pcd')
+    pcl.save(cloud_cylinder, './data/point_clouds/cylinder.pcd')
     
 def visualization():
     """Visualization testing
@@ -70,7 +71,7 @@ def visualization():
         import pcl.pcl_visualization
         # from pcl.pcl_registration import icp, gicp, icp_nl
 
-        cloud = pcl.load_XYZRGB('./examples/pcldata/tutorials/table_scene_mug_stereo_textured.pcd')
+        cloud = pcl.load_XYZRGB('./data/point_clouds/table_scene_mug_stereo_textured.pcd')
 
         visual = pcl.pcl_visualization.CloudViewing()
 
@@ -96,7 +97,7 @@ def thread_harris():
     """
     https://github.com/strawlab/python-pcl/blob/master/examples/3dharris.py
     """
-    cloud = pcl.load('./data/bunny.pcd')
+    cloud = pcl.load('./data/point_clouds/bunny.pcd')
     print("cloud points: " + str(cloud.size))
     
     detector = cloud.make_HarrisKeypoint3D()
@@ -130,7 +131,7 @@ def thread_harris():
 
     return cloud, keypoints3D 
 
-def plot_point_cloud(cloud=pcl.load('./data/bunny.pcd')):
+def plot_point_cloud(cloud=pcl.load('./data/point_clouds/bunny.pcd')):
 
     # extract coordinates of points
     points = np.zeros((cloud.size, 3))
@@ -142,7 +143,7 @@ def plot_point_cloud(cloud=pcl.load('./data/bunny.pcd')):
     ax.scatter(points[:, 0], points[:, 1], points[:, 2], zdir='x')
     plt.show()
 
-def point_cloud_testing(cloud=pcl.load('./data/bunny.pcd')):
+def point_cloud_testing(cloud=pcl.load('./data/point_clouds/bunny.pcd')):
     """Testing out plotting of point clouds
     """
     
@@ -164,3 +165,49 @@ def point_cloud_testing(cloud=pcl.load('./data/bunny.pcd')):
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(points[:, 0], points[:, 1], points[:, 2], zdir='x')
     plt.show()
+
+def plot_mayavi_ply(filename):
+    """Mayavi plotting a PLY point cloud file
+    """
+    # logic to test if PCD or PLY file and convert
+
+    mlab.pipeline.surface(mlab.pipeline.open(filename))
+    mlab.show()
+
+def concave_hull_2d():
+    """Concave hull example
+
+    https://github.com/strawlab/python-pcl/blob/master/examples/official/Surface/concave_hull_2d.py
+
+    http://pointclouds.org/documentation/tutorials/hull_2d.php#hull-2d
+    """
+
+    cloud = pcl.load('./data/point_clouds/table_scene_mug_stereo_textured.pcd')
+
+    # build a filter to remove suprious NaNs
+    passthrough = cloud.make_passthrough_filter()
+    passthrough.set_filter_field_name("z")
+    passthrough.set_filter_limits(0.0, 1.1)
+    cloud_filtered = passthrough.filter()
+    print('PointCloud after filtering has: ' + str(cloud_filtered.size) + ' data points.')
+
+    seg = cloud_filtered.make_segmenter_normals(ksearch=50)
+    seg.set_optimize_coefficients(True)
+    seg.set_model_type(pcl.SACMODEL_NORMAL_PLANE)
+    seg.set_method_type(pcl.SAC_RANSAC)
+    seg.set_distance_threshold(0.01)
+    indices, model = seg.segment()
+    print("PointCloud after segmentation has: " + str(len(indices)) + " inliers.")
+
+    proj = cloud_filtered.make_ProjectInliers()
+    proj.set_model_type(pcl.SACMODEL_PLANE)
+    cloud_projected = proj.filter()
+    print('PointCloud after projection has: ' + str(cloud_projected.size) + ' data points.')
+    
+    chull = cloud_projected.make_ConcaveHull()
+    chull.set_Alpha(0.1)
+    cloud_hull = chull.reconstruct()
+    print('Concave Hull has: ' + str(cloud_hull.size) + ' data points.')
+
+    if cloud_hull.size != 0:
+        pcl.save(cloud_hull, './data/point_clouds/table_scene_mug_stereo_textured_hull.ply')
