@@ -2,6 +2,7 @@
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
+import pdb
 import pcl
 
 def segment_cyl_plane(filename='./data/table_scene_mug_stereo_textured.pcd'):
@@ -88,8 +89,12 @@ def visualization():
     except ImportError:
         print("Only works on Windows: https://github.com/strawlab/python-pcl/issues/127")
 
-def threed_harris():
+def thread_harris():
     """
     https://github.com/strawlab/python-pcl/blob/master/examples/3dharris.py
     """
     cloud = pcl.load('./data/bunny.pcd')
+    print("cloud points: " + str(cloud.size))
+    
+    detector = cloud.make_HarrisKeypoint3D()
+    detector.set_NonMaxSupression(True)
