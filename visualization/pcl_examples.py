@@ -2,6 +2,9 @@
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
 import pdb
 import pcl
 
@@ -98,3 +101,66 @@ def thread_harris():
     
     detector = cloud.make_HarrisKeypoint3D()
     detector.set_NonMaxSupression(True)
+    detector.set_Radius(0)
+    keypoints = detector.compute()
+
+    print("keypoints detected: " + str(keypoints.size))
+
+    keypoints3D = pcl.PointCloud()
+    high = 0
+    low = 0
+
+    points = np.zeros((keypoints.size, 3), dtype=np.float32)
+    # generate the data
+    for i in range(0, keypoints.size):
+        points[i, 0] = keypoints[i][0]
+        points[i, 1] = keypoints[i][1]
+        points[i, 2] = keypoints[i][2]
+        intensity = keypoints[i][3]
+
+        if intensity > high:
+            print("coords: " + str(keypoints[i][0]) + ";" + str(keypoints[i][1]) + ";" + str(keypoints[i][2]))
+            high = intensity
+
+            if intensity < low:
+                low = intensity
+
+    keypoints3D.from_array(points)
+    print("maximal response: " + str(high) + " min response: " + str(low))
+
+    return cloud, keypoints3D 
+
+def plot_point_cloud(cloud=pcl.load('./data/bunny.pcd')):
+
+    # extract coordinates of points
+    points = np.zeros((cloud.size, 3))
+    for i in range(0, cloud.size):
+        points[i, :] = np.array([cloud[i][0], cloud[i][1], cloud[i][2]])
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(points[:, 0], points[:, 1], points[:, 2], zdir='x')
+    plt.show()
+
+def point_cloud_testing(cloud=pcl.load('./data/bunny.pcd')):
+    """Testing out plotting of point clouds
+    """
+    
+    # properties of the cloud
+    print('Width of point cloud {}.'.format(cloud.width))
+    print('Height of point cloud {}.'.format(cloud.height))
+    if cloud.height == 1:
+        print('Unorganized point cloud')
+    else:
+        print("Organized point cloud")
+
+
+    # extract coordinates of points
+    points = np.zeros((cloud.size, 3))
+    for i in range(0, cloud.size):
+        points[i, :] = np.array([cloud[i][0], cloud[i][1], cloud[i][2]])
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(points[:, 0], points[:, 1], points[:, 2], zdir='x')
+    plt.show()
