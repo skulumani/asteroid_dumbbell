@@ -5,7 +5,10 @@
 import vtk
 import numpy as np
 from vtk.util.colors import tomato
-
+from vtk.util.misc import vtkGetDataRoot
+import os
+import string
+import time
 
 def vtk_example():
     # generate a polygon data for a cube
@@ -200,6 +203,149 @@ def vtk_stlreader(filename='/tmp/test.stl'):
     renWin.Render()
     iren.Start()
 
+def reconstruct_surface():
+    """Example of constructing a surface from a point cloud
+
+    https://github.com/Kitware/VTK/blob/a1a94d0ca96854fe72480cf2ec031a533b129b04/Examples/Modelling/Python/reconstructSurface.py
+    """
+
+    VTK_DATA_ROOT = vtkGetDataRoot()
+    pointSource = vtk.vtkProgrammableSource()
+
+    def readPoints():
+        output = pointSource.GetPolyDataOutput()
+        points = vtk.vtkPoints()
+        output.SetPoints(points)
+
+        fname = open('./data/point_clouds/cactus.3337.pts')
+        
+        line = fname.readline()
+        while line:
+            data = line.split()
+            if data and data[0] == 'p':
+                x, y, z = float(data[1]), float(data[2]), float(data[3])
+                points.InsertNextPoint(x, y, z)
+            line = fname.readline()
+
+    pointSource.SetExecuteMethod(readPoints)
+    
+    surf = vtk.vtkSurfaceReconstructionFilter()
+    surf.SetInputConnection(pointSource.GetOutputPort())
+
+
+    cf = vtk.vtkContourFilter()
+    cf.SetInputConnection(surf.GetOutputPort())
+    cf.SetValue(0, 0.0)
+    
+    reverse = vtk.vtkReverseSense()
+    reverse.SetInputConnection(cf.GetOutputPort())
+    reverse.ReverseCellsOn()
+    reverse.ReverseNormalsOn()
+
+    map = vtk.vtkPolyDataMapper()
+    map.SetInputConnection(reverse.GetOutputPort())
+    map.ScalarVisibilityOff()
+
+    surfaceActor = vtk.vtkActor()
+    surfaceActor.SetMapper(map)
+    surfaceActor.GetProperty().SetDiffuseColor(1, 0.3882, 0.2784)
+    surfaceActor.GetProperty().SetSpecularColor(1, 1, 1)
+    surfaceActor.GetProperty().SetSpecular(0.4)
+    surfaceActor.GetProperty().SetSpecularPower(50)
+
+    ren = vtk.vtkRenderer()
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(ren)
+    iren = vtk.vtkRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
+
+    ren.AddActor(surfaceActor)
+    ren.SetBackground(1, 1, 1)
+    renWin.SetSize(400, 400)
+    ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+    ren.GetActiveCamera().SetPosition(1, 0, 0)
+    ren.GetActiveCamera().SetViewUp(0, 0, 1)
+    
+    ren.ResetCamera()
+    ren.GetActiveCamera().Azimuth(20)
+    ren.GetActiveCamera().Elevation(30)
+    ren.GetActiveCamera().Dolly(1.2)
+    ren.ResetCameraClippingRange()
+
+    iren.Initialize()
+    renWin.Render()
+    iren.Start()
+   
+def step1_cone():
+    """Example of dealing with VTK
+    https://github.com/Kitware/VTK/blob/master/Examples/Tutorial/Step1/Python/Cone.py
+    """
+    
+    # Create a source object - returns vtkPolyData type
+    cone = vtk.vtkConeSource()
+    cone.SetHeight(3.0)
+    cone.SetRadius(1.0)
+    cone.SetResolution(10)
+    
+    # no filters here - connect the source to the mapper to convert the data to a graphics primitvie
+    coneMapper = vtk.vtkPolyDataMapper()
+    coneMapper.SetInputConnection(cone.GetOutputPort())
+
+    # create teh actor to represent the cone - this is what handles transforming the graphic primitives into something that can be rendered
+    coneActor = vtk.vtkActor()
+    coneActor.SetMapper(coneMapper)
+
+    # crete the renderer - this is the figure/viewport where we create the image
+    ren1 = vtk.vtkRenderer()
+    ren1.AddActor(coneActor)
+    ren1.SetBackground(0.1, 0.2, 0.4)
+
+    # create the render window - this is what shows up on the screen
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(ren1)
+    renWin.SetSize(300, 300)
+
+    # now animate
+    for i in range(0, 360):
+        time.sleep(0.03)
+
+        renWin.Render()
+        ren1.GetActiveCamera().Azimuth(1)
+
+def step2_observer():
+    """
+    This is an example of using a callback via an observer on the renderer
+
+    Everytime it's called a function is run
+    """
+    def myCallback(obj, string):
+        print("Starting a render")
+
+    # create a basic pipeline
+    cone = vtk.vtkConeSource()
+    cone.SetHeight(3.0)
+    cone.SetRadius(1.0)
+    cone.SetResolution(10)
+
+    coneMapper = vtk.vtkPolyDataMapper()
+    coneMapper.SetInputConnection(cone.GetOutputPort())
+    coneActor = vtk.vtkActor()
+    coneActor.SetMapper(coneMapper)
+
+    ren1 = vtk.vtkRenderer()
+    ren1.AddActor(coneActor)
+    ren1.SetBackground(0.1, 0.2, 0.4)
+
+    # add observer
+    ren1.AddObserver("StartEvent", myCallback)
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(ren1)
+    renWin.SetSize(300, 300)
+
+    for i in range(0, 360):
+        time.sleep(0.03)
+        renWin.Render()
+        ren1.GetActiveCamera().Azimuth(1)
 if __name__ == '__main__':
     vtk_cylinder()
     vtk_distance()
