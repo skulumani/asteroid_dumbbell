@@ -163,7 +163,7 @@ def point_cloud_testing(cloud=pcl.load('./data/point_clouds/bunny.pcd')):
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(points[:, 0], points[:, 1], points[:, 2], zdir='x')
+    ax.scatter(points[:, 0], points[:, 1], points[:, 2], 'b.')
     plt.show()
 
 def plot_mayavi_ply(filename):
@@ -172,6 +172,15 @@ def plot_mayavi_ply(filename):
     # logic to test if PCD or PLY file and convert
 
     mlab.pipeline.surface(mlab.pipeline.open(filename))
+    mlab.show()
+
+def plot_mayavi_point_cloud(cloud=pcl.load('./data/point_clouds/bunny.pcd')):
+    points = np.zeros((cloud.size, 3))
+    for i in range(0, cloud.size):
+        points[i, :] = np.array([cloud[i][0], cloud[i][1], cloud[i][2]])
+
+    mlab.points3d(points[:, 0], points[:, 1], points[:, 2], mode='sphere',
+                  scale_factor=0.005)
     mlab.show()
 
 def concave_hull_2d():
@@ -208,6 +217,25 @@ def concave_hull_2d():
     chull.set_Alpha(0.1)
     cloud_hull = chull.reconstruct()
     print('Concave Hull has: ' + str(cloud_hull.size) + ' data points.')
+    
 
     if cloud_hull.size != 0:
-        pcl.save(cloud_hull, './data/point_clouds/table_scene_mug_stereo_textured_hull.ply')
+        pcl.save(cloud_hull, './data/point_clouds/table_scene_mug_stereo_textured_hull.pcd')
+
+def resampling(filename='./data/point_clouds/bun0.pcd'):
+    """Smoothing and normal estimation based on polynomial reconstruction
+    """
+    cloud = pcl.load(filename)
+    print('cloud (size) = ' + str(cloud.size))
+
+    tree = cloud.make_kdtree()
+
+    mls = cloud.make_moving_least_squares()
+    mls.set_Compute_Normals(True)
+    mls.set_polynomial_fit(True)
+    mls.set_Search_Method(tree)
+    mls.set_search_radius(0.03)
+    print('set parameters')
+    mls_points = mls.process()
+
+    pdb.set_trace()
