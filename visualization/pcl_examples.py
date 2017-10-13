@@ -238,4 +238,5 @@ def resampling(filename='./data/point_clouds/bun0.pcd'):
     print('set parameters')
     mls_points = mls.process()
 
-    pdb.set_trace()
+def greedy_triangulation(filename='./data/point_clouds/bun0.pcd'):
+    pass
