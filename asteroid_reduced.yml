@@ -1,0 +1,34 @@
+name: asteroid
+channels:
+- menpo
+- anaconda
+- defaults
+dependencies:
+- astropy
+- h5py
+- ipython
+- jedi
+- matplotlib
+- mkl
+- numpy
+- numpydoc
+- pep8
+- pillow
+- pip
+- pylint
+- pyqt=4
+- pytest
+- python=3.5
+- seaborn
+- mayavi
+- pyface
+- traits
+- traitsui
+- vtk
+- pip:
+  - astro
+  - kinematics
+  - spacetrack
+  - spiceypy
+prefix: /home/shankar/anaconda3/envs/asteroid
+
