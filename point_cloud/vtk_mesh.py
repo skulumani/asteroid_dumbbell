@@ -22,9 +22,10 @@ Shankar Kulumani		GWU		skulumani@gwu.edu
 
 import numpy as np
 import vtk
+import pdb
 
 
-def read_obj_points(filename, pointSource=vtk.vtkProgrammableSource):
+def read_obj_points(pointSource, filename):
     r"""A source filter for VTK to read OBJ files
 
     This is a programmable filter to allow for the input of OBJ formatted shape
@@ -33,7 +34,10 @@ def read_obj_points(filename, pointSource=vtk.vtkProgrammableSource):
     Parameters
     ----------
     filename : string
-        <`4:Description of the variable`>
+        Name of the wavefront OBJ file to input
+    pointSource : vtkProgrammableSource
+        pointSource = vtk.ProgrammableSource
+        This is the vtk object that we'll use to store the points
 
     Returns
     -------
@@ -64,13 +68,25 @@ def read_obj_points(filename, pointSource=vtk.vtkProgrammableSource):
     output = pointSource.GetPolyDataOutput()
     points = vtk.vtkPoints()
     output.SetPoints(points)
-
-    fname = open('./data/point_clouds/cactus.3337.pts')
-
-    line = fname.readline()
-    while line:
-        data = line.split()
-        if data and data[0] == 'p':
-            x, y, z = float(data[1]), float(data[2]), float(data[3])
-            points.InsertNextPoint(x, y, z)
+    pdb.set_trace() 
+    # open the OBJ file
+    with open(filename) as fname:
         line = fname.readline()
+        while line:
+            data = line.split()
+            if data and data[0] == 'v':
+                x, y, z = float(data[1]), float(data[2]), float(data[3])
+                points.InsertNextPoint(x, y, z)
+            line = fname.readline()
+
+def read_numpy_points(pointSource, point_cloud):
+    """Read point cloud from an array
+    """
+    output = pointSource.GetPolyDataOutput()
+    points = vtk.vtkPoints()
+    output.SetPoints(points)
+    # open the OBJ file
+    for ii in range(0, point_cloud.shape[0]):
+        vector = point_cloud[ii, :]
+        x, y, z = vector
+        points.InsertNextPoint(x, y, z)
