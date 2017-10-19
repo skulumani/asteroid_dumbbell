@@ -209,7 +209,6 @@ def reconstruct_surface():
     https://github.com/Kitware/VTK/blob/a1a94d0ca96854fe72480cf2ec031a533b129b04/Examples/Modelling/Python/reconstructSurface.py
     """
 
-    VTK_DATA_ROOT = vtkGetDataRoot()
     pointSource = vtk.vtkProgrammableSource()
 
     def readPoints():
@@ -385,6 +384,70 @@ def step3_multiple_renderer():
         renWin.Render()
         ren1.GetActiveCamera().Azimuth(1)
         ren2.GetActiveCamera().Azimuth(1)
+    
+def read_obj(filename):
+    """Test to read and display a wavefront OBJ
+
+    """
+        
+    reader = vtk.vtkOBJReader()
+    reader.SetFileName(filename)
+
+    mapper = vtk.vtkPolyDataMapper()
+    if vtk.VTK_MAJOR_VERSION <= 5:
+        mapper.SetInput(reader.GetOutput())
+    else:
+        mapper.SetInputConnection(reader.GetOutputPort())
+
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    ren = vtk.vtkRenderer()
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(ren)
+
+    iren = vtk.vtkRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
+
+    ren.AddActor(actor)
+    iren.Initialize()
+    renWin.Render()
+    iren.Start()
+
+def write_obj(infile='./data/itokawa_low.obj', outfile='./data/point_clouds/itokawa_low_vtkwriter'):
+    """Read from a OBJ and then write to a different one
+    """
+
+    reader = vtk.vtkOBJReader()
+    reader.SetFileName(infile)
+
+    # write the stl file to a disk
+    objWriter = vtk.vtkOBJExporter()
+    objWriter.SetFilePrefix(outfile)
+
+    mapper = vtk.vtkPolyDataMapper()
+    if vtk.VTK_MAJOR_VERSION <= 5:
+        mapper.SetInput(reader.GetOutput())
+    else:
+        mapper.SetInputConnection(reader.GetOutputPort())
+
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    ren = vtk.vtkRenderer()
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(ren)
+
+    iren = vtk.vtkRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
+
+    ren.AddActor(actor)
+    iren.Initialize()
+    renWin.Render()
+    iren.Start()
+
+    objWriter.SetRenderWindow(renWin)
+    objWriter.Write()
 
 if __name__ == '__main__':
     vtk_cylinder()
