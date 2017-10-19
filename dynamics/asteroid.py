@@ -35,7 +35,8 @@ class Asteroid(object):
         dir_path = os.path.dirname(os.path.realpath(__file__))
 
         self.name = name
-
+        
+        # TODO: Deprecate matlab mat file import and just read the shape file directly and reduce as necessary
         if name == 'castalia':
             self.M = 1.4091e12
             self.sigma = 2.1 # g/cm^3
