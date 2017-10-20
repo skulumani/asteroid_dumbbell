@@ -23,7 +23,7 @@ Shankar Kulumani		GWU		skulumani@gwu.edu
 import numpy as np
 import vtk
 import pdb
-
+from point_cloud import wavefront
 
 
 def read_numpy_points(pointSource, point_cloud):
@@ -152,18 +152,19 @@ def obj_mesh_comparison(filename='./data/itokawa_low.obj'):
     objWriter.SetRenderWindow(renWin)
     objWriter.Write()
 
-def reduced_mesh_generation(filename='./data/itokawa_low.obj'):
+def reduced_mesh_generation(filename='./data/itokawa_low.obj', step=1):
     """Read in the OBJ shape file, degrade the number of vectors and then 
     create a surface
     """
 
     pointSource = vtk.vtkProgrammableSource()
     filename='./data/itokawa_low.obj'
+    faces, verts = wavefront.read_obj(filename)
 
-    def read_obj_points():
-        r"""A source filter for VTK to read OBJ files
+    def read_numpy_points():
+        r"""A source filter for VTK to read Numpy point cloud
 
-        This is a programmable filter to allow for the input of OBJ formatted shape
+        This is a programmable filter to allow for the input of numpy point cloud
         files into a VTK object.
 
         Parameters
@@ -204,17 +205,10 @@ def reduced_mesh_generation(filename='./data/itokawa_low.obj'):
         points = vtk.vtkPoints()
         output.SetPoints(points)
         # open the OBJ file
-        with open(filename) as fname:
-            line = fname.readline()
-            while line:
-                data = line.split()
-                if data and data[0] == 'v':
-                    x, y, z = float(data[1]), float(data[2]), float(data[3])
-                    points.InsertNextPoint(x, y, z)
+        for ii in range(0, verts.shape[0], step):
+            points.InsertNextPoint(verts[ii, 0], verts[ii, 1], verts[ii, 2])
 
-                line = fname.readline()
-
-    pointSource.SetExecuteMethod(read_obj_points)
+    pointSource.SetExecuteMethod(read_numpy_points)
 
     surf = vtk.vtkSurfaceReconstructionFilter()
     surf.SetInputConnection(pointSource.GetOutputPort())
@@ -233,20 +227,15 @@ def reduced_mesh_generation(filename='./data/itokawa_low.obj'):
 
     surfaceActor = vtk.vtkActor()
     surfaceActor.SetMapper(mapper)
-    surfaceActor.GetProperty().SetDiffuseColor(1, 0.3882, 0.2784)
+    surfaceActor.GetProperty().SetColor(0.5, 0.5, 0.5)
+    surfaceActor.GetProperty().SetDiffuseColor(1, 1, 1)
     surfaceActor.GetProperty().SetSpecularColor(1, 1, 1)
     surfaceActor.GetProperty().SetSpecular(0.4)
     surfaceActor.GetProperty().SetSpecularPower(50)
 
     ren = vtk.vtkRenderer()
-    renWin = vtk.vtkRenderWindow()
-    renWin.AddRenderer(ren)
-    iren = vtk.vtkRenderWindowInteractor()
-    iren.SetRenderWindow(renWin)
-
     ren.AddActor(surfaceActor)
-    ren.SetBackground(1, 1, 1)
-    renWin.SetSize(400, 400)
+    ren.SetBackground(0, 0, 0)
     ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
     ren.GetActiveCamera().SetPosition(1, 0, 0)
     ren.GetActiveCamera().SetViewUp(0, 0, 1)
@@ -256,13 +245,63 @@ def reduced_mesh_generation(filename='./data/itokawa_low.obj'):
     ren.GetActiveCamera().Elevation(30)
     ren.GetActiveCamera().Dolly(1.2)
     ren.ResetCameraClippingRange()
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(ren)
+    renWin.SetSize(800,800)
+
+    iren = vtk.vtkRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
 
     iren.Initialize()
     renWin.Render()
     iren.Start()
 
+
+def write_vtk_obj(renWin, filename):
+    """Given a render window we'll write it to a OBJ file
+    """
     # write the new surface to a wavefront file OBJ
     objWriter = vtk.vtkOBJExporter()
-    objWriter.SetFilePrefix('./data/point_clouds/itokawa_low_vtkwriter')
+    objWriter.SetFilePrefix(filename)
     objWriter.SetRenderWindow(renWin)
     objWriter.Write()
+
+def read_obj(filename):
+    """Test to read and display a wavefront OBJ
+
+    """
+        
+    reader = vtk.vtkOBJReader()
+    reader.SetFileName(filename)
+
+    mapper = vtk.vtkPolyDataMapper()
+    if vtk.VTK_MAJOR_VERSION <= 5:
+        mapper.SetInput(reader.GetOutput())
+    else:
+        mapper.SetInputConnection(reader.GetOutputPort())
+
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    ren = vtk.vtkRenderer()
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(ren)
+
+    iren = vtk.vtkRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
+
+    ren.AddActor(actor)
+    ren.SetBackground(0, 0, 0)
+    ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
+    ren.GetActiveCamera().SetPosition(1, 0, 0)
+    ren.GetActiveCamera().SetViewUp(0, 0, 1)
+    
+    ren.ResetCamera()
+    ren.GetActiveCamera().Azimuth(20)
+    ren.GetActiveCamera().Elevation(30)
+    ren.GetActiveCamera().Dolly(1.2)
+    ren.ResetCameraClippingRange()
+    renWin.SetSize(800,800)
+    iren.Initialize()
+    renWin.Render()
+    iren.Start()
