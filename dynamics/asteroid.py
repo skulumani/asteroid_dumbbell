@@ -74,11 +74,11 @@ class Asteroid(object):
 
         elif shape_flag == 'obj':  # read directly from the OBJ file
             if name == 'castalia':
-                faces, verts = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj')
+                verts, faces = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj')
             elif name == 'itokawa':
-                faces, verts = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
+                verts, faces = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
             elif name == 'eros':
-                faces, verts = wavefront.read_obj('./data/shape_model/EROS/eros_low.obj')
+                verts, faces = wavefront.read_obj('./data/shape_model/EROS/eros_low.obj')
             else:
                 print("Unknown asteroid. Use 'castalia', 'itokawa', or 'eros' only.")
             

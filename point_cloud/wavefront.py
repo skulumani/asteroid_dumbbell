@@ -29,4 +29,4 @@ def read_obj(filename):
 
     faces = np.asarray(faces)
     verts = np.asarray(verts) 
-    return faces, verts
+    return verts, faces

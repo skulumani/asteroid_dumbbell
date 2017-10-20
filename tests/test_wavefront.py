@@ -9,7 +9,7 @@ import pdb
 def test_reader_input_sizes_itokawa_low():
     """Test that number of faces/verts matches Euler's constraint
     """
-    faces, verts = wavefront.read_obj('./data/itokawa_low.obj')
+    verts, faces = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
     
     edges_obj = verts.shape[0] + faces.shape[0] - 2
     np.testing.assert_allclose(edges_obj, 74500)
@@ -19,7 +19,7 @@ def test_reader_input_sizes_itokawa_low():
 def test_reader_input_sizes_itokawa_high():
     """Test that number of faces/verts matches Euler's constraint
     """
-    faces, verts = wavefront.read_obj('./data/itokawa_high.obj')
+    verts, faces = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_high.obj')
     
     edges_obj = verts.shape[0] + faces.shape[0] - 2
     np.testing.assert_allclose(edges_obj, 1182724)
