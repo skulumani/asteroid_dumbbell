@@ -18,7 +18,6 @@ def read_obj(filename):
     """
     faces = []
     verts = []
-    pdb.set_trace()    
     with open(filename, 'r') as f:
         for line in f:
             prefix, value = line.split(' ', 1)
