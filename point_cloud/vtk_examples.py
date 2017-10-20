@@ -485,6 +485,58 @@ def obj_to_numpy(filename):
     iren.Start()
 
     return verts
+
+def mesh_decimate(filename):
+    """Input a OBJ shape model and then reduce the number of vertices
+    then output to a numpy array
+
+    https://stackoverflow.com/questions/38197212/mesh-decimation-in-python
+
+    https://www.vtk.org/gitweb?p=VTK.git;a=blob;f=Examples/VisualizationAlgorithms/Python/deciFran.py
+    """
+
+    reader = vtk.vtkOBJReader()
+    reader.SetFileName(filename)
+    reader.Update()
+    
+    # decimate the obj file object
+    inputPoly = vtk.vtkPolyData()
+    inputPoly.ShallowCopy(reader.GetOutput())
+    
+    print("Before decimation\n\n {} vertices \n {} faces".format(inputPoly.GetNumberOfPoints(), inputPoly.GetNumberOfPolys()))
+    
+    # now decimate
+    decimate = vtk.vtkDecimatePro()
+    decimate.SetInputData(inputPoly)
+    decimate.SetTargetReduction(0.5)
+    decimate.Update()
+
+    decimatedPoly = vtk.vtkPolyData()
+    decimatedPoly.ShallowCopy(decimate.GetOutput())
+    print("After decimation\n\n {} vertices \n {} faces".format(decimatedPoly.GetNumberOfPoints(),decimatedPoly.GetNumberOfPolys()))
+
+    mapper = vtk.vtkPolyDataMapper()
+    if vtk.VTK_MAJOR_VERSION <= 5:
+        mapper.SetInput(reader.GetOutput())
+    else:
+        mapper.SetInputConnection(reader.GetOutputPort())
+
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    ren = vtk.vtkRenderer()
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(ren)
+
+    iren = vtk.vtkRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
+
+    ren.AddActor(actor)
+    iren.Initialize()
+    renWin.Render()
+    iren.Start()
+
+
 if __name__ == '__main__':
     vtk_cylinder()
     vtk_distance()
