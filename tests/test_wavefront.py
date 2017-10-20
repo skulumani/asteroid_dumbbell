@@ -31,3 +31,6 @@ def test_reader_input_sizes_itokawa_high():
 def test_reader_matches():
     """Compare faces/verts to Matlab mat file?"""
     pass
+
+
+# TODO: Test to convert OBJ to VTK to Numpy and make sure the numbers are correct
