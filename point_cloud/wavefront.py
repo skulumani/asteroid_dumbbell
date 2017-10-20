@@ -10,6 +10,7 @@ Shankar Kulumani		GWU		skulumani@gwu.edu
 import numpy as np
 import pdb
 
+# TODO: Implement a wavefront writer
 def write_obj():
     pass
 
@@ -30,3 +31,21 @@ def read_obj(filename):
     faces = np.asarray(faces)
     verts = np.asarray(verts) 
     return verts, faces
+
+def create_points(vertices):
+    """Given a (n, 3) numpy array of vertices this will place each one inot the 
+    vtkPoints object
+    """
+    pass
+
+# TODO: Add a decimate function which takes/outputs numpy arrays and uses VTK
+def decimate(verts, faces):
+    decimated_verts = verts
+    decimated_faces = faces
+
+    # create a vtk polygon object
+
+    # decimate the polygon
+
+    # extract out the faces and vertices back to numpy
+    return decimated_verts, decimated_faces

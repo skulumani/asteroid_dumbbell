@@ -537,6 +537,16 @@ def mesh_decimate(filename):
     iren.Start()
 
 
+def build_triangle():
+    """Build a triangle mesh using the raw points and faces
+    
+    https://lorensen.github.io/VTKExamples/site/Python/PolyData/ColoredTriangle/
+    """
+
+    Points = vtk.vtkPoints()
+    Triangles = vtk.vtkCellArray()
+
+    Points.InsertNextPoint(1.0, 0.0, 0.0)
 if __name__ == '__main__':
     vtk_cylinder()
     vtk_distance()
