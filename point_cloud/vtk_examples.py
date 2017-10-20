@@ -4,6 +4,7 @@
 
 import vtk
 import numpy as np
+from vtk.util import numpy_support
 from vtk.util.colors import tomato
 from vtk.util.misc import vtkGetDataRoot
 import os
@@ -449,6 +450,41 @@ def write_obj(infile='./data/itokawa_low.obj', outfile='./data/point_clouds/itok
     objWriter.SetRenderWindow(renWin)
     objWriter.Write()
 
+def obj_to_numpy(filename):
+    """Convert OBJ to a numpy array
+
+    https://stackoverflow.com/questions/23138112/vtk-to-maplotlib-using-numpy
+    """
+    reader = vtk.vtkOBJReader()
+    reader.SetFileName(filename)
+    reader.Update()
+
+    output = reader.GetOutput()
+    points = output.GetPoints()
+    verts = numpy_support.vtk_to_numpy(points.GetData())
+
+    mapper = vtk.vtkPolyDataMapper()
+    if vtk.VTK_MAJOR_VERSION <= 5:
+        mapper.SetInput(reader.GetOutput())
+    else:
+        mapper.SetInputConnection(reader.GetOutputPort())
+
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    ren = vtk.vtkRenderer()
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(ren)
+
+    iren = vtk.vtkRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
+
+    ren.AddActor(actor)
+    iren.Initialize()
+    renWin.Render()
+    iren.Start()
+
+    return verts
 if __name__ == '__main__':
     vtk_cylinder()
     vtk_distance()
