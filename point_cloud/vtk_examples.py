@@ -547,6 +547,133 @@ def build_triangle():
     Triangles = vtk.vtkCellArray()
 
     Points.InsertNextPoint(1.0, 0.0, 0.0)
+    Points.InsertNextPoint(0.0, 0.0, 0.0)
+    Points.InsertNextPoint(0.0, 1.0, 0.0)
+
+    Triangle = vtk.vtkTriangle()
+    Triangle.GetPointIds().SetId(0, 0)
+    Triangle.GetPointIds().SetId(1, 1)
+    Triangle.GetPointIds().SetId(2, 2)
+    Triangles.InsertNextCell(Triangle)
+
+    # setup colors
+    Colors = vtk.vtkUnsignedCharArray()
+    Colors.SetNumberOfComponents(3)
+    Colors.SetName("Colors")
+    Colors.InsertNextTuple3(255, 0, 0)
+    Colors.InsertNextTuple3(0, 255, 0)
+    Colors.InsertNextTuple3(0, 0, 255)
+
+    polydata = vtk.vtkPolyData()
+    polydata.SetPoints(Points)
+    polydata.SetPolys(Triangles)
+
+    polydata.GetPointData().SetScalars(Colors)
+    polydata.Modified()
+    if vtk.VTK_MAJOR_VERSION <= 5:
+        polydata.Update()
+    
+    # now display it
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputData(polydata)
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    # now render stuff
+    camera = vtk.vtkCamera()
+    camera.SetPosition(1, 1, 1)
+    camera.SetFocalPoint(0, 0, 0)
+
+    renderer = vtk.vtkRenderer()
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(renderer)
+
+    iren = vtk.vtkXRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
+
+    renderer.AddActor(actor)
+    renderer.SetActiveCamera(camera)
+    renderer.ResetCamera()
+    renderer.SetBackground(0, 0, 0)
+    renWin.Render()
+    iren.Start()
+
+def make_vtk_idlist(array):
+    """Turn an iterable listing vertices in a face into a VTK list
+    """
+    vil = vtk.vtkIdList()
+    for i in array:
+        vil.InsertNextId(int(i))
+    return vil
+
+def cube():
+    """Construct a cube manually
+
+    https://www.vtk.org/Wiki/VTK/Examples/Python/DataManipulation/Cube.py
+    """
+    verts = [(0.0, 0.0, 0.0),
+             (1.0, 0.0, 0.0),
+             (1.0, 1.0, 0.0),
+             (0.0, 1.0, 0.0),
+             (0.0, 0.0, 1.0),
+             (1.0, 0.0, 1.0),
+             (1.0, 1.0, 1.0),
+             (0.0, 1.0, 1.0)]
+    faces = [(0, 1, 2, 3),
+             (4, 5, 6, 7),
+             (0, 1, 5, 4),
+             (1, 2, 6, 5),
+             (2, 3, 7, 6),
+             (3, 0, 4, 7)]
+
+    cube = vtk.vtkPolyData()
+    points = vtk.vtkPoints()
+    polys = vtk.vtkCellArray() # insert cell as a number and a tuple of the vertices in the face
+    scalars = vtk.vtkFloatArray()
+    
+    # load the data
+    for i in range(8):
+        points.InsertPoint(i, verts[i])
+
+    for i in range(6):
+        polys.InsertNextCell(make_vtk_idlist(faces[i]))
+    
+    for i in range(8):
+        scalars.InsertTuple1(i, i)
+
+    # now assign everything to the polydata object
+    cube.SetPoints(points)
+    cube.SetPolys(polys)
+    cube.GetPointData().SetScalars(scalars)
+
+    # now viusalize
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputData(cube)
+    mapper.SetScalarRange(0, 7)
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    # now render
+    camera = vtk.vtkCamera()
+    camera.SetPosition(1, 1, 1)
+    camera.SetFocalPoint(0, 0, 0)
+
+    renderer = vtk.vtkRenderer()
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(renderer)
+
+    iren = vtk.vtkXRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
+
+    renderer.AddActor(actor)
+    renderer.SetActiveCamera(camera)
+    renderer.ResetCamera()
+    renderer.SetBackground(0, 0, 0)
+
+    renWin.SetSize(300, 300)
+
+    renWin.Render()
+    iren.Start()
 if __name__ == '__main__':
     vtk_cylinder()
     vtk_distance()
