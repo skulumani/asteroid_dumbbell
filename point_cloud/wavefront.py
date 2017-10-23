@@ -11,7 +11,7 @@ import numpy as np
 import pdb
 import vtk
 
-
+# TODO: NEed to check indexing - zero based in code and 1 based in OBJ file
 def write_obj(verts, faces, filename, comments=False):
     """Given numpy arrays of vertices/faces this will write it out to a OBJ file
 
@@ -30,6 +30,7 @@ def write_obj(verts, faces, filename, comments=False):
 
     return 0
 
+# TODO: Need to check indexing - zero based
 def read_obj(filename):
     """Read the OBJ file and save to a numpy array
     """
