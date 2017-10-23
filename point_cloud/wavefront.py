@@ -9,10 +9,26 @@ Shankar Kulumani		GWU		skulumani@gwu.edu
 """
 import numpy as np
 import pdb
+import vtk
 
-# TODO: Implement a wavefront writer
-def write_obj():
-    pass
+
+def write_obj(verts, faces, filename, comments=False):
+    """Given numpy arrays of vertices/faces this will write it out to a OBJ file
+
+    Assumes triangular faces and the numpy indexing defines the topology
+    """
+    with open(filename, 'w') as fname:
+        if comments:
+            fname.write('# Created by Shankar Kulumani - use at your own risk')
+            fname.write('# List of vertices\n')
+
+        for v in verts:
+            fname.write('v {} {} {}\n'.format(v[0], v[1], v[2]))
+
+        for f in faces:
+            fname.write('f {} {} {}\n'.format(f[0], f[1], f[2]))
+
+    return 0
 
 def read_obj(filename):
     """Read the OBJ file and save to a numpy array
