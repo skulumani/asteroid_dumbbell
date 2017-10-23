@@ -22,6 +22,7 @@ Shankar Kulumani		GWU		skulumani@gwu.edu
 
 import numpy as np
 import vtk
+from vtk.util import numpy_support
 import pdb
 from point_cloud import wavefront
 
@@ -266,45 +267,16 @@ def write_vtk_obj(renWin, filename):
     objWriter.SetRenderWindow(renWin)
     objWriter.Write()
 
-def read_obj(filename):
+def read_obj_to_polydata(filename):
     """Test to read and display a wavefront OBJ
 
     """
         
     reader = vtk.vtkOBJReader()
     reader.SetFileName(filename)
-
-    mapper = vtk.vtkPolyDataMapper()
-    if vtk.VTK_MAJOR_VERSION <= 5:
-        mapper.SetInput(reader.GetOutput())
-    else:
-        mapper.SetInputConnection(reader.GetOutputPort())
-
-    actor = vtk.vtkActor()
-    actor.SetMapper(mapper)
-
-    ren = vtk.vtkRenderer()
-    renWin = vtk.vtkRenderWindow()
-    renWin.AddRenderer(ren)
-
-    iren = vtk.vtkRenderWindowInteractor()
-    iren.SetRenderWindow(renWin)
-
-    ren.AddActor(actor)
-    ren.SetBackground(0, 0, 0)
-    ren.GetActiveCamera().SetFocalPoint(0, 0, 0)
-    ren.GetActiveCamera().SetPosition(1, 0, 0)
-    ren.GetActiveCamera().SetViewUp(0, 0, 1)
-    
-    ren.ResetCamera()
-    ren.GetActiveCamera().Azimuth(20)
-    ren.GetActiveCamera().Elevation(30)
-    ren.GetActiveCamera().Dolly(1.2)
-    ren.ResetCameraClippingRange()
-    renWin.SetSize(800,800)
-    iren.Initialize()
-    renWin.Render()
-    iren.Start()
+    reader.Update()
+    polyData = reader.GetOutput()
+    return polyData
 
 def make_vtk_idlist(array):
     """Turn an iterable listing vertices in a face into a VTK list
