@@ -305,3 +305,87 @@ def read_obj(filename):
     iren.Initialize()
     renWin.Render()
     iren.Start()
+
+def make_vtk_idlist(array):
+    """Turn an iterable listing vertices in a face into a VTK list
+    """
+    vil = vtk.vtkIdList()
+    for i in array:
+        vil.InsertNextId(int(i))
+    return vil
+
+def numpy_to_vtk_poly(vertices, faces):
+    r"""Convert numpy to vtk poly data
+
+    Extended description of the function.
+
+    Parameters
+    ----------
+    var1 : array_like and type
+        <`4:Description of the variable`>
+
+    Returns
+    -------
+    describe : type
+        Explanation of return value named describe
+
+    Other Parameters
+    ----------------
+    only_seldom_used_keywords : type
+        Explanation of this parameter
+
+    Raises
+    ------
+    BadException
+        Because you shouldn't have done that.
+
+    See Also
+    --------
+    other_func: Other function that this one might call
+
+    Notes
+    -----
+    You may include some math:
+
+    .. math:: X(e^{j\omega } ) = x(n)e^{ - j\omega n}
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    References
+    ----------
+    Cite the relevant literature, e.g. [1]_.  You may also cite these
+    references in the notes section above.
+
+    .. [1] Shannon, Claude E. "Communication theory of secrecy systems."
+    Bell Labs Technical Journal 28.4 (1949): 656-715
+
+    Examples
+    --------
+    An example of how to use the function
+
+    >>> a = [1, 2, 3]
+    >>> print [x + 3 for x in a]
+    [4, 5, 6]
+    >>> print "a\n\nb"
+    a
+    b
+
+    """ 
+    # initialize some of the objects
+    body = vtk.vtkPolyData()
+    points = vtk.vtkPoints()
+    polys = vtk.vtkCellArray()
+    
+    # load the data
+    for ii in range(vertices.shape[0]):
+        points.InsertPoint(ii, vertices[ii])
+    
+    for ii in range(faces.shape[0]):
+        polys.InsertNextCell(make_vtk_idlist(faces[ii]))
+
+    body.SetPoints(points)
+    body.SetPolys(polys)
+
+    return body

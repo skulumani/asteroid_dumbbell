@@ -10,6 +10,8 @@ from vtk.util.misc import vtkGetDataRoot
 import os
 import string
 import time
+from point_cloud import vtk_mesh
+import pdb
 
 def vtk_example():
     # generate a polygon data for a cube
@@ -598,13 +600,6 @@ def build_triangle():
     renWin.Render()
     iren.Start()
 
-def make_vtk_idlist(array):
-    """Turn an iterable listing vertices in a face into a VTK list
-    """
-    vil = vtk.vtkIdList()
-    for i in array:
-        vil.InsertNextId(int(i))
-    return vil
 
 def cube():
     """Construct a cube manually
@@ -626,25 +621,26 @@ def cube():
              (2, 3, 7, 6),
              (3, 0, 4, 7)]
 
-    cube = vtk.vtkPolyData()
-    points = vtk.vtkPoints()
-    polys = vtk.vtkCellArray() # insert cell as a number and a tuple of the vertices in the face
-    scalars = vtk.vtkFloatArray()
+    # cube = vtk.vtkPolyData()
+    # points = vtk.vtkPoints()
+    # polys = vtk.vtkCellArray() # insert cell as a number and a tuple of the vertices in the face
+    # scalars = vtk.vtkFloatArray()
     
-    # load the data
-    for i in range(8):
-        points.InsertPoint(i, verts[i])
+    # # load the data
+    # for i in range(8):
+    #     points.InsertPoint(i, verts[i])
 
-    for i in range(6):
-        polys.InsertNextCell(make_vtk_idlist(faces[i]))
+    # for i in range(6):
+    #     polys.InsertNextCell(vtk_mesh.make_vtk_idlist(faces[i]))
     
-    for i in range(8):
-        scalars.InsertTuple1(i, i)
+    # for i in range(8):
+    #     scalars.InsertTuple1(i, i)
 
-    # now assign everything to the polydata object
-    cube.SetPoints(points)
-    cube.SetPolys(polys)
-    cube.GetPointData().SetScalars(scalars)
+    # # now assign everything to the polydata object
+    # cube.SetPoints(points)
+    # cube.SetPolys(polys)
+    # cube.GetPointData().SetScalars(scalars)
+    cube = vtk_mesh.numpy_to_vtk_poly(np.array(verts), np.array(faces))
 
     # now viusalize
     mapper = vtk.vtkPolyDataMapper()
