@@ -11,7 +11,7 @@ import numpy as np
 import pdb
 import vtk
 
-# TODO: NEed to check indexing - zero based in code and 1 based in OBJ file
+# TODO: Add documentation and link to OBJ format
 def write_obj(verts, faces, filename, comments=False):
     """Given numpy arrays of vertices/faces this will write it out to a OBJ file
 
@@ -26,11 +26,11 @@ def write_obj(verts, faces, filename, comments=False):
             fname.write('v {} {} {}\n'.format(v[0], v[1], v[2]))
 
         for f in faces:
-            fname.write('f {} {} {}\n'.format(f[0], f[1], f[2]))
+            fname.write('f {} {} {}\n'.format(f[0]+1, f[1]+1, f[2]+1))
 
     return 0
 
-# TODO: Need to check indexing - zero based
+# TODO: Add documentation and link to OBJ format
 def read_obj(filename):
     """Read the OBJ file and save to a numpy array
     """
@@ -43,7 +43,7 @@ def read_obj(filename):
             if prefix == 'v':
                 verts.append([float(val) for val in value.split()]) 
             elif prefix == 'f':
-                faces.append([int(val) for val in value.split()])
+                faces.append([(int(val)-1) for val in value.split()])
 
     faces = np.asarray(faces)
     verts = np.asarray(verts) 
@@ -55,14 +55,3 @@ def create_points(vertices):
     """
     pass
 
-# TODO: Add a decimate function which takes/outputs numpy arrays and uses VTK
-def decimate(verts, faces):
-    decimated_verts = verts
-    decimated_faces = faces
-
-    # create a vtk polygon object
-
-    # decimate the polygon
-
-    # extract out the faces and vertices back to numpy
-    return decimated_verts, decimated_faces
