@@ -362,6 +362,19 @@ def numpy_to_vtk_poly(vertices, faces):
 
     return body
 
+# TODO: Fix vtk polydata to numpy array conversion
+def vtk_poly_to_numpy(polyData):
+    """Convert a vtkPolyData object to the vertices and faces
+
+    """
+    # output = polyData.GetOutput()
+    # get the vertices
+    vertices = numpy_support.vtk_to_numpy(polyData.GetPoints().GetData()) 
+    # get the faces
+    faces = numpy_support.vtk_to_numpy(polyData.GetPolys().GetData()).reshape(-1, 3)
+    
+    return vertices, faces
+
 def decimate_numpy(vertices, faces, num_faces):
     r"""Reduce the size of a numpy polyhedron using VTK
 
