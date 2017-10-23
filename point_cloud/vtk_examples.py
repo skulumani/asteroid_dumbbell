@@ -512,7 +512,8 @@ def mesh_decimate(filename):
     decimate.SetInputData(inputPoly)
     decimate.SetTargetReduction(0.5)
     decimate.Update()
-
+    
+    pdb.set_trace()
     decimatedPoly = vtk.vtkPolyData()
     decimatedPoly.ShallowCopy(decimate.GetOutput())
     print("After decimation\n\n {} vertices \n {} faces".format(decimatedPoly.GetNumberOfPoints(),decimatedPoly.GetNumberOfPolys()))
