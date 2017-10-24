@@ -70,7 +70,7 @@ class Asteroid(object):
                 print("That number of faces is not possible.")
                 return 1
 
-            self.F = mat[F_key]
+            self.F = mat[F_key] - 1
             self.V = mat[V_key]
 
         elif shape_flag == 'obj':  # read directly from the OBJ file
@@ -150,9 +150,9 @@ class Asteroid(object):
         F_face = np.zeros([3, 3, num_f])
 
         # calculate all the edges - zero indexing for python
-        Fa = F[:, 0] - 1
-        Fb = F[:, 1] - 1
-        Fc = F[:, 2] - 1
+        Fa = F[:, 0] 
+        Fb = F[:, 1]
+        Fc = F[:, 2]
 
         V1 = V[Fa, :]
         V2 = V[Fb, :]
