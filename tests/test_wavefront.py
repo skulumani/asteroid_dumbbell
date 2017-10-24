@@ -151,11 +151,17 @@ class TestItokawaLowReadingAndWriting():
     def test_output_faces_equal(self):
         np.testing.assert_allclose(self.out_faces, self.faces)
 
-# TODO: Test decimate functions and visualize
 class TestDecimation():
     """Ensure decimation is working properly
     """
     filename = './data/shape_model/ITOKAWA/itokawa_low.obj'
-    polydata = wavefront.read_obj_to_polydata(filename)
-    v, f = wavefront.read_obj_to_numpy(filename)
+    ratio = 0.5
+    v, f = wavefront.read_obj(filename)
+    dv, df = wavefront.decimate_numpy(v, f, ratio)
+
+    def test_ensure_vertices_ratio(self):
+        np.testing.assert_array_less(self.dv.shape[0], self.ratio*self.v.shape[0])
+
+    def test_ensure_faces_ratio(self):
+        np.testing.assert_array_less(self.df.shape[0], self.ratio*self.f.shape[0])
 
