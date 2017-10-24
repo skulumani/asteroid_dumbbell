@@ -257,7 +257,7 @@ def reduced_mesh_generation(filename='./data/itokawa_low.obj', step=1):
     renWin.Render()
     iren.Start()
 
-
+# TODO: Test writing to obj files by comparing to wavefront
 def write_vtk_obj(renWin, filename):
     """Given a render window we'll write it to a OBJ file
     """
@@ -267,6 +267,7 @@ def write_vtk_obj(renWin, filename):
     objWriter.SetRenderWindow(renWin)
     objWriter.Write()
 
+# TODO: write another function to convert directly to numpy arrays and test
 def read_obj_to_polydata(filename):
     """Test to read and display a wavefront OBJ
 
