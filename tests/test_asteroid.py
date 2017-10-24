@@ -674,6 +674,14 @@ class TestAsteroidCastalia32():
         np.testing.assert_almost_equal(self.Ulap_true,self.Ulap)
 
 # TODO:Add test for reading directly from shape file
+class TestAsteroidItokawaOBJ():
+    """Testing out the polyhedron potential model using the OBJ file directly
+    """
+    # initialize the asteroid object using itokawa and OBJ
+
+    # TODO: Test to make sure number of vertices/faces are correct
+
+    # TODO: Test point outside body is actuall outside based on check
 
 # TODO: Add a test that generates and visualizes the gravity field using contour plots
 

@@ -7,7 +7,7 @@ import utilities
 from point_cloud import wavefront
 import pdb
 
-
+# TODO: Implement the ability to input a filename for OBJ shape files
 class Asteroid(object):
     """An asteroid that we're orbiting about
 
