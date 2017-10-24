@@ -358,6 +358,14 @@ def read_obj_to_polydata(filename):
     polyData = reader.GetOutput()
     return polyData
 
+# TODO: Add documentation
+def read_obj_to_numpy(filename):
+    """Use VTK to convert a OBJ file directly to a numpy array
+    """
+    polyData = read_obj_to_polydata(filename)
+    v, f = vtk_poly_to_numpy(polyData)
+    return v, f
+
 def make_vtk_idlist(array):
     """Turn an iterable listing vertices in a face into a VTK list
     """
@@ -461,13 +469,23 @@ def vtk_poly_to_numpy(polyData):
     
     return vertices, faces
 
-# TODO: Add a decimate function which takes/outputs numpy arrays and uses VTK
-def decimate_polydata(polyData, num_faces):
+# TODO: Add documentation
+def decimate_polydata(polyData, ratio=0.5):
     """Take a polydata and decimate it and return another polydata
     """
-    pass
+    # decimate
+    decimate = vtk.vtkDecimatePro()
+    decimate.SetInputData(polyData)
+    decimate.SetTargetReduction(ratio)
+    decimate.Update()
 
-def decimate_numpy(vertices, faces, num_faces):
+    decimatedPoly = vtk.vtkPolyData()
+    decimatedPoly.ShallowCopy(decimate.GetOutput())
+    
+    return decimatedPoly
+
+# TODO: Add documentation
+def decimate_numpy(vertices, faces, ratio=0.5):
     r"""Reduce the size of a numpy polyhedron using VTK
 
     Extended description of the function.
@@ -528,18 +546,54 @@ def decimate_numpy(vertices, faces, num_faces):
     """ 
     
     # reduction target as a fraction
-    scale = num_faces/faces.shape[0]
     polyhedron = numpy_to_vtk_poly(vertices, faces)
 
     # decimate
     decimate = vtk.vtkDecimatePro()
     decimate.SetInputData(polyhedron)
-    decimate.SetTargetReduction(scale)
+    decimate.SetTargetReduction(ratio)
     decimate.Update()
 
     decimatedPoly = vtk.vtkPolyData()
     decimatedPoly.ShallowCopy(decimate.GetOutput())
 
     # extract out the points from a vtkPolyData
+    dec_vertices, dec_faces = vtk_poly_to_numpy(decimatedPoly)
 
     # return faces/vertices
+    return dec_vertices, dec_faces
+
+# TODO: Add documentation
+def draw_polyedron_vtk(vertices, faces):
+    """Use VTK to draw a polyhedron
+    """
+    # create a polydata object
+    polyData = numpy_to_vtk_poly(vertices, faces)
+
+    # render and view
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputData(polyData)
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    # now render
+    camera = vtk.vtkCamera()
+    camera.SetPosition(1, 1, 1)
+    camera.SetFocalPoint(0, 0, 0)
+
+    renderer = vtk.vtkRenderer()
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(renderer)
+
+    iren = vtk.vtkXRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
+
+    renderer.AddActor(actor)
+    renderer.SetActiveCamera(camera)
+    renderer.ResetCamera()
+    renderer.SetBackground(0, 0, 0)
+
+    renWin.SetSize(800,800)
+
+    renWin.Render()
+    iren.Start()
