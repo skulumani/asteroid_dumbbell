@@ -34,6 +34,8 @@ from vtk.util import numpy_support
 import pdb
 from point_cloud import wavefront
 
+# TODO: Create better function names
+
 # TODO: Add documentation and link to OBJ format
 def write_obj(verts, faces, filename, comments=False):
     """Given numpy arrays of vertices/faces this will write it out to a OBJ file
@@ -308,7 +310,7 @@ def reduced_mesh_generation(filename='./data/itokawa_low.obj', step=1):
     renWin.Render()
     iren.Start()
 
-# TODO: Test writing to obj files by comparing to wavefront
+# TODO: Add documentaiton
 def write_render_window(renWin, filename):
     """Given a render window we'll write it to a OBJ file
     """
@@ -319,6 +321,7 @@ def write_render_window(renWin, filename):
     objWriter.Write()
     return 0
 
+# TODO: Add documentation
 def write_vtkPolyData(polyData, filename):
     """Write a polyData to a OBJ file
     """
