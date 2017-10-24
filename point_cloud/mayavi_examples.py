@@ -1,5 +1,6 @@
 import numpy as np
 from mayavi import mlab
+import pdb
 
 def test_triangular_mesh():
     """An example of a cone
@@ -23,5 +24,18 @@ def test_triangular_mesh():
     mlab.show()
     return 0
 
+def test_contour3d():
+    """Contour plots in 3d
+
+    http://docs.enthought.com/mayavi/mayavi/auto/mlab_helper_functions.html#contour3d
+    """
+
+    x, y, z = np.ogrid[-5:5:64j, -5:5:64j, -5:5:64j]
+
+    scalars = x * x * 0.5 + y * y + z * z * 2.0
+    obj = mlab.contour3d(scalars, contours=4, transparent=True)
+    mlab.show()
+    return obj
 if __name__ == '__main__':
     test_triangular_mesh()
+    test_contour3d()
