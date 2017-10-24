@@ -672,3 +672,13 @@ class TestAsteroidCastalia32():
 
     def test_polyhedron_potential_Ulaplace(self):
         np.testing.assert_almost_equal(self.Ulap_true,self.Ulap)
+
+# TODO:Add test for reading directly from shape file
+
+# TODO: Add a test that generates and visualizes the gravity field using contour plots
+
+# TODO:Test to ensure we can read all three asteroid types
+
+# TODO: Test to verify mass properties
+
+# TODO: Test the compares obj potential with teh same number of faces as one that is in matlab

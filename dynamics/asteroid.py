@@ -42,23 +42,11 @@ class Asteroid(object):
         # either use the matlab file or read the OBJ file
         if shape_flag == 'mat':  # use matlab shape data
             if name == 'castalia':
-                self.M = 1.4091e12
-                self.sigma = 2.1  # g/cm^3
-                self.axes = np.array([1.6130, 0.9810, 0.8260]) / 2.0
-                self.omega = 2 * np.pi / 4.07 / 3600
-
-                # self.C20 = -7.275e-2
-                # self.C22 = 2.984e-2
 
                 mat = scipy.io.loadmat(
                     dir_path + "/CASTALIA/castalia_model.mat")
 
             elif name == 'itokawa':
-                self.M = 3.51e10
-                self.sigma = 1.9  # g/cm^3
-                self.axes = np.array([535, 294, 209]) / 1.0e3  # size in meters
-                self.omega = 2 * np.pi / 12.132 / 3600
-
                 mat = scipy.io.loadmat(dir_path + "/ITOKAWA/itokawa_model.mat")
             else:
                 print("Unknown asteroid. Use 'castalia or 'itokawa' only.")
@@ -84,12 +72,37 @@ class Asteroid(object):
                 print("Unknown asteroid. Use 'castalia', 'itokawa', or 'eros' only.")
             
             # reduce the number of faces/vertices somehow
+            ratio = num_faces / faces.shape[0]
+            verts, faces = wavefront.decimate_numpy(verts, faces, ratio)
 
             self.F = faces
             self.V = verts
 
             # print("Using %g faces for %s." % (self.F.shape[0],self.name))
             # print("Polyhedron Model: %g faces, %g vertices." % (self.F.shape[0],self.V.shape[0]))
+        
+        # define the mass properties of the asteroid
+        if name == 'castalia':
+            self.M = 1.4091e12
+            self.sigma = 2.1  # g/cm^3
+            self.axes = np.array([1.6130, 0.9810, 0.8260]) / 2.0
+            self.omega = 2 * np.pi / 4.07 / 3600
+
+            # self.C20 = -7.275e-2
+            # self.C22 = 2.984e-2
+        elif name == 'itokawa':
+            self.M = 3.51e10
+            self.sigma = 1.9  # g/cm^3
+            self.axes = np.array([535, 294, 209]) / 1.0e3  # size in meters
+            self.omega = 2 * np.pi / 12.132 / 3600
+
+        elif name == 'eros':
+            self.M = 4.463e-4 / self.G
+            self.sigma = 2.67 # g/cm^3
+            self.axes = np.array([34.4, 11.7, 11.7])  # size in kilometers
+            self.omega = 2 * np.pi / 5.27 / 3600
+        else:
+            print("Unknown asteroid.")
 
         self.mu = self.G * self.M
         self.sigma = self.sigma / 1000 * \
@@ -121,7 +134,8 @@ class Asteroid(object):
 
         # compute a bunch of parameters for the polyhedron model
         self.asteroid_grav = self.polyhedron_shape_input()
-
+    
+    # TODO: Add documentation
     def polyhedron_shape_input(self):
         """Precomputes parameters for a given polyhedron shape model
 
