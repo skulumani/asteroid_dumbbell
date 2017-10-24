@@ -60,8 +60,32 @@ class TestCompareVTKAndWavefrontWritingOBJ():
     input_vertices, input_faces = wavefront.vtk_poly_to_numpy(vtkPolyData)
     
     # write OBJ file using both VTK and Wavefront
+    wavefront.write_vtkPolyData(vtkPolyData, '/tmp/vtk_output')
+    wavefront.write_obj(input_vertices, input_faces, '/tmp/wavefront_output.obj')
 
-    # ensure the files are the same by reading
+    # now read our two files
+    polydata_vtk_output = wavefront.read_obj_to_polydata('/tmp/vtk_output.obj')
+    vtk_output_vertices, vtk_output_faces = wavefront.vtk_poly_to_numpy(polydata_vtk_output)
+
+    polydata_wavefront_output = wavefront.read_obj_to_polydata('/tmp/wavefront_output.obj')
+    wavefront_output_vertices, wavefront_output_faces = wavefront.vtk_poly_to_numpy(polydata_wavefront_output)
+
+    def test_number_vertices(self):
+        np.testing.assert_allclose(self.vtk_output_vertices.shape,
+                                   self.wavefront_output_vertices.shape)
+    
+    def test_number_of_faces(self):
+        np.testing.assert_allclose(self.vtk_output_faces.shape,
+                                   self.wavefront_output_faces.shape)
+
+    def test_vertices_equal(self):
+        np.testing.assert_allclose(self.vtk_output_vertices,
+                                   self.wavefront_output_vertices)
+
+    def test_faces_equal(self):
+        np.testing.assert_allclose(self.vtk_output_faces,
+                                   self.wavefront_output_faces)
+
 # TODO: Compare with the matlab file with faces/vertices
 
 def test_reader_matches():

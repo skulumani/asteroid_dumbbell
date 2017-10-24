@@ -309,7 +309,7 @@ def reduced_mesh_generation(filename='./data/itokawa_low.obj', step=1):
     iren.Start()
 
 # TODO: Test writing to obj files by comparing to wavefront
-def write_vtk_obj(renWin, filename):
+def write_render_window(renWin, filename):
     """Given a render window we'll write it to a OBJ file
     """
     # write the new surface to a wavefront file OBJ
@@ -317,6 +317,31 @@ def write_vtk_obj(renWin, filename):
     objWriter.SetFilePrefix(filename)
     objWriter.SetRenderWindow(renWin)
     objWriter.Write()
+    return 0
+
+def write_vtkPolyData(polyData, filename):
+    """Write a polyData to a OBJ file
+    """
+    # create the render window then output that
+
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputData(polyData)
+
+    # connect the mapper to an actor
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    # render the cube actor
+    renderer = vtk.vtkRenderer()
+    renderer.SetBackground(0.0, 0.0, 0.0)
+    renderer.AddActor(actor)
+
+    # create a render window
+    render_window = vtk.vtkRenderWindow()
+    render_window.AddRenderer(renderer)
+
+    write_render_window(render_window, filename)
+    return 0
 
 # TODO: write another function to convert directly to numpy arrays and test
 def read_obj_to_polydata(filename):
