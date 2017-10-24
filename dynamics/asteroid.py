@@ -29,7 +29,8 @@ class Asteroid(object):
         C22 - spherical harmoning coefficient
     """
     G = 6.673e-20
-
+    # TODO: Deprecate matlab matfile
+    # TODO: Ensure we account zero based indexing someplace
     def __init__(self, name, num_faces, shape_flag='mat'):
         """Initialize the asteroid instance with it's properties
 
