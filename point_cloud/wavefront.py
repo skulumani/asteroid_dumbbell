@@ -30,6 +30,7 @@ Shankar Kulumani		GWU		skulumani@gwu.edu
 """
 import numpy as np
 import vtk
+from mayavi import mlab
 from vtk.util import numpy_support
 import pdb
 from point_cloud import wavefront
@@ -597,3 +598,16 @@ def draw_polyedron_vtk(vertices, faces):
 
     renWin.Render()
     iren.Start()
+
+# TODO: Add documentation
+def draw_polyhedron_mayavi(vertices, faces):
+    """Draw a polyhedron using Mayavi
+    """
+    x = vertices[:, 0]
+    y = vertices[:, 1]
+    z = vertices[:, 2]
+    scalars = np.tile(0.5, x.shape)
+    mlab.triangular_mesh(x, y, z, faces, color=(0.5, 0.5, 0.5))
+    mlab.show()
+
+    return 0
