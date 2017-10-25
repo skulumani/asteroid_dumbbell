@@ -151,6 +151,7 @@ class TestItokawaLowReadingAndWriting():
     def test_output_faces_equal(self):
         np.testing.assert_allclose(self.out_faces, self.faces)
 
+# TODO: Add tests to verify function of preserve topology/splitting settings
 class TestDecimation():
     """Ensure decimation is working properly
     """

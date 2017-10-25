@@ -679,11 +679,12 @@ class TestAsteroidItokawaOBJ():
     """
     # initialize the asteroid object using itokawa and OBJ
     num_faces = 128
-    pdb.set_trace()
     ast = dynamics.asteroid.Asteroid('itokawa', 128, shape_flag='obj')
-    # TODO: Test to make sure number of vertices/faces are correct
     def test_ensure_number_of_faces(self):
-        np.testing.assert_almost_equal(self.ast.F.shape, (self.num_faces, 3))
+        assert self.ast.F.shape[0] <= self.num_faces
+
+    def test_ensure_number_of_vertices(self):
+        assert self.ast.V.shape[0] <= 132
     # TODO: Test point outside body is actuall outside based on check
 
 # TODO: Add a test that generates and visualizes the gravity field using contour plots
