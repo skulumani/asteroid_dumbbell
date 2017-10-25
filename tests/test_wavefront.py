@@ -160,8 +160,10 @@ class TestDecimation():
     dv, df = wavefront.decimate_numpy(v, f, ratio)
 
     def test_ensure_vertices_ratio(self):
-        np.testing.assert_array_less(self.dv.shape[0], self.ratio*self.v.shape[0])
+        assert self.dv.shape[0] <= self.ratio*self.v.shape[0]
+        # np.testing.assert_array_less(self.dv.shape[0], self.ratio*self.v.shape[0])
 
     def test_ensure_faces_ratio(self):
-        np.testing.assert_array_less(self.df.shape[0], self.ratio*self.f.shape[0])
+        assert self.df.shape[0] <= self.ratio*self.f.shape[0]
+        # np.testing.assert_array_less(self.df.shape[0], self.ratio*self.f.shape[0])
 
