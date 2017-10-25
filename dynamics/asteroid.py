@@ -73,9 +73,9 @@ class Asteroid(object):
                 print("Unknown asteroid. Use 'castalia', 'itokawa', or 'eros' only.")
             
             # reduce the number of faces/vertices somehow
-            pdb.set_trace()
-            ratio = num_faces / faces.shape[0]
-            verts, faces = wavefront.decimate_numpy(verts, faces, ratio)
+            # if num_faces < faces.shape[0]:
+            #     ratio = 1 - num_faces / faces.shape[0]
+            #     verts, faces = wavefront.decimate_numpy(verts, faces, ratio)
 
             self.F = faces
             self.V = verts
