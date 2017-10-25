@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import dynamics.asteroid
-
+import pdb
 class TestAsteroidItokawa32():
     name = 'itokawa'
     faces = 32
@@ -678,9 +678,12 @@ class TestAsteroidItokawaOBJ():
     """Testing out the polyhedron potential model using the OBJ file directly
     """
     # initialize the asteroid object using itokawa and OBJ
-
+    num_faces = 128
+    pdb.set_trace()
+    ast = dynamics.asteroid.Asteroid('itokawa', 128, shape_flag='obj')
     # TODO: Test to make sure number of vertices/faces are correct
-
+    def test_ensure_number_of_faces(self):
+        np.testing.assert_almost_equal(self.ast.F.shape, (self.num_faces, 3))
     # TODO: Test point outside body is actuall outside based on check
 
 # TODO: Add a test that generates and visualizes the gravity field using contour plots

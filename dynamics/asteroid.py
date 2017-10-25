@@ -30,7 +30,6 @@ class Asteroid(object):
     """
     G = 6.673e-20
     # TODO: Deprecate matlab matfile
-    # TODO: Ensure we account zero based indexing someplace
     def __init__(self, name, num_faces, shape_flag='mat'):
         """Initialize the asteroid instance with it's properties
 
@@ -72,6 +71,7 @@ class Asteroid(object):
                 print("Unknown asteroid. Use 'castalia', 'itokawa', or 'eros' only.")
             
             # reduce the number of faces/vertices somehow
+            pdb.set_trace()
             ratio = num_faces / faces.shape[0]
             verts, faces = wavefront.decimate_numpy(verts, faces, ratio)
 
