@@ -680,11 +680,13 @@ class TestAsteroidItokawaOBJ():
     # initialize the asteroid object using itokawa and OBJ
     num_faces = 128
     ast = dynamics.asteroid.Asteroid('itokawa', 128, shape_flag='obj')
-    def test_ensure_number_of_faces(self):
-        assert self.ast.F.shape[0] <= self.num_faces
 
-    def test_ensure_number_of_vertices(self):
-        assert self.ast.V.shape[0] <= 132
+    # generate a grid around the asteroid
+
+    # fidn the potential at each point
+
+    # plot some contour plots in mayavi
+
     # TODO: Test point outside body is actuall outside based on check
 
 # TODO: Add a test that generates and visualizes the gravity field using contour plots

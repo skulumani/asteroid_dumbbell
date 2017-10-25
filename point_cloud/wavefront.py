@@ -554,6 +554,8 @@ def decimate_numpy(vertices, faces, ratio=0.5):
     decimate = vtk.vtkDecimatePro()
     decimate.SetInputData(polyhedron)
     decimate.SetTargetReduction(ratio)
+    # TODO: Mention that this will prevent you from reaching the target number of faces
+    decimate.PreserveTopologyOn()
     decimate.Update()
 
     decimatedPoly = vtk.vtkPolyData()
