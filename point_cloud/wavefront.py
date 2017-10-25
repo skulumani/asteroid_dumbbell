@@ -486,6 +486,7 @@ def decimate_polydata(polyData, ratio=0.5):
     return decimatedPoly
 
 # TODO: Add documentation
+# TODO: Research other settings - https://www.vtk.org/doc/nightly/html/classvtkDecimatePro.html
 def decimate_numpy(vertices, faces, ratio=0.5):
     r"""Reduce the size of a numpy polyhedron using VTK
 
