@@ -687,6 +687,10 @@ class TestAsteroidItokawaOBJ():
 
     # plot some contour plots in mayavi
 
+    def test_ensure_number_of_faces(self):
+        np.testing.assert
+    def test_ensure_number_of_vertices(self):
+        assert self.ast.V.shape[0] <= 132
     # TODO: Test point outside body is actuall outside based on check
 
 # TODO: Add a test that generates and visualizes the gravity field using contour plots
