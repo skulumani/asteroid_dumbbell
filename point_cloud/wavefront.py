@@ -487,7 +487,8 @@ def decimate_polydata(polyData, ratio=0.5):
 
 # TODO: Add documentation
 # TODO: Research other settings - https://www.vtk.org/doc/nightly/html/classvtkDecimatePro.html
-def decimate_numpy(vertices, faces, ratio=0.5):
+def decimate_numpy(vertices, faces, ratio=0.5, preserve_topology=True,
+                   preserve_boundary=False, splitting=False):
     r"""Reduce the size of a numpy polyhedron using VTK
 
     Extended description of the function.
@@ -555,7 +556,21 @@ def decimate_numpy(vertices, faces, ratio=0.5):
     decimate.SetInputData(polyhedron)
     decimate.SetTargetReduction(ratio)
     # TODO: Mention that this will prevent you from reaching the target number of faces
-    decimate.PreserveTopologyOn()
+    if preserve_topology:
+        decimate.PreserveTopologyOn()
+    else:
+        decimate.PreserveTopologyOff()
+    
+    if preserve_boundary:
+        decimate.BoundaryVertexDeletionOff()
+    else:
+        decimate.BoundaryVertexDeletionOn()
+
+    if splitting:
+        decimate.SplittingOn()
+    else:
+        decimate.SplittingOff()
+
     decimate.Update()
 
     decimatedPoly = vtk.vtkPolyData()
