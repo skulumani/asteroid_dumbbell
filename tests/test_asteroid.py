@@ -1,7 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import dynamics.asteroid
-from point_cloud import wavefront
 import pdb
 class TestAsteroidItokawa32():
     name = 'itokawa'
@@ -682,31 +681,6 @@ class TestAsteroidItokawaOBJ():
     num_faces = 128
     ast = dynamics.asteroid.Asteroid('itokawa', 128, shape_flag='obj')
     
-    def test_mayavi_potential_contour(self):
-        """Compute and visualize the potential around an asteroid
-        """
-        # generate a grid around the asteroid
-        nx, ny, nz = (10 ,10 ,10 )
-        xmin, xmax = -self.ast.axes[0], self.ast.axes[0]
-        ymin, ymax = -self.ast.axes[1], self.ast.axes[1]
-        zmin, zmax = -self.ast.axes[2], self.ast.axes[2]
-        
-        xval = np.concatenate((np.linspace(-5, xmin, nx/2), np.linspace(xmax, 5, nx/2)))
-        yval = np.concatenate((np.linspace(-5, ymin, ny/2), np.linspace(ymax, 5, ny/2)))
-        zval = np.concatenate((np.linspace(-5, zmin, nz/2), np.linspace(zmax, 5, nz/2)))
-        xg, yg, zg = np.meshgrid(xval, yval, zval, sparse=False, indexing='ij')
-
-        U_array = np.zeros((nx, ny, nz))
-        # fidn the potential at each point
-        for ii in range(nx):
-            for jj in range(ny):
-                for kk in range(nz):
-                    pos = np.array([xg[ii, jj, kk], yg[ii, jj, kk], zg[ii, jj, kk]])
-                    U, Ugrad, Ugrad_mat, Ulaplace = self.ast.polyhedron_potential(pos)
-
-        # plot some contour plots in mayavi
-        wavefront.draw_polyhedron_mayavi(self.ast.V, self.ast.F)                
-        pdb.set_trace()
     def test_ensure_number_of_faces(self):
         np.testing.assert_allclose(1, 1)
     def test_ensure_number_of_vertices(self):
