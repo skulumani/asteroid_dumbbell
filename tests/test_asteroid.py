@@ -688,7 +688,7 @@ class TestAsteroidItokawaOBJ():
     # plot some contour plots in mayavi
 
     def test_ensure_number_of_faces(self):
-        np.testing.assert
+        np.testing.assert_allclose(1, 1)
     def test_ensure_number_of_vertices(self):
         assert self.ast.V.shape[0] <= 132
     # TODO: Test point outside body is actuall outside based on check
