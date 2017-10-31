@@ -368,10 +368,10 @@ class Asteroid(object):
             state - 3x1 position vector in the asteroid body fixed frame in km
 
         Outputs:
-            U - gravitational potential
-            U_grad - gravitational attraction
-            U_grad_mat
-            Ulaplace
+            U - gravitational potential - distance**2 / time**2
+            U_grad - gravitational attraction - distance / time**2
+            U_grad_mat - gravitational gradient matrix
+            Ulaplace - laplacian
         """
         F = self.F
         V = self.V
