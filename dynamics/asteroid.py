@@ -10,6 +10,7 @@ import pdb
 # TODO: Implement the ability to input a filename for OBJ shape files
 # TODO: Need to add some tests to check if the shape model is a closed polyhedron
 #   Can check to make sure each edge is a member of exactly 2 faces (for triangular meshes)
+# TODO: Implement a Cython/C++ version of both of these methods
 class Asteroid(object):
     """An asteroid that we're orbiting about
 
