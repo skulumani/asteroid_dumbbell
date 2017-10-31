@@ -369,7 +369,7 @@ class Asteroid(object):
 
         Outputs:
             U - gravitational potential
-            U_grad
+            U_grad - gravitational attraction
             U_grad_mat
             Ulaplace
         """
