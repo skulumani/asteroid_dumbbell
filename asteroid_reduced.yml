@@ -30,5 +30,6 @@ dependencies:
   - kinematics
   - spacetrack
   - spiceypy
+  - scipy
 prefix: /home/shankar/anaconda3/envs/asteroid
 
