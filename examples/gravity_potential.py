@@ -81,7 +81,7 @@ def visualize_data(ast, Ug_array, grid):
 
 if __name__ == '__main__':
     ast = asteroid.Asteroid('itokawa', 0, 'obj')
-    grid = define_grid(ast)
+    grid = define_grid(ast, 5)
     Ug_array = generate_scalar_data(ast, grid)
     visualize_data(ast, Ug_array, grid)
 # handle for plot
