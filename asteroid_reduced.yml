@@ -22,7 +22,7 @@ dependencies:
 - seaborn
 - mayavi
 - pyface
-- traits
+- traits=4.6
 - traitsui
 - vtk
 - pip:
