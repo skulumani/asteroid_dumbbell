@@ -169,3 +169,19 @@ class TestDecimation():
     def test_ensure_polyhedron_is_closed(self):
         pass
 
+class TestReconstruction():
+    filename = './data/shape_model/ITOKAWA/itokawa_low.obj'
+    ratio = 0.5
+    v, f = wavefront.read_obj(filename)
+    dv, df = wavefront.decimate_numpy(v, f, ratio)
+    
+    rv, rf = wavefront.reconstruct_numpy(v)
+
+    def test_reconstruct_vertices(self):
+        np.testing.assert_allclose(self.v.shape[1], self.rv.shape[1])
+
+    def test_reconstruct_faces(self):
+        np.testing.assert_allclose(self.f.shape[1], self.rf.shape[1])
+
+    
+

@@ -207,6 +207,43 @@ def obj_mesh_comparison(filename='./data/itokawa_low.obj'):
     objWriter.SetRenderWindow(renWin)
     objWriter.Write()
 
+# TODO: Create a function to do surface reconstruction from a set of V
+def reconstruct_numpy(verts):
+    """Surface Reconstruction using VTK
+    """
+
+    pointSource = vtk.vtkProgrammableSource()
+
+    def read_numpy_points():
+        output = pointSource.GetPolyDataOutput()
+        points = vtk.vtkPoints()
+        output.SetPoints(points)
+        for ii in range(0, verts.shape[0],1):
+            points.InsertNextPoint(verts[ii, 0], verts[ii, 1], verts[ii, 2])
+
+    pointSource.SetExecuteMethod(read_numpy_points)
+
+    surf = vtk.vtkSurfaceReconstructionFilter()
+    surf.SetNeighborhoodSize(20) # a low value makes a craggly surface
+    surf.SetInputConnection(pointSource.GetOutputPort())
+    
+    cf = vtk.vtkContourFilter()
+    cf.SetInputConnection(surf.GetOutputPort())
+    cf.SetValue(0, 0.0)
+    
+    reverse = vtk.vtkReverseSense()
+    reverse.SetInputConnection(cf.GetOutputPort())
+    reverse.ReverseCellsOn()
+    reverse.ReverseNormalsOn()
+    reverse.Update()
+    # convert to polydata
+    poly = vtk.vtkPolyData()
+    poly.ShallowCopy(reverse.GetOutput())
+    # convert to numpy arrays
+    v_new, f_new = vtk_poly_to_numpy(poly)
+
+    return v_new, f_new
+
 def reduced_mesh_generation(filename='./data/itokawa_low.obj', step=1):
     """Read in the OBJ shape file, degrade the number of vectors and then 
     create a surface
