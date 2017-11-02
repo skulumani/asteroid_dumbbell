@@ -74,7 +74,7 @@ class Asteroid(object):
                 print("Unknown asteroid. Use 'castalia', 'itokawa', or 'eros' only.")
             
             # reduce the number of faces/vertices somehow
-            if num_faces < faces.shape[0] and num_faces != 0:
+            if (num_faces != 0 and num_faces < faces.shape[0]):
                 ratio = 1 - num_faces / faces.shape[0]
                 verts, faces = wavefront.decimate_numpy(verts, faces, ratio)
 

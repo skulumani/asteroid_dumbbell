@@ -77,6 +77,7 @@ def visualize_data(ast, Ug_array, grid):
                                      slice_index=nz/2)
     mlab.outline()
     mlab.axes()
+    mlab.colorbar(object=mesh, title='mm/sec^2' )
     # mlab.show()
 
 def comparison_generate_asteroid():
@@ -86,35 +87,44 @@ def comparison_generate_asteroid():
     # define all of the asteroid models
     name = 'itokawa'
     ast_mat_4092 = asteroid.Asteroid(name, 4092, 'mat')
-    # ast_mat_2048 = asteroid.Asteroid(name, 2048, 'mat')
-    # # OBJ - original without reduction
+    ast_mat_2048 = asteroid.Asteroid(name, 2048, 'mat')
+    # OBJ - original without reduction
     ast_obj_low = asteroid.Asteroid(name, 0, 'obj')
     
-    # # now decimate
+    # now decimate
     ast_obj_90 = ast_obj_low
     ast_obj_90.V, ast_obj_90.F = wavefront.decimate_numpy(ast_obj_low.V, ast_obj_low.F, 0.9)
     ast_obj_90.polyhedron_shape_input()
-    # ast_obj_50 = ast_obj_low
-    # ast_obj_50.V, ast_obj_50.F = wavefront.decimate_numpy(ast_obj_low.V, ast_obj_low.F, 0.9)
-    # ast_obj_50.polyhedron_shape_input()
+    ast_obj_50 = ast_obj_low
+    ast_obj_50.V, ast_obj_50.F = wavefront.decimate_numpy(ast_obj_low.V, ast_obj_low.F, 0.9)
+    ast_obj_50.polyhedron_shape_input()
 
-    # # OBJ reconstructed - take the previous OBJ version and use surface reconstruction on them
-    # ast_obj_90_reconstruct = ast_obj_90
-    # ast_obj_90_reconstruct.V, ast_obj_90_reconstruct.F = wavefront.reconstruct_numpy(ast_obj_90.V)
+    # OBJ reconstructed - take the previous OBJ version and use surface reconstruction on them
+    ast_obj_90_reconstruct = ast_obj_90
+    ast_obj_90_reconstruct.V, ast_obj_90_reconstruct.F = wavefront.reconstruct_numpy(ast_obj_90.V)
     
-    # ast_obj_50_reconstruct = ast_obj_50
-    # ast_obj_50_reconstruct.V, ast_obj_50_reconstruct.F = wavefront.reconstruct_numpy(ast_obj_50.V)
+    ast_obj_50_reconstruct = ast_obj_50
+    ast_obj_50_reconstruct.V, ast_obj_50_reconstruct.F = wavefront.reconstruct_numpy(ast_obj_50.V)
 
-    # ast_obj_low_reconstruct = ast_obj_low
-    # ast_obj_low_reconstruct.V, ast_obj_low_reconstruct.F = wavefront.reconstruct_numpy(ast_obj_low.V)
+    ast_obj_low_reconstruct = ast_obj_low
+    ast_obj_low_reconstruct.V, ast_obj_low_reconstruct.F = wavefront.reconstruct_numpy(ast_obj_low.V)
     
-    ast_tuple = [ ast_mat_4092 , ast_obj_low, ast_obj_90 ]
-    titles = ['MAT 4092',  'OBJ LOW', 'OBJ Decimate 90%']
-    # define a grid
-    grid = define_grid(ast_mat_4092, 5)
+    ast_list = [ ast_mat_4092 , ast_mat_2048, ast_obj_low, 
+                 ast_obj_90, ast_obj_50, 
+                 ast_obj_90_reconstruct, ast_obj_50_reconstruct]
+    titles_list = ['MAT 4092',  'MAT 2048', 'OBJ LOW',
+                    'OBJ Decimate 90%', 'OBJ Decimate 50%',
+                    'OBJ Reconstruct 90%', 'OBJ Reconstruct 50%']
+    grid_list = []
+    Ug_list = []
+    for title, ast in zip(titles_list, ast_list):
+        print('Computing magnitude of acceleration for {}'.format(title))
+        grid = define_grid(ast, 5)
+        grid_list.append(grid)
 
-    for title, ast in zip(titles,ast_tuple):
         Ug = generate_scalar_data(ast, grid)
+        Ug_list.append(Ug)
+
         visualize_data(ast, Ug, grid)
         mlab.title(title)
     # compute grid of Ug at every point in grid
