@@ -620,7 +620,7 @@ def decimate_numpy(vertices, faces, ratio=0.5, preserve_topology=True,
     return dec_vertices, dec_faces
 
 # TODO: Add documentation
-def draw_polyedron_vtk(vertices, faces):
+def draw_polyhedron_vtk(vertices, faces):
     """Use VTK to draw a polyhedron
     """
     # create a polydata object
@@ -662,6 +662,7 @@ def draw_polyhedron_mayavi(vertices, faces, fig):
     y = vertices[:, 1]
     z = vertices[:, 2]
     scalars = np.tile(0.5, x.shape)
-    mesh = mlab.triangular_mesh(x, y, z, faces, color=(0.5, 0.5, 0.5), figure=fig)
+    mesh = mlab.triangular_mesh(x, y, z, faces, color=(0.5, 0.5, 0.5), figure=fig,
+                                representation='surface')
 
     return mesh
