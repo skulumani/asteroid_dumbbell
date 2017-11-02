@@ -63,7 +63,7 @@ def visualize_data(ast, Ug_array, grid):
     # volume rendering
     # volume = mlab.pipeline.volume(mlab.pipeline.scalar_field(Ug_array))
     f = mlab.pipeline.scalar_field(xg, yg, zg, Ug_array)
-    # v = mlab.pipeline.volume(f, vmin=0, vmax=0.2)
+    v = mlab.pipeline.volume(f, vmin=0, vmax=0.2)
     
     # cut planes
     mlab.pipeline.image_plane_widget(f, 
@@ -79,27 +79,32 @@ def visualize_data(ast, Ug_array, grid):
     mlab.axes()
     mlab.show()
 
+def comparison_generate_asteroid():
+    """Generate all of the asteroid objects
+    """
+    
+    # define all of the asteroid models
+    name = 'itokawa'
+    ast_mat_4092 = asteroid.Asteroid(name, 4092, 'mat')
+    ast_mat_2048 = asteroid.Asteroid(name, 2048, 'mat')
+    # OBJ - original without reduction
+    ast_obj_low = asteroid.Asteroid(name, 0, 'obj')
+    
+    # now decimate
+    ast_obj_90 = ast_obj_low
+    ast_obj_90.V, ast_obj_90.F = wavefront.decimate_numpy(ast_obj_low.V, ast_obj_low.F, 0.9)
+    ast_obj_90.polyhedron_shape_input()
+    ast_obj_50 = ast_obj_low
+    ast_obj_50.V, ast_obj_50.F = wavefront.decimate_numpy(ast_obj_low.V, ast_obj_low.F, 0.9)
+    ast_obj_50.polyhedron_shape_input()
+    # OBJ reconstructed - take the previous OBJ version and use surface reconstruction on them
+
+    
+
+    
 if __name__ == '__main__':
     ast = asteroid.Asteroid('itokawa', 0, 'obj')
     print('Finished with gravity model')
     grid = define_grid(ast, 5)
     Ug_array = generate_scalar_data(ast, grid)
     visualize_data(ast, Ug_array, grid)
-# handle for plot
-# iso_surface = scene.children[0].children[0].children[0]
-# iso_surface.contour.print_traits()
-
-# iso_surface.compute_normals=False
-# iso_surface.contour.number_of_contours = 10
-# iso_surface.contour.minimum_contour = 0
-# iso_surface.contour.maximum_contour = 0.2
-# scalar_cut_plane = ScalarCutPlane()
-# module_manager1 = engine.scenes[0].children[1].children[0]
-# engine.add_filter(scalar_cut_plane, module_manager1)
-# scalar_cut_plane.warp_scalar.filter.normal = array([ 1.,  0.,  0.])
-# scalar_cut_plane.implicit_plane.widget.normal = array([ 1.,  0.,  0.])
-# scalar_cut_plane.implicit_plane.widget.origin = array([ 0.,  0.,  0.])
-# scalar_cut_plane.warp_scalar.filter.normal = array([ 1.,  0.,  0.])
-# scalar_cut_plane.implicit_plane.widget.normal = array([ 1.,  0.,  0.])
-# scalar_cut_plane.implicit_plane.widget.origin = array([ 0.,  0.,  0.])
-# scalar_cut_plane.implicit_plane.widget.normal_to_x_axis = True
