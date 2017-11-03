@@ -6,14 +6,14 @@ import pdb
 from mayavi import mlab
 import mayavi.api
 
-def define_grid(ast, density):
+def define_grid(ast, density=100):
     # generate a grid around the asteroid
-    nx, ny, nz = (5, 5, 5)
+    nx, ny, nz = (density, density, density)
     xmin, xmax = -ast.axes[0], ast.axes[0]
     ymin, ymax = -ast.axes[1], ast.axes[1]
     zmin, zmax = -ast.axes[2], ast.axes[2]
 
-    xg, yg, zg = np.mgrid[ xmin:xmax:5j, ymin:ymax:5j, zmin:zmax:5j]
+    xg, yg, zg = np.mgrid[ xmin:xmax:100j, ymin:ymax:100j, zmin:zmax:100j]
     
     grid = {'xg': xg, 'yg':yg, 'zg':zg,
             'nx': nx, 'ny':ny, 'nz':nz}
