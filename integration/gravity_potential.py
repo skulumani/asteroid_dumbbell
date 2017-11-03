@@ -5,7 +5,9 @@ from dynamics import asteroid
 import pdb
 from mayavi import mlab
 import mayavi.api
-
+import copy
+from multiprocessing import Pool
+from functools import partial
 def define_grid(ast, density=5):
     # generate a grid around the asteroid
     nx, ny, nz = (density, density, density)
@@ -19,7 +21,7 @@ def define_grid(ast, density=5):
             'nx': nx, 'ny':ny, 'nz':nz}
     return grid
 
-def generate_scalar_data(ast_in, grid):
+def generate_scalar_data(grid, ast_in):
     nx = grid['nx']
     ny = grid['ny']
     nz = grid['nz']
@@ -92,52 +94,46 @@ def comparison_generate_asteroid():
     ast_obj_low = asteroid.Asteroid(name, 0, 'obj')
     
     # now decimate
-    ast_obj_90 = ast_obj_low
+    ast_obj_90 = copy.deepcopy(ast_obj_low)
     ast_obj_90.V, ast_obj_90.F = wavefront.decimate_numpy(ast_obj_low.V, ast_obj_low.F, 0.9)
-    ast_obj_90.polyhedron_shape_input()
-    ast_obj_50 = ast_obj_low
+    ast_obj_90.asteroid_grav = ast_obj_90.polyhedron_shape_input()
+    ast_obj_50 = copy.deepcopy(ast_obj_low)
     ast_obj_50.V, ast_obj_50.F = wavefront.decimate_numpy(ast_obj_low.V, ast_obj_low.F, 0.9)
-    ast_obj_50.polyhedron_shape_input()
+    ast_obj_50.asteroid_grav = ast_obj_50.polyhedron_shape_input()
 
     # OBJ reconstructed - take the previous OBJ version and use surface reconstruction on them
-    ast_obj_90_reconstruct = ast_obj_90
+    ast_obj_90_reconstruct = copy.deepcopy(ast_obj_90)
     ast_obj_90_reconstruct.V, ast_obj_90_reconstruct.F = wavefront.reconstruct_numpy(ast_obj_90.V)
-    
+    ast_obj_90_reconstruct.asteroid_grav = ast_obj_90_reconstruct.polyhedron_shape_input()
+
     ast_obj_50_reconstruct = ast_obj_50
     ast_obj_50_reconstruct.V, ast_obj_50_reconstruct.F = wavefront.reconstruct_numpy(ast_obj_50.V)
+    ast_obj_50_reconstruct.asteroid_grav = ast_obj_50_reconstruct.polyhedron_shape_input()
 
-    ast_obj_low_reconstruct = ast_obj_low
+    ast_obj_low_reconstruct = copy.deepcopy(ast_obj_low)
     ast_obj_low_reconstruct.V, ast_obj_low_reconstruct.F = wavefront.reconstruct_numpy(ast_obj_low.V)
-    
-    ast_list = [ast_obj_low,
+    ast_obj_low_reconstruct.asteroid_grav = ast_obj_low_reconstruct.polyhedron_shape_input()
+
+    ast_list = [ast_mat_4092, ast_mat_2048, ast_obj_low,
                 ast_obj_90, ast_obj_50, 
-                ast_obj_90_reconstruct, ast_obj_50_reconstruct]
-    titles_list = ['OBJ Low',
+                ast_obj_90_reconstruct, ast_obj_50_reconstruct, ast_obj_low_reconstruct]
+    titles_list = ['MAT 4092', 'MAT 2048', 'OBJ Low',
                    'OBJ Decimate 0.90', 'OBJ Decimate 0.50',
-                   'OBJ Reconstruct 0.90', 'OBJ Reconstruct 0.50']
-    grid_list = []
-    Ug_list = []
-    for ii in range(len(ast_list)):
-        print('Computing magnitude of acceleration for {}'.format(titles_list[ii]))
-        grid = define_grid(ast_list[ii], 5)
-        grid_list.append(grid)
-        pdb.set_trace()
-        Ug = generate_scalar_data(ast_list[ii], grid)
-        Ug_list.append(Ug)
+                   'OBJ Reconstruct 0.90', 'OBJ Reconstruct 0.50', 'OBJ Low Reconstruct']
+    grid = define_grid(ast_list[ii], 5)
+    pdb.set_trace()
+    with Pool(8) as p:
+        func = partial(generate_scalar_data, grid)
+        Ug_list = p.map(func, ast_list)
 
         # visualize_data(ast, Ug, grid)
         # mlab.title(title)
-    # compute grid of Ug at every point in grid
-    
-    np.savez('./integration/gravity_potential.npz', ast_list=ast_list,
-             titles_list=titles_list, grid_list=grid_list, Ug_list=Ug_list,
-             ast_mat_4092=ast_mat_4092, ast_mat_2048=ast_mat_2048,
-             ast_obj_low=ast_obj_low, ast_obj_90=ast_obj_90, ast_obj_50=ast_obj_50,
-             ast_obj_90_reconstruct=ast_obj_90_reconstruct, ast_obj_50_reconstruct=ast_obj_50_reconstruct, 
-             ast_obj_low_reconstruct=ast_obj_low_reconstruct)
+    pdb.set_trace() 
+    np.savez('./integration/gravity_potential.npz',ast_list=ast_list,
+             grid=grid, Ug_list=Ug_list)
 
-    # visualize each
 if __name__ == '__main__':
+    pass
     # ast = asteroid.Asteroid('itokawa', 0, 'obj')
     # print('Finished with gravity model')
     # grid = define_grid(ast, 5)

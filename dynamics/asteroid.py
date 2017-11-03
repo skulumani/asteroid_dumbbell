@@ -40,7 +40,6 @@ class Asteroid(object):
         dir_path = os.path.dirname(os.path.realpath(__file__))
 
         self.name = name
-        pdb.set_trace()
         # either use the matlab file or read the OBJ file
         if shape_flag == 'mat':  # use matlab shape data
             if name == 'castalia':
