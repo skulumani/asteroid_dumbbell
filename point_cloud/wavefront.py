@@ -666,3 +666,68 @@ def draw_polyhedron_mayavi(vertices, faces, fig):
                                 representation='surface')
 
     return mesh
+
+# TODO: Add some documentation
+def polyhedron_parameters(V, F):
+    """Compute some edge/face vectors for a polyhedron
+    """
+    # calculate shape parameters
+
+    num_v = V.shape[0]
+    num_f = F.shape[0]
+    num_e = 3 * (num_v - 2)
+    # calculate all the edges - zero indexing for python
+    Fa = F[:, 0] 
+    Fb = F[:, 1]
+    Fc = F[:, 2]
+
+    V1 = V[Fa, :]
+    V2 = V[Fb, :]
+    V3 = V[Fc, :]
+    
+    # Get all edge vectors
+    e1 = V2 - V1
+    e2 = V3 - V2
+    e3 = V1 - V3
+
+    # TODO: Instead of searching on edges search these arrays instead
+    e1_vertex_map = np.vstack((Fb, Fa)).T
+    e2_vertex_map = np.vstack((Fc, Fb)).T
+    e3_vertex_map = np.vstack((Fa, Fc)).T
+
+    # Normalize edge vectors
+    # e1_norm=e1./repmat(sqrt(e1(:,1).^2+e1(:,2).^2+e1(:,3).^2),1,3);
+    # e2_norm=e2./repmat(sqrt(e2(:,1).^2+e2(:,2).^2+e2(:,3).^2),1,3);
+    # e3_norm=e3./repmat(sqrt(e3(:,1).^2+e3(:,2).^2+e3(:,3).^2),1,3);
+
+    # normal to face
+    normal_face = np.cross(e1, e2)
+    normal_face = normal_face / \
+        np.tile(np.reshape(
+            np.sqrt(np.sum(normal_face**2, axis=1)), (num_f, 1)), (1, 3))
+
+    # normal to each edge
+    e1_normal = np.cross(e1, normal_face)
+    e1_normal = e1_normal / \
+        np.tile(np.reshape(
+            np.sqrt(np.sum(e1_normal**2, axis=1)), (num_f, 1)), (1, 3))
+
+    e2_normal = np.cross(e2, normal_face)
+    e2_normal = e2_normal / \
+        np.tile(np.reshape(
+            np.sqrt(np.sum(e2_normal**2, axis=1)), (num_f, 1)), (1, 3))
+
+    e3_normal = np.cross(e3, normal_face)
+    e3_normal = e3_normal / \
+        np.tile(np.reshape(
+            np.sqrt(np.sum(e3_normal**2, axis=1)), (num_f, 1)), (1, 3))
+
+    # calculate the center of each face
+    center_face = 1.0 / 3 * (V[Fa, :] + V[Fb, :] + V[Fc, :])
+
+    # Calculate Angle of face seen from vertices
+    # Angle =  [acos(dot(e1_norm',-e3_norm'));acos(dot(e2_norm',-e1_norm'));acos(dot(e3_norm',-e2_norm'))]';
+    
+    return (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3,
+            e1_vertex_map, e2_vertex_map, e3_vertex_map, 
+            normal_face, e1_normal, e2_normal,e3_normal, center_face)
