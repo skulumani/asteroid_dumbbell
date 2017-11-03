@@ -19,7 +19,7 @@ def define_grid(ast, density=5):
             'nx': nx, 'ny':ny, 'nz':nz}
     return grid
 
-def generate_scalar_data(ast, grid):
+def generate_scalar_data(ast_in, grid):
     nx = grid['nx']
     ny = grid['ny']
     nz = grid['nz']
@@ -34,7 +34,7 @@ def generate_scalar_data(ast, grid):
         for jj in range(ny):
             for kk in range(nz):
                 pos = np.array([xg[ii, jj, kk], yg[ii, jj, kk], zg[ii, jj, kk]])
-                _, Ugrad, _,  _= ast.polyhedron_potential(pos)
+                _, Ugrad, _,  _= ast_in.polyhedron_potential(pos)
                 Ug_array[ii, jj, kk] = np.linalg.norm(Ugrad)
     # scale potential to useful units - convert from km to mm
     km2mm = 1e7
@@ -138,8 +138,8 @@ def comparison_generate_asteroid():
 
     # visualize each
 if __name__ == '__main__':
-    ast = asteroid.Asteroid('itokawa', 0, 'obj')
-    print('Finished with gravity model')
-    grid = define_grid(ast, 5)
-    Ug_array = generate_scalar_data(ast, grid)
-    visualize_data(ast, Ug_array, grid)
+    # ast = asteroid.Asteroid('itokawa', 0, 'obj')
+    # print('Finished with gravity model')
+    # grid = define_grid(ast, 5)
+    # Ug_array = generate_scalar_data(ast, grid)
+    # visualize_data(ast, Ug_array, grid)
