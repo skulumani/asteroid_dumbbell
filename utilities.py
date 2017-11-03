@@ -64,6 +64,7 @@ def in1d_index(a, b):
     voida, voidb = map(asvoid, (a, b))
     return np.where(np.in1d(voidb, voida))[0]
 
+# TODO: Add documentation and exmaple
 def ismember_index(a,b):
     """Find index of matching elements
     
