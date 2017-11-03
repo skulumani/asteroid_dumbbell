@@ -22,7 +22,7 @@ dependencies:
 - seaborn
 - mayavi
 - pyface
-- traits
+- traits=4.6
 - traitsui
 - vtk
 - pip:
@@ -30,5 +30,6 @@ dependencies:
   - kinematics
   - spacetrack
   - spiceypy
+  - scipy
 prefix: /home/shankar/anaconda3/envs/asteroid
 

@@ -1,14 +1,14 @@
 import vtk
 import numpy as np
-from point_cloud import vtk_mesh, wavefront
+from point_cloud import wavefront
 
 def test_vtk_major_version():
     np.testing.assert_allclose(vtk.VTK_MAJOR_VERSION, 7)
 
 class TestVTKReadingOBJFilesItokawaLow():
     filename = './data/shape_model/ITOKAWA/itokawa_low.obj'
-    vtkPolyData = vtk_mesh.read_obj_to_polydata(filename)
-    vtk_vertices, vtk_faces = vtk_mesh.vtk_poly_to_numpy(vtkPolyData)
+    vtkPolyData = wavefront.read_obj_to_polydata(filename)
+    vtk_vertices, vtk_faces = wavefront.vtk_poly_to_numpy(vtkPolyData)
     wavefront_verts, wavefront_faces = wavefront.read_obj(filename)
 
     def test_numpy_vertices_equal(self):
@@ -29,8 +29,8 @@ class TestVTKReadingOBJFilesItokawaLow():
 
 class TestVTKReadingOBJFilesItokawaHigh():
     filename = './data/shape_model/ITOKAWA/itokawa_high.obj'
-    vtkPolyData = vtk_mesh.read_obj_to_polydata(filename)
-    vtk_vertices, vtk_faces = vtk_mesh.vtk_poly_to_numpy(vtkPolyData)
+    vtkPolyData = wavefront.read_obj_to_polydata(filename)
+    vtk_vertices, vtk_faces = wavefront.vtk_poly_to_numpy(vtkPolyData)
     wavefront_verts, wavefront_faces = wavefront.read_obj(filename)
 
     def test_numpy_vertices_equal(self):

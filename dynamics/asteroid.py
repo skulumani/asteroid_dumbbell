@@ -7,7 +7,10 @@ import utilities
 from point_cloud import wavefront
 import pdb
 
-
+# TODO: Implement the ability to input a filename for OBJ shape files
+# TODO: Need to add some tests to check if the shape model is a closed polyhedron
+#   Can check to make sure each edge is a member of exactly 2 faces (for triangular meshes)
+# TODO: Implement a Cython/C++ version of both of these methods
 class Asteroid(object):
     """An asteroid that we're orbiting about
 
@@ -30,7 +33,6 @@ class Asteroid(object):
     """
     G = 6.673e-20
     # TODO: Deprecate matlab matfile
-    # TODO: Ensure we account zero based indexing someplace
     def __init__(self, name, num_faces, shape_flag='mat'):
         """Initialize the asteroid instance with it's properties
 
@@ -38,27 +40,14 @@ class Asteroid(object):
         dir_path = os.path.dirname(os.path.realpath(__file__))
 
         self.name = name
-
         # either use the matlab file or read the OBJ file
         if shape_flag == 'mat':  # use matlab shape data
             if name == 'castalia':
-                self.M = 1.4091e12
-                self.sigma = 2.1  # g/cm^3
-                self.axes = np.array([1.6130, 0.9810, 0.8260]) / 2.0
-                self.omega = 2 * np.pi / 4.07 / 3600
-
-                # self.C20 = -7.275e-2
-                # self.C22 = 2.984e-2
 
                 mat = scipy.io.loadmat(
                     dir_path + "/CASTALIA/castalia_model.mat")
 
             elif name == 'itokawa':
-                self.M = 3.51e10
-                self.sigma = 1.9  # g/cm^3
-                self.axes = np.array([535, 294, 209]) / 1.0e3  # size in meters
-                self.omega = 2 * np.pi / 12.132 / 3600
-
                 mat = scipy.io.loadmat(dir_path + "/ITOKAWA/itokawa_model.mat")
             else:
                 print("Unknown asteroid. Use 'castalia or 'itokawa' only.")
@@ -70,7 +59,7 @@ class Asteroid(object):
                 print("That number of faces is not possible.")
                 return 1
 
-            self.F = mat[F_key]
+            self.F = mat[F_key] - 1
             self.V = mat[V_key]
 
         elif shape_flag == 'obj':  # read directly from the OBJ file
@@ -84,12 +73,38 @@ class Asteroid(object):
                 print("Unknown asteroid. Use 'castalia', 'itokawa', or 'eros' only.")
             
             # reduce the number of faces/vertices somehow
+            # if (num_faces != 0 and num_faces < faces.shape[0]):
+            #     ratio = 1 - num_faces / faces.shape[0]
+            #     verts, faces = wavefront.decimate_numpy(verts, faces, ratio)
 
             self.F = faces
             self.V = verts
 
             # print("Using %g faces for %s." % (self.F.shape[0],self.name))
             # print("Polyhedron Model: %g faces, %g vertices." % (self.F.shape[0],self.V.shape[0]))
+        
+        # define the mass properties of the asteroid
+        if name == 'castalia':
+            self.M = 1.4091e12
+            self.sigma = 2.1  # g/cm^3
+            self.axes = np.array([1.6130, 0.9810, 0.8260]) / 2.0
+            self.omega = 2 * np.pi / 4.07 / 3600
+
+            # self.C20 = -7.275e-2
+            # self.C22 = 2.984e-2
+        elif name == 'itokawa':
+            self.M = 3.51e10
+            self.sigma = 1.9  # g/cm^3
+            self.axes = np.array([535, 294, 209]) / 1.0e3  # size in meters
+            self.omega = 2 * np.pi / 12.132 / 3600
+
+        elif name == 'eros':
+            self.M = 4.463e-4 / self.G
+            self.sigma = 2.67 # g/cm^3
+            self.axes = np.array([34.4, 11.7, 11.7])  # size in kilometers
+            self.omega = 2 * np.pi / 5.27 / 3600
+        else:
+            print("Unknown asteroid.")
 
         self.mu = self.G * self.M
         self.sigma = self.sigma / 1000 * \
@@ -121,7 +136,8 @@ class Asteroid(object):
 
         # compute a bunch of parameters for the polyhedron model
         self.asteroid_grav = self.polyhedron_shape_input()
-
+    
+    # TODO: Add documentation
     def polyhedron_shape_input(self):
         """Precomputes parameters for a given polyhedron shape model
 
@@ -150,9 +166,9 @@ class Asteroid(object):
         F_face = np.zeros([3, 3, num_f])
 
         # calculate all the edges - zero indexing for python
-        Fa = F[:, 0] - 1
-        Fb = F[:, 1] - 1
-        Fc = F[:, 2] - 1
+        Fa = F[:, 0] 
+        Fb = F[:, 1]
+        Fc = F[:, 2]
 
         V1 = V[Fa, :]
         V2 = V[Fb, :]
@@ -352,10 +368,10 @@ class Asteroid(object):
             state - 3x1 position vector in the asteroid body fixed frame in km
 
         Outputs:
-            U - gravitational potential
-            U_grad
-            U_grad_mat
-            Ulaplace
+            U - gravitational potential - distance**2 / time**2
+            U_grad - gravitational attraction - distance / time**2
+            U_grad_mat - gravitational gradient matrix
+            Ulaplace - laplacian
         """
         F = self.F
         V = self.V

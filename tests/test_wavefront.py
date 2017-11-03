@@ -151,6 +151,7 @@ class TestItokawaLowReadingAndWriting():
     def test_output_faces_equal(self):
         np.testing.assert_allclose(self.out_faces, self.faces)
 
+# TODO: Add tests to verify function of preserve topology/splitting settings
 class TestDecimation():
     """Ensure decimation is working properly
     """
@@ -158,10 +159,29 @@ class TestDecimation():
     ratio = 0.5
     v, f = wavefront.read_obj(filename)
     dv, df = wavefront.decimate_numpy(v, f, ratio)
-
+    
     def test_ensure_vertices_ratio(self):
-        np.testing.assert_array_less(self.dv.shape[0], self.ratio*self.v.shape[0])
+        np.testing.assert_array_less(self.dv.shape[0], self.v.shape[0])
 
     def test_ensure_faces_ratio(self):
-        np.testing.assert_array_less(self.df.shape[0], self.ratio*self.f.shape[0])
+        np.testing.assert_array_less(self.df.shape[0], self.f.shape[0])
+
+    def test_ensure_polyhedron_is_closed(self):
+        pass
+
+class TestReconstruction():
+    filename = './data/shape_model/ITOKAWA/itokawa_low.obj'
+    ratio = 0.5
+    v, f = wavefront.read_obj(filename)
+    dv, df = wavefront.decimate_numpy(v, f, ratio)
+    
+    rv, rf = wavefront.reconstruct_numpy(v)
+
+    def test_reconstruct_vertices(self):
+        np.testing.assert_allclose(self.v.shape[1], self.rv.shape[1])
+
+    def test_reconstruct_faces(self):
+        np.testing.assert_allclose(self.f.shape[1], self.rf.shape[1])
+
+    
 

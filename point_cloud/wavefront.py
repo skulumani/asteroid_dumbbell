@@ -207,6 +207,43 @@ def obj_mesh_comparison(filename='./data/itokawa_low.obj'):
     objWriter.SetRenderWindow(renWin)
     objWriter.Write()
 
+# TODO: Create a function to do surface reconstruction from a set of V
+def reconstruct_numpy(verts):
+    """Surface Reconstruction using VTK
+    """
+
+    pointSource = vtk.vtkProgrammableSource()
+
+    def read_numpy_points():
+        output = pointSource.GetPolyDataOutput()
+        points = vtk.vtkPoints()
+        output.SetPoints(points)
+        for ii in range(0, verts.shape[0],1):
+            points.InsertNextPoint(verts[ii, 0], verts[ii, 1], verts[ii, 2])
+
+    pointSource.SetExecuteMethod(read_numpy_points)
+
+    surf = vtk.vtkSurfaceReconstructionFilter()
+    surf.SetNeighborhoodSize(20) # a low value makes a craggly surface
+    surf.SetInputConnection(pointSource.GetOutputPort())
+    
+    cf = vtk.vtkContourFilter()
+    cf.SetInputConnection(surf.GetOutputPort())
+    cf.SetValue(0, 0.0)
+    
+    reverse = vtk.vtkReverseSense()
+    reverse.SetInputConnection(cf.GetOutputPort())
+    reverse.ReverseCellsOn()
+    reverse.ReverseNormalsOn()
+    reverse.Update()
+    # convert to polydata
+    poly = vtk.vtkPolyData()
+    poly.ShallowCopy(reverse.GetOutput())
+    # convert to numpy arrays
+    v_new, f_new = vtk_poly_to_numpy(poly)
+
+    return v_new, f_new
+
 def reduced_mesh_generation(filename='./data/itokawa_low.obj', step=1):
     """Read in the OBJ shape file, degrade the number of vectors and then 
     create a surface
@@ -486,7 +523,9 @@ def decimate_polydata(polyData, ratio=0.5):
     return decimatedPoly
 
 # TODO: Add documentation
-def decimate_numpy(vertices, faces, ratio=0.5):
+# TODO: Research other settings - https://www.vtk.org/doc/nightly/html/classvtkDecimatePro.html
+def decimate_numpy(vertices, faces, ratio=0.5, preserve_topology=True,
+                   preserve_boundary=False, splitting=False):
     r"""Reduce the size of a numpy polyhedron using VTK
 
     Extended description of the function.
@@ -553,6 +592,22 @@ def decimate_numpy(vertices, faces, ratio=0.5):
     decimate = vtk.vtkDecimatePro()
     decimate.SetInputData(polyhedron)
     decimate.SetTargetReduction(ratio)
+    # TODO: Mention that this will prevent you from reaching the target number of faces
+    if preserve_topology:
+        decimate.PreserveTopologyOn()
+    else:
+        decimate.PreserveTopologyOff()
+    
+    if preserve_boundary:
+        decimate.BoundaryVertexDeletionOff()
+    else:
+        decimate.BoundaryVertexDeletionOn()
+
+    if splitting:
+        decimate.SplittingOn()
+    else:
+        decimate.SplittingOff()
+
     decimate.Update()
 
     decimatedPoly = vtk.vtkPolyData()
@@ -565,7 +620,7 @@ def decimate_numpy(vertices, faces, ratio=0.5):
     return dec_vertices, dec_faces
 
 # TODO: Add documentation
-def draw_polyedron_vtk(vertices, faces):
+def draw_polyhedron_vtk(vertices, faces):
     """Use VTK to draw a polyhedron
     """
     # create a polydata object
@@ -600,14 +655,14 @@ def draw_polyedron_vtk(vertices, faces):
     iren.Start()
 
 # TODO: Add documentation
-def draw_polyhedron_mayavi(vertices, faces):
+def draw_polyhedron_mayavi(vertices, faces, fig):
     """Draw a polyhedron using Mayavi
     """
     x = vertices[:, 0]
     y = vertices[:, 1]
     z = vertices[:, 2]
     scalars = np.tile(0.5, x.shape)
-    mlab.triangular_mesh(x, y, z, faces, color=(0.5, 0.5, 0.5))
-    mlab.show()
+    mesh = mlab.triangular_mesh(x, y, z, faces, color=(0.5, 0.5, 0.5), figure=fig,
+                                representation='surface')
 
-    return 0
+    return mesh

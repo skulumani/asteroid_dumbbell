@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import dynamics.asteroid
-
+import pdb
 class TestAsteroidItokawa32():
     name = 'itokawa'
     faces = 32
@@ -672,3 +672,25 @@ class TestAsteroidCastalia32():
 
     def test_polyhedron_potential_Ulaplace(self):
         np.testing.assert_almost_equal(self.Ulap_true,self.Ulap)
+
+# TODO:Add test for reading directly from shape file
+class TestAsteroidItokawaOBJ():
+    """Testing out the polyhedron potential model using the OBJ file directly
+    """
+    # initialize the asteroid object using itokawa and OBJ
+    num_faces = 128
+    ast = dynamics.asteroid.Asteroid('itokawa', 128, shape_flag='obj')
+    
+    def test_ensure_number_of_faces(self):
+        np.testing.assert_allclose(1, 1)
+    def test_ensure_number_of_vertices(self):
+        assert self.ast.V.shape[0] <= 132
+    # TODO: Test point outside body is actuall outside based on check
+
+    # TODO: Add a test that generates and visualizes the gravity field using contour plots
+
+    # TODO:Test to ensure we can read all three asteroid types
+
+    # TODO: Test to verify mass properties
+
+    # TODO: Test the compares obj potential with teh same number of faces as one that is in matlab
