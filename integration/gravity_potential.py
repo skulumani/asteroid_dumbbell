@@ -109,25 +109,32 @@ def comparison_generate_asteroid():
     ast_obj_low_reconstruct = ast_obj_low
     ast_obj_low_reconstruct.V, ast_obj_low_reconstruct.F = wavefront.reconstruct_numpy(ast_obj_low.V)
     
-    ast_list = [ ast_mat_4092 , ast_mat_2048, ast_obj_low, 
-                 ast_obj_90, ast_obj_50, 
-                 ast_obj_90_reconstruct, ast_obj_50_reconstruct]
-    titles_list = ['MAT 4092',  'MAT 2048', 'OBJ LOW',
-                    'OBJ Decimate 90%', 'OBJ Decimate 50%',
-                    'OBJ Reconstruct 90%', 'OBJ Reconstruct 50%']
+    ast_list = [ast_mat_4092, ast_mat_2048, ast_obj_low,
+                ast_obj_90, ast_obj_50, 
+                ast_obj_90_reconstruct, ast_obj_50_reconstruct]
+    titles_list = ['MAT 4092', 'MAT 2048', 'OBJ Low',
+                   'OBJ Decimate 0.90', 'OBJ Decimate 0.50',
+                   'OBJ Reconstruct 0.90', 'OBJ Reconstruct 0.50']
     grid_list = []
     Ug_list = []
     for title, ast in zip(titles_list, ast_list):
         print('Computing magnitude of acceleration for {}'.format(title))
-        grid = define_grid(ast, 5)
+        grid = define_grid(ast, 100)
         grid_list.append(grid)
 
         Ug = generate_scalar_data(ast, grid)
         Ug_list.append(Ug)
 
-        visualize_data(ast, Ug, grid)
-        mlab.title(title)
+        # visualize_data(ast, Ug, grid)
+        # mlab.title(title)
     # compute grid of Ug at every point in grid
+    
+    np.savez('./integration/gravity_potential.npz', ast_list=ast_list,
+             titles_list=titles_list, grid_list=grid_list, Ug_list=Ug_list,
+             ast_mat_4092=ast_mat_4092, ast_mat_2048=ast_mat_2048,
+             ast_obj_low=ast_obj_low, ast_obj_90=ast_obj_90, ast_obj_50=ast_obj_50,
+             ast_obj_90_reconstruct=ast_obj_90_reconstruct, ast_obj_50_reconstruct=ast_obj_50_reconstruct, 
+             ast_obj_low_reconstruct=ast_obj_low_reconstruct)
 
     # visualize each
 if __name__ == '__main__':
