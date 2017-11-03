@@ -75,7 +75,7 @@ There are driver modules for each, which are called:
 
 To profile the Python code you can use `cProfile` or `line-profiler`
 ~~~
-pip install cProfile line-profiler snakeviz
+pip install line-profiler snakeviz
 ~~~
 
 * Use `cProfile` to find which function call is taking the most time out of a bigger script
