@@ -6,14 +6,14 @@ import pdb
 from mayavi import mlab
 import mayavi.api
 
-def define_grid(ast, density=100):
+def define_grid(ast, density=5):
     # generate a grid around the asteroid
     nx, ny, nz = (density, density, density)
     xmin, xmax = -ast.axes[0], ast.axes[0]
     ymin, ymax = -ast.axes[1], ast.axes[1]
     zmin, zmax = -ast.axes[2], ast.axes[2]
 
-    xg, yg, zg = np.mgrid[ xmin:xmax:100j, ymin:ymax:100j, zmin:zmax:100j]
+    xg, yg, zg = np.mgrid[ xmin:xmax:5j, ymin:ymax:5j, zmin:zmax:5j]
     
     grid = {'xg': xg, 'yg':yg, 'zg':zg,
             'nx': nx, 'ny':ny, 'nz':nz}
@@ -109,20 +109,20 @@ def comparison_generate_asteroid():
     ast_obj_low_reconstruct = ast_obj_low
     ast_obj_low_reconstruct.V, ast_obj_low_reconstruct.F = wavefront.reconstruct_numpy(ast_obj_low.V)
     
-    ast_list = [ast_mat_4092, ast_mat_2048, ast_obj_low,
+    ast_list = [ast_obj_low,
                 ast_obj_90, ast_obj_50, 
                 ast_obj_90_reconstruct, ast_obj_50_reconstruct]
-    titles_list = ['MAT 4092', 'MAT 2048', 'OBJ Low',
+    titles_list = ['OBJ Low',
                    'OBJ Decimate 0.90', 'OBJ Decimate 0.50',
                    'OBJ Reconstruct 0.90', 'OBJ Reconstruct 0.50']
     grid_list = []
     Ug_list = []
-    for title, ast in zip(titles_list, ast_list):
-        print('Computing magnitude of acceleration for {}'.format(title))
-        grid = define_grid(ast, 100)
+    for ii in range(len(ast_list)):
+        print('Computing magnitude of acceleration for {}'.format(titles_list[ii]))
+        grid = define_grid(ast_list[ii], 5)
         grid_list.append(grid)
-
-        Ug = generate_scalar_data(ast, grid)
+        pdb.set_trace()
+        Ug = generate_scalar_data(ast_list[ii], grid)
         Ug_list.append(Ug)
 
         # visualize_data(ast, Ug, grid)
