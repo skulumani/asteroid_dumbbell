@@ -94,13 +94,15 @@ def search_index(a, b):
     """
     a[a == -0.0] = 0
     b[b == -0.0] = 0
+    invalid = -1
 
     voida, voidb = map(asvoid, (a, b))
-    voida, voidb = map(np.squeeze, (voida, voidb))  
-    ae = np.outer([1,]*len(voida), voidb)
-    be = np.outer(voida, [1,]*len(voidb))
-    _, indices = np.where(np.equal(ae, be))
-    return indices
+
+    index_match = np.where(np.in1d(voida, voidb))
+    index = np.full(a.shape[0], invalid, dtype='int')
+
+    index[index_match] = index_match
+    return index
 
 if __name__ == "__main__":
     
