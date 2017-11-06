@@ -155,7 +155,8 @@ class Asteroid(object):
         num_v = V.shape[0]
         num_f = F.shape[0]
         num_e = 3 * (num_v - 2)
-
+        
+        # TODO: Search across this instead of the actual vectors
         # calculate shape parameters
         # calculate vectors for each edge (loop through F and difference the
         # vectors) then store them
