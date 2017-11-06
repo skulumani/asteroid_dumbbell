@@ -87,6 +87,21 @@ def ismember_index(a,b):
 
     return index
 
+def search_index(a, b):
+    """Use a sorted search to find elements of b in a
+
+    https://stackoverflow.com/questions/8251541/numpy-for-every-element-in-one-array-find-the-index-in-another-array
+    """
+    a[a == -0.0] = 0
+    b[b == -0.0] = 0
+
+    voida, voidb = map(asvoid, (a, b))
+    voida, voidb = map(np.squeeze, (voida, voidb))  
+    ae = np.outer([1,]*len(voida), voidb)
+    be = np.outer(voida, [1,]*len(voidb))
+    _, indices = np.where(np.equal(ae, be))
+    return indices
+
 if __name__ == "__main__":
     
     print("Some versions of trying to duplicate Matlab's ismember function.")
