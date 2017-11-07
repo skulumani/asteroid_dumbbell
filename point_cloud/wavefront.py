@@ -34,7 +34,7 @@ from mayavi import mlab
 from vtk.util import numpy_support
 import pdb
 from point_cloud import wavefront
-
+import utilities
 # TODO: Create better function names
 
 # TODO: Add documentation and link to OBJ format
@@ -731,3 +731,29 @@ def polyhedron_parameters(V, F):
     return (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3,
             e1_vertex_map, e2_vertex_map, e3_vertex_map, 
             normal_face, e1_normal, e2_normal,e3_normal, center_face)
+
+# TODO: Add documentation and modify inputs to search over e vertex maps instead
+def search_edge(e1, e2, e3):
+
+    e1_ind1b = utilities.ismember_index(-e1, e1)
+    e1_ind2b = utilities.ismember_index(-e1, e2)
+    e1_ind3b = utilities.ismember_index(-e1, e3)
+
+    e2_ind1b = utilities.ismember_index(-e2, e1)
+    e2_ind2b = utilities.ismember_index(-e2, e2)
+    e2_ind3b = utilities.ismember_index(-e2, e3)
+
+    e3_ind1b = utilities.ismember_index(-e3, e1)
+    e3_ind2b = utilities.ismember_index(-e3, e2)
+    e3_ind3b = utilities.ismember_index(-e3, e3)
+
+    return (e1_ind1b, e1_ind2b, e1_ind3b,
+            e2_ind1b, e2_ind2b, e2_ind3b,
+            e3_ind1b, e3_ind2b, e3_ind3b)
+
+def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
+
+
+    return (e1_ind1b, e1_ind2b, e1_ind3b,
+            e2_ind1b, e2_ind2b, e2_ind3b,
+            e3_ind1b, e3_ind2b, e3_ind3b)
