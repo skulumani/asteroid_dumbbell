@@ -88,29 +88,25 @@ def ismember_index(a,b):
     return index
 
 def search_index(a, b):
-    """Use a sorted search to find elements of b in a
+    """Memory intensive way to find matches. have to search across vertex map
 
     https://stackoverflow.com/questions/8251541/numpy-for-every-element-in-one-array-find-the-index-in-another-array
     """
-    a[a == -0.0] = 0
-    b[b == -0.0] = 0
+    
     invalid = -1
+    lenb = len(b)
+    lena = len(a)
 
-    voida, voidb = map(asvoid, (a, b))
-    pdb.set_trace()
-    index_match = np.where(np.in1d(voida, voidb))[0]
+    ae = np.broadcast_to(b, (lena, lenb))
+    be = np.broadcast_to(a, (lenb, lena)).T
 
-    # swap the order
-    # temp = np.empty(len(index_match) / 2, dtype='int')
-    # indx_flip = np.empty(len(index_match), dtype='int')
-
-    # temp[:] = index_match[1::2]
-    # indx_flip[1::2] = index_match[0::2]
-    # indx_flip[0::2] = temp
-
-    index = np.full(a.shape[0], invalid, dtype='int')
-    index[index_match] =index match
-    return index
+    inda, indb = np.where(np.equal(ae, be))
+    
+    index_a = np.full(a.shape, -1, dtype='int')
+    index_b = np.full(b.shape, -1, dtype='int')
+    index_a[inda] = indb
+    index_b[indb] = inda
+    return index_a, index_b 
 
 if __name__ == "__main__":
     
