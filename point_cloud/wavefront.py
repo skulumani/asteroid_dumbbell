@@ -668,6 +668,7 @@ def draw_polyhedron_mayavi(vertices, faces, fig):
     return mesh
 
 # TODO: Add some documentation
+# TODO: Add unit testing
 def polyhedron_parameters(V, F):
     """Compute some edge/face vectors for a polyhedron
     """
@@ -752,8 +753,16 @@ def search_edge(e1, e2, e3):
             e3_ind1b, e3_ind2b, e3_ind3b)
 
 def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
+    invalid = -1
+    # search for e1 inside e1
 
-
+    index_a1, _= utilities.search_index(e1_vertex_map[:, 0], e1_vertex_map[:, 1])
+    amatch = np.in1d(index_a1, index_b1, invert=True)
+    bmatch = np.in1d(index_b1, index_a1, invert=True)
+    match = np.logical_and(amatch, bmatch)
+    e1_ind1b = np.full_like(e1_vertex_map.shape[0], invalid, dtype='int')
+    
+    
     return (e1_ind1b, e1_ind2b, e1_ind3b,
             e2_ind1b, e2_ind2b, e2_ind3b,
             e3_ind1b, e3_ind2b, e3_ind3b)
