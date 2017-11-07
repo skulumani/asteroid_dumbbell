@@ -184,4 +184,20 @@ class TestReconstruction():
         np.testing.assert_allclose(self.f.shape[1], self.rf.shape[1])
 
     
+class TestReadingCubeOBJ():
+    """Read a simple cube and run some tests"""
+    v, f = wavefront.read_obj('./integration/cube.obj')
+
+    (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3,
+     e1_vertex_map, e2_vertex_map, e3_vertex_map, 
+     normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(v, f)
+
+    def test_number_faces(self):
+        np.testing.assert_allclose(self.f.shape, (12,3))
+
+    def test_number_edges(self):
+        np.testing.assert_allclose(self.v.shape, (8, 3))
+    
+    def test_Fa(self):
+        np.testing.assert_allclose(self.Fa, self.f[:, 0])
 
