@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import sys
-
+import pdb
 
 def save_to_interactive(dct):
     """Save variables from debugger to main interpreter
@@ -97,11 +97,19 @@ def search_index(a, b):
     invalid = -1
 
     voida, voidb = map(asvoid, (a, b))
+    pdb.set_trace()
+    index_match = np.where(np.in1d(voida, voidb))[0]
 
-    index_match = np.where(np.in1d(voida, voidb))
+    # swap the order
+    # temp = np.empty(len(index_match) / 2, dtype='int')
+    # indx_flip = np.empty(len(index_match), dtype='int')
+
+    # temp[:] = index_match[1::2]
+    # indx_flip[1::2] = index_match[0::2]
+    # indx_flip[0::2] = temp
+
     index = np.full(a.shape[0], invalid, dtype='int')
-
-    index[index_match] = index_match
+    index[index_match] =index match
     return index
 
 if __name__ == "__main__":
