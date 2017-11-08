@@ -734,6 +734,7 @@ def polyhedron_parameters(V, F):
             normal_face, e1_normal, e2_normal,e3_normal, center_face)
 
 # TODO: Add documentation and modify inputs to search over e vertex maps instead
+# TODO: THis function will give false positives for parallel edges (should be rare in a real object hopefully)
 def search_edge(e1, e2, e3):
 
     e1_ind1b = utilities.ismember_index(-e1, e1)
@@ -752,17 +753,98 @@ def search_edge(e1, e2, e3):
             e2_ind1b, e2_ind2b, e2_ind3b,
             e3_ind1b, e3_ind2b, e3_ind3b)
 
+# TODO: Remove the loops
+# TODO: Don't have to repeat allt he searches (e1 in e2 is same as e2 in e1)
+# TODO: Create a tuple and a big outer loop to avoid having to type everything
 def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
     invalid = -1
+    num_e = e1_vertex_map.shape[0]
+    a = 0
+    b = 1
     # search for e1 inside e1
+    e1_ind1b = np.full(num_e, invalid, dtype='int')
+    inda1, indb1 = utilities.search_index(e1_vertex_map[:, a], e1_vertex_map[:, b])
+    # inda2, indb2 = utilities.search_index(e1_vertex_map[inda1, b], e1_vertex_map[indb1, a])
+    
+    # update e1_ind1b
+    # check for opposite match and if so note it
+    for ii in range(len(inda1)):
+        if e1_vertex_map[inda1[ii], b] == e1_vertex_map[indb1[ii], a]:
+            e1_ind1b[inda1[ii]] = indb1[ii]
 
-    index_a1, _= utilities.search_index(e1_vertex_map[:, 0], e1_vertex_map[:, 1])
-    amatch = np.in1d(index_a1, index_b1, invert=True)
-    bmatch = np.in1d(index_b1, index_a1, invert=True)
-    match = np.logical_and(amatch, bmatch)
-    e1_ind1b = np.full_like(e1_vertex_map.shape[0], invalid, dtype='int')
+    # search for e1 inside e2
+    e1_ind2b = np.full(num_e, invalid, dtype='int')
+    inda1, indb1 = utilities.search_index(e1_vertex_map[:, a], e2_vertex_map[:, b])
+    # inda2, indb2 = utilities.search_index(e1_vertex_map[inda1, b], e2_vertex_map[indb1, a])
+    for ii in range(len(inda1)):
+        if e1_vertex_map[inda1[ii], b] == e2_vertex_map[indb1[ii], a]:
+            e1_ind2b[inda1[ii]] = indb1[ii]
+    # search for e1 inside e3
+    e1_ind3b = np.full(num_e, invalid, dtype='int')
+    inda1, indb1 = utilities.search_index(e1_vertex_map[:, a], e3_vertex_map[:, b])
+    # inda2, indb2 = utilities.search_index(e1_vertex_map[inda1, b], e3_vertex_map[indb1, a])
+
+    for ii in range(len(inda1)):
+        if e1_vertex_map[inda1[ii], b] == e3_vertex_map[indb1[ii], a]:
+            e1_ind3b[inda1[ii]] = indb1[ii]
     
+    ############################ e2 searching #################################
+    # search for e2 inside e1
+    e2_ind1b = np.full(num_e, invalid, dtype='int')
+    inda1, indb1 = utilities.search_index(e2_vertex_map[:, a], e1_vertex_map[:, b])
+    # inda2, indb2 = utilities.search_index(e2_vertex_map[inda1, b], e1_vertex_map[indb1, a])
     
+    # update e2_ind1b
+    # check for opposite match and if so note it
+    for ii in range(len(inda1)):
+        if e2_vertex_map[inda1[ii], b] == e1_vertex_map[indb1[ii], a]:
+            e2_ind1b[inda1[ii]] = indb1[ii]
+
+    # search for e2 inside e2
+    e2_ind2b = np.full(num_e, invalid, dtype='int')
+    inda1, indb1 = utilities.search_index(e2_vertex_map[:, a], e2_vertex_map[:, b])
+    # inda2, indb2 = utilities.search_index(e2_vertex_map[inda1, b], e2_vertex_map[indb1, a])
+    for ii in range(len(inda1)):
+        if e2_vertex_map[inda1[ii], b] == e2_vertex_map[indb1[ii], a]:
+            e2_ind2b[inda1[ii]] = indb1[ii]
+    # search for e2 inside e3
+    e2_ind3b = np.full(num_e, invalid, dtype='int')
+    inda1, indb1 = utilities.search_index(e2_vertex_map[:, a], e3_vertex_map[:, b])
+    # inda2, indb2 = utilities.search_index(e2_vertex_map[inda1, b], e3_vertex_map[indb1, a])
+
+    for ii in range(len(inda1)):
+        if e2_vertex_map[inda1[ii], b] == e3_vertex_map[indb1[ii], a]:
+            e2_ind3b[inda1[ii]] = indb1[ii]
+
+    ############################ e3 searching #################################
+    # search for e2 inside e1
+    e3_ind1b = np.full(num_e, invalid, dtype='int')
+    inda1, indb1 = utilities.search_index(e3_vertex_map[:, a], e1_vertex_map[:, b])
+    # inda2, indb2 = utilities.search_index(e3_vertex_map[inda1, b], e1_vertex_map[indb1, a])
+    
+    # update e3_ind1b
+    # check for opposite match and if so note it
+    for ii in range(len(inda1)):
+        if e3_vertex_map[inda1[ii], b] == e1_vertex_map[indb1[ii], a]:
+            e3_ind1b[inda1[ii]] = indb1[ii]
+
+    # search for e3 inside e2
+    e3_ind2b = np.full(num_e, invalid, dtype='int')
+    inda1, indb1 = utilities.search_index(e3_vertex_map[:, a], e2_vertex_map[:, b])
+    # inda2, indb2 = utilities.search_index(e3_vertex_map[inda1, b], e2_vertex_map[indb1, a])
+    for ii in range(len(inda1)):
+        if e3_vertex_map[inda1[ii], b] == e2_vertex_map[indb1[ii], a]:
+            e3_ind2b[inda1[ii]] = indb1[ii]
+
+    # search for e3 inside e3
+    e3_ind3b = np.full(num_e, invalid, dtype='int')
+    inda1, indb1 = utilities.search_index(e3_vertex_map[:, a], e3_vertex_map[:, b])
+    # inda2, indb2 = utilities.search_index(e3_vertex_map[inda1, b], e3_vertex_map[indb1, a])
+
+    for ii in range(len(inda1)):
+        if e3_vertex_map[inda1[ii], b] == e3_vertex_map[indb1[ii], a]:
+            e3_ind3b[inda1[ii]] = indb1[ii]
+
     return (e1_ind1b, e1_ind2b, e1_ind3b,
             e2_ind1b, e2_ind2b, e2_ind3b,
             e3_ind1b, e3_ind2b, e3_ind3b)

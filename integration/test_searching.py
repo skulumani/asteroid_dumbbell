@@ -26,9 +26,9 @@ e3_ind1b, e3_ind2b, e3_ind3b) = wavefront.search_edge(e1, e2, e3)
 # duplicate this by searchinf over e1_vertex_map instead
 # check that the first column values are in the second column
 
-# (e1_ind1b, e1_ind2b, e1_ind3b,
-# e2_ind1b, e2_ind2b, e2_ind3b,
-# e3_ind1b, e3_ind2b, e3_ind3b) = wavefront.search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map)
+(e1_ind1b_new, e1_ind2b_new, e1_ind3b_new,
+e2_ind1b_new, e2_ind2b_new, e2_ind3b_new,
+e3_ind1b_new, e3_ind2b_new, e3_ind3b_new) = wavefront.search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map)
 
 def example_searching_array():
     """Example from

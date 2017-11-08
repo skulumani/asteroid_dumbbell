@@ -92,7 +92,6 @@ def search_index(a, b):
 
     https://stackoverflow.com/questions/8251541/numpy-for-every-element-in-one-array-find-the-index-in-another-array
     """
-    
     invalid = -1
     lenb = len(b)
     lena = len(a)
@@ -102,11 +101,10 @@ def search_index(a, b):
 
     inda, indb = np.where(np.equal(ae, be))
     
-    index_a = np.full(a.shape, -1, dtype='int')
-    index_b = np.full(b.shape, -1, dtype='int')
-    index_a[inda] = indb
-    index_b[indb] = inda
-    return index_a, index_b 
+    # returns locations where there are matches ( and the elements to find them)
+    # inda - index for each element corresponds to the match given in indb
+    # so a[inda[0]] = b[indb[0]] and a[inda[1]] = b[indb[1]]
+    return inda, indb
 
 if __name__ == "__main__":
     
