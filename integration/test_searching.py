@@ -6,8 +6,9 @@ import utilities
 import pdb
 
 # define a polyhedron
-# v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
-v, f = wavefront.read_obj('./integration/cube.obj')
+v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
+# v, f = wavefront.read_obj('./integration/cube.obj')
+# v, f = wavefront.read_obj('./integration/triangle.obj')
 
 num_v = v.shape[0]
 num_f = f.shape[0]
