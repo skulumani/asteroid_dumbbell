@@ -774,8 +774,17 @@ def vertex_map_search(a_map, b_map):
 
     return index_map
 
+def vertex_map_inverse(a_map, invalid=-1):
+    """Create the inverse index map for matching edges
+    """
+
+    a_loc = np.where(a_map != invalid)
+    b_loc = a_map[a_loc]
+    b_map = np.full(a_map.shape, invalid, dtype='int')
+    b_map[b_loc] = a_loc
+    return b_map
+
 # TODO: Remove the loops
-# TODO: Don't have to repeat allt he searches (e1 in e2 is same as e2 in e1)
 # TODO: Code reuse to ease all of this nonsense
 def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
     invalid = -1
@@ -788,15 +797,14 @@ def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
     e1_ind2b = vertex_map_search(e1_vertex_map, e2_vertex_map)
     e1_ind3b = vertex_map_search(e1_vertex_map, e3_vertex_map)
 
-    
     ############################ e2 searching #################################
-    e2_ind1b = vertex_map_search(e2_vertex_map, e1_vertex_map)
+    e2_ind1b = vertex_map_inverse(e1_ind2b)
     e2_ind2b = vertex_map_search(e2_vertex_map, e2_vertex_map)
     e2_ind3b = vertex_map_search(e2_vertex_map, e3_vertex_map)
 
     ############################ e3 searching #################################
-    e3_ind1b = vertex_map_search(e3_vertex_map, e1_vertex_map)
-    e3_ind2b = vertex_map_search(e3_vertex_map, e2_vertex_map)
+    e3_ind1b = vertex_map_inverse(e1_ind3b)
+    e3_ind2b = vertex_map_inverse(e2_ind3b)
     e3_ind3b = vertex_map_search(e3_vertex_map, e3_vertex_map)
     
     return (e1_ind1b, e1_ind2b, e1_ind3b,
