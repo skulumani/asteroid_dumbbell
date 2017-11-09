@@ -4,32 +4,84 @@ import numpy as np
 from point_cloud import wavefront
 import utilities
 import pdb
+import scipy.io
+import timeit
 
-# define a polyhedron
-v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
-# v, f = wavefront.read_obj('./integration/cube.obj')
-# v, f = wavefront.read_obj('./integration/triangle.obj')
+def polyhedron_setup():
 
-num_v = v.shape[0]
-num_f = f.shape[0]
-num_e = 3 * (num_v - 2)
+    # load mat file and use a smaller number of faces
+    mat = scipy.io.loadmat('./dynamics/ITOKAWA/itokawa_model.mat')
+    f = mat['F_32'] - 1
+    v = mat['V_32']
 
-(Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map,
-e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(v, f)
+    # define a polyhedron
+    # v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
+    # v, f = wavefront.read_obj('./integration/cube.obj')
+    # v, f = wavefront.read_obj('./integration/triangle.obj')
 
-# add face/edge map
+    num_v = v.shape[0]
+    num_f = f.shape[0]
+    num_e = 3 * (num_v - 2)
 
-# this is very slow
-(e1_ind1b, e1_ind2b, e1_ind3b,
-e2_ind1b, e2_ind2b, e2_ind3b,
-e3_ind1b, e3_ind2b, e3_ind3b) = wavefront.search_edge(e1, e2, e3)
+    (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map,
+    e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(v, f)
 
-# duplicate this by searchinf over e1_vertex_map instead
-# check that the first column values are in the second column
+    return (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map,
+    e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face)
 
-(e1_ind1b_new, e1_ind2b_new, e1_ind3b_new,
-e2_ind1b_new, e2_ind2b_new, e2_ind3b_new,
-e3_ind1b_new, e3_ind2b_new, e3_ind3b_new) = wavefront.search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map)
+def edge_searching(e1, e2, e3):
+
+    # this is very slow
+    (e1_ind1b, e1_ind2b, e1_ind3b,
+    e2_ind1b, e2_ind2b, e2_ind3b,
+    e3_ind1b, e3_ind2b, e3_ind3b) = wavefront.search_edge(e1, e2, e3)
+
+    return 0
+
+def edge_map_searching(e1_vertex_map, e2_vertex_map, e3_vertex_map):
+    # this should be faster
+    (e1_ind1b_new, e1_ind2b_new, e1_ind3b_new,
+    e2_ind1b_new, e2_ind2b_new, e2_ind3b_new,
+    e3_ind1b_new, e3_ind2b_new, e3_ind3b_new) = wavefront.search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map)
+
+    return 0
+
+def edge_search_time(num_runs=1000, repeat=3):
+    """Compute time for using older searching over edges
+    """
+    TEST_CODE='''
+edge_searching(e1, e2, e3)
+'''
+
+    SETUP_CODE='''
+from __main__ import polyhedron_setup, edge_searching
+(Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face) = polyhedron_setup()
+'''
+
+    times=timeit.repeat(setup=SETUP_CODE,
+                        stmt=TEST_CODE,
+                        repeat=repeat,
+                        number=num_runs)
+    print('Searching over edges: {} ms +/- {} ms'.format(np.mean(times)/ num_runs * 1e3, np.std(times)/num_runs * 1e3))
+
+def edge_map_search_time(num_runs=1000, repeat=3):
+    """Compute time for using new hotness searching over vertex maps
+    """
+    TEST_CODE='''
+edge_map_searching(e1_vertex_map, e2_vertex_map, e3_vertex_map)
+'''
+
+    SETUP_CODE='''
+from __main__ import polyhedron_setup, edge_map_searching
+(Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face) = polyhedron_setup()
+'''
+
+    times=timeit.repeat(setup=SETUP_CODE,
+                        stmt=TEST_CODE,
+                        repeat=repeat,
+                        number=num_runs)
+    
+    print('Searching over edge map: {} ms +/- {} ms'.format(np.mean(times)/ num_runs * 1e3, np.std(times)/num_runs * 1e3))
 
 def example_searching_array():
     """Example from
@@ -66,4 +118,7 @@ def example_searching_array():
 
     return index_x, index_y
 
+if __name__ == "__main__":
+    edge_search_time(1, 1)
+    edge_map_search_time(1, 1)
 
