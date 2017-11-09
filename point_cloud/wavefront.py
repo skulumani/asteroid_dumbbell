@@ -790,6 +790,7 @@ def vertex_map_inverse(a_map, invalid=-1):
     return b_map
 
 # TODO: Code reuse to ease all of this nonsense
+# TODO: Convert to input a tuple into vertex_map_search
 def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
     invalid = -1
     num_e = e1_vertex_map.shape[0]
@@ -797,9 +798,13 @@ def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
     b = 1
 
     ######################## e1 searching #####################################
-    e1_ind1b = vertex_map_search(e1_vertex_map, e1_vertex_map)
-    e1_ind2b = vertex_map_search(e1_vertex_map, e2_vertex_map)
-    e1_ind3b = vertex_map_search(e1_vertex_map, e3_vertex_map)
+    with Pool(3) as p:
+        func = partial(vertex_map_search, e1_vertex_map)
+        e1_ind_list = p.map(func, (e1_vertex_map, e2_vertex_map, e3_vertex_map))
+
+    e1_ind1b = e1_ind_list[0]
+    e1_ind2b = e1_ind_list[1]
+    e1_ind3b = e1_ind_list[2]
 
     ############################ e2 searching #################################
     e2_ind1b = vertex_map_inverse(e1_ind2b)
