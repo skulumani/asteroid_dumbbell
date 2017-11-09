@@ -192,12 +192,386 @@ class TestReadingCubeOBJ():
      e1_vertex_map, e2_vertex_map, e3_vertex_map, 
      normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(v, f)
 
+    num_v = v.shape[0]
+    num_f = f.shape[0]
+    num_e = 3 * (num_v - 2)
     def test_number_faces(self):
-        np.testing.assert_allclose(self.f.shape, (12,3))
+        np.testing.assert_allclose(self.f.shape, (self.num_f,3))
+    
+    def test_number_e1_edges(self):
+        np.testing.assert_allclose(self.e1.shape, (self.num_f, 3))
+    def test_number_e2_edges(self):
+        np.testing.assert_allclose(self.e2.shape, (self.num_f, 3))
+    def test_number_e3_edges(self):
+        np.testing.assert_allclose(self.e3.shape, (self.num_f, 3))
+    
+    def test_number_vertices(self):
+        np.testing.assert_allclose(self.v.shape, (self.num_v, 3))
 
-    def test_number_edges(self):
-        np.testing.assert_allclose(self.v.shape, (8, 3))
+    def test_Fa(self):
+        np.testing.assert_allclose(self.Fa, self.f[:, 0])
+    def test_Fb(self):
+        np.testing.assert_allclose(self.Fb, self.f[:, 1])
+    def test_Fc(self):
+        np.testing.assert_allclose(self.Fc, self.f[:, 2])
+
+    def test_V1_shape(self):
+        np.testing.assert_allclose(self.V1.shape, (self.num_f, 3))
+    def test_V2_shape(self):
+        np.testing.assert_allclose(self.V1.shape, (self.num_f, 3))
+    def test_V3_shape(self):
+        np.testing.assert_allclose(self.V3.shape, (self.num_f, 3))
+
+    def test_e1_vertex_map_shape(self):
+        np.testing.assert_allclose(self.e1_vertex_map.shape, (self.num_f, 2))
+    def test_e2_vertex_map_shape(self):
+        np.testing.assert_allclose(self.e2_vertex_map.shape, (self.num_f, 2))
+    def test_e3_vertex_map_shape(self):
+        np.testing.assert_allclose(self.e3_vertex_map.shape, (self.num_f, 2))
+
+    def test_e1_vertex_map_values(self):
+        np.testing.assert_allclose(self.e1_vertex_map, np.stack((self.f[:, 1], self.f[:, 0]), axis=1))
+    def test_e2_vertex_map_values(self):
+        np.testing.assert_allclose(self.e2_vertex_map, np.stack((self.f[:, 2], self.f[:, 1]), axis=1))
+    def test_e3_vertex_map_values(self):
+        np.testing.assert_allclose(self.e3_vertex_map, np.stack((self.f[:, 0], self.f[:, 2]), axis=1))
+
+    def test_normal_face_shape(self):
+        np.testing.assert_allclose(self.normal_face.shape, (self.num_f, 3))
+    
+    def test_e1_normal_shape(self):
+        np.testing.assert_allclose(self.e1_normal.shape, (self.num_f, 3))
+    def test_e2_normal_shape(self):
+        np.testing.assert_allclose(self.e2_normal.shape, (self.num_f, 3))
+    def test_e3_normal_shape(self):
+        np.testing.assert_allclose(self.e3_normal.shape, (self.num_f, 3))
+    def test_center_face(self):
+        np.testing.assert_allclose(self.center_face.shape, (self.num_f, 3))
+class TestEdgeSearchingItokawaMat32():
+    # load mat file
+    mat = scipy.io.loadmat('./dynamics/ITOKAWA/itokawa_model.mat')
+    f = mat['F_32'] - 1
+    v = mat['V_32'] 
+
+    (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map,
+    e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(v, f)
+
+    (e1_ind1b, e1_ind2b, e1_ind3b,
+    e2_ind1b, e2_ind2b, e2_ind3b,
+    e3_ind1b, e3_ind2b, e3_ind3b) = wavefront.search_edge(e1, e2, e3)
+
+    (e1_ind1b_new, e1_ind2b_new, e1_ind3b_new,
+    e2_ind1b_new, e2_ind2b_new, e2_ind3b_new,
+    e3_ind1b_new, e3_ind2b_new, e3_ind3b_new) = wavefront.search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map)
+     
+    num_v = v.shape[0]
+    num_f = f.shape[0]
+    num_e = 3 * (num_v - 2)
+    
+    def test_number_faces(self):
+        np.testing.assert_allclose(self.f.shape, (self.num_f,3))
+
+    def test_number_e1_edges(self):
+        np.testing.assert_allclose(self.e1.shape, (self.num_f, 3))
+    def test_number_e2_edges(self):
+        np.testing.assert_allclose(self.e2.shape, (self.num_f, 3))
+    def test_number_e3_edges(self):
+        np.testing.assert_allclose(self.e3.shape, (self.num_f, 3))
+    
+    def test_number_vertices(self):
+        np.testing.assert_allclose(self.v.shape, (self.num_v, 3))
     
     def test_Fa(self):
         np.testing.assert_allclose(self.Fa, self.f[:, 0])
+    def test_Fb(self):
+        np.testing.assert_allclose(self.Fb, self.f[:, 1])
+    def test_Fc(self):
+        np.testing.assert_allclose(self.Fc, self.f[:, 2])
+    def test_V1_shape(self):
+        np.testing.assert_allclose(self.V1.shape, (self.num_f, 3))
+    def test_V2_shape(self):
+        np.testing.assert_allclose(self.V1.shape, (self.num_f, 3))
+    def test_V3_shape(self):
+        np.testing.assert_allclose(self.V3.shape, (self.num_f, 3))
+    def test_e1_vertex_map_shape(self):
+        np.testing.assert_allclose(self.e1_vertex_map.shape, (self.num_f, 2))
+    def test_e2_vertex_map_shape(self):
+        np.testing.assert_allclose(self.e2_vertex_map.shape, (self.num_f, 2))
+    def test_e3_vertex_map_shape(self):
+        np.testing.assert_allclose(self.e3_vertex_map.shape, (self.num_f, 2))
 
+    def test_e1_vertex_map_values(self):
+        np.testing.assert_allclose(self.e1_vertex_map, np.stack((self.f[:, 1], self.f[:, 0]), axis=1))
+    def test_e2_vertex_map_values(self):
+        np.testing.assert_allclose(self.e2_vertex_map, np.stack((self.f[:, 2], self.f[:, 1]), axis=1))
+    def test_e3_vertex_map_values(self):
+        np.testing.assert_allclose(self.e3_vertex_map, np.stack((self.f[:, 0], self.f[:, 2]), axis=1))
+
+    def test_normal_face_shape(self):
+        np.testing.assert_allclose(self.normal_face.shape, (self.num_f, 3))
+    
+    def test_e1_normal_shape(self):
+        np.testing.assert_allclose(self.e1_normal.shape, (self.num_f, 3))
+    def test_e2_normal_shape(self):
+        np.testing.assert_allclose(self.e2_normal.shape, (self.num_f, 3))
+    def test_e3_normal_shape(self):
+        np.testing.assert_allclose(self.e3_normal.shape, (self.num_f, 3))
+    def test_center_face(self):
+        np.testing.assert_allclose(self.center_face.shape, (self.num_f, 3))
+
+    def test_e1_edge_searching_shape(self):
+        np.testing.assert_allclose(self.e1_ind1b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e1_ind2b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e1_ind3b.shape, (self.num_f,))
+    def test_e2_edge_searching_shape(self):
+        np.testing.assert_allclose(self.e2_ind1b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e2_ind2b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e2_ind3b.shape, (self.num_f,))
+    def test_e3_edge_searching_shape(self):
+        np.testing.assert_allclose(self.e3_ind1b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e3_ind2b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e3_ind3b.shape, (self.num_f,))
+    def test_e1_vertex_map_searching(self):
+        np.testing.assert_allclose(self.e1_ind1b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e1_ind2b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e1_ind3b_new.shape, (self.num_f,))
+    def test_e2_vertex_map_searching(self):
+        np.testing.assert_allclose(self.e2_ind1b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e2_ind2b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e2_ind3b_new.shape, (self.num_f,))
+    def test_e3_vertex_map_searching(self):
+        np.testing.assert_allclose(self.e3_ind1b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e3_ind2b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e3_ind3b_new.shape, (self.num_f,))
+
+    def test_e1_searching_matches(self):
+        np.testing.assert_allclose(self.e1_ind1b_new, self.e1_ind1b)
+        np.testing.assert_allclose(self.e1_ind2b_new, self.e1_ind2b)
+        np.testing.assert_allclose(self.e1_ind3b_new, self.e1_ind3b)
+    def test_e2_searching_matches(self):
+        np.testing.assert_allclose(self.e2_ind1b_new, self.e2_ind1b)
+        np.testing.assert_allclose(self.e2_ind2b_new, self.e2_ind2b)
+        np.testing.assert_allclose(self.e2_ind3b_new, self.e2_ind3b)
+    def test_e3_searching_matches(self):
+        np.testing.assert_allclose(self.e3_ind1b_new, self.e3_ind1b)
+        np.testing.assert_allclose(self.e3_ind2b_new, self.e3_ind2b)
+        np.testing.assert_allclose(self.e3_ind3b_new, self.e3_ind3b)
+class TestEdgeSearchingItokawaMat2048():
+    # load mat file
+    mat = scipy.io.loadmat('./dynamics/ITOKAWA/itokawa_model.mat')
+    f = mat['F_2048'] - 1
+    v = mat['V_2048'] 
+
+    (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map,
+    e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(v, f)
+
+    (e1_ind1b, e1_ind2b, e1_ind3b,
+    e2_ind1b, e2_ind2b, e2_ind3b,
+    e3_ind1b, e3_ind2b, e3_ind3b) = wavefront.search_edge(e1, e2, e3)
+
+    (e1_ind1b_new, e1_ind2b_new, e1_ind3b_new,
+    e2_ind1b_new, e2_ind2b_new, e2_ind3b_new,
+    e3_ind1b_new, e3_ind2b_new, e3_ind3b_new) = wavefront.search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map)
+     
+    num_v = v.shape[0]
+    num_f = f.shape[0]
+    num_e = 3 * (num_v - 2)
+    
+    def test_number_faces(self):
+        np.testing.assert_allclose(self.f.shape, (self.num_f,3))
+
+    def test_number_e1_edges(self):
+        np.testing.assert_allclose(self.e1.shape, (self.num_f, 3))
+    def test_number_e2_edges(self):
+        np.testing.assert_allclose(self.e2.shape, (self.num_f, 3))
+    def test_number_e3_edges(self):
+        np.testing.assert_allclose(self.e3.shape, (self.num_f, 3))
+    
+    def test_number_vertices(self):
+        np.testing.assert_allclose(self.v.shape, (self.num_v, 3))
+    
+    def test_Fa(self):
+        np.testing.assert_allclose(self.Fa, self.f[:, 0])
+    def test_Fb(self):
+        np.testing.assert_allclose(self.Fb, self.f[:, 1])
+    def test_Fc(self):
+        np.testing.assert_allclose(self.Fc, self.f[:, 2])
+    def test_V1_shape(self):
+        np.testing.assert_allclose(self.V1.shape, (self.num_f, 3))
+    def test_V2_shape(self):
+        np.testing.assert_allclose(self.V1.shape, (self.num_f, 3))
+    def test_V3_shape(self):
+        np.testing.assert_allclose(self.V3.shape, (self.num_f, 3))
+    def test_e1_vertex_map_shape(self):
+        np.testing.assert_allclose(self.e1_vertex_map.shape, (self.num_f, 2))
+    def test_e2_vertex_map_shape(self):
+        np.testing.assert_allclose(self.e2_vertex_map.shape, (self.num_f, 2))
+    def test_e3_vertex_map_shape(self):
+        np.testing.assert_allclose(self.e3_vertex_map.shape, (self.num_f, 2))
+
+    def test_e1_vertex_map_values(self):
+        np.testing.assert_allclose(self.e1_vertex_map, np.stack((self.f[:, 1], self.f[:, 0]), axis=1))
+    def test_e2_vertex_map_values(self):
+        np.testing.assert_allclose(self.e2_vertex_map, np.stack((self.f[:, 2], self.f[:, 1]), axis=1))
+    def test_e3_vertex_map_values(self):
+        np.testing.assert_allclose(self.e3_vertex_map, np.stack((self.f[:, 0], self.f[:, 2]), axis=1))
+
+    def test_normal_face_shape(self):
+        np.testing.assert_allclose(self.normal_face.shape, (self.num_f, 3))
+    
+    def test_e1_normal_shape(self):
+        np.testing.assert_allclose(self.e1_normal.shape, (self.num_f, 3))
+    def test_e2_normal_shape(self):
+        np.testing.assert_allclose(self.e2_normal.shape, (self.num_f, 3))
+    def test_e3_normal_shape(self):
+        np.testing.assert_allclose(self.e3_normal.shape, (self.num_f, 3))
+    def test_center_face(self):
+        np.testing.assert_allclose(self.center_face.shape, (self.num_f, 3))
+
+    def test_e1_edge_searching_shape(self):
+        np.testing.assert_allclose(self.e1_ind1b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e1_ind2b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e1_ind3b.shape, (self.num_f,))
+    def test_e2_edge_searching_shape(self):
+        np.testing.assert_allclose(self.e2_ind1b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e2_ind2b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e2_ind3b.shape, (self.num_f,))
+    def test_e3_edge_searching_shape(self):
+        np.testing.assert_allclose(self.e3_ind1b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e3_ind2b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e3_ind3b.shape, (self.num_f,))
+    def test_e1_vertex_map_searching(self):
+        np.testing.assert_allclose(self.e1_ind1b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e1_ind2b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e1_ind3b_new.shape, (self.num_f,))
+    def test_e2_vertex_map_searching(self):
+        np.testing.assert_allclose(self.e2_ind1b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e2_ind2b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e2_ind3b_new.shape, (self.num_f,))
+    def test_e3_vertex_map_searching(self):
+        np.testing.assert_allclose(self.e3_ind1b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e3_ind2b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e3_ind3b_new.shape, (self.num_f,))
+
+    def test_e1_searching_matches(self):
+        np.testing.assert_allclose(self.e1_ind1b_new, self.e1_ind1b)
+        np.testing.assert_allclose(self.e1_ind2b_new, self.e1_ind2b)
+        np.testing.assert_allclose(self.e1_ind3b_new, self.e1_ind3b)
+    def test_e2_searching_matches(self):
+        np.testing.assert_allclose(self.e2_ind1b_new, self.e2_ind1b)
+        np.testing.assert_allclose(self.e2_ind2b_new, self.e2_ind2b)
+        np.testing.assert_allclose(self.e2_ind3b_new, self.e2_ind3b)
+    def test_e3_searching_matches(self):
+        np.testing.assert_allclose(self.e3_ind1b_new, self.e3_ind1b)
+        np.testing.assert_allclose(self.e3_ind2b_new, self.e3_ind2b)
+        np.testing.assert_allclose(self.e3_ind3b_new, self.e3_ind3b)
+
+class TestEdgeSearchingCastaliaMat4092():
+    # load mat file
+    mat = scipy.io.loadmat('./dynamics/CASTALIA/castalia_model.mat')
+    f = mat['F_4092'] - 1
+    v = mat['V_4092'] 
+
+    (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map,
+    e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(v, f)
+
+    (e1_ind1b, e1_ind2b, e1_ind3b,
+    e2_ind1b, e2_ind2b, e2_ind3b,
+    e3_ind1b, e3_ind2b, e3_ind3b) = wavefront.search_edge(e1, e2, e3)
+
+    (e1_ind1b_new, e1_ind2b_new, e1_ind3b_new,
+    e2_ind1b_new, e2_ind2b_new, e2_ind3b_new,
+    e3_ind1b_new, e3_ind2b_new, e3_ind3b_new) = wavefront.search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map)
+     
+    num_v = v.shape[0]
+    num_f = f.shape[0]
+    num_e = 3 * (num_v - 2)
+    
+    def test_number_faces(self):
+        np.testing.assert_allclose(self.f.shape, (self.num_f,3))
+
+    def test_number_e1_edges(self):
+        np.testing.assert_allclose(self.e1.shape, (self.num_f, 3))
+    def test_number_e2_edges(self):
+        np.testing.assert_allclose(self.e2.shape, (self.num_f, 3))
+    def test_number_e3_edges(self):
+        np.testing.assert_allclose(self.e3.shape, (self.num_f, 3))
+    
+    def test_number_vertices(self):
+        np.testing.assert_allclose(self.v.shape, (self.num_v, 3))
+    
+    def test_Fa(self):
+        np.testing.assert_allclose(self.Fa, self.f[:, 0])
+    def test_Fb(self):
+        np.testing.assert_allclose(self.Fb, self.f[:, 1])
+    def test_Fc(self):
+        np.testing.assert_allclose(self.Fc, self.f[:, 2])
+    def test_V1_shape(self):
+        np.testing.assert_allclose(self.V1.shape, (self.num_f, 3))
+    def test_V2_shape(self):
+        np.testing.assert_allclose(self.V1.shape, (self.num_f, 3))
+    def test_V3_shape(self):
+        np.testing.assert_allclose(self.V3.shape, (self.num_f, 3))
+    def test_e1_vertex_map_shape(self):
+        np.testing.assert_allclose(self.e1_vertex_map.shape, (self.num_f, 2))
+    def test_e2_vertex_map_shape(self):
+        np.testing.assert_allclose(self.e2_vertex_map.shape, (self.num_f, 2))
+    def test_e3_vertex_map_shape(self):
+        np.testing.assert_allclose(self.e3_vertex_map.shape, (self.num_f, 2))
+
+    def test_e1_vertex_map_values(self):
+        np.testing.assert_allclose(self.e1_vertex_map, np.stack((self.f[:, 1], self.f[:, 0]), axis=1))
+    def test_e2_vertex_map_values(self):
+        np.testing.assert_allclose(self.e2_vertex_map, np.stack((self.f[:, 2], self.f[:, 1]), axis=1))
+    def test_e3_vertex_map_values(self):
+        np.testing.assert_allclose(self.e3_vertex_map, np.stack((self.f[:, 0], self.f[:, 2]), axis=1))
+
+    def test_normal_face_shape(self):
+        np.testing.assert_allclose(self.normal_face.shape, (self.num_f, 3))
+    
+    def test_e1_normal_shape(self):
+        np.testing.assert_allclose(self.e1_normal.shape, (self.num_f, 3))
+    def test_e2_normal_shape(self):
+        np.testing.assert_allclose(self.e2_normal.shape, (self.num_f, 3))
+    def test_e3_normal_shape(self):
+        np.testing.assert_allclose(self.e3_normal.shape, (self.num_f, 3))
+    def test_center_face(self):
+        np.testing.assert_allclose(self.center_face.shape, (self.num_f, 3))
+
+    def test_e1_edge_searching_shape(self):
+        np.testing.assert_allclose(self.e1_ind1b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e1_ind2b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e1_ind3b.shape, (self.num_f,))
+    def test_e2_edge_searching_shape(self):
+        np.testing.assert_allclose(self.e2_ind1b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e2_ind2b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e2_ind3b.shape, (self.num_f,))
+    def test_e3_edge_searching_shape(self):
+        np.testing.assert_allclose(self.e3_ind1b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e3_ind2b.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e3_ind3b.shape, (self.num_f,))
+    def test_e1_vertex_map_searching(self):
+        np.testing.assert_allclose(self.e1_ind1b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e1_ind2b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e1_ind3b_new.shape, (self.num_f,))
+    def test_e2_vertex_map_searching(self):
+        np.testing.assert_allclose(self.e2_ind1b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e2_ind2b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e2_ind3b_new.shape, (self.num_f,))
+    def test_e3_vertex_map_searching(self):
+        np.testing.assert_allclose(self.e3_ind1b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e3_ind2b_new.shape, (self.num_f,))
+        np.testing.assert_allclose(self.e3_ind3b_new.shape, (self.num_f,))
+
+    def test_e1_searching_matches(self):
+        np.testing.assert_allclose(self.e1_ind1b_new, self.e1_ind1b)
+        np.testing.assert_allclose(self.e1_ind2b_new, self.e1_ind2b)
+        np.testing.assert_allclose(self.e1_ind3b_new, self.e1_ind3b)
+    def test_e2_searching_matches(self):
+        np.testing.assert_allclose(self.e2_ind1b_new, self.e2_ind1b)
+        np.testing.assert_allclose(self.e2_ind2b_new, self.e2_ind2b)
+        np.testing.assert_allclose(self.e2_ind3b_new, self.e2_ind3b)
+    def test_e3_searching_matches(self):
+        np.testing.assert_allclose(self.e3_ind1b_new, self.e3_ind1b)
+        np.testing.assert_allclose(self.e3_ind2b_new, self.e3_ind2b)
+        np.testing.assert_allclose(self.e3_ind3b_new, self.e3_ind3b)
