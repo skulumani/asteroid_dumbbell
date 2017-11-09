@@ -776,7 +776,7 @@ def vertex_map_search(a_map, b_map):
 
 # TODO: Remove the loops
 # TODO: Don't have to repeat allt he searches (e1 in e2 is same as e2 in e1)
-# TODO: Create a tuple and a big outer loop to avoid having to type everything
+# TODO: Code reuse to ease all of this nonsense
 def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
     invalid = -1
     num_e = e1_vertex_map.shape[0]
