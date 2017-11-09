@@ -35,6 +35,9 @@ from vtk.util import numpy_support
 import pdb
 from point_cloud import wavefront
 import utilities
+from multiprocessing import Pool
+from functools import partial
+
 # TODO: Create better function names
 
 # TODO: Add documentation and link to OBJ format
@@ -754,6 +757,7 @@ def search_edge(e1, e2, e3):
             e3_ind1b, e3_ind2b, e3_ind3b)
 
 # TODO: Add documentation
+# TODO: Remove the loops
 def vertex_map_search(a_map, b_map):
     """Search and define mapping for these two sets of edge vertex maps
 
@@ -774,6 +778,7 @@ def vertex_map_search(a_map, b_map):
 
     return index_map
 
+# TODO: Add documentation
 def vertex_map_inverse(a_map, invalid=-1):
     """Create the inverse index map for matching edges
     """
@@ -784,7 +789,6 @@ def vertex_map_inverse(a_map, invalid=-1):
     b_map[b_loc] = a_loc
     return b_map
 
-# TODO: Remove the loops
 # TODO: Code reuse to ease all of this nonsense
 def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
     invalid = -1

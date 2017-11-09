@@ -10,12 +10,12 @@ import timeit
 def polyhedron_setup():
 
     # load mat file and use a smaller number of faces
-    mat = scipy.io.loadmat('./dynamics/ITOKAWA/itokawa_model.mat')
-    f = mat['F_32'] - 1
-    v = mat['V_32']
+    # mat = scipy.io.loadmat('./dynamics/ITOKAWA/itokawa_model.mat')
+    # f = mat['F_32'] - 1
+    # v = mat['V_32']
 
     # define a polyhedron
-    # v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
+    v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
     # v, f = wavefront.read_obj('./integration/cube.obj')
     # v, f = wavefront.read_obj('./integration/triangle.obj')
 
