@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import sys
-
+import pdb
 
 def save_to_interactive(dct):
     """Save variables from debugger to main interpreter
@@ -64,6 +64,7 @@ def in1d_index(a, b):
     voida, voidb = map(asvoid, (a, b))
     return np.where(np.in1d(voidb, voida))[0]
 
+# TODO: Add documentation and exmaple
 def ismember_index(a,b):
     """Find index of matching elements
     
@@ -85,6 +86,26 @@ def ismember_index(a,b):
             index[ii] = match[0]
 
     return index
+
+# TODO: Documentation
+def search_index(a, b):
+    """Memory intensive way to find matches. have to search across vertex map
+
+    https://stackoverflow.com/questions/8251541/numpy-for-every-element-in-one-array-find-the-index-in-another-array
+    """
+    invalid = -1
+    lenb = len(b)
+    lena = len(a)
+
+    ae = np.broadcast_to(b, (lena, lenb))
+    be = np.broadcast_to(a, (lenb, lena)).T
+
+    inda, indb = np.where(np.equal(ae, be))
+    
+    # returns locations where there are matches ( and the elements to find them)
+    # inda - index for each element corresponds to the match given in indb
+    # so a[inda[0]] = b[indb[0]] and a[inda[1]] = b[indb[1]]
+    return inda, indb
 
 if __name__ == "__main__":
     

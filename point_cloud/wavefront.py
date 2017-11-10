@@ -34,6 +34,9 @@ from mayavi import mlab
 from vtk.util import numpy_support
 import pdb
 from point_cloud import wavefront
+import utilities
+from multiprocessing import Pool
+from functools import partial
 
 # TODO: Create better function names
 
@@ -666,3 +669,154 @@ def draw_polyhedron_mayavi(vertices, faces, fig):
                                 representation='surface')
 
     return mesh
+
+# TODO: Add some documentation
+# TODO: Add unit testing
+def polyhedron_parameters(V, F):
+    """Compute some edge/face vectors for a polyhedron
+    """
+    # calculate shape parameters
+
+    num_v = V.shape[0]
+    num_f = F.shape[0]
+    num_e = 3 * (num_v - 2)
+    # calculate all the edges - zero indexing for python
+    Fa = F[:, 0] 
+    Fb = F[:, 1]
+    Fc = F[:, 2]
+
+    V1 = V[Fa, :]
+    V2 = V[Fb, :]
+    V3 = V[Fc, :]
+    
+    # Get all edge vectors
+    e1 = V2 - V1
+    e2 = V3 - V2
+    e3 = V1 - V3
+
+    # TODO: Instead of searching on edges search these arrays instead
+    e1_vertex_map = np.vstack((Fb, Fa)).T
+    e2_vertex_map = np.vstack((Fc, Fb)).T
+    e3_vertex_map = np.vstack((Fa, Fc)).T
+
+    # Normalize edge vectors
+    # e1_norm=e1./repmat(sqrt(e1(:,1).^2+e1(:,2).^2+e1(:,3).^2),1,3);
+    # e2_norm=e2./repmat(sqrt(e2(:,1).^2+e2(:,2).^2+e2(:,3).^2),1,3);
+    # e3_norm=e3./repmat(sqrt(e3(:,1).^2+e3(:,2).^2+e3(:,3).^2),1,3);
+
+    # normal to face
+    normal_face = np.cross(e1, e2)
+    normal_face = normal_face / \
+        np.tile(np.reshape(
+            np.sqrt(np.sum(normal_face**2, axis=1)), (num_f, 1)), (1, 3))
+
+    # normal to each edge
+    e1_normal = np.cross(e1, normal_face)
+    e1_normal = e1_normal / \
+        np.tile(np.reshape(
+            np.sqrt(np.sum(e1_normal**2, axis=1)), (num_f, 1)), (1, 3))
+
+    e2_normal = np.cross(e2, normal_face)
+    e2_normal = e2_normal / \
+        np.tile(np.reshape(
+            np.sqrt(np.sum(e2_normal**2, axis=1)), (num_f, 1)), (1, 3))
+
+    e3_normal = np.cross(e3, normal_face)
+    e3_normal = e3_normal / \
+        np.tile(np.reshape(
+            np.sqrt(np.sum(e3_normal**2, axis=1)), (num_f, 1)), (1, 3))
+
+    # calculate the center of each face
+    center_face = 1.0 / 3 * (V[Fa, :] + V[Fb, :] + V[Fc, :])
+
+    # Calculate Angle of face seen from vertices
+    # Angle =  [acos(dot(e1_norm',-e3_norm'));acos(dot(e2_norm',-e1_norm'));acos(dot(e3_norm',-e2_norm'))]';
+    
+    return (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3,
+            e1_vertex_map, e2_vertex_map, e3_vertex_map, 
+            normal_face, e1_normal, e2_normal,e3_normal, center_face)
+
+# TODO: Add documentation and modify inputs to search over e vertex maps instead
+# TODO: THis function will give false positives for parallel edges (should be rare in a real object hopefully)
+def search_edge(e1, e2, e3):
+
+    e1_ind1b = utilities.ismember_index(-e1, e1)
+    e1_ind2b = utilities.ismember_index(-e1, e2)
+    e1_ind3b = utilities.ismember_index(-e1, e3)
+
+    e2_ind1b = utilities.ismember_index(-e2, e1)
+    e2_ind2b = utilities.ismember_index(-e2, e2)
+    e2_ind3b = utilities.ismember_index(-e2, e3)
+
+    e3_ind1b = utilities.ismember_index(-e3, e1)
+    e3_ind2b = utilities.ismember_index(-e3, e2)
+    e3_ind3b = utilities.ismember_index(-e3, e3)
+
+    return (e1_ind1b, e1_ind2b, e1_ind3b,
+            e2_ind1b, e2_ind2b, e2_ind3b,
+            e3_ind1b, e3_ind2b, e3_ind3b)
+
+# TODO: Add documentation
+def vertex_map_search(arrays):
+    """Search and define mapping for these two sets of edge vertex maps
+
+    """
+    a_map = arrays[0]
+    b_map = arrays[1]
+    invalid = -1
+    num_e = a_map.shape[0]
+    a = 0
+    b = 1
+
+    index_map = np.full(num_e, invalid, dtype='int')
+    inda1, indb1 = utilities.search_index(a_map[:, a], b_map[:, b])
+    
+    index_match = np.where(a_map[inda1, b] == b_map[indb1, a])
+    index_map[inda1[index_match]] = indb1[index_match]
+    return index_map
+
+# TODO: Add documentation
+def vertex_map_inverse(a_map, invalid=-1):
+    """Create the inverse index map for matching edges
+    """
+
+    a_loc = np.where(a_map != invalid)
+    b_loc = a_map[a_loc]
+    b_map = np.full(a_map.shape, invalid, dtype='int')
+    b_map[b_loc] = a_loc
+    return b_map
+
+# TODO: Code reuse to ease all of this nonsense
+# TODO: Documentation
+def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
+    invalid = -1
+    num_e = e1_vertex_map.shape[0]
+    a = 0
+    b = 1
+
+    ######################## e1 searching #####################################
+    with Pool(6) as p:
+        # func = partial(vertex_map_search, e1_vertex_map)
+        index_list = p.map(vertex_map_search, ((e1_vertex_map, e1_vertex_map),
+                                               (e1_vertex_map, e2_vertex_map),
+                                               (e1_vertex_map, e3_vertex_map),
+                                               (e2_vertex_map, e2_vertex_map),
+                                               (e2_vertex_map, e3_vertex_map),
+                                               (e3_vertex_map, e3_vertex_map)))
+
+    e1_ind1b =index_list[0]
+    e1_ind2b =index_list[1]
+    e1_ind3b =index_list[2]
+
+    e2_ind1b = vertex_map_inverse(e1_ind2b)
+    e2_ind2b = index_list[3]
+    e2_ind3b = index_list[4]
+
+    e3_ind1b = vertex_map_inverse(e1_ind3b)
+    e3_ind2b = vertex_map_inverse(e2_ind3b)
+    e3_ind3b = index_list[5]
+
+    
+    return (e1_ind1b, e1_ind2b, e1_ind3b,
+            e2_ind1b, e2_ind2b, e2_ind3b,
+            e3_ind1b, e3_ind2b, e3_ind3b)

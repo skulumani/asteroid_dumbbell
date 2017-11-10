@@ -8,14 +8,14 @@ import mayavi.api
 import copy
 from multiprocessing import Pool
 from functools import partial
-def define_grid(ast, density=5):
+def define_grid(ast, density=100):
     # generate a grid around the asteroid
     nx, ny, nz = (density, density, density)
     xmin, xmax = -ast.axes[0], ast.axes[0]
     ymin, ymax = -ast.axes[1], ast.axes[1]
     zmin, zmax = -ast.axes[2], ast.axes[2]
 
-    xg, yg, zg = np.mgrid[ xmin:xmax:5j, ymin:ymax:5j, zmin:zmax:5j]
+    xg, yg, zg = np.mgrid[ xmin:xmax:100j, ymin:ymax:100j, zmin:zmax:100j]
     
     grid = {'xg': xg, 'yg':yg, 'zg':zg,
             'nx': nx, 'ny':ny, 'nz':nz}
@@ -82,17 +82,20 @@ def visualize_data(ast, Ug_array, grid):
     mlab.colorbar(object=mesh, title='mm/sec^2' )
     # mlab.show()
 
-def comparison_generate_asteroid():
-    """Generate all of the asteroid objects
-    """
-    
+def iterable_visualize(ast_list, Ug_list, titles_list, grid):
+
+    for ii in range(len(ast_list)):
+        visualize_data(ast_list[ii], Ug_list[ii], grid)
+        mlab.title(titles_list[ii])
+
+if __name__ == '__main__':
     # define all of the asteroid models
     name = 'itokawa'
     ast_mat_4092 = asteroid.Asteroid(name, 4092, 'mat')
     ast_mat_2048 = asteroid.Asteroid(name, 2048, 'mat')
     # OBJ - original without reduction
     ast_obj_low = asteroid.Asteroid(name, 0, 'obj')
-    
+
     # now decimate
     ast_obj_90 = copy.deepcopy(ast_obj_low)
     ast_obj_90.V, ast_obj_90.F = wavefront.decimate_numpy(ast_obj_low.V, ast_obj_low.F, 0.9)
@@ -114,28 +117,18 @@ def comparison_generate_asteroid():
     ast_obj_low_reconstruct.V, ast_obj_low_reconstruct.F = wavefront.reconstruct_numpy(ast_obj_low.V)
     ast_obj_low_reconstruct.asteroid_grav = ast_obj_low_reconstruct.polyhedron_shape_input()
 
-    ast_list = [ast_mat_4092, ast_mat_2048, ast_obj_low,
+    ast_list = ( ast_mat_4092, ast_mat_2048, ast_obj_low,
                 ast_obj_90, ast_obj_50, 
-                ast_obj_90_reconstruct, ast_obj_50_reconstruct, ast_obj_low_reconstruct]
-    titles_list = ['MAT 4092', 'MAT 2048', 'OBJ Low',
-                   'OBJ Decimate 0.90', 'OBJ Decimate 0.50',
-                   'OBJ Reconstruct 0.90', 'OBJ Reconstruct 0.50', 'OBJ Low Reconstruct']
-    grid = define_grid(ast_list[ii], 5)
-    pdb.set_trace()
+                ast_obj_90_reconstruct, ast_obj_50_reconstruct, ast_obj_low_reconstruct )
+    titles_list = ( 'MAT 4092', 'MAT 2048', 'OBJ Low',
+                    'OBJ Decimate 0.90', 'OBJ Decimate 0.50',
+                    'OBJ Reconstruct 0.90', 'OBJ Reconstruct 0.50', 'OBJ Low Reconstruct' )
+    grid = define_grid(ast_obj_low)
     with Pool(8) as p:
         func = partial(generate_scalar_data, grid)
         Ug_list = p.map(func, ast_list)
 
         # visualize_data(ast, Ug, grid)
         # mlab.title(title)
-    pdb.set_trace() 
     np.savez('./integration/gravity_potential.npz',ast_list=ast_list,
-             grid=grid, Ug_list=Ug_list)
-
-if __name__ == '__main__':
-    pass
-    # ast = asteroid.Asteroid('itokawa', 0, 'obj')
-    # print('Finished with gravity model')
-    # grid = define_grid(ast, 5)
-    # Ug_array = generate_scalar_data(ast, grid)
-    # visualize_data(ast, Ug_array, grid)
+                grid=grid, Ug_list=Ug_list, titles_list=titles_list)

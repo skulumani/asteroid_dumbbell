@@ -113,7 +113,7 @@ class TestIsmember():
         indx = utilities.ismember_index(-self.e1,self.e1)
 
         np.testing.assert_allclose(indx, self.e1_ind1b -1)
-
+    
 
 class TestIsmember_256():
     e1 = np.array([

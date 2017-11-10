@@ -26,6 +26,8 @@ dependencies:
 - traitsui
 - vtk
 - pip:
+  - line-profiler
+  - snakeviz
   - astro
   - kinematics
   - spacetrack
