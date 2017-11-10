@@ -86,7 +86,6 @@ def write_obj(verts, faces, filename, comments=False):
 
     return 0
 
-# TODO: Add documentation and link to OBJ format
 def read_obj(filename):
     r"""Read a OBJ shape model and output vertices and faces
 
@@ -128,19 +127,20 @@ def read_obj(filename):
     verts = np.asarray(verts) 
     return verts, faces
 
+# TODO : Write this function
 def create_points(vertices):
     """Given a (n, 3) numpy array of vertices this will place each one inot the 
     vtkPoints object
     """
     pass
 
+# TODO: Add documentation
 def read_numpy_points(pointSource, point_cloud):
     """Read point cloud from an array
     """
     output = pointSource.GetPolyDataOutput()
     points = vtk.vtkPoints()
     output.SetPoints(points)
-    # open the OBJ file
     for ii in range(0, point_cloud.shape[0]):
         vector = point_cloud[ii, :]
         x, y, z = vector
@@ -839,6 +839,43 @@ def vertex_map_inverse(a_map, invalid=-1):
 # TODO: Code reuse to ease all of this nonsense
 # TODO: Documentation
 def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
+    r"""Find matching edges across the vertex/edge maps
+
+    Instead of searching through the actual edges, this function will find opposite 
+    edges that exist by searching through the lists of vertices/edges.
+    
+    Each face is composed of three edges, and each edge is a member of two faces.
+    Each face has a e1, e2, and e3 edge and this function will find the location
+    of the opposite edge.
+
+    Parameters
+    ----------
+    e1_vertex_map : numpy array f x 2
+        e1 edges are defined as V[e1_vertex_map[:, 0], :] - V[e1_vertex_map[:, 1], :]
+    e2_vertex_map : numpy array f x 2
+        e2 edges are defined as V[e2_vertex_map[:, 0], :] - V[e2_vertex_map[:, 1], :]
+    e3_vertex_map : numpy array f x 2
+        e3 edges are defined as V[e3_vertex_map[:, 0], :] - V[e3_vertex_map[:, 1], :]
+        
+    Returns
+    -------
+    e1_ind1b : numpy array (f,)
+        Defines the matching edges for each edge -e1 that is also in e1.
+        If there is no match then that row in -1. So assume e1_ind1b[0] = 2 then e1[0, :] == - e1[2, :]
+        and e1_vertex_map[0,0] == e1_vertex_map[2,1]
+    e1_ind2b, e1_ind3b, e2_ind1b, e2_ind2b, e2_ind3b, e3_ind1b, e3_ind2b, e3_ind3b
+        These are all similar as previously defined. Just defines the matching (inverse) 
+        edges and where they're located.
+
+    See Also
+    --------
+    vertex_map_search : actually does the search for matching values in two arrays
+    vertex_map_inverse : if we know matches of a in b, we can easily get the matches of b in a
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     invalid = -1
     num_e = e1_vertex_map.shape[0]
     a = 0
