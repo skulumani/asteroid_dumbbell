@@ -757,7 +757,6 @@ def search_edge(e1, e2, e3):
             e3_ind1b, e3_ind2b, e3_ind3b)
 
 # TODO: Add documentation
-# TODO: Remove the loops
 def vertex_map_search(arrays):
     """Search and define mapping for these two sets of edge vertex maps
 
@@ -771,13 +770,9 @@ def vertex_map_search(arrays):
 
     index_map = np.full(num_e, invalid, dtype='int')
     inda1, indb1 = utilities.search_index(a_map[:, a], b_map[:, b])
-    # inda2, indb2 = utilities.search_index(e1_vertex_map[inda1, b], e1_vertex_map[indb1, a])
-
-    # check for opposite match and if so note it
-    for ii in range(len(inda1)):
-        if a_map[inda1[ii], b] == b_map[indb1[ii], a]:
-            index_map[inda1[ii]] = indb1[ii]
-
+    
+    index_match = np.where(a_map[inda1, b] == b_map[indb1, a])
+    index_map[inda1[index_match]] = indb1[index_match]
     return index_map
 
 # TODO: Add documentation
@@ -792,6 +787,7 @@ def vertex_map_inverse(a_map, invalid=-1):
     return b_map
 
 # TODO: Code reuse to ease all of this nonsense
+# TODO: Documentation
 def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
     invalid = -1
     num_e = e1_vertex_map.shape[0]
