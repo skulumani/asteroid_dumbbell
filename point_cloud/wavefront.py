@@ -56,59 +56,24 @@ def write_obj(verts, faces, filename, comments=False):
         which make up that face.  It is assumed they are numbered in a right
         hand sense, such that the normal to each face is outward pointing
     filename : string
+        Filename and path to save the OBJ file. This file will be overwritten
+    comments : boolean
+        Can write comments to the OBJ file. Not implemented yet
+
     Returns
     -------
-    describe : type
-        Explanation of return value named describe
-
-    Other Parameters
-    ----------------
-    only_seldom_used_keywords : type
-        Explanation of this parameter
-
-    Raises
-    ------
-    BadException
-        Because you shouldn't have done that.
+    out : integer
+        Just a 0 if successful. No other error codes
 
     See Also
     --------
-other_func: Other function that this one might call
-
-    Notes
-    -----
-    You may include some math:
-
-    .. math:: X(e^{j\omega } ) = x(n)e^{ - j\omega n}
+    Look for OBJ format in ./docs/obj_format.txt
 
     Author
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
 
-    References
-    ----------
-    Cite the relevant literature, e.g. [1]_.  You may also cite these
-    references in the notes section above.
-
-    .. [1] Shannon, Claude E. "Communication theory of secrecy systems."
-    Bell Labs Technical Journal 28.4 (1949): 656-715
-
-    Examples
-    --------
-    An example of how to use the function
-
-    >>> a = [1, 2, 3]
-    >>> print [x + 3 for x in a]
-    [4, 5, 6]
-    >>> print "a\n\nb"
-    a
-    b
-
     """ 
-    """Given numpy arrays of vertices/faces this will write it out to a OBJ file
-
-    Assumes triangular faces and the numpy indexing defines the topology
-    """
     with open(filename, 'w') as fname:
         if comments:
             fname.write('# Created by Shankar Kulumani - use at your own risk')
