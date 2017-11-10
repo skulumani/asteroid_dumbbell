@@ -720,11 +720,59 @@ def draw_polyhedron_mayavi(vertices, faces, fig):
 
     return mesh
 
-# TODO: Add some documentation
 # TODO: Add unit testing
 def polyhedron_parameters(V, F):
-    """Compute some edge/face vectors for a polyhedron
-    """
+    r"""Compute parameters associated with a polyhedron and useful for
+    calculating the gravity model
+
+    This takes the shape model (vertices, and faces) and computes a bunch of
+    elements which are needed later in the gravity model.
+
+    Parameters
+    ----------
+    V : numpy array (v, 3)
+        Array defining all of the vertices in the shape model
+    F : numpy array (f, 3)
+        Array defining the vertices composed in each face in the model
+
+    Returns
+    -------
+    Fa, Fb, Fc : numpy array (f,)
+        All of the 1, 2, 3 vertices in each face, respectively
+        Fa = F[:, 0], Fb = F[:, 1], Fc = F[:, 2]
+    V1, V2, V3 : numpy array (f, 3)
+        All of vertices associated with Fa, Fb, Fc respectively
+        V1 = V[Fa, :], V2 = V[Fb, :], V3 = V[Fc, :] 
+    e1, e2, e3 : numpy array (f, 3)
+        These are each of the e1, e2, e3 edges on each face.
+        e1 = V2 - V1, e2 = V3 - V2, e3 = V1 - V3
+    e1_vertex_map, e2_vertex_map, e3_vertex_map : numpy array (f, 2)
+        These define the vertices which make up each edge
+        e1_vertex_map = [Fb, Fa], etc.
+    normal_face : numpy array (f, 3)
+        Normal vector to each face. Assumes outward facing normal. so is a function 
+        of the vertex numbering
+    e1_normal, e2_normal,e3_normal : numpy array (f, 3)
+        This is the normal to each edge, and again is outward facing. 
+        Cross product of face normal and edge vector
+    center_face : numpy array (f, 3)
+        The geometric center for each face
+
+    See Also
+    --------
+    asteroid.Asteroid : Polyhedron potential model class
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    References
+    ----------
+
+    .. [1] WERNER, Robert A. "The Gravitational Potential of a Homogeneous
+    Polyhedron or Don't Cut Corners". Celestial Mechanics and Dynamical
+    Astronomy. 1994, vol 59
+    """ 
     # calculate shape parameters
 
     num_v = V.shape[0]
@@ -744,7 +792,6 @@ def polyhedron_parameters(V, F):
     e2 = V3 - V2
     e3 = V1 - V3
 
-    # TODO: Instead of searching on edges search these arrays instead
     e1_vertex_map = np.vstack((Fb, Fa)).T
     e2_vertex_map = np.vstack((Fc, Fb)).T
     e3_vertex_map = np.vstack((Fa, Fc)).T
@@ -786,8 +833,6 @@ def polyhedron_parameters(V, F):
             e1_vertex_map, e2_vertex_map, e3_vertex_map, 
             normal_face, e1_normal, e2_normal,e3_normal, center_face)
 
-# TODO: Add documentation and modify inputs to search over e vertex maps instead
-# TODO: THis function will give false positives for parallel edges (should be rare in a real object hopefully)
 def search_edge(e1, e2, e3):
     r"""Search for matching edges by looking directly at teh computed edges,
     rather than the edge/vertex maps
