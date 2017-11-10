@@ -709,8 +709,63 @@ def draw_polyhedron_vtk(vertices, faces):
 
 # TODO: Add documentation
 def draw_polyhedron_mayavi(vertices, faces, fig):
-    """Draw a polyhedron using Mayavi
-    """
+    r"""Plot a polyhedron using Mayavi
+
+
+    Parameters
+    ----------
+    var1 : array_like and type
+        <`4:Description of the variable`>
+
+    Returns
+    -------
+    describe : type
+        Explanation of return value named describe
+
+    Other Parameters
+    ----------------
+    only_seldom_used_keywords : type
+        Explanation of this parameter
+
+    Raises
+    ------
+    BadException
+        Because you shouldn't have done that.
+
+    See Also
+    --------
+    other_func: Other function that this one might call
+
+    Notes
+    -----
+    You may include some math:
+
+    .. math:: X(e^{j\omega } ) = x(n)e^{ - j\omega n}
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    References
+    ----------
+    Cite the relevant literature, e.g. [1]_.  You may also cite these
+    references in the notes section above.
+
+    .. [1] Shannon, Claude E. "Communication theory of secrecy systems."
+    Bell Labs Technical Journal 28.4 (1949): 656-715
+
+    Examples
+    --------
+    An example of how to use the function
+
+    >>> a = [1, 2, 3]
+    >>> print [x + 3 for x in a]
+    [4, 5, 6]
+    >>> print "a\n\nb"
+    a
+    b
+
+    """ 
     x = vertices[:, 0]
     y = vertices[:, 1]
     z = vertices[:, 2]
