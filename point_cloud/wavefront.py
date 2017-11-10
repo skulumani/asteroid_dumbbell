@@ -789,7 +789,38 @@ def polyhedron_parameters(V, F):
 # TODO: Add documentation and modify inputs to search over e vertex maps instead
 # TODO: THis function will give false positives for parallel edges (should be rare in a real object hopefully)
 def search_edge(e1, e2, e3):
+    r"""Search for matching edges by looking directly at teh computed edges,
+    rather than the edge/vertex maps
 
+    Given all of the edges, this will find the opposite edge somewhere else and
+    provide the index of that match. One caveat is that this method will fail
+    for parallel edges. In a closed polyhedron there should only be a single match
+    in all of the edges.
+
+    Parameters
+    ----------
+    e1 : numpy array (f, 3)
+        Array defining all of the e1 (others respecitvely) edges in the polyhedron
+
+    Returns
+    -------
+    e1_ind1b : numpy array (f,)
+        Defines the matching edges for each edge -e1 that is also in e1.
+        If there is no match then that row in -1. So assume e1_ind1b[0] = 2 then e1[0, :] == - e1[2, :]
+        and e1_vertex_map[0,0] == e1_vertex_map[2,1]
+    e1_ind2b, e1_ind3b, e2_ind1b, e2_ind2b, e2_ind3b, e3_ind1b, e3_ind2b, e3_ind3b
+        These are all similar as previously defined. Just defines the matching (inverse) 
+        edges and where they're located.
+
+    See Also
+    --------
+    search_edge_vertex_map : Use this improved and faster function
+    ismember_index : a kludge implementation of Matlab ismember
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     e1_ind1b = utilities.ismember_index(-e1, e1)
     e1_ind2b = utilities.ismember_index(-e1, e2)
     e1_ind3b = utilities.ismember_index(-e1, e3)
@@ -806,7 +837,6 @@ def search_edge(e1, e2, e3):
             e2_ind1b, e2_ind2b, e2_ind3b,
             e3_ind1b, e3_ind2b, e3_ind3b)
 
-# TODO: Add documentation
 def vertex_map_search(arrays):
     r"""Finds locations of matching/inverse elements in edge/vertex maps
 
