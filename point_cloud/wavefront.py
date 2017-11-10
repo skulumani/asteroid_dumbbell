@@ -827,17 +827,37 @@ def vertex_map_search(arrays):
 
 # TODO: Add documentation
 def vertex_map_inverse(a_map, invalid=-1):
-    """Create the inverse index map for matching edges
-    """
+    r"""Create the inverse mapping for vertices and edges
 
+    Given a list of matching edges of a which also exist in b (a_map). This function
+    will give you a list of matching edges of b which are in a (a_map).
+
+    Parameters
+    ----------
+    a_map : numpy array (f,)
+        This is a list of matches of a_map (and the edges it's defining) to some other array of edges.
+    invalid : int
+        The non-matches are signified with invalid
+
+    Returns
+    -------
+    b_map : numpy array (f,)
+        This the inverse of a_map and shows the matches of b in a and their location
+
+    See Also
+    --------
+    vertex_map_search : this finds the original mapping
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     a_loc = np.where(a_map != invalid)
     b_loc = a_map[a_loc]
     b_map = np.full(a_map.shape, invalid, dtype='int')
     b_map[b_loc] = a_loc
     return b_map
 
-# TODO: Code reuse to ease all of this nonsense
-# TODO: Documentation
 def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
     r"""Find matching edges across the vertex/edge maps
 
