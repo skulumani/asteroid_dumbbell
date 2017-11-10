@@ -40,7 +40,6 @@ from functools import partial
 
 # TODO: Create better function names
 
-# TODO: Add documentation and link to OBJ format
 def write_obj(verts, faces, filename, comments=False):
     r"""Output vertices and faces to the Wavefront OBJ format
 
@@ -89,8 +88,31 @@ def write_obj(verts, faces, filename, comments=False):
 
 # TODO: Add documentation and link to OBJ format
 def read_obj(filename):
-    """Read the OBJ file and save to a numpy array
-    """
+    r"""Read a OBJ shape model and output vertices and faces
+
+    This will read a shape model and store the values into numpy arrays.
+
+    Parameters
+    ----------
+    filename : string
+        Name of OBJ file to read
+
+    Returns
+    -------
+    verts : numpy array v x 3
+        Array of vertices - each row is a vector in the body fixed frame
+    faces : numpy array f x 3
+        Mapping of the vectors which define each face. It is already corrected to use
+        zero based indexing and each vector is numbered assuming a right hand orientation.
+
+    See Also
+    --------
+    write_obj : inverse function which writes OBJ files
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     faces = []
     verts = []
     with open(filename, 'r') as f:
