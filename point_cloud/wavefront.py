@@ -808,9 +808,33 @@ def search_edge(e1, e2, e3):
 
 # TODO: Add documentation
 def vertex_map_search(arrays):
-    """Search and define mapping for these two sets of edge vertex maps
+    r"""Finds locations of matching/inverse elements in edge/vertex maps
 
-    """
+    Given arrays which hold the indices of vertices for each edge, this function
+    will find the opposite edge in the other array.
+
+    Parameters
+    ----------
+    arrays : tuple (2,)
+        arrays[0] - a_map numpy array (f, 2) which defines the vertices involved in all the a edges
+        arrays[1] - b_map numpy array (f, 2) which defines the vertices involved in all the b edges 
+
+    Returns
+    -------
+    index_map : numpy array (f,)
+        This is an array which has an integer (non-negative) which defines the
+        index (in b_map) which is the opposite edge as a_map. 
+
+    See Also
+    --------
+    vertex_map_inverse : finds the opposite match without having to do an
+    intensive search by inverting the mapping 
+    utilities.search_index : does the searching between two arrays
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     a_map = arrays[0]
     b_map = arrays[1]
     invalid = -1
@@ -825,7 +849,6 @@ def vertex_map_search(arrays):
     index_map[inda1[index_match]] = indb1[index_match]
     return index_map
 
-# TODO: Add documentation
 def vertex_map_inverse(a_map, invalid=-1):
     r"""Create the inverse mapping for vertices and edges
 
