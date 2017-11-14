@@ -1080,3 +1080,14 @@ def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
     return (e1_ind1b, e1_ind2b, e1_ind3b,
             e2_ind1b, e2_ind2b, e2_ind3b,
             e3_ind1b, e3_ind2b, e3_ind3b)
+
+def build_edge_face_map(e1_ind1b, e1_ind2b, e1_ind3b,
+                        e2_ind1b, e2_ind2b, e2_ind3b,
+                        e3_ind1b, e3_ind2b, e3_ind3b):
+
+    faces_list = np.arange(e1_ind1b.shape[0])
+    e1_face_map = np.stack((faces_list, e1_ind1b, e1_ind2b, e1_ind3b), axis=1)
+    e2_face_map = np.stack((faces_list, e2_ind1b, e2_ind2b, e2_ind3b), axis=1)
+    e3_face_map = np.stack((faces_list, e3_ind1b, e3_ind2b, e3_ind3b), axis=1)
+
+    return e1_face_map, e2_face_map, e3_face_map
