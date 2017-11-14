@@ -178,7 +178,9 @@ class Asteroid(object):
 
         (e1_ind1b, e1_ind2b, e1_ind3b,
         e2_ind1b, e2_ind2b, e2_ind3b,
-        e3_ind1b, e3_ind2b, e3_ind3b) = wavefront.search_edge(e1, e2, e3)
+        e3_ind1b, e3_ind2b, e3_ind3b) = wavefront.search_edge_vertex_map(e1_vertex_map,
+                                                                         e2_vertex_map, 
+                                                                         e3_vertex_map)
 
         E1_edge = np.zeros([3, 3, num_f])
         E2_edge = np.zeros([3, 3, num_f])
