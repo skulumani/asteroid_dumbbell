@@ -172,7 +172,8 @@ class Asteroid(object):
         # compute F dyad
         for ii in range(normal_face.shape[0]):
             F_face[:, :, ii] = np.outer(normal_face[ii, :], normal_face[ii, :])
-
+        
+        # F_face = np.einsum('ij,ik->jki', normal_face, normal_face)
         # loop over all the edges to figure out the common edges and calculate E_e
         # find common e1 edges
 
