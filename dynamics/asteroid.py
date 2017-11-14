@@ -156,7 +156,6 @@ class Asteroid(object):
         num_f = F.shape[0]
         num_e = 3 * (num_v - 2)
         
-        # TODO: Search across this instead of the actual vectors
         # calculate shape parameters
         # calculate vectors for each edge (loop through F and difference the
         # vectors) then store them
@@ -170,50 +169,25 @@ class Asteroid(object):
         e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(V, F)
 
         # compute F dyad
-        for ii in range(normal_face.shape[0]):
-            F_face[:, :, ii] = np.outer(normal_face[ii, :], normal_face[ii, :])
-
+        F_face = np.einsum('ij,ik->jki', normal_face, normal_face)
         # loop over all the edges to figure out the common edges and calculate E_e
         # find common e1 edges
 
         (e1_ind1b, e1_ind2b, e1_ind3b,
         e2_ind1b, e2_ind2b, e2_ind3b,
-        e3_ind1b, e3_ind2b, e3_ind3b) = wavefront.search_edge(e1, e2, e3)
+        e3_ind1b, e3_ind2b, e3_ind3b) = wavefront.search_edge_vertex_map(e1_vertex_map,
+                                                                         e2_vertex_map, 
+                                                                         e3_vertex_map)
+        # build the edge face maps
+        e1_face_map, e2_face_map, e3_face_map = wavefront.build_edge_face_map(e1_ind1b, e1_ind2b, e1_ind3b,
+                                                                              e2_ind1b, e2_ind2b, e2_ind3b,
+                                                                              e3_ind1b, e3_ind2b, e3_ind3b)
 
         E1_edge = np.zeros([3, 3, num_f])
         E2_edge = np.zeros([3, 3, num_f])
         E3_edge = np.zeros([3, 3, num_f])
-
+        
         for ii in range(num_f):
-            # check each of the edges in the current face for a match in all the
-            # other edges
-            e1_face_map[ii, 0] = ii
-            e2_face_map[ii, 0] = ii
-            e3_face_map[ii, 0] = ii
-
-            # e1 edge duplicate
-            if e1_ind1b[ii] != invalid:
-                e1_face_map[ii, 1] = e1_ind1b[ii]
-            elif e1_ind2b[ii] != invalid:
-                e1_face_map[ii, 2] = e1_ind2b[ii]
-            elif e1_ind3b[ii] != invalid:
-                e1_face_map[ii, 3] = e1_ind3b[ii]
-
-            # e2 edge duplicate
-            if e2_ind1b[ii] != invalid:
-                e2_face_map[ii, 1] = e2_ind1b[ii]
-            elif e2_ind2b[ii] != invalid:
-                e2_face_map[ii, 2] = e2_ind2b[ii]
-            elif e2_ind3b[ii] != invalid:
-                e2_face_map[ii, 3] = e2_ind3b[ii]
-
-            # e3 edge duplicate
-            if e3_ind1b[ii] != invalid:
-                e3_face_map[ii, 1] = e3_ind1b[ii]
-            elif e3_ind2b[ii] != invalid:
-                e3_face_map[ii, 2] = e3_ind2b[ii]
-            elif e3_ind3b[ii] != invalid:
-                e3_face_map[ii, 3] = e3_ind3b[ii]
 
             # find the edge normals for all edges of the current face
             # also pull out the edge normals for each adjacent face (3 adjacent
@@ -287,6 +261,15 @@ class Asteroid(object):
             'e1_vertex_map':    e1_vertex_map,
             'e2_vertex_map':    e2_vertex_map,
             'e3_vertex_map':    e3_vertex_map,
+            'e1_ind1b':         e1_ind1b,
+            'e1_ind2b':         e1_ind2b,
+            'e1_ind3b':         e1_ind3b,
+            'e2_ind1b':         e2_ind1b,
+            'e2_ind2b':         e2_ind2b,
+            'e2_ind3b':         e2_ind3b,
+            'e3_ind1b':         e3_ind1b,
+            'e3_ind2b':         e3_ind2b,
+            'e3_ind3b':         e3_ind3b,
             'normal_face':      normal_face,
             'center_face':      center_face,
             'e1_normal':        e1_normal,

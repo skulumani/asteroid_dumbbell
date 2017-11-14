@@ -40,12 +40,39 @@ from functools import partial
 
 # TODO: Create better function names
 
-# TODO: Add documentation and link to OBJ format
 def write_obj(verts, faces, filename, comments=False):
-    """Given numpy arrays of vertices/faces this will write it out to a OBJ file
+    r"""Output vertices and faces to the Wavefront OBJ format
 
-    Assumes triangular faces and the numpy indexing defines the topology
-    """
+    Given a shape model defined in terms of numpy arrays, this will output them
+    to a OBJ file
+
+    Parameters
+    ----------
+    verts : numpy array v x 3 
+        Arrays defining the vertices of the shape in the body fixed frame
+    faces : numpy array f x 3
+        Array defining the toplogy of the shape. Each row defines the vertices
+        which make up that face.  It is assumed they are numbered in a right
+        hand sense, such that the normal to each face is outward pointing
+    filename : string
+        Filename and path to save the OBJ file. This file will be overwritten
+    comments : boolean
+        Can write comments to the OBJ file. Not implemented yet
+
+    Returns
+    -------
+    out : integer
+        Just a 0 if successful. No other error codes
+
+    See Also
+    --------
+    Look for OBJ format in ./docs/obj_format.txt
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    """ 
     with open(filename, 'w') as fname:
         if comments:
             fname.write('# Created by Shankar Kulumani - use at your own risk')
@@ -59,10 +86,32 @@ def write_obj(verts, faces, filename, comments=False):
 
     return 0
 
-# TODO: Add documentation and link to OBJ format
 def read_obj(filename):
-    """Read the OBJ file and save to a numpy array
-    """
+    r"""Read a OBJ shape model and output vertices and faces
+
+    This will read a shape model and store the values into numpy arrays.
+
+    Parameters
+    ----------
+    filename : string
+        Name of OBJ file to read
+
+    Returns
+    -------
+    verts : numpy array v x 3
+        Array of vertices - each row is a vector in the body fixed frame
+    faces : numpy array f x 3
+        Mapping of the vectors which define each face. It is already corrected to use
+        zero based indexing and each vector is numbered assuming a right hand orientation.
+
+    See Also
+    --------
+    write_obj : inverse function which writes OBJ files
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     faces = []
     verts = []
     with open(filename, 'r') as f:
@@ -78,19 +127,20 @@ def read_obj(filename):
     verts = np.asarray(verts) 
     return verts, faces
 
+# TODO : Write this function
 def create_points(vertices):
     """Given a (n, 3) numpy array of vertices this will place each one inot the 
     vtkPoints object
     """
     pass
 
+# TODO: Add documentation
 def read_numpy_points(pointSource, point_cloud):
     """Read point cloud from an array
     """
     output = pointSource.GetPolyDataOutput()
     points = vtk.vtkPoints()
     output.SetPoints(points)
-    # open the OBJ file
     for ii in range(0, point_cloud.shape[0]):
         vector = point_cloud[ii, :]
         x, y, z = vector
@@ -659,8 +709,63 @@ def draw_polyhedron_vtk(vertices, faces):
 
 # TODO: Add documentation
 def draw_polyhedron_mayavi(vertices, faces, fig):
-    """Draw a polyhedron using Mayavi
-    """
+    r"""Plot a polyhedron using Mayavi
+
+
+    Parameters
+    ----------
+    var1 : array_like and type
+        <`4:Description of the variable`>
+
+    Returns
+    -------
+    describe : type
+        Explanation of return value named describe
+
+    Other Parameters
+    ----------------
+    only_seldom_used_keywords : type
+        Explanation of this parameter
+
+    Raises
+    ------
+    BadException
+        Because you shouldn't have done that.
+
+    See Also
+    --------
+    other_func: Other function that this one might call
+
+    Notes
+    -----
+    You may include some math:
+
+    .. math:: X(e^{j\omega } ) = x(n)e^{ - j\omega n}
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    References
+    ----------
+    Cite the relevant literature, e.g. [1]_.  You may also cite these
+    references in the notes section above.
+
+    .. [1] Shannon, Claude E. "Communication theory of secrecy systems."
+    Bell Labs Technical Journal 28.4 (1949): 656-715
+
+    Examples
+    --------
+    An example of how to use the function
+
+    >>> a = [1, 2, 3]
+    >>> print [x + 3 for x in a]
+    [4, 5, 6]
+    >>> print "a\n\nb"
+    a
+    b
+
+    """ 
     x = vertices[:, 0]
     y = vertices[:, 1]
     z = vertices[:, 2]
@@ -670,11 +775,59 @@ def draw_polyhedron_mayavi(vertices, faces, fig):
 
     return mesh
 
-# TODO: Add some documentation
 # TODO: Add unit testing
 def polyhedron_parameters(V, F):
-    """Compute some edge/face vectors for a polyhedron
-    """
+    r"""Compute parameters associated with a polyhedron and useful for
+    calculating the gravity model
+
+    This takes the shape model (vertices, and faces) and computes a bunch of
+    elements which are needed later in the gravity model.
+
+    Parameters
+    ----------
+    V : numpy array (v, 3)
+        Array defining all of the vertices in the shape model
+    F : numpy array (f, 3)
+        Array defining the vertices composed in each face in the model
+
+    Returns
+    -------
+    Fa, Fb, Fc : numpy array (f,)
+        All of the 1, 2, 3 vertices in each face, respectively
+        Fa = F[:, 0], Fb = F[:, 1], Fc = F[:, 2]
+    V1, V2, V3 : numpy array (f, 3)
+        All of vertices associated with Fa, Fb, Fc respectively
+        V1 = V[Fa, :], V2 = V[Fb, :], V3 = V[Fc, :] 
+    e1, e2, e3 : numpy array (f, 3)
+        These are each of the e1, e2, e3 edges on each face.
+        e1 = V2 - V1, e2 = V3 - V2, e3 = V1 - V3
+    e1_vertex_map, e2_vertex_map, e3_vertex_map : numpy array (f, 2)
+        These define the vertices which make up each edge
+        e1_vertex_map = [Fb, Fa], etc.
+    normal_face : numpy array (f, 3)
+        Normal vector to each face. Assumes outward facing normal. so is a function 
+        of the vertex numbering
+    e1_normal, e2_normal,e3_normal : numpy array (f, 3)
+        This is the normal to each edge, and again is outward facing. 
+        Cross product of face normal and edge vector
+    center_face : numpy array (f, 3)
+        The geometric center for each face
+
+    See Also
+    --------
+    asteroid.Asteroid : Polyhedron potential model class
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    References
+    ----------
+
+    .. [1] WERNER, Robert A. "The Gravitational Potential of a Homogeneous
+    Polyhedron or Don't Cut Corners". Celestial Mechanics and Dynamical
+    Astronomy. 1994, vol 59
+    """ 
     # calculate shape parameters
 
     num_v = V.shape[0]
@@ -694,7 +847,6 @@ def polyhedron_parameters(V, F):
     e2 = V3 - V2
     e3 = V1 - V3
 
-    # TODO: Instead of searching on edges search these arrays instead
     e1_vertex_map = np.vstack((Fb, Fa)).T
     e2_vertex_map = np.vstack((Fc, Fb)).T
     e3_vertex_map = np.vstack((Fa, Fc)).T
@@ -736,10 +888,39 @@ def polyhedron_parameters(V, F):
             e1_vertex_map, e2_vertex_map, e3_vertex_map, 
             normal_face, e1_normal, e2_normal,e3_normal, center_face)
 
-# TODO: Add documentation and modify inputs to search over e vertex maps instead
-# TODO: THis function will give false positives for parallel edges (should be rare in a real object hopefully)
 def search_edge(e1, e2, e3):
+    r"""Search for matching edges by looking directly at teh computed edges,
+    rather than the edge/vertex maps
 
+    Given all of the edges, this will find the opposite edge somewhere else and
+    provide the index of that match. One caveat is that this method will fail
+    for parallel edges. In a closed polyhedron there should only be a single match
+    in all of the edges.
+
+    Parameters
+    ----------
+    e1 : numpy array (f, 3)
+        Array defining all of the e1 (others respecitvely) edges in the polyhedron
+
+    Returns
+    -------
+    e1_ind1b : numpy array (f,)
+        Defines the matching edges for each edge -e1 that is also in e1.
+        If there is no match then that row in -1. So assume e1_ind1b[0] = 2 then e1[0, :] == - e1[2, :]
+        and e1_vertex_map[0,0] == e1_vertex_map[2,1]
+    e1_ind2b, e1_ind3b, e2_ind1b, e2_ind2b, e2_ind3b, e3_ind1b, e3_ind2b, e3_ind3b
+        These are all similar as previously defined. Just defines the matching (inverse) 
+        edges and where they're located.
+
+    See Also
+    --------
+    search_edge_vertex_map : Use this improved and faster function
+    ismember_index : a kludge implementation of Matlab ismember
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     e1_ind1b = utilities.ismember_index(-e1, e1)
     e1_ind2b = utilities.ismember_index(-e1, e2)
     e1_ind3b = utilities.ismember_index(-e1, e3)
@@ -756,11 +937,34 @@ def search_edge(e1, e2, e3):
             e2_ind1b, e2_ind2b, e2_ind3b,
             e3_ind1b, e3_ind2b, e3_ind3b)
 
-# TODO: Add documentation
 def vertex_map_search(arrays):
-    """Search and define mapping for these two sets of edge vertex maps
+    r"""Finds locations of matching/inverse elements in edge/vertex maps
 
-    """
+    Given arrays which hold the indices of vertices for each edge, this function
+    will find the opposite edge in the other array.
+
+    Parameters
+    ----------
+    arrays : tuple (2,)
+        arrays[0] - a_map numpy array (f, 2) which defines the vertices involved in all the a edges
+        arrays[1] - b_map numpy array (f, 2) which defines the vertices involved in all the b edges 
+
+    Returns
+    -------
+    index_map : numpy array (f,)
+        This is an array which has an integer (non-negative) which defines the
+        index (in b_map) which is the opposite edge as a_map. 
+
+    See Also
+    --------
+    vertex_map_inverse : finds the opposite match without having to do an
+    intensive search by inverting the mapping 
+    utilities.search_index : does the searching between two arrays
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     a_map = arrays[0]
     b_map = arrays[1]
     invalid = -1
@@ -775,20 +979,76 @@ def vertex_map_search(arrays):
     index_map[inda1[index_match]] = indb1[index_match]
     return index_map
 
-# TODO: Add documentation
 def vertex_map_inverse(a_map, invalid=-1):
-    """Create the inverse index map for matching edges
-    """
+    r"""Create the inverse mapping for vertices and edges
 
+    Given a list of matching edges of a which also exist in b (a_map). This function
+    will give you a list of matching edges of b which are in a (a_map).
+
+    Parameters
+    ----------
+    a_map : numpy array (f,)
+        This is a list of matches of a_map (and the edges it's defining) to some other array of edges.
+    invalid : int
+        The non-matches are signified with invalid
+
+    Returns
+    -------
+    b_map : numpy array (f,)
+        This the inverse of a_map and shows the matches of b in a and their location
+
+    See Also
+    --------
+    vertex_map_search : this finds the original mapping
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     a_loc = np.where(a_map != invalid)
     b_loc = a_map[a_loc]
     b_map = np.full(a_map.shape, invalid, dtype='int')
     b_map[b_loc] = a_loc
     return b_map
 
-# TODO: Code reuse to ease all of this nonsense
-# TODO: Documentation
 def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
+    r"""Find matching edges across the vertex/edge maps
+
+    Instead of searching through the actual edges, this function will find opposite 
+    edges that exist by searching through the lists of vertices/edges.
+    
+    Each face is composed of three edges, and each edge is a member of two faces.
+    Each face has a e1, e2, and e3 edge and this function will find the location
+    of the opposite edge.
+
+    Parameters
+    ----------
+    e1_vertex_map : numpy array f x 2
+        e1 edges are defined as V[e1_vertex_map[:, 0], :] - V[e1_vertex_map[:, 1], :]
+    e2_vertex_map : numpy array f x 2
+        e2 edges are defined as V[e2_vertex_map[:, 0], :] - V[e2_vertex_map[:, 1], :]
+    e3_vertex_map : numpy array f x 2
+        e3 edges are defined as V[e3_vertex_map[:, 0], :] - V[e3_vertex_map[:, 1], :]
+        
+    Returns
+    -------
+    e1_ind1b : numpy array (f,)
+        Defines the matching edges for each edge -e1 that is also in e1.
+        If there is no match then that row in -1. So assume e1_ind1b[0] = 2 then e1[0, :] == - e1[2, :]
+        and e1_vertex_map[0,0] == e1_vertex_map[2,1]
+    e1_ind2b, e1_ind3b, e2_ind1b, e2_ind2b, e2_ind3b, e3_ind1b, e3_ind2b, e3_ind3b
+        These are all similar as previously defined. Just defines the matching (inverse) 
+        edges and where they're located.
+
+    See Also
+    --------
+    vertex_map_search : actually does the search for matching values in two arrays
+    vertex_map_inverse : if we know matches of a in b, we can easily get the matches of b in a
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     invalid = -1
     num_e = e1_vertex_map.shape[0]
     a = 0
@@ -820,3 +1080,14 @@ def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
     return (e1_ind1b, e1_ind2b, e1_ind3b,
             e2_ind1b, e2_ind2b, e2_ind3b,
             e3_ind1b, e3_ind2b, e3_ind3b)
+
+def build_edge_face_map(e1_ind1b, e1_ind2b, e1_ind3b,
+                        e2_ind1b, e2_ind2b, e2_ind3b,
+                        e3_ind1b, e3_ind2b, e3_ind3b):
+
+    faces_list = np.arange(e1_ind1b.shape[0])
+    e1_face_map = np.stack((faces_list, e1_ind1b, e1_ind2b, e1_ind3b), axis=1)
+    e2_face_map = np.stack((faces_list, e2_ind1b, e2_ind2b, e2_ind3b), axis=1)
+    e3_face_map = np.stack((faces_list, e3_ind1b, e3_ind2b, e3_ind3b), axis=1)
+
+    return e1_face_map, e2_face_map, e3_face_map
