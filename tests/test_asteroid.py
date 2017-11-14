@@ -237,6 +237,8 @@ class TestAsteroidItokawa32():
         [0.043646196495641, -0.064999721787375,   0.193691099936648],
         [-0.064999721787375,  0.096800275205152,  -0.288452800459490],
         [0.193691099936648, -0.288452800459490,   0.859553528299207]])
+    
+    F_face_loop = wavefront.face_dyad_loop(ast.asteroid_grav['normal_face'])
 
     E1_edge_zero = np.array([
         [-0.009484256134360,  0.032591079138589, -0.020757039620554],
@@ -267,7 +269,9 @@ class TestAsteroidItokawa32():
         [-0.479493905018774,  0.061575102289838, -0.023949960574480],
         [0.061575102289838,  0.034964998427025, -0.135160647184476],
         [-0.023949960574480, -0.135160647184476,  0.444528906591748]])
-
+    E1_edge_loop, E2_edge_loop, E3_edge_loop = wavefront.edge_dyad_loop(ast.asteroid_grav['e1_face_map'], ast.asteroid_grav['e2_face_map'], ast.asteroid_grav['e3_face_map'],
+                                                                        ast.asteroid_grav['e1_normal'], ast.asteroid_grav['e2_normal'], ast.asteroid_grav['e3_normal'],
+                                                                        ast.asteroid_grav['normal_face'])
     def test_asteroid_gravs(self):
         assert self.ast.asteroid_grav['num_f'] == self.faces
         assert self.ast.name == self.name
@@ -340,6 +344,9 @@ class TestAsteroidItokawa32():
     def test_edge_map(self):
         pass
 
+    def test_face_dyad_loop(self):
+        np.testing.assert_allclose(
+            self.ast.asteroid_grav['F_face'], self.F_face_loop)
     def test_edge_face_map(self):
         e1_ind1b = self.ast.asteroid_grav['e1_ind1b']
         e1_ind2b = self.ast.asteroid_grav['e1_ind2b']
@@ -606,6 +613,8 @@ class TestAsteroidCastalia32():
         [0.0266,   0.0042, -0.0593],
         [-0.3718,   -0.0593,   0.8290]])
 
+    F_face_loop = wavefront.face_dyad_loop(ast.asteroid_grav['normal_face'])
+
     E1_edge_zero = np.array([
         [0.3516,   0.2135,   0.4229],
         [0.2135,   0.0802,   0.0412],
@@ -708,6 +717,9 @@ class TestAsteroidCastalia32():
     def test_edge_map(self):
         pass
 
+    def test_face_dyad_loop(self):
+        np.testing.assert_allclose(
+            self.ast.asteroid_grav['F_face'], self.F_face_loop)
     def test_edge_face_map(self):
         e1_ind1b = self.ast.asteroid_grav['e1_ind1b']
         e1_ind2b = self.ast.asteroid_grav['e1_ind2b']
@@ -966,11 +978,7 @@ class TestAsteroidItokawaOBJ():
                            [-0.03175053,  0.45819816, -0.49723688],
                            [0.03445569, -0.49723688,  0.53960171]])
 
-    F_face_loop = np.zeros([3, 3, ast.F.shape[0]])
-    normal_face = ast.asteroid_grav['normal_face']
-    for ii in range(normal_face.shape[0]):
-        F_face_loop[:, :, ii] = np.outer(
-            normal_face[ii, :], normal_face[ii, :])
+    F_face_loop = wavefront.face_dyad_loop(ast.asteroid_grav['normal_face'])
 
     E1_edge_zero = np.array([[-0.00338533, -0.02064222, -0.00825471],
                              [-0.02064222, -0.02494028,  0.01959696],

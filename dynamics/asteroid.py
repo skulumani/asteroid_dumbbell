@@ -182,69 +182,15 @@ class Asteroid(object):
         e1_face_map, e2_face_map, e3_face_map = wavefront.build_edge_face_map(e1_ind1b, e1_ind2b, e1_ind3b,
                                                                               e2_ind1b, e2_ind2b, e2_ind3b,
                                                                               e3_ind1b, e3_ind2b, e3_ind3b)
-
-        E1_edge = np.zeros([3, 3, num_f])
-        E2_edge = np.zeros([3, 3, num_f])
-        E3_edge = np.zeros([3, 3, num_f])
         
-        for ii in range(num_f):
+        # adjacent faces for edges
+        edge_dyad = wavefront.compute_edge_dyad(e1_face_map, e2_face_map, e3_face_map,
+                                    e1_normal, e2_normal, e3_normal,
+                                    normal_face)
 
-            # find the edge normals for all edges of the current face
-            # also pull out the edge normals for each adjacent face (3 adjacent
-            # faces
-            nA1 = e1_normal[e1_face_map[ii, 0], :]
-            nA2 = e2_normal[e2_face_map[ii, 0], :]
-            nA3 = e3_normal[e3_face_map[ii, 0], :]
-
-            # find adjacent face for edge 1
-            col = np.where(e1_face_map[ii, 1:] != invalid)[0][0]
-            face_index = e1_face_map[ii, col + 1]
-
-            if col == 0:  # adjacent face is also edge 1
-                nB1 = e1_normal[face_index, :]
-            elif col == 1:  # adjacent face is edge 2
-                nB1 = e2_normal[face_index, :]
-            elif col == 2:
-                nB1 = e3_normal[face_index, :]
-
-            nA = normal_face[ii, :]
-            nB = normal_face[face_index, :]
-
-            # second order dyadic tensor
-            E1_edge[:, :, ii] = np.outer(nA, nA1) + np.outer(nB, nB1)
-
-            # find adjacent face for edge 2
-            col = np.where(e2_face_map[ii, 1:] != invalid)[0][0]
-            face_index = e2_face_map[ii, col + 1]
-
-            if col == 0:  # adjacent face is also edge 1
-                nB2 = e1_normal[face_index, :]
-            elif col == 1:  # adjacent face is edge 2
-                nB2 = e2_normal[face_index, :]
-            elif col == 2:
-                nB2 = e3_normal[face_index, :]
-
-            nB = normal_face[face_index, :]
-
-            # second order dyadic tensor
-            E2_edge[:, :, ii] = np.outer(nA, nA2) + np.outer(nB, nB2)
-
-            # find adjacent face for edge 3
-            col = np.where(e3_face_map[ii, 1:] != invalid)[0][0]
-            face_index = e3_face_map[ii, col + 1]
-
-            if col == 0:  # adjacent face is also edge 1
-                nB3 = e1_normal[face_index, :]
-            elif col == 1:  # adjacent face is edge 2
-                nB3 = e2_normal[face_index, :]
-            elif col == 2:
-                nB3 = e3_normal[face_index, :]
-
-            nB = normal_face[face_index, :]
-
-            # second order dyadic tensor
-            E3_edge[:, :, ii] = np.outer(nA, nA3) + np.outer(nB, nB3)
-
+        E1_edge, E2_edge, E3_edge = wavefront.edge_dyad_loop(e1_face_map, e2_face_map, e3_face_map,
+                                                             e1_normal, e2_normal, e3_normal,
+                                                             normal_face)
         # save as a structure with all the precomputed polyhedron potential data
         asteroid_grav = {
             'F':                F,
