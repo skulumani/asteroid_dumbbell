@@ -334,6 +334,14 @@ class TestAsteroidItokawa32():
     def test_edge_three_dyad_end(self):
         np.testing.assert_array_almost_equal(
             self.E3_edge_end, self.ast.asteroid_grav['E3_edge'][:, :, -1], decimal=self.decimal)
+    def test_edge_one_dyad_loop(self):
+        np.testing.assert_allclose(self.ast.asteroid_grav['E1_edge'], self.E1_edge_loop)
+
+    def test_edge_two_dyad_loop(self):
+        np.testing.assert_allclose(self.ast.asteroid_grav['E2_edge'], self.E2_edge_loop)
+
+    def test_edge_three_dyad_loop(self):
+        np.testing.assert_allclose(self.ast.asteroid_grav['E3_edge'], self.E3_edge_loop)
 
     def test_face_normal(self):
         pass
@@ -645,6 +653,9 @@ class TestAsteroidCastalia32():
         [-0.0301,  -0.0229,   0.1974],
         [-0.6180,   0.1974,  -0.7466]])
 
+    E1_edge_loop, E2_edge_loop, E3_edge_loop = wavefront.edge_dyad_loop(ast.asteroid_grav['e1_face_map'], ast.asteroid_grav['e2_face_map'], ast.asteroid_grav['e3_face_map'],
+                                                                        ast.asteroid_grav['e1_normal'], ast.asteroid_grav['e2_normal'], ast.asteroid_grav['e3_normal'],
+                                                                        ast.asteroid_grav['normal_face'])
     def test_asteroid_gravs(self):
         assert self.ast.asteroid_grav['num_f'] == self.faces
         assert self.ast.name == self.name
@@ -708,6 +719,14 @@ class TestAsteroidCastalia32():
         np.testing.assert_array_almost_equal(
             self.E3_edge_end, self.ast.asteroid_grav['E3_edge'][:, :, -1], decimal=self.decimal)
 
+    def test_edge_one_dyad_loop(self):
+        np.testing.assert_allclose(self.ast.asteroid_grav['E1_edge'], self.E1_edge_loop)
+
+    def test_edge_two_dyad_loop(self):
+        np.testing.assert_allclose(self.ast.asteroid_grav['E2_edge'], self.E2_edge_loop)
+
+    def test_edge_three_dyad_loop(self):
+        np.testing.assert_allclose(self.ast.asteroid_grav['E3_edge'], self.E3_edge_loop)
     def test_face_normal(self):
         pass
 
@@ -1004,6 +1023,9 @@ class TestAsteroidItokawaOBJ():
                             [-0.03096352, -0.02630646,  0.12890078],
                             [-0.05325589,  0.12890078, -0.00421643]])
 
+    E1_edge_loop, E2_edge_loop, E3_edge_loop = wavefront.edge_dyad_loop(ast.asteroid_grav['e1_face_map'], ast.asteroid_grav['e2_face_map'], ast.asteroid_grav['e3_face_map'],
+                                                                        ast.asteroid_grav['e1_normal'], ast.asteroid_grav['e2_normal'], ast.asteroid_grav['e3_normal'],
+                                                                        ast.asteroid_grav['normal_face'])
     def test_ensure_number_of_faces(self):
         np.testing.assert_allclose(1, 1)
 
@@ -1078,6 +1100,14 @@ class TestAsteroidItokawaOBJ():
         np.testing.assert_array_almost_equal(
             self.E3_edge_end, self.ast.asteroid_grav['E3_edge'][:, :, -1], decimal=self.decimal)
 
+    def test_edge_one_dyad_loop(self):
+        np.testing.assert_allclose(self.ast.asteroid_grav['E1_edge'], self.E1_edge_loop)
+
+    def test_edge_two_dyad_loop(self):
+        np.testing.assert_allclose(self.ast.asteroid_grav['E2_edge'], self.E2_edge_loop)
+
+    def test_edge_three_dyad_loop(self):
+        np.testing.assert_allclose(self.ast.asteroid_grav['E3_edge'], self.E3_edge_loop)
     # def test_face_normal(self):
     #     pass
 
