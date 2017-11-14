@@ -184,13 +184,10 @@ class Asteroid(object):
                                                                               e3_ind1b, e3_ind2b, e3_ind3b)
         
         # adjacent faces for edges
-        edge_dyad = wavefront.compute_edge_dyad(e1_face_map, e2_face_map, e3_face_map,
+        E1_edge, E2_edge, E3_edge = wavefront.compute_edge_dyad(e1_face_map, e2_face_map, e3_face_map,
                                     e1_normal, e2_normal, e3_normal,
                                     normal_face)
 
-        E1_edge, E2_edge, E3_edge = wavefront.edge_dyad_loop(e1_face_map, e2_face_map, e3_face_map,
-                                                             e1_normal, e2_normal, e3_normal,
-                                                             normal_face)
         # save as a structure with all the precomputed polyhedron potential data
         asteroid_grav = {
             'F':                F,
