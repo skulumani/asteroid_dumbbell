@@ -4,6 +4,8 @@ import numpy as np
 from dynamics import asteroid
 from point_cloud import polyhedron
 import pdb
+
+# TODO: Put all of the OBJ based testing into a single class. This avoids having to instantiate many large asteroid objects
 class TestFaceContributionItokawaMat():
     # define asteroid
     ast = asteroid.Asteroid('itokawa', 32, 'mat')
