@@ -53,3 +53,20 @@ class TestFaceContributionItokawaLowOBJ():
 
     def test_laplacian(self):
         np.testing.assert_allclose(self.U_grad_mat_face, self.U_grad_mat_face_loop)
+
+class TestEdgeFactorItokawaOBJ():
+    ast = asteroid.Asteroid('itokawa', 0, 'obj')
+    pos = np.random.uniform(1, 2, size=(3,))
+    V = ast.V
+    num_v = V.shape[0]
+
+    r_v = V - np.tile(pos, (num_v, 1))
+    e1, e2, e3 = ast.asteroid_grav['e1'], ast.asteroid_grav['e2'], ast.asteroid_grav['e3']
+    e1_vertex_map, e2_vertex_map, e3_vertex_map = ast.asteroid_grav['e1_vertex_map'], ast.asteroid_grav['e2_vertex_map'], ast.asteroid_grav['e3_vertex_map']
+    
+    L1_edge, L2_edge, L3_edge = polyhedron.edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map)
+    L1_edge_map, _, _ = polyhedron.map_edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map)
+
+    def test_L1_edge(self):
+        np.testing.assert_allclose(self.L1_edge_map, self.L1_edge)
+
