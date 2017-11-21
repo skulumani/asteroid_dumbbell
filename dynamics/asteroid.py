@@ -285,31 +285,12 @@ class Asteroid(object):
 
         G = self.G
         sigma = self.sigma
-
+        
         # distance from state to each vertex
         r_v = V - np.tile(state, (num_v, 1))
 
-        # vectorize w_face calculation
-        ri = r_v[Fa, :]
-        ri_norm = np.sqrt(np.sum(ri**2, axis=1))
-
-        rj = r_v[Fb, :]
-        rj_norm = np.sqrt(np.sum(rj**2, axis=1))
-
-        rk = r_v[Fc, :]
-        rk_norm = np.sqrt(np.sum(rk**2, axis=1))
-
-        rjrk_cross = np.cross(rj, rk)
-        num = np.sum(ri * rjrk_cross, axis=1)
-
-        rjrk_dot = np.sum(rj * rk, axis=1)
-        rkri_dot = np.sum(rk * ri, axis=1)
-        rirj_dot = np.sum(ri * rj, axis=1)
-
-        den = ri_norm * rj_norm * rk_norm + ri_norm * \
-            rjrk_dot + rj_norm * rkri_dot + rk_norm * rirj_dot
-
-        w_face = 2.0 * np.arctan2(num, den).reshape((num_f, 1))
+        # function to compute laplacia factor (wf)
+        w_face = polyhedron.laplacian_factor(r_v, Fa, Fb, Fc)
 
         # check if point is inside or outside the body
         # zero when outside body and -G*sigma*4 pi on the inside
@@ -352,19 +333,9 @@ class Asteroid(object):
             
             # compute the contribution of the each face
             U_face, U_grad_face, U_grad_mat_face  = polyhedron.face_contribution_loop(r_v, Fa, F_face, w_face)
+
             # sum over edges
             for ii in range(num_f):
-
-                # face contribution
-                # this can potentially be done completely outside of the for loop
-                U_face = U_face + \
-                    r_v[Fa[ii], :].dot(F_face[:, :, ii]).dot(
-                        r_v[Fa[ii], :].T) * w_face[ii, 0]
-                U_grad_face = U_grad_face + \
-                    F_face[:, :, ii].dot(r_v[Fa[ii], :].T) * w_face[ii, 0]
-                U_grad_mat_face = U_grad_mat_face + \
-                    F_face[:, :, ii] * w_face[ii]
-
                 # compute contributions for the three edges on this face but ignore if
                 # it's a duplicate
 
