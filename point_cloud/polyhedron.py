@@ -76,3 +76,5 @@ def laplacian_factor(r_v, Fa, Fb, Fc):
         rjrk_dot + rj_norm * rkri_dot + rk_norm * rirj_dot
 
     w_face = 2.0 * np.arctan2(num, den).reshape((num_f, 1))
+
+    return w_face
