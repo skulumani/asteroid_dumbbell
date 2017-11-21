@@ -4,7 +4,7 @@ import numpy as np
 import scipy.io
 import os
 import utilities
-from point_cloud import wavefront
+from point_cloud import wavefront, polyhedron
 import pdb
 
 # TODO: Implement the ability to input a filename for OBJ shape files
@@ -349,7 +349,9 @@ class Asteroid(object):
 
             U_grad_mat_edge = np.zeros((3, 3))
             U_grad_mat_face = np.zeros((3, 3))
-
+            
+            # compute the contribution of the each face
+            U_face, U_grad_face, U_grad_mat_face  = polyhedron.face_contribution_loop(r_v, Fa, F_face, w_face)
             # sum over edges
             for ii in range(num_f):
 
@@ -470,3 +472,4 @@ class Asteroid(object):
         #     print("INSIDE ASTEROID!")
 
         return (U, U_grad, U_grad_mat, Ulaplace)
+
