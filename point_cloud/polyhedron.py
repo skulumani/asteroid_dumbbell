@@ -20,6 +20,8 @@ Author
 Shankar Kulumani		GWU		skulumani@gwu.edu
 """
 import numpy as np
+import pdb
+from multiprocessing import Pool
 
 def face_contribution_loop(r_v, Fa, F_face, w_face):
     U_face = 0
@@ -109,23 +111,29 @@ def edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map):
     
     return L1_edge, L2_edge, L3_edge
 
+def map_edge(edge_tuple):
+    ri, rj, e = edge_tuple
+    num_f = e.shape[0]
+
+    ri_norm = np.sqrt(np.sum(ri**2, axis=1))
+    rj_norm = np.sqrt(np.sum(rj**2, axis=1))
+    e_norm = np.sqrt(np.sum(e**2, axis=1))
+    L_edge = np.log((ri_norm + rj_norm + e_norm) / 
+                    (ri_norm + rj_norm - e_norm)).reshape((num_f, 1))
+    
+    return L_edge
+
 def map_edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map):
 
-    num_f = e1.shape[0]
     
-    def map_edge(edge_tuple):
-        ri, rj, e = edge_tuple
-        ri_norm = np.sqrt(np.sum(ri**2, axis=1))
-        rj_norm = np.sqrt(np.sum(rj**2, axis=1))
-        e_norm = np.sqrt(np.sum(e**2, axis=1))
-        L_edge = np.log((ri_norm + rj_norm + e_norm) / 
-                        (ri_norm + rj_norm - e_norm)).reshape((num_f, 1))
-        
-        return L_edge
+    
+    # L_edges = list(map(map_edge, ((r_v[e1_vertex_map[:, 0], :], r_v[e1_vertex_map[:, 1], :], e1),
+    #                          (r_v[e2_vertex_map[:, 0], :], r_v[e2_vertex_map[:, 1], :], e2),
+    #                          (r_v[e3_vertex_map[:, 0], :], r_v[e3_vertex_map[:, 1], :], e3))))
 
-    L1_edge = map_edge((r_v[e1_vertex_map[:, 0], :], r_v[e1_vertex_map[:, 1], :], e1))
-
-    L2_edge = map_edge((r_v[e2_vertex_map[:, 0], :], r_v[e2_vertex_map[:, 1], :], e2))
-    L3_edge = map_edge((r_v[e3_vertex_map[:, 0], :], r_v[e3_vertex_map[:, 1], :], e3))
+    with Pool(3) as p:
+        L_edges = p.map(map_edge, ((r_v[e1_vertex_map[:, 0], :], r_v[e1_vertex_map[:, 1], :], e1),
+                                   (r_v[e2_vertex_map[:, 0], :], r_v[e2_vertex_map[:, 1], :], e2),
+                                   (r_v[e3_vertex_map[:, 0], :], r_v[e3_vertex_map[:, 1], :], e3)))
    
-    return L1_edge, L2_edge, L3_edge
+    return L_edges[0], L_edges[1], L_edges[2]
