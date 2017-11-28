@@ -79,7 +79,7 @@ def edge_contribution_loop(r_v, e1_face_map, e2_face_map, e3_face_map,
                            L1_edge, L2_edge, L3_edge):
     """Loop over all the faces and figure out edge duplicates on the fly
     """
-
+    count = 0
     U_edge = 0
     U_grad_edge = np.zeros(3)
     U_grad_mat_edge = np.zeros((3, 3))
@@ -114,7 +114,8 @@ def edge_contribution_loop(r_v, e1_face_map, e2_face_map, e3_face_map,
                 e2_lock[row, 1] = ii
             elif col == 2:
                 e3_lock[row, 1] = ii
-
+            
+            count += 1
         else:
             e1_lock[ii, 0] = ii
 
@@ -143,7 +144,8 @@ def edge_contribution_loop(r_v, e1_face_map, e2_face_map, e3_face_map,
                 e2_lock[row, 2] = ii
             elif col == 2:
                 e3_lock[row, 2] = ii
-
+            
+            count += 1
         else:
             e2_lock[ii, 0] = ii
 
@@ -171,7 +173,8 @@ def edge_contribution_loop(r_v, e1_face_map, e2_face_map, e3_face_map,
                 e2_lock[row, 3] = ii
             elif col == 2:
                 e3_lock[row, 3] = ii
-
+            
+            count += 1
         else:
             e3_lock[ii, 0] = ii
 
@@ -183,7 +186,8 @@ def edge_contribution_loop(r_v, e1_face_map, e2_face_map, e3_face_map,
         U_grad_edge = U_grad_edge + U1_grad.reshape(U_grad_edge.shape) + U2_grad.reshape(
             U_grad_edge.shape) + U3_grad.reshape(U_grad_edge.shape)
         U_grad_mat_edge = U_grad_mat_edge + U1_grad_mat + U2_grad_mat + U3_grad_mat
-
+    
+    print(count)
     return U_edge, U_grad_edge, U_grad_mat_edge
 
 # TODO: Add documentation
