@@ -164,9 +164,10 @@ class Asteroid(object):
         e3_face_map = np.full([num_f, 4], invalid, dtype='int')
 
         F_face = np.zeros([3, 3, num_f])
-
+        
+        # TODO Make this a named tuple or dictionary
         (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map,
-        e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(V, F)
+        e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face, e_vertex_map, unique_index) = wavefront.polyhedron_parameters(V, F)
 
         # compute F dyad
         F_face = np.einsum('ij,ik->jki', normal_face, normal_face)
@@ -204,6 +205,8 @@ class Asteroid(object):
             'e1_vertex_map':    e1_vertex_map,
             'e2_vertex_map':    e2_vertex_map,
             'e3_vertex_map':    e3_vertex_map,
+            'e_vertex_map':     e_vertex_map,
+            'unique_index':     unique_index,
             'e1_ind1b':         e1_ind1b,
             'e1_ind2b':         e1_ind2b,
             'e1_ind3b':         e1_ind3b,
@@ -259,13 +262,25 @@ class Asteroid(object):
         e2_face_map = self.asteroid_grav['e2_face_map']
         e3_face_map = self.asteroid_grav['e3_face_map']
 
-        e1_lock = np.full(e1_face_map.shape, -1, dtype='int8')
-        e2_lock = np.full(e2_face_map.shape, -1, dtype='int8')
-        e3_lock = np.full(e3_face_map.shape, -1, dtype='int8')
 
         e1_vertex_map = self.asteroid_grav['e1_vertex_map']
         e2_vertex_map = self.asteroid_grav['e2_vertex_map']
         e3_vertex_map = self.asteroid_grav['e3_vertex_map']
+        
+        e_vertex_map = self.asteroid_grav['e_vertex_map']
+        unique_index = self.asteroid_grav['unique_index']
+
+        e1_ind1b = self.asteroid_grav['e1_ind1b']
+        e1_ind2b = self.asteroid_grav['e1_ind2b']
+        e1_ind3b = self.asteroid_grav['e1_ind3b']
+
+        e2_ind1b = self.asteroid_grav['e2_ind1b']
+        e2_ind2b = self.asteroid_grav['e2_ind2b']
+        e2_ind3b = self.asteroid_grav['e2_ind3b']
+
+        e3_ind1b = self.asteroid_grav['e3_ind1b']
+        e3_ind2b = self.asteroid_grav['e3_ind2b']
+        e3_ind3b = self.asteroid_grav['e3_ind3b']
 
         normal_face = self.asteroid_grav['normal_face']
 
@@ -295,118 +310,20 @@ class Asteroid(object):
         # check if point is inside or outside the body
         # zero when outside body and -G*sigma*4 pi on the inside
         inside_check = np.sum(w_face)
-
         if np.isclose(inside_check, 0):  # outside the body
             L1_edge, L2_edge, L3_edge = polyhedron.edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map)
 
             # calculate the potential at input state
-            U_edge = 0
-            U_face = 0
-
-            U_grad_edge = np.zeros(3)
-            U_grad_face = np.zeros(3)
-
-            U_grad_mat_edge = np.zeros((3, 3))
-            U_grad_mat_face = np.zeros((3, 3))
             
             # compute the contribution of the each face
-            U_face, U_grad_face, U_grad_mat_face  = polyhedron.face_contribution_loop(r_v, Fa, F_face, w_face)
+            U_face, U_grad_face, U_grad_mat_face  = polyhedron.face_contribution(r_v, Fa, F_face, w_face)
+            
+            # U_edge, U_grad_edge, U_grad_mat_edge = polyhedron.edge_contribution_loop(r_v, e1_face_map, e2_face_map, e3_face_map,
+            #                                                                          e1_vertex_map, e2_vertex_map, e3_vertex_map,
+            #                                                                          E1_edge, E2_edge, E3_edge, 
+            #                                                                          L1_edge, L2_edge, L3_edge)
 
-            # sum over edges
-            for ii in range(num_f):
-                # compute contributions for the three edges on this face but ignore if
-                # it's a duplicate
-
-                # edge 1
-                if np.sum(e1_lock[ii, :]) == -4:  # new edge
-
-                    U1 = r_v[e1_vertex_map[ii, 0], :].dot(E1_edge[:, :, ii]).dot(
-                        r_v[e1_vertex_map[ii, 0], :].T) * L1_edge[ii, 0]
-                    U1_grad = E1_edge[:, :, ii].dot(
-                        r_v[e1_vertex_map[ii, 1], :].T) * L1_edge[ii, 0]
-                    U1_grad_mat = E1_edge[:, :, ii] * L1_edge[ii, 0]
-
-                    col = np.where(e1_face_map[ii, 1:] != -1)[0][0]
-                    row = e1_face_map[ii, col + 1]
-
-                    e1_lock[ii, 0] = ii
-                    e1_lock[ii, col + 1] = row
-                    # update lock
-                    if col == 0:  # adjacent face is also edge 1
-                        e1_lock[row, 1] = ii
-                    elif col == 1:  # adjacent face is edge 2
-                        e2_lock[row, 1] = ii
-                    elif col == 2:
-                        e3_lock[row, 1] = ii
-
-                else:
-                    e1_lock[ii, 0] = ii
-
-                    U1 = 0
-                    U1_grad = np.zeros(3)
-                    U1_grad_mat = np.zeros((3, 3))
-
-                # edge 2
-                if np.sum(e2_lock[ii, :]) == -4:
-                    U2 = r_v[e2_vertex_map[ii, 0], :].dot(E2_edge[:, :, ii]).dot(
-                        r_v[e2_vertex_map[ii, 0], :].T) * L2_edge[ii, 0]
-                    U2_grad = E2_edge[:, :, ii].dot(
-                        r_v[e2_vertex_map[ii, 0], :].T) * L2_edge[ii, 0]
-                    U2_grad_mat = E2_edge[:, :, ii] * L2_edge[ii, 0]
-
-                    col = np.where(e2_face_map[ii, 1:] != -1)[0][0]
-                    row = e2_face_map[ii, col + 1]
-
-                    e2_lock[ii, 0] = ii
-                    e2_lock[ii, col + 1] = row
-
-                    # update lock
-                    if col == 0:  # duplicate edge is edge 1 on another face
-                        e1_lock[row, 2] = ii
-                    elif col == 1:  # adjacent face is edge 2
-                        e2_lock[row, 2] = ii
-                    elif col == 2:
-                        e3_lock[row, 2] = ii
-
-                else:
-                    e2_lock[ii, 0] = ii
-
-                    U2 = 0
-                    U2_grad = np.zeros(3)
-                    U2_grad_mat = np.zeros((3, 3))
-
-                # edge 3
-                if np.sum(e3_lock[ii, :]) == -4:
-                    U3 = r_v[e3_vertex_map[ii, 0], :].dot(E3_edge[:, :, ii]).dot(
-                        r_v[e3_vertex_map[ii, 0], :].T) * L3_edge[ii, 0]
-                    U3_grad = E3_edge[:, :, ii].dot(
-                        r_v[e3_vertex_map[ii, 0], :].T) * L3_edge[ii, 0]
-                    U3_grad_mat = E3_edge[:, :, ii] * L3_edge[ii, 0]
-
-                    col = np.where(e3_face_map[ii, 1:] != -1)[0][0]
-                    row = e3_face_map[ii, col + 1]
-
-                    e3_lock[ii, 0] = ii
-                    e3_lock[ii, col + 1] = row
-                    # update lock
-                    if col == 0:  # duplicate is in e1
-                        e1_lock[row, 3] = ii
-                    elif col == 1:
-                        e2_lock[row, 3] = ii
-                    elif col == 2:
-                        e3_lock[row, 3] = ii
-
-                else:
-                    e3_lock[ii, 0] = ii
-
-                    U3 = 0
-                    U3_grad = np.zeros(3)
-                    U3_grad_mat = np.zeros((3, 3))
-
-                U_edge = U_edge + U1 + U2 + U3
-                U_grad_edge = U_grad_edge + U1_grad.reshape(U_grad_edge.shape) + U2_grad.reshape(
-                    U_grad_edge.shape) + U3_grad.reshape(U_grad_edge.shape)
-                U_grad_mat_edge = U_grad_mat_edge + U1_grad_mat + U2_grad_mat + U3_grad_mat
+            U_edge, U_grad_edge, U_grad_mat_edge = polyhedron.edge_contribution(state, e_vertex_map, unique_index, V, E1_edge, E2_edge, E3_edge, L1_edge, L2_edge, L3_edge)
 
             # combine edge and face summations
             U = 1 / 2 * G * sigma * U_edge - 1 / 2 * G * sigma * U_face
