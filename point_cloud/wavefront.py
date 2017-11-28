@@ -812,7 +812,9 @@ def polyhedron_parameters(V, F):
         Cross product of face normal and edge vector
     center_face : numpy array (f, 3)
         The geometric center for each face
-
+    e_vertex_map : numpy array (e, 2)
+        Unique vertices which define all the edges (no duplicates) 
+        
     See Also
     --------
     asteroid.Asteroid : Polyhedron potential model class
@@ -850,6 +852,8 @@ def polyhedron_parameters(V, F):
     e1_vertex_map = np.vstack((Fb, Fa)).T
     e2_vertex_map = np.vstack((Fc, Fb)).T
     e3_vertex_map = np.vstack((Fa, Fc)).T
+    
+    e_vertex_map, unique_index = np.unique(np.sort(np.vstack((e1_vertex_map, e2_vertex_map, e3_vertex_map)), axis=1), axis=0, return_index=True)
 
     # Normalize edge vectors
     # e1_norm=e1./repmat(sqrt(e1(:,1).^2+e1(:,2).^2+e1(:,3).^2),1,3);
@@ -883,10 +887,11 @@ def polyhedron_parameters(V, F):
 
     # Calculate Angle of face seen from vertices
     # Angle =  [acos(dot(e1_norm',-e3_norm'));acos(dot(e2_norm',-e1_norm'));acos(dot(e3_norm',-e2_norm'))]';
-    
+    # TODO : Make this a dictionary or a named tuple for ease of use
+
     return (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3,
             e1_vertex_map, e2_vertex_map, e3_vertex_map, 
-            normal_face, e1_normal, e2_normal,e3_normal, center_face)
+            normal_face, e1_normal, e2_normal,e3_normal, center_face, e_vertex_map, unique_index)
 
 def search_edge(e1, e2, e3):
     r"""Search for matching edges by looking directly at teh computed edges,
