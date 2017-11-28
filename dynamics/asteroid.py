@@ -69,6 +69,10 @@ class Asteroid(object):
                 verts, faces = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
             elif name == 'eros':
                 verts, faces = wavefront.read_obj('./data/shape_model/EROS/eros_low.obj')
+            elif name == 'cube':
+                verts, faces = wavefront.read_obj('./integration/cube.obj')
+                # translate so center of object is at origin
+                verts = verts - np.array([0.5, 0.5, 0.5])
             else:
                 print("Unknown asteroid. Use 'castalia', 'itokawa', or 'eros' only.")
             
@@ -103,6 +107,11 @@ class Asteroid(object):
             self.sigma = 2.67 # g/cm^3
             self.axes = np.array([34.4, 11.7, 11.7])  # size in kilometers
             self.omega = 2 * np.pi / 5.27 / 3600
+        elif name == 'cube':
+            self.M = 1
+            self.sigma = 1
+            self.axes=np.array([0.9, 1.0, 1.1])
+            self.omega = 1
         else:
             print("Unknown asteroid.")
 
@@ -318,12 +327,13 @@ class Asteroid(object):
             # compute the contribution of the each face
             U_face, U_grad_face, U_grad_mat_face  = polyhedron.face_contribution(r_v, Fa, F_face, w_face)
             
-            # U_edge, U_grad_edge, U_grad_mat_edge = polyhedron.edge_contribution_loop(r_v, e1_face_map, e2_face_map, e3_face_map,
-            #                                                                          e1_vertex_map, e2_vertex_map, e3_vertex_map,
-            #                                                                          E1_edge, E2_edge, E3_edge, 
-            #                                                                          L1_edge, L2_edge, L3_edge)
+            # pdb.set_trace()
+            U_edge, U_grad_edge, U_grad_mat_edge = polyhedron.edge_contribution_loop(r_v, e1_face_map, e2_face_map, e3_face_map,
+                                                                                     e1_vertex_map, e2_vertex_map, e3_vertex_map,
+                                                                                     E1_edge, E2_edge, E3_edge, 
+                                                                                     L1_edge, L2_edge, L3_edge)
 
-            U_edge, U_grad_edge, U_grad_mat_edge = polyhedron.edge_contribution(state, e_vertex_map, unique_index, V, E1_edge, E2_edge, E3_edge, L1_edge, L2_edge, L3_edge)
+            # U_edge, U_grad_edge, U_grad_mat_edge = polyhedron.edge_contribution(state, e_vertex_map, unique_index, V, E1_edge, E2_edge, E3_edge, L1_edge, L2_edge, L3_edge)
 
             # combine edge and face summations
             U = 1 / 2 * G * sigma * U_edge - 1 / 2 * G * sigma * U_face
