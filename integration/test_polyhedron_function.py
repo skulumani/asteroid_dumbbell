@@ -4,7 +4,8 @@ from point_cloud import wavefront, polyhedron
 
 # define asteroid
 ast = asteroid.Asteroid('itokawa', 0, 'obj')
-pos = np.random.uniform(1, 2, size=(3,))
+# pos = np.random.uniform(1, 2, size=(3,))
+pos = np.array([2, 0, 0])
 V = ast.V
 num_v = V.shape[0]
 
