@@ -321,19 +321,10 @@ class Asteroid(object):
         inside_check = np.sum(w_face)
         if np.isclose(inside_check, 0):  # outside the body
             L1_edge, L2_edge, L3_edge = polyhedron.edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map)
-
-            # calculate the potential at input state
             
             # compute the contribution of the each face
             U_face, U_grad_face, U_grad_mat_face  = polyhedron.face_contribution(r_v, Fa, F_face, w_face)
-            
-            # pdb.set_trace()
-            U_edge, U_grad_edge, U_grad_mat_edge = polyhedron.edge_contribution_loop(r_v, e1_face_map, e2_face_map, e3_face_map,
-                                                                                     e1_vertex_map, e2_vertex_map, e3_vertex_map,
-                                                                                     E1_edge, E2_edge, E3_edge, 
-                                                                                     L1_edge, L2_edge, L3_edge)
-
-            # U_edge, U_grad_edge, U_grad_mat_edge = polyhedron.edge_contribution(state, e_vertex_map, unique_index, V, E1_edge, E2_edge, E3_edge, L1_edge, L2_edge, L3_edge)
+            U_edge, U_grad_edge, U_grad_mat_edge = polyhedron.edge_contribution(state, e_vertex_map, unique_index, V, E1_edge, E2_edge, E3_edge, L1_edge, L2_edge, L3_edge)
 
             # combine edge and face summations
             U = 1 / 2 * G * sigma * U_edge - 1 / 2 * G * sigma * U_face
