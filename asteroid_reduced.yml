@@ -10,7 +10,6 @@ dependencies:
 - jedi
 - matplotlib
 - mkl
-- numpy
 - numpydoc
 - pep8
 - pillow
@@ -29,6 +28,7 @@ dependencies:
   - line-profiler
   - snakeviz
   - astro
+  - numpy==1.13.3
   - kinematics
   - spacetrack
   - spiceypy
