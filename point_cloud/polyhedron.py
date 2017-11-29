@@ -74,6 +74,7 @@ def edge_contribution(state, e_vertex_map, unique_index,
 
     return U_edge, U_grad_edge, U_grad_mat_edge
 
+# TODO : Deprecate - pretty sure this is wrong far large numbers of edges
 def edge_contribution_loop(r_v, e1_face_map, e2_face_map, e3_face_map,
                            e1_vertex_map, e2_vertex_map, e3_vertex_map,
                            E1_edge, E2_edge, E3_edge, 
