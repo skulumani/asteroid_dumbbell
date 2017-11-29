@@ -224,7 +224,8 @@ class TestItokawaLowOBJ():
     def test_L3_edge(self):
         np.testing.assert_allclose(self.L3_edge_map, self.L3_edge)
     
-    # Does not match. Error most likely in old code edge_contribution_loop
+    # FIXME Does not match. Error most likely in old code edge_contribution_loop.
+    # Replace with correct values
     # def test_edge_contribution(self):
     #     np.testing.assert_allclose(self.U_edge, self.U_edge_loop)
 
