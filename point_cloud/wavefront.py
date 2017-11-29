@@ -812,7 +812,9 @@ def polyhedron_parameters(V, F):
         Cross product of face normal and edge vector
     center_face : numpy array (f, 3)
         The geometric center for each face
-
+    e_vertex_map : numpy array (e, 2)
+        Unique vertices which define all the edges (no duplicates) 
+        
     See Also
     --------
     asteroid.Asteroid : Polyhedron potential model class
@@ -850,6 +852,8 @@ def polyhedron_parameters(V, F):
     e1_vertex_map = np.vstack((Fb, Fa)).T
     e2_vertex_map = np.vstack((Fc, Fb)).T
     e3_vertex_map = np.vstack((Fa, Fc)).T
+    
+    e_vertex_map, unique_index = np.unique(np.sort(np.vstack((e1_vertex_map, e2_vertex_map, e3_vertex_map)), axis=1), axis=0, return_index=True)
 
     # Normalize edge vectors
     # e1_norm=e1./repmat(sqrt(e1(:,1).^2+e1(:,2).^2+e1(:,3).^2),1,3);
@@ -883,10 +887,11 @@ def polyhedron_parameters(V, F):
 
     # Calculate Angle of face seen from vertices
     # Angle =  [acos(dot(e1_norm',-e3_norm'));acos(dot(e2_norm',-e1_norm'));acos(dot(e3_norm',-e2_norm'))]';
-    
+    # TODO : Make this a dictionary or a named tuple for ease of use
+
     return (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3,
             e1_vertex_map, e2_vertex_map, e3_vertex_map, 
-            normal_face, e1_normal, e2_normal,e3_normal, center_face)
+            normal_face, e1_normal, e2_normal,e3_normal, center_face, e_vertex_map, unique_index)
 
 def search_edge(e1, e2, e3):
     r"""Search for matching edges by looking directly at teh computed edges,
@@ -1080,3 +1085,126 @@ def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
     return (e1_ind1b, e1_ind2b, e1_ind3b,
             e2_ind1b, e2_ind2b, e2_ind3b,
             e3_ind1b, e3_ind2b, e3_ind3b)
+
+def build_edge_face_map(e1_ind1b, e1_ind2b, e1_ind3b,
+                        e2_ind1b, e2_ind2b, e2_ind3b,
+                        e3_ind1b, e3_ind2b, e3_ind3b):
+
+    faces_list = np.arange(e1_ind1b.shape[0])
+    e1_face_map = np.stack((faces_list, e1_ind1b, e1_ind2b, e1_ind3b), axis=1)
+    e2_face_map = np.stack((faces_list, e2_ind1b, e2_ind2b, e2_ind3b), axis=1)
+    e3_face_map = np.stack((faces_list, e3_ind1b, e3_ind2b, e3_ind3b), axis=1)
+
+    return e1_face_map, e2_face_map, e3_face_map
+
+# TODO: Maybe make this into a map function 
+def compute_edge_dyad(e1_face_map, e2_face_map, e3_face_map,
+                      e1_normal, e2_normal, e3_normal,
+                      normal_face, invalid=-1):
+
+    edge_normals = np.stack((e1_normal, e2_normal, e3_normal), axis=2)
+    # create a big list of edge normals for e1 edges
+    row, col = np.where(e1_face_map[:, 1:] != invalid)
+    e1_adjacent_face_index = e1_face_map[row, col+1]
+    e1_adjacent_face = col
+    e1_matching_normal = edge_normals[e1_adjacent_face_index, :, e1_adjacent_face]
+
+    e1_adjacent_normal_face = normal_face[e1_adjacent_face_index, :]
+
+    E1_edge = np.einsum('ij,ik->jki', normal_face, e1_normal) + np.einsum('ij,ik->jki', e1_adjacent_normal_face, e1_matching_normal)
+    # create a big list of edge normals for e2 edges
+    row, col = np.where(e2_face_map[:, 1:] != invalid)
+    e2_adjacent_face_index = e2_face_map[row, col+1]
+    e2_adjacent_face = col
+    e2_matching_normal = edge_normals[e2_adjacent_face_index, :, e2_adjacent_face]
+    e2_adjacent_normal_face = normal_face[e2_adjacent_face_index, :]
+
+    E2_edge = np.einsum('ij,ik->jki', normal_face, e2_normal) + np.einsum('ij,ik->jki', e2_adjacent_normal_face, e2_matching_normal)
+    # create a big list of edge normals for e3 edges
+    row, col = np.where(e3_face_map[:, 1:] != invalid)
+    e3_adjacent_face_index = e3_face_map[row, col+1]
+    e3_adjacent_face = col
+    e3_matching_normal = edge_normals[e3_adjacent_face_index, :, e3_adjacent_face]
+    e3_adjacent_normal_face = normal_face[e3_adjacent_face_index, :]
+
+    E3_edge = np.einsum('ij,ik->jki', normal_face, e3_normal) + np.einsum('ij,ik->jki', e3_adjacent_normal_face, e3_matching_normal)
+    
+    # compute the dyad
+    return E1_edge, E2_edge, E3_edge
+
+def face_dyad_loop(normal_face):
+
+    F_face= np.zeros([3, 3, normal_face.shape[0]])
+    for ii in range(normal_face.shape[0]):
+        F_face[:, :, ii] = np.outer(
+            normal_face[ii, :], normal_face[ii, :])
+
+    return F_face
+
+def edge_dyad_loop(e1_face_map, e2_face_map, e3_face_map,
+                   e1_normal, e2_normal, e3_normal,
+                   normal_face, invalid=-1):
+    num_f = e1_face_map.shape[0]
+    E1_edge = np.zeros([3, 3, num_f])
+    E2_edge = np.zeros([3, 3, num_f])
+    E3_edge = np.zeros([3, 3, num_f])
+    
+    for ii in range(num_f):
+
+        # find the edge normals for all edges of the current face
+        # also pull out the edge normals for each adjacent face (3 adjacent
+        # faces
+        nA1 = e1_normal[e1_face_map[ii, 0], :]
+        nA2 = e2_normal[e2_face_map[ii, 0], :]
+        nA3 = e3_normal[e3_face_map[ii, 0], :]
+
+        # find adjacent face for edge 1
+        col = np.where(e1_face_map[ii, 1:] != invalid)[0][0]
+        face_index = e1_face_map[ii, col + 1]
+
+        if col == 0:  # adjacent face is also edge 1
+            nB1 = e1_normal[face_index, :]
+        elif col == 1:  # adjacent face is edge 2
+            nB1 = e2_normal[face_index, :]
+        elif col == 2:
+            nB1 = e3_normal[face_index, :]
+
+        nA = normal_face[ii, :]
+        nB = normal_face[face_index, :]
+
+        # second order dyadic tensor
+        E1_edge[:, :, ii] = np.outer(nA, nA1) + np.outer(nB, nB1)
+
+        # find adjacent face for edge 2
+        col = np.where(e2_face_map[ii, 1:] != invalid)[0][0]
+        face_index = e2_face_map[ii, col + 1]
+
+        if col == 0:  # adjacent face is also edge 1
+            nB2 = e1_normal[face_index, :]
+        elif col == 1:  # adjacent face is edge 2
+            nB2 = e2_normal[face_index, :]
+        elif col == 2:
+            nB2 = e3_normal[face_index, :]
+
+        nB = normal_face[face_index, :]
+
+        # second order dyadic tensor
+        E2_edge[:, :, ii] = np.outer(nA, nA2) + np.outer(nB, nB2)
+
+        # find adjacent face for edge 3
+        col = np.where(e3_face_map[ii, 1:] != invalid)[0][0]
+        face_index = e3_face_map[ii, col + 1]
+
+        if col == 0:  # adjacent face is also edge 1
+            nB3 = e1_normal[face_index, :]
+        elif col == 1:  # adjacent face is edge 2
+            nB3 = e2_normal[face_index, :]
+        elif col == 2:
+            nB3 = e3_normal[face_index, :]
+
+        nB = normal_face[face_index, :]
+
+        # second order dyadic tensor
+        E3_edge[:, :, ii] = np.outer(nA, nA3) + np.outer(nB, nB3)
+
+    return E1_edge, E2_edge, E3_edge

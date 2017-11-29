@@ -4,7 +4,7 @@ import numpy as np
 import scipy.io
 import os
 import utilities
-from point_cloud import wavefront
+from point_cloud import wavefront, polyhedron
 import pdb
 
 # TODO: Implement the ability to input a filename for OBJ shape files
@@ -69,6 +69,10 @@ class Asteroid(object):
                 verts, faces = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
             elif name == 'eros':
                 verts, faces = wavefront.read_obj('./data/shape_model/EROS/eros_low.obj')
+            elif name == 'cube':
+                verts, faces = wavefront.read_obj('./integration/cube.obj')
+                # translate so center of object is at origin
+                verts = verts - np.array([0.5, 0.5, 0.5])
             else:
                 print("Unknown asteroid. Use 'castalia', 'itokawa', or 'eros' only.")
             
@@ -103,6 +107,11 @@ class Asteroid(object):
             self.sigma = 2.67 # g/cm^3
             self.axes = np.array([34.4, 11.7, 11.7])  # size in kilometers
             self.omega = 2 * np.pi / 5.27 / 3600
+        elif name == 'cube':
+            self.M = 1
+            self.sigma = 1
+            self.axes=np.array([0.9, 1.0, 1.1])
+            self.omega = 1
         else:
             print("Unknown asteroid.")
 
@@ -156,7 +165,6 @@ class Asteroid(object):
         num_f = F.shape[0]
         num_e = 3 * (num_v - 2)
         
-        # TODO: Search across this instead of the actual vectors
         # calculate shape parameters
         # calculate vectors for each edge (loop through F and difference the
         # vectors) then store them
@@ -165,111 +173,30 @@ class Asteroid(object):
         e3_face_map = np.full([num_f, 4], invalid, dtype='int')
 
         F_face = np.zeros([3, 3, num_f])
-
+        
+        # TODO Make this a named tuple or dictionary
         (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map,
-        e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(V, F)
+        e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face, e_vertex_map, unique_index) = wavefront.polyhedron_parameters(V, F)
 
         # compute F dyad
-        for ii in range(normal_face.shape[0]):
-            F_face[:, :, ii] = np.outer(normal_face[ii, :], normal_face[ii, :])
-
+        F_face = np.einsum('ij,ik->jki', normal_face, normal_face)
         # loop over all the edges to figure out the common edges and calculate E_e
         # find common e1 edges
 
         (e1_ind1b, e1_ind2b, e1_ind3b,
         e2_ind1b, e2_ind2b, e2_ind3b,
-        e3_ind1b, e3_ind2b, e3_ind3b) = wavefront.search_edge(e1, e2, e3)
-
-        E1_edge = np.zeros([3, 3, num_f])
-        E2_edge = np.zeros([3, 3, num_f])
-        E3_edge = np.zeros([3, 3, num_f])
-
-        for ii in range(num_f):
-            # check each of the edges in the current face for a match in all the
-            # other edges
-            e1_face_map[ii, 0] = ii
-            e2_face_map[ii, 0] = ii
-            e3_face_map[ii, 0] = ii
-
-            # e1 edge duplicate
-            if e1_ind1b[ii] != invalid:
-                e1_face_map[ii, 1] = e1_ind1b[ii]
-            elif e1_ind2b[ii] != invalid:
-                e1_face_map[ii, 2] = e1_ind2b[ii]
-            elif e1_ind3b[ii] != invalid:
-                e1_face_map[ii, 3] = e1_ind3b[ii]
-
-            # e2 edge duplicate
-            if e2_ind1b[ii] != invalid:
-                e2_face_map[ii, 1] = e2_ind1b[ii]
-            elif e2_ind2b[ii] != invalid:
-                e2_face_map[ii, 2] = e2_ind2b[ii]
-            elif e2_ind3b[ii] != invalid:
-                e2_face_map[ii, 3] = e2_ind3b[ii]
-
-            # e3 edge duplicate
-            if e3_ind1b[ii] != invalid:
-                e3_face_map[ii, 1] = e3_ind1b[ii]
-            elif e3_ind2b[ii] != invalid:
-                e3_face_map[ii, 2] = e3_ind2b[ii]
-            elif e3_ind3b[ii] != invalid:
-                e3_face_map[ii, 3] = e3_ind3b[ii]
-
-            # find the edge normals for all edges of the current face
-            # also pull out the edge normals for each adjacent face (3 adjacent
-            # faces
-            nA1 = e1_normal[e1_face_map[ii, 0], :]
-            nA2 = e2_normal[e2_face_map[ii, 0], :]
-            nA3 = e3_normal[e3_face_map[ii, 0], :]
-
-            # find adjacent face for edge 1
-            col = np.where(e1_face_map[ii, 1:] != invalid)[0][0]
-            face_index = e1_face_map[ii, col + 1]
-
-            if col == 0:  # adjacent face is also edge 1
-                nB1 = e1_normal[face_index, :]
-            elif col == 1:  # adjacent face is edge 2
-                nB1 = e2_normal[face_index, :]
-            elif col == 2:
-                nB1 = e3_normal[face_index, :]
-
-            nA = normal_face[ii, :]
-            nB = normal_face[face_index, :]
-
-            # second order dyadic tensor
-            E1_edge[:, :, ii] = np.outer(nA, nA1) + np.outer(nB, nB1)
-
-            # find adjacent face for edge 2
-            col = np.where(e2_face_map[ii, 1:] != invalid)[0][0]
-            face_index = e2_face_map[ii, col + 1]
-
-            if col == 0:  # adjacent face is also edge 1
-                nB2 = e1_normal[face_index, :]
-            elif col == 1:  # adjacent face is edge 2
-                nB2 = e2_normal[face_index, :]
-            elif col == 2:
-                nB2 = e3_normal[face_index, :]
-
-            nB = normal_face[face_index, :]
-
-            # second order dyadic tensor
-            E2_edge[:, :, ii] = np.outer(nA, nA2) + np.outer(nB, nB2)
-
-            # find adjacent face for edge 3
-            col = np.where(e3_face_map[ii, 1:] != invalid)[0][0]
-            face_index = e3_face_map[ii, col + 1]
-
-            if col == 0:  # adjacent face is also edge 1
-                nB3 = e1_normal[face_index, :]
-            elif col == 1:  # adjacent face is edge 2
-                nB3 = e2_normal[face_index, :]
-            elif col == 2:
-                nB3 = e3_normal[face_index, :]
-
-            nB = normal_face[face_index, :]
-
-            # second order dyadic tensor
-            E3_edge[:, :, ii] = np.outer(nA, nA3) + np.outer(nB, nB3)
+        e3_ind1b, e3_ind2b, e3_ind3b) = wavefront.search_edge_vertex_map(e1_vertex_map,
+                                                                         e2_vertex_map, 
+                                                                         e3_vertex_map)
+        # build the edge face maps
+        e1_face_map, e2_face_map, e3_face_map = wavefront.build_edge_face_map(e1_ind1b, e1_ind2b, e1_ind3b,
+                                                                              e2_ind1b, e2_ind2b, e2_ind3b,
+                                                                              e3_ind1b, e3_ind2b, e3_ind3b)
+        
+        # adjacent faces for edges
+        E1_edge, E2_edge, E3_edge = wavefront.compute_edge_dyad(e1_face_map, e2_face_map, e3_face_map,
+                                    e1_normal, e2_normal, e3_normal,
+                                    normal_face)
 
         # save as a structure with all the precomputed polyhedron potential data
         asteroid_grav = {
@@ -287,6 +214,17 @@ class Asteroid(object):
             'e1_vertex_map':    e1_vertex_map,
             'e2_vertex_map':    e2_vertex_map,
             'e3_vertex_map':    e3_vertex_map,
+            'e_vertex_map':     e_vertex_map,
+            'unique_index':     unique_index,
+            'e1_ind1b':         e1_ind1b,
+            'e1_ind2b':         e1_ind2b,
+            'e1_ind3b':         e1_ind3b,
+            'e2_ind1b':         e2_ind1b,
+            'e2_ind2b':         e2_ind2b,
+            'e2_ind3b':         e2_ind3b,
+            'e3_ind1b':         e3_ind1b,
+            'e3_ind2b':         e3_ind2b,
+            'e3_ind3b':         e3_ind3b,
             'normal_face':      normal_face,
             'center_face':      center_face,
             'e1_normal':        e1_normal,
@@ -333,13 +271,25 @@ class Asteroid(object):
         e2_face_map = self.asteroid_grav['e2_face_map']
         e3_face_map = self.asteroid_grav['e3_face_map']
 
-        e1_lock = np.full(e1_face_map.shape, -1, dtype='int8')
-        e2_lock = np.full(e2_face_map.shape, -1, dtype='int8')
-        e3_lock = np.full(e3_face_map.shape, -1, dtype='int8')
 
         e1_vertex_map = self.asteroid_grav['e1_vertex_map']
         e2_vertex_map = self.asteroid_grav['e2_vertex_map']
         e3_vertex_map = self.asteroid_grav['e3_vertex_map']
+        
+        e_vertex_map = self.asteroid_grav['e_vertex_map']
+        unique_index = self.asteroid_grav['unique_index']
+
+        e1_ind1b = self.asteroid_grav['e1_ind1b']
+        e1_ind2b = self.asteroid_grav['e1_ind2b']
+        e1_ind3b = self.asteroid_grav['e1_ind3b']
+
+        e2_ind1b = self.asteroid_grav['e2_ind1b']
+        e2_ind2b = self.asteroid_grav['e2_ind2b']
+        e2_ind3b = self.asteroid_grav['e2_ind3b']
+
+        e3_ind1b = self.asteroid_grav['e3_ind1b']
+        e3_ind2b = self.asteroid_grav['e3_ind2b']
+        e3_ind3b = self.asteroid_grav['e3_ind3b']
 
         normal_face = self.asteroid_grav['normal_face']
 
@@ -359,177 +309,22 @@ class Asteroid(object):
 
         G = self.G
         sigma = self.sigma
-
+        
         # distance from state to each vertex
         r_v = V - np.tile(state, (num_v, 1))
 
-        # vectorize w_face calculation
-        ri = r_v[Fa, :]
-        ri_norm = np.sqrt(np.sum(ri**2, axis=1))
-
-        rj = r_v[Fb, :]
-        rj_norm = np.sqrt(np.sum(rj**2, axis=1))
-
-        rk = r_v[Fc, :]
-        rk_norm = np.sqrt(np.sum(rk**2, axis=1))
-
-        rjrk_cross = np.cross(rj, rk)
-        num = np.sum(ri * rjrk_cross, axis=1)
-
-        rjrk_dot = np.sum(rj * rk, axis=1)
-        rkri_dot = np.sum(rk * ri, axis=1)
-        rirj_dot = np.sum(ri * rj, axis=1)
-
-        den = ri_norm * rj_norm * rk_norm + ri_norm * \
-            rjrk_dot + rj_norm * rkri_dot + rk_norm * rirj_dot
-
-        w_face = 2.0 * np.arctan2(num, den).reshape((num_f, 1))
+        # function to compute laplacia factor (wf)
+        w_face = polyhedron.laplacian_factor(r_v, Fa, Fb, Fc)
 
         # check if point is inside or outside the body
         # zero when outside body and -G*sigma*4 pi on the inside
         inside_check = np.sum(w_face)
-
         if np.isclose(inside_check, 0):  # outside the body
-            r1i = r_v[e1_vertex_map[:, 0], :]
-            r1j = r_v[e1_vertex_map[:, 1], :]
-            r1i_norm = np.sqrt(np.sum(r1i**2, axis=1))
-            r1j_norm = np.sqrt(np.sum(r1j**2, axis=1))
-            e1_norm = np.sqrt(np.sum(e1**2, axis=1))
-            L1_edge = np.log((r1i_norm + r1j_norm + e1_norm) /
-                             (r1i_norm + r1j_norm - e1_norm)).reshape((num_f, 1))
-
-            r2i = r_v[e2_vertex_map[:, 0], :]
-            r2j = r_v[e2_vertex_map[:, 1], :]
-            r2i_norm = np.sqrt(np.sum(r2i**2, axis=1))
-            r2j_norm = np.sqrt(np.sum(r2j**2, axis=1))
-            e2_norm = np.sqrt(np.sum(e2**2, axis=1))
-            L2_edge = np.log((r2i_norm + r2j_norm + e2_norm) /
-                             (r2i_norm + r2j_norm - e2_norm)).reshape((num_f, 1))
-
-            r3i = r_v[e3_vertex_map[:, 0], :]
-            r3j = r_v[e3_vertex_map[:, 1], :]
-            r3i_norm = np.sqrt(np.sum(r3i**2, axis=1))
-            r3j_norm = np.sqrt(np.sum(r3j**2, axis=1))
-            e3_norm = np.sqrt(np.sum(e3**2, axis=1))
-            L3_edge = np.log((r3i_norm + r3j_norm + e3_norm) /
-                             (r3i_norm + r3j_norm - e3_norm)).reshape((num_f, 1))
-
-            # calculate the potential at input state
-            U_edge = 0
-            U_face = 0
-
-            U_grad_edge = np.zeros(3)
-            U_grad_face = np.zeros(3)
-
-            U_grad_mat_edge = np.zeros((3, 3))
-            U_grad_mat_face = np.zeros((3, 3))
-
-            # sum over edges
-            for ii in range(num_f):
-
-                # face contribution
-                # this can potentially be done completely outside of the for loop
-                U_face = U_face + \
-                    r_v[Fa[ii], :].dot(F_face[:, :, ii]).dot(
-                        r_v[Fa[ii], :].T) * w_face[ii, 0]
-                U_grad_face = U_grad_face + \
-                    F_face[:, :, ii].dot(r_v[Fa[ii], :].T) * w_face[ii, 0]
-                U_grad_mat_face = U_grad_mat_face + \
-                    F_face[:, :, ii] * w_face[ii]
-
-                # compute contributions for the three edges on this face but ignore if
-                # it's a duplicate
-
-                # edge 1
-                if np.sum(e1_lock[ii, :]) == -4:  # new edge
-
-                    U1 = r_v[e1_vertex_map[ii, 0], :].dot(E1_edge[:, :, ii]).dot(
-                        r_v[e1_vertex_map[ii, 0], :].T) * L1_edge[ii, 0]
-                    U1_grad = E1_edge[:, :, ii].dot(
-                        r_v[e1_vertex_map[ii, 1], :].T) * L1_edge[ii, 0]
-                    U1_grad_mat = E1_edge[:, :, ii] * L1_edge[ii, 0]
-
-                    col = np.where(e1_face_map[ii, 1:] != -1)[0][0]
-                    row = e1_face_map[ii, col + 1]
-
-                    e1_lock[ii, 0] = ii
-                    e1_lock[ii, col + 1] = row
-                    # update lock
-                    if col == 0:  # adjacent face is also edge 1
-                        e1_lock[row, 1] = ii
-                    elif col == 1:  # adjacent face is edge 2
-                        e2_lock[row, 1] = ii
-                    elif col == 2:
-                        e3_lock[row, 1] = ii
-
-                else:
-                    e1_lock[ii, 0] = ii
-
-                    U1 = 0
-                    U1_grad = np.zeros(3)
-                    U1_grad_mat = np.zeros((3, 3))
-
-                # edge 2
-                if np.sum(e2_lock[ii, :]) == -4:
-                    U2 = r_v[e2_vertex_map[ii, 0], :].dot(E2_edge[:, :, ii]).dot(
-                        r_v[e2_vertex_map[ii, 0], :].T) * L2_edge[ii, 0]
-                    U2_grad = E2_edge[:, :, ii].dot(
-                        r_v[e2_vertex_map[ii, 0], :].T) * L2_edge[ii, 0]
-                    U2_grad_mat = E2_edge[:, :, ii] * L2_edge[ii, 0]
-
-                    col = np.where(e2_face_map[ii, 1:] != -1)[0][0]
-                    row = e2_face_map[ii, col + 1]
-
-                    e2_lock[ii, 0] = ii
-                    e2_lock[ii, col + 1] = row
-
-                    # update lock
-                    if col == 0:  # duplicate edge is edge 1 on another face
-                        e1_lock[row, 2] = ii
-                    elif col == 1:  # adjacent face is edge 2
-                        e2_lock[row, 2] = ii
-                    elif col == 2:
-                        e3_lock[row, 2] = ii
-
-                else:
-                    e2_lock[ii, 0] = ii
-
-                    U2 = 0
-                    U2_grad = np.zeros(3)
-                    U2_grad_mat = np.zeros((3, 3))
-
-                # edge 3
-                if np.sum(e3_lock[ii, :]) == -4:
-                    U3 = r_v[e3_vertex_map[ii, 0], :].dot(E3_edge[:, :, ii]).dot(
-                        r_v[e3_vertex_map[ii, 0], :].T) * L3_edge[ii, 0]
-                    U3_grad = E3_edge[:, :, ii].dot(
-                        r_v[e3_vertex_map[ii, 0], :].T) * L3_edge[ii, 0]
-                    U3_grad_mat = E3_edge[:, :, ii] * L3_edge[ii, 0]
-
-                    col = np.where(e3_face_map[ii, 1:] != -1)[0][0]
-                    row = e3_face_map[ii, col + 1]
-
-                    e3_lock[ii, 0] = ii
-                    e3_lock[ii, col + 1] = row
-                    # update lock
-                    if col == 0:  # duplicate is in e1
-                        e1_lock[row, 3] = ii
-                    elif col == 1:
-                        e2_lock[row, 3] = ii
-                    elif col == 2:
-                        e3_lock[row, 3] = ii
-
-                else:
-                    e3_lock[ii, 0] = ii
-
-                    U3 = 0
-                    U3_grad = np.zeros(3)
-                    U3_grad_mat = np.zeros((3, 3))
-
-                U_edge = U_edge + U1 + U2 + U3
-                U_grad_edge = U_grad_edge + U1_grad.reshape(U_grad_edge.shape) + U2_grad.reshape(
-                    U_grad_edge.shape) + U3_grad.reshape(U_grad_edge.shape)
-                U_grad_mat_edge = U_grad_mat_edge + U1_grad_mat + U2_grad_mat + U3_grad_mat
+            L1_edge, L2_edge, L3_edge = polyhedron.edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map)
+            
+            # compute the contribution of the each face
+            U_face, U_grad_face, U_grad_mat_face  = polyhedron.face_contribution(r_v, Fa, F_face, w_face)
+            U_edge, U_grad_edge, U_grad_mat_edge = polyhedron.edge_contribution(state, e_vertex_map, unique_index, V, E1_edge, E2_edge, E3_edge, L1_edge, L2_edge, L3_edge)
 
             # combine edge and face summations
             U = 1 / 2 * G * sigma * U_edge - 1 / 2 * G * sigma * U_face
@@ -544,3 +339,4 @@ class Asteroid(object):
         #     print("INSIDE ASTEROID!")
 
         return (U, U_grad, U_grad_mat, Ulaplace)
+
