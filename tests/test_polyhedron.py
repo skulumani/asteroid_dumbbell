@@ -118,7 +118,7 @@ class TestItokawaMat64():
     def test_grad_edge(self):
         np.testing.assert_allclose(self.U_grad_edge, self.U_grad_edge_loop)
 
-class TestItokawaMat256():
+class TestItokawaMat512():
     # define asteroid
     ast = asteroid.Asteroid('itokawa', 512, 'mat')
     pos = np.random.uniform(1, 2, size=(3,))
