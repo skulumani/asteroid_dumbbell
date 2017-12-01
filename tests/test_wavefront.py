@@ -190,7 +190,8 @@ class TestReadingCubeOBJ():
 
     (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3,
      e1_vertex_map, e2_vertex_map, e3_vertex_map, 
-     normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(v, f)
+     normal_face, e1_normal, e2_normal,e3_normal, center_face,
+     e_vertex_map, unique_index) = wavefront.polyhedron_parameters(v, f)
 
     num_v = v.shape[0]
     num_f = f.shape[0]
@@ -254,7 +255,7 @@ class TestEdgeSearchingItokawaMat32():
     v = mat['V_32'] 
 
     (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map,
-    e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(v, f)
+    e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face, e_vertex_map, unique_index) = wavefront.polyhedron_parameters(v, f)
 
     (e1_ind1b, e1_ind2b, e1_ind3b,
     e2_ind1b, e2_ind2b, e2_ind3b,
@@ -363,7 +364,7 @@ class TestEdgeSearchingItokawaMat2048():
     v = mat['V_2048'] 
 
     (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map,
-    e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(v, f)
+    e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face, e_vertex_map, unique_index) = wavefront.polyhedron_parameters(v, f)
 
     (e1_ind1b, e1_ind2b, e1_ind3b,
     e2_ind1b, e2_ind2b, e2_ind3b,
@@ -473,7 +474,7 @@ class TestEdgeSearchingCastaliaMat4092():
     v = mat['V_4092'] 
 
     (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map,
-    e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face) = wavefront.polyhedron_parameters(v, f)
+    e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face, e_vertex_map, unique_index) = wavefront.polyhedron_parameters(v, f)
 
     (e1_ind1b, e1_ind2b, e1_ind3b,
     e2_ind1b, e2_ind2b, e2_ind3b,

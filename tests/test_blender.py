@@ -6,7 +6,7 @@ import numpy as np
 
 import bpy
 def test_python_version():
-    req_version = (3, 5, 3, 'final', 0)
+    req_version = (3, 5, 4, 'final', 0)
     cur_version = sys.version_info
     np.testing.assert_equal(cur_version, req_version)
 
