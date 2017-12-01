@@ -32,7 +32,7 @@ read -p "Press enter to continue"
 git submodule foreach git pull --rebase origin master
 
 sudo apt-get update
-sudo apt-get install git build-essential cmake cmake-curses-gui
+sudo apt-get install git build-essential cmake cmake-curses-gui libopenimageio-dev
 
 # install blender dependencies
 cd "$HOME/blender-git"
