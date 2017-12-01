@@ -10,7 +10,7 @@ from vtk.util.misc import vtkGetDataRoot
 import os
 import string
 import time
-from point_cloud import vtk_mesh
+from point_cloud import wavefront
 import pdb
 
 def vtk_example():
@@ -671,6 +671,142 @@ def cube():
 
     renWin.Render()
     iren.Start()
+
+def vtk_render_polydata(poly):
+    """Helper function to turn VTK poly data to a rendered window
+    """
+    # now viusalize
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputData(poly)
+    mapper.SetScalarRange(0, 7)
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    # now render
+    camera = vtk.vtkCamera()
+    camera.SetPosition(1, 1, 1)
+    camera.SetFocalPoint(0, 0, 0)
+
+    renderer = vtk.vtkRenderer()
+    renWin = vtk.vtkRenderWindow()
+    renWin.AddRenderer(renderer)
+
+    iren = vtk.vtkXRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
+
+    renderer.AddActor(actor)
+    renderer.SetActiveCamera(camera)
+    renderer.ResetCamera()
+    renderer.SetBackground(0, 0, 0)
+
+    renWin.SetSize(300, 300)
+
+    renWin.Render()
+    iren.Start()
+
+def vtk_addPoint(renderer, p, radius=1.0, color=[0.0, 0.0, 0.0]):
+    res = 100
+
+    point = vtk.vtkSphereSource()
+    point.SetCenter(p)
+    point.SetRadius(radius)
+    point.SetPhiResolution(res)
+    point.SetThetaResolution(res)
+
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputConnection(point.GetOutputPort())
+
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+    actor.GetProperty().SetColor(color)
+
+    renderer.AddActor(actor)
+    
+    return 0
+
+def vtk_addLine(renderer, p1, p2, color=[0.0, 0.0, 1.0]):
+    line = vtk.vtkLineSource()
+    line.SetPoint1(p1)
+    line.SetPoint2(p2)
+
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputConnection(line.GetOutputPort())
+
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+    actor.GetProperty().SetColor(color)
+
+    renderer.AddActor(actor)
+    
+    return 0
+
+def vtk_addPoly(renderer, polydata, color=[0.0, 0.0, 1.0]):
+    # now viusalize
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputData(polydata)
+    mapper.SetScalarRange(0, 7)
+
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    renderer.AddActor(actor)
+
+    
+    return 0
+
+def vtk_show(renderer, width=800, height=600):
+    """Takes a vtkrenderer instance start the rendering window
+    """
+    # now render
+    camera = vtk.vtkCamera()
+    camera.SetPosition(2, 2, 2)
+    camera.SetFocalPoint(0, 0, 0)
+
+    renderer.SetActiveCamera(camera)
+    renderer.ResetCamera()
+    renderer.SetBackground(0, 0, 0)
+
+    renderWindow = vtk.vtkRenderWindow()
+    # renderWindow.SetOffScreenRendering(1)
+    renderWindow.AddRenderer(renderer)
+    renderWindow.SetSize(width, height)
+    
+    iren = vtk.vtkXRenderWindowInteractor()
+    iren.SetRenderWindow(renderWindow)
+
+    renderWindow.Render()
+    iren.Start()
+
+def vtk_raycasting():
+    """Testing out raycasting inside of VTK
+    """
+    
+    # read and turn OBJ to polydata
+    polydata = wavefront.read_obj_to_polydata('./data/shape_model/ITOKAWA/itokawa_low.obj')
+    renderer = vtk.vtkRenderer() 
+
+    pSource = np.array([-2.0, 0, 0])
+    pTarget = np.array([2, 0, 0])
+    
+    
+    # oriented bounding box for the polydata
+    obbTree = vtk.vtkOBBTree()
+    obbTree.SetDataSet(polydata)
+    obbTree.BuildLocator()
+    
+    pointsVTKintersection = vtk.vtkPoints()
+    code = obbTree.IntersectWithLine(pSource, pTarget, pointsVTKintersection, None)
+    if code:
+        points_int = numpy_support.vtk_to_numpy(pointsVTKintersection.GetData())
+        for p in points_int: 
+            vtk_addPoint(renderer, p , color=[0, 0, 1], radius=0.01)
+
+    vtk_addPoly(renderer, polydata)    
+    vtk_addPoint(renderer, pSource, color=[0, 1.0, 0], radius=0.01)
+    vtk_addPoint(renderer, pTarget, color=[1.0, 0, 0], radius=0.01)
+    vtk_addLine(renderer, pSource, pTarget)
+    vtk_show(renderer)
+
 if __name__ == '__main__':
     vtk_cylinder()
     vtk_distance()
