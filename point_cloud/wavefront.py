@@ -1208,3 +1208,44 @@ def edge_dyad_loop(e1_face_map, e2_face_map, e3_face_map,
         E3_edge[:, :, ii] = np.outer(nA, nA3) + np.outer(nB, nB3)
 
     return E1_edge, E2_edge, E3_edge
+
+class RayCaster(object):
+    """Ray casting object
+    """
+
+    def __init__(self, polydata):
+        """Initialize the ray caster
+
+        polydata - vtkPolyData object holding the mesh
+        caster - raycasting object holding vtkOBBtree
+        """
+
+        self.polydata = polydata
+        self.caster = None
+
+    def __initCaster(self):
+        """Initialize a raycaster
+
+        Internal method that just creates a vtkOBBTree object and setup
+        """
+        self.caster = vtk.vtkOBBTree()
+        # set the object polydata as the dataset
+        self.caster.SetDataSet(self.polydata)
+        self.cast.BuildLocator()
+    
+    def __updateCaster(self):
+        """Update the vtkOBBTree if the polydata changes
+        """
+        self.caster.SetDataSet(self.polydata)
+        self.caster.BuildLocator()
+
+    @staticmethod
+    def loadmesh(v, f, scale=1.0):
+        """Create a vtkPolydata from a set of vertices and faces
+
+        v : vertices
+        f : faces
+        scale : scale the units - factor to multiply by
+        """
+
+

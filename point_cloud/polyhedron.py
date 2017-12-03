@@ -276,3 +276,4 @@ def map_edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map
                                    (r_v[e3_vertex_map[:, 0], :], r_v[e3_vertex_map[:, 1], :], e3)))
    
     return L_edges[0], L_edges[1], L_edges[2]
+
