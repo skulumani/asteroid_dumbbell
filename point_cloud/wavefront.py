@@ -1248,4 +1248,19 @@ class RayCaster(object):
         scale : scale the units - factor to multiply by
         """
 
+        pass
+
+    def scalemesh(self, scale):
+
+        pass
+    
+    def castray(self, psource, ptarget):
+        pass
+    
+    def ispointinside(self, point):
+        pass
+
+    def __distance(self, pa, pb):
+        pass
+
 
