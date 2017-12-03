@@ -1251,8 +1251,29 @@ class RayCaster(object):
         pass
 
     def scalemesh(self, scale):
+        """Scales (multiplies) the mesh by scale
 
-        pass
+        Simply multiplies all the vertices by the given scale factor
+
+        scale : float
+            Apply to the polydata
+
+        """
+        transform = vtk.vtkTransform()
+        transformFilter = vtk.vtkTransformPolyDataFilter()
+        
+        transform.Scale(scale, scale, scale)
+
+        transformFilter.SetInput(self.polydata)
+
+        transformFilter.SetTransform(transform)
+        transformFilter.Update()
+
+        self.polydata = transformFilter.GetOutput()
+
+        # update the raycaster
+        self.__updateCaster()
+
     
     def castray(self, psource, ptarget):
         pass
