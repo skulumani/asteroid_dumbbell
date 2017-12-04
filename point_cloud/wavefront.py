@@ -465,67 +465,29 @@ def make_vtk_idlist(array):
         vil.InsertNextId(int(i))
     return vil
 
-def numpy_to_vtk_poly(vertices, faces):
+def meshtopolydata(vertices, faces):
     r"""Convert numpy to vtk poly data
 
-    Extended description of the function.
+    polydata = meshtopolydata(v, f)
 
     Parameters
     ----------
-    var1 : array_like and type
-        <`4:Description of the variable`>
+    vertices : numpy array (v, 3)
+        Array definining all the vertices in the body fixed frame
+    faces : numpy array (f, 3)
+        Topological connection between the vertices
 
     Returns
     -------
-    describe : type
-        Explanation of return value named describe
-
-    Other Parameters
-    ----------------
-    only_seldom_used_keywords : type
-        Explanation of this parameter
-
-    Raises
-    ------
-    BadException
-        Because you shouldn't have done that.
-
-    See Also
-    --------
-    other_func: Other function that this one might call
-
-    Notes
-    -----
-    You may include some math:
-
-    .. math:: X(e^{j\omega } ) = x(n)e^{ - j\omega n}
+    polydata : vtk.vtkPolyData 
+        vtk polydata object defining the polyhedron
 
     Author
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
-
-    References
-    ----------
-    Cite the relevant literature, e.g. [1]_.  You may also cite these
-    references in the notes section above.
-
-    .. [1] Shannon, Claude E. "Communication theory of secrecy systems."
-    Bell Labs Technical Journal 28.4 (1949): 656-715
-
-    Examples
-    --------
-    An example of how to use the function
-
-    >>> a = [1, 2, 3]
-    >>> print [x + 3 for x in a]
-    [4, 5, 6]
-    >>> print "a\n\nb"
-    a
-    b
-
     """ 
     # initialize some of the objects
-    body = vtk.vtkPolyData()
+    polydata = vtk.vtkPolyData()
     points = vtk.vtkPoints()
     polys = vtk.vtkCellArray()
     
@@ -536,16 +498,32 @@ def numpy_to_vtk_poly(vertices, faces):
     for ii in range(faces.shape[0]):
         polys.InsertNextCell(make_vtk_idlist(faces[ii]))
 
-    body.SetPoints(points)
-    body.SetPolys(polys)
+    polydata.SetPoints(points)
+    polydata.SetPolys(polys)
 
-    return body
+    return polydata 
 
-# TODO: Add documentation
-def vtk_poly_to_numpy(polyData):
-    """Convert a vtkPolyData object to the vertices and faces
+def polydatatomesh(polyData):
+    r"""Convert VTK Polydata to numpy arrays V, F
 
-    """
+    v, f = polydatatomesh(polyData)
+
+    Parameters
+    ----------
+    polyData : vtk.vtkPolyData
+        Polyhedron object from vtk
+
+    Returns
+    -------
+    vertices : numpy array (v, 3)
+        All the vertices associated with the polyhedron
+    faces : numpy array (f, 3)
+        Connection between the vertices in the polyhedron
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     # output = polyData.GetOutput()
     number_of_triangles = polyData.GetNumberOfCells()
     faces = np.zeros((number_of_triangles, 3), dtype=int)
@@ -639,7 +617,7 @@ def decimate_numpy(vertices, faces, ratio=0.5, preserve_topology=True,
     """ 
     
     # reduction target as a fraction
-    polyhedron = numpy_to_vtk_poly(vertices, faces)
+    polyhedron = meshtopolydata(vertices, faces)
 
     # decimate
     decimate = vtk.vtkDecimatePro()
@@ -677,7 +655,7 @@ def draw_polyhedron_vtk(vertices, faces):
     """Use VTK to draw a polyhedron
     """
     # create a polydata object
-    polyData = numpy_to_vtk_poly(vertices, faces)
+    polyData = meshtopolydata(vertices, faces)
 
     # render and view
     mapper = vtk.vtkPolyDataMapper()
