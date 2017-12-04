@@ -10,7 +10,7 @@ def test_vtk_major_version():
 class TestVTKReadingOBJFilesItokawaLow():
     filename = './data/shape_model/ITOKAWA/itokawa_low.obj'
     vtkPolyData = wavefront.read_obj_to_polydata(filename)
-    vtk_vertices, vtk_faces = wavefront.vtk_poly_to_numpy(vtkPolyData)
+    vtk_vertices, vtk_faces = wavefront.polydatatomesh(vtkPolyData)
     wavefront_verts, wavefront_faces = wavefront.read_obj(filename)
 
     def test_numpy_vertices_equal(self):
@@ -32,7 +32,7 @@ class TestVTKReadingOBJFilesItokawaLow():
 class TestVTKReadingOBJFilesItokawaHigh():
     filename = './data/shape_model/ITOKAWA/itokawa_high.obj'
     vtkPolyData = wavefront.read_obj_to_polydata(filename)
-    vtk_vertices, vtk_faces = wavefront.vtk_poly_to_numpy(vtkPolyData)
+    vtk_vertices, vtk_faces = wavefront.polydatatomesh(vtkPolyData)
     wavefront_verts, wavefront_faces = wavefront.read_obj(filename)
 
     def test_numpy_vertices_equal(self):
@@ -57,7 +57,7 @@ class TestCompareVTKAndWavefrontWritingOBJ():
     filename = './data/shape_model/ITOKAWA/itokawa_low.obj'
 
     vtkPolyData = wavefront.read_obj_to_polydata(filename)
-    input_vertices, input_faces = wavefront.vtk_poly_to_numpy(vtkPolyData)
+    input_vertices, input_faces = wavefront.polydatatomesh(vtkPolyData)
     
     # write OBJ file using both VTK and Wavefront
     wavefront.write_vtkPolyData(vtkPolyData, '/tmp/vtk_output')
@@ -65,10 +65,10 @@ class TestCompareVTKAndWavefrontWritingOBJ():
 
     # now read our two files
     polydata_vtk_output = wavefront.read_obj_to_polydata('/tmp/vtk_output.obj')
-    vtk_output_vertices, vtk_output_faces = wavefront.vtk_poly_to_numpy(polydata_vtk_output)
+    vtk_output_vertices, vtk_output_faces = wavefront.polydatatomesh(polydata_vtk_output)
 
     polydata_wavefront_output = wavefront.read_obj_to_polydata('/tmp/wavefront_output.obj')
-    wavefront_output_vertices, wavefront_output_faces = wavefront.vtk_poly_to_numpy(polydata_wavefront_output)
+    wavefront_output_vertices, wavefront_output_faces = wavefront.polydatatomesh(polydata_wavefront_output)
 
     def test_number_vertices(self):
         np.testing.assert_allclose(self.vtk_output_vertices.shape,

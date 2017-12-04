@@ -293,7 +293,7 @@ def reconstruct_numpy(verts):
     poly = vtk.vtkPolyData()
     poly.ShallowCopy(reverse.GetOutput())
     # convert to numpy arrays
-    v_new, f_new = vtk_poly_to_numpy(poly)
+    v_new, f_new = polydatatomesh(poly)
 
     return v_new, f_new
 
@@ -454,7 +454,7 @@ def read_obj_to_numpy(filename):
     """Use VTK to convert a OBJ file directly to a numpy array
     """
     polyData = read_obj_to_polydata(filename)
-    v, f = vtk_poly_to_numpy(polyData)
+    v, f = polydatatomesh(polyData)
     return v, f
 
 def make_vtk_idlist(array):
@@ -645,7 +645,7 @@ def decimate_numpy(vertices, faces, ratio=0.5, preserve_topology=True,
     decimatedPoly.ShallowCopy(decimate.GetOutput())
 
     # extract out the points from a vtkPolyData
-    dec_vertices, dec_faces = vtk_poly_to_numpy(decimatedPoly)
+    dec_vertices, dec_faces = polydatatomesh(decimatedPoly)
 
     # return faces/vertices
     return dec_vertices, dec_faces
