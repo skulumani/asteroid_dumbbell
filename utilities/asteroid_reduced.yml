@@ -16,7 +16,6 @@ dependencies:
 - pip
 - pylint
 - pyqt=4
-- pytest
 - python=3.5
 - seaborn
 - mayavi
@@ -33,5 +32,7 @@ dependencies:
   - spacetrack
   - spiceypy
   - scipy
+  - pytest
+  - pytest-cov
 prefix: /home/shankar/anaconda3/envs/asteroid
 
