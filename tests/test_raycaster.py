@@ -1,4 +1,5 @@
 import numpy as np
+import pdb
 from point_cloud import wavefront, raycaster
 
 class TestRayCaster():
@@ -36,5 +37,31 @@ class TestRayCaster():
         caster = raycaster.RayCaster.loadmesh(self.v, self.f, scale=scale)
         xmin, xmax = caster.polydata.GetBounds()[0:2]
         np.testing.assert_allclose((xmin, xmax), scale * np.array([min(self.v[:, 0]), max(self.v[:, 0])]))
+    
+    def test_castray_number_intersections(self):
+        intersections = self.caster.castray([5, 0, 0], [-5, 0, 0])
+        np.testing.assert_allclose(intersections.shape, (2,3))
+    
+    def test_castray_no_intersections(self):
+        intersections = self.caster.castray([5, 0, 0], [6, 0, 0])
+        np.testing.assert_allclose(intersections.shape, (0,))
 
+    def test_castray_coordinates(self):
+        intersections = self.caster.castray([5, 0, 0], [-5, 0, 0])
+        np.testing.assert_allclose(intersections[0, :], np.array([0.29648888, 0, 0]))
+        np.testing.assert_allclose(intersections[1, :], np.array([-0.2460786, 0, 0]))
+    
+    def test_ispointinside_yes(self):
+        point = np.array([0,0,0])
+        np.testing.assert_allclose(self.caster.ispointinside(point), True)
+
+    def test_ispointinside_no(self):
+        point = np.array([5,5,5])
+        np.testing.assert_allclose(self.caster.ispointinside(point),False)
+
+    def test_distance(self):
+        pa = np.array([5, 0, 0])
+        pb = np.array([0, 0, 0])
+        np.testing.assert_allclose(self.caster.distance(pa, pb), 5)
+        
     # test scale method

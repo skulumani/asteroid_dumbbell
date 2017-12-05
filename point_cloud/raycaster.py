@@ -126,7 +126,8 @@ class RayCaster(object):
             logger.info(
                 "No intersection points for 'source': " + str(psource) 
                 + " and 'target': " + str(ptarget))
-            return []
+            return np.array([])
+
         elif code == -1: # source is outside of the surface
             logger.info(
                 "The point 'source': " + str(psource) + " is outside mesh.")
