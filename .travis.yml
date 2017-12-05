@@ -17,7 +17,7 @@ before_install:
 install:
     # setup the development environment
     #
-    - conda create -q --file ./utilities/asteroid_reduced.yml
+    - conda env create -q --file ./utilities/asteroid_reduced.yml
     - source activate asteroid
 script:
     - pytest tests/test_asteroid.py
