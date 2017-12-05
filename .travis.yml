@@ -20,7 +20,8 @@ install:
     - conda env create -q --file ./utilities/asteroid_reduced.yml
     - source activate asteroid
 script:
-    - pytest tests/test_asteroid.py
+    - pwd
+    - pytest ./tests/test_asteroid.py
 after_success:
     - coveralls
 
