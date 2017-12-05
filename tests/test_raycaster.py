@@ -63,5 +63,11 @@ class TestRayCaster():
         pa = np.array([5, 0, 0])
         pb = np.array([0, 0, 0])
         np.testing.assert_allclose(self.caster.distance(pa, pb), 5)
+    
+    def test_source_inside_body(self):
+        psource = np.array([0, 0, 0])
+        ptarget = np.array([5, 0, 0])
+        intersections = self.caster.castray(psource, ptarget)
+        np.testing.assert_allclose(intersections.shape, (1, 3))
+
         
-    # test scale method

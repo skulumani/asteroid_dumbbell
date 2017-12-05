@@ -50,8 +50,8 @@ class RayCaster(object):
         polydata = wavefront.meshtopolydata(v, f)
 
         # error check the number of points in the mesh
-        if polydata.GetNumberOfPoints() == 0:
-            raise ValueError("No point data loaded from input mesh")
+        if polydata.GetNumberOfPoints() != v.shape[0]:
+            raise ValueError("Polydata does not match")
             return None
 
         # initialize a raycaster
@@ -128,9 +128,9 @@ class RayCaster(object):
                 + " and 'target': " + str(ptarget))
             return np.array([])
 
-        elif code == -1: # source is outside of the surface
+        elif code == -1: # source is inside of the surface
             logger.info(
-                "The point 'source': " + str(psource) + " is outside mesh.")
+                "The point 'source': " + str(psource) + " is inside mesh.")
 
         # extract intersections for vtkPoints
         intersection = numpy_support.vtk_to_numpy(pointsVTKintersection.GetData())
