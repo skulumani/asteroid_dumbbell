@@ -170,4 +170,17 @@ class RayCaster(object):
         distance = np.linalg.norm(pa - pb)
         return distance
 
+    def lidar(self, state, max_depth=50):
+        """Return depth measurements from a simulated lidar
 
+        state should be in the asteroid fixed frame
+        R is the transformation from the dumbbell body frame to the asteroid frame
+
+        return all of the measurements from the FOV of sensor
+
+        """
+
+        # extract out current state of satellite (position and attitude)
+
+        # define the pointing directiof sensor in the inertial frame
+        pass
