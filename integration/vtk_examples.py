@@ -10,7 +10,7 @@ from vtk.util.misc import vtkGetDataRoot
 import os
 import string
 import time
-from point_cloud import wavefront
+from point_cloud import wavefront, raycaster
 import pdb
 
 def vtk_example():
@@ -704,7 +704,7 @@ def vtk_render_polydata(poly):
     renWin.Render()
     iren.Start()
 
-def vtk_addPoint(renderer, p, radius=1.0, color=[0.0, 0.0, 0.0]):
+def vtk_addPoint(renderer, p, radius=0.1, color=[0.0, 0.0, 1]):
     res = 100
 
     point = vtk.vtkSphereSource()
@@ -805,6 +805,24 @@ def vtk_raycasting():
     vtk_addPoint(renderer, pSource, color=[0, 1.0, 0], radius=0.01)
     vtk_addPoint(renderer, pTarget, color=[1.0, 0, 0], radius=0.01)
     vtk_addLine(renderer, pSource, pTarget)
+    vtk_show(renderer)
+
+def raycasting_visualization():
+    v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
+    caster = raycaster.RayCaster.loadmesh(v, f)
+    
+    renderer = vtk.vtkRenderer() 
+
+    pSource = np.array([-2.0, 0, 0])
+    pTarget = np.array([2, 0, 0])
+    
+    intersections = caster.castray(pSource, pTarget)
+    
+
+    for p in intersections:
+        vtk_addPoint(renderer, p, color=[0, 0, 1], radius=0.01)
+
+    vtk_addPoly(renderer, caster.polydata)
     vtk_show(renderer)
 
 if __name__ == '__main__':
