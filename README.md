@@ -12,7 +12,7 @@ This code is written in Python and uses:
 To set it all up properly you must first install [Anaconda](www.anaconda.org) and clone the `asteroid` environment:
 
 ~~~
-conda env create -f asteroid.yml
+conda env create --file asteroid.yml
 ~~~
 
 The follow the instructions in each section below.
