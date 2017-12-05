@@ -5,6 +5,13 @@ import sys
 import numpy as np
 
 import bpy
+import pytest
+
+# mark as skipped
+# pytestmark = pytest.skip('Blender exists with error codes and will break Travis',
+#                          allow_module_level=True)
+
+
 def test_python_version():
     req_version = (3, 5, 4, 'final', 0)
     cur_version = sys.version_info
