@@ -576,3 +576,5 @@ class TestEdgeSearchingCastaliaMat4092():
         np.testing.assert_allclose(self.e3_ind1b_new, self.e3_ind1b)
         np.testing.assert_allclose(self.e3_ind2b_new, self.e3_ind2b)
         np.testing.assert_allclose(self.e3_ind3b_new, self.e3_ind3b)
+
+
