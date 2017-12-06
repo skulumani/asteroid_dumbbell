@@ -24,7 +24,7 @@ install:
     - conda env create --file ./utilities/asteroid_reduced.yml
     - source activate asteroid
 script:
-    - pytest ./tests/test_asteroid.py
+    - pytest ./tests/test_raycaster.py
 after_success:
     - coveralls
 
