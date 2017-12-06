@@ -14,6 +14,8 @@ before_install:
     - hash -r
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
+    - wget https://github.com/skulumani/asteroid_dumbbell/releases/download/v0.3/shape_model.tar.gz -O ./data/shape_model.tar.gz
+    - tar xf ./data/shape_model/shape_model.tar.gz -C ./data/shape_model
 install:
     # setup the development environment
     #
