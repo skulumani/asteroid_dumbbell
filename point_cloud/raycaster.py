@@ -170,7 +170,7 @@ class RayCaster(object):
         distance = np.linalg.norm(pa - pb)
         return distance
 
-    def lidar(self, state, max_depth=50):
+    def castsensor(self, state, sensor, max_depth=50):
         """Return depth measurements from a simulated lidar
 
         state should be in the asteroid fixed frame
@@ -181,6 +181,11 @@ class RayCaster(object):
         """
 
         # extract out current state of satellite (position and attitude)
+        
+        # take the sensor and get all of the unit vectors associated with senso
 
-        # define the pointing directiof sensor in the inertial frame
+        # determine the targets (sensor * distance)
+
+        # do the point intersection using self (caster)
+
         pass

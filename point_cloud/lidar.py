@@ -28,7 +28,7 @@ class Lidar(object):
 
         # need to rotate the camera axis +/- FOV in horizontal and vertical direction
 
-
+        # outpupt a bunch of unit vectors to the object
         pass
     
     def rotate_fov(self, R_body2inertial):
