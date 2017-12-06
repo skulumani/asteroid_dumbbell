@@ -17,6 +17,7 @@ conda env create --file asteroid.yml
 
 The follow the instructions in each section below.
 
+
 ### Repository setup
 
 Clone and run `chmod +x setup_repo.sh` then `./setup_repo.sh` to automatically create the correct remote repositories. 
@@ -121,3 +122,14 @@ Some additional information:
 
 * [Even dimensions](https://stackoverflow.com/questions/20847674/ffmpeg-libx264-height-not-divisible-by-2)
 * [FFMPEG Images to Video](https://askubuntu.com/questions/610903/how-can-i-create-a-video-file-from-a-set-of-jpg-images)
+
+## TODO
+
+1. Create a setup script that setups up the development environment
+
+    * Can setup Anaconda
+    * Downloads shape models from github release (ensure the tar.gz file includes everythign)
+    * Runs the build scripts
+    * Runs pytest
+
+2. Figure out how to get TOX/Create a seperate build script for travis
