@@ -21,6 +21,21 @@ class Lidar(object):
 
         sigma : 3 sigma uncertainty in depth measurements
         """
-    pass
+        
+        # need to define both a look direciton and an up direction, which are orthogonal
+
+        # define all the unit vectors for the sensor
+
+        # need to rotate the camera axis +/- FOV in horizontal and vertical direction
+
+
+        pass
+    
+    def rotate_fov(self, R_body2inertial):
+        """Rotate the entire FOV by a given rotation matrix
+        """
+
+        # rotate all the vector by the new rotation matrix
+    
 
 
