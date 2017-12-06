@@ -6,6 +6,9 @@ python:
 # addons:
 #     apt:
 #         pacakge
+branches:
+    only:
+        - master
 before_install:
     - sudo apt-get -qq update
     - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
