@@ -36,5 +36,6 @@ dependencies:
   - pytest
   - pytest-cov
   - pytest-faulthandler
+  - coveralls
 prefix: /home/shankar/anaconda3/envs/asteroid
 
