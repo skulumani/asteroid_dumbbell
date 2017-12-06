@@ -1,6 +1,9 @@
 import numpy as np
 import itertools, pdb
 
+# TODO Add documentation about the fact that these are all unit vectors
+# TODO Add unit tests and a bigger test showing a plot of all the vectors. 
+# TODO Test out rotating and plotting that as well
 class Lidar(object):
     """LIDAR object
     
@@ -50,7 +53,8 @@ class Lidar(object):
         self.up_axis = up_axis
         self.view_axis = view_axis
         self.right_axis = right_axis
-
+    
+    # TODO Add method to rotate lidar_arr based on an input rotation matrix
     def rotate_fov(self, R_body2inertial):
         """Rotate the entire FOV by a given rotation matrix
         """
@@ -58,4 +62,4 @@ class Lidar(object):
         # rotate all the vector by the new rotation matrix
     
 
-
+    
