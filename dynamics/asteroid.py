@@ -37,18 +37,16 @@ class Asteroid(object):
         """Initialize the asteroid instance with it's properties
 
         """
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-
         self.name = name
         # either use the matlab file or read the OBJ file
         if shape_flag == 'mat':  # use matlab shape data
             if name == 'castalia':
 
                 mat = scipy.io.loadmat(
-                    dir_path + "/CASTALIA/castalia_model.mat")
+                    "./data/shape_model/CASTALIA/castalia_model.mat")
 
             elif name == 'itokawa':
-                mat = scipy.io.loadmat(dir_path + "/ITOKAWA/itokawa_model.mat")
+                mat = scipy.io.loadmat("./data/shape_model/ITOKAWA/itokawa_model.mat")
             else:
                 print("Unknown asteroid. Use 'castalia or 'itokawa' only.")
 
