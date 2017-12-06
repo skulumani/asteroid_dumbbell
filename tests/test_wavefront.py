@@ -250,7 +250,7 @@ class TestReadingCubeOBJ():
         np.testing.assert_allclose(self.center_face.shape, (self.num_f, 3))
 class TestEdgeSearchingItokawaMat32():
     # load mat file
-    mat = scipy.io.loadmat('./dynamics/ITOKAWA/itokawa_model.mat')
+    mat = scipy.io.loadmat('./data/shape_model/ITOKAWA/itokawa_model.mat')
     f = mat['F_32'] - 1
     v = mat['V_32'] 
 
@@ -359,7 +359,7 @@ class TestEdgeSearchingItokawaMat32():
         np.testing.assert_allclose(self.e3_ind3b_new, self.e3_ind3b)
 class TestEdgeSearchingItokawaMat2048():
     # load mat file
-    mat = scipy.io.loadmat('./dynamics/ITOKAWA/itokawa_model.mat')
+    mat = scipy.io.loadmat('./data/shape_model/ITOKAWA/itokawa_model.mat')
     f = mat['F_2048'] - 1
     v = mat['V_2048'] 
 
@@ -469,7 +469,7 @@ class TestEdgeSearchingItokawaMat2048():
 
 class TestEdgeSearchingCastaliaMat4092():
     # load mat file
-    mat = scipy.io.loadmat('./dynamics/CASTALIA/castalia_model.mat')
+    mat = scipy.io.loadmat('./data/shape_model/CASTALIA/castalia_model.mat')
     f = mat['F_4092'] - 1
     v = mat['V_4092'] 
 
