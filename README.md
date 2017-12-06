@@ -2,6 +2,10 @@
 
 Simulation to test the motion of a dumbbell spacecraft around an asteroid
 
+| Testing | Coverage |
+|---------|----------|
+| [![Build Status](https://travis-ci.org/skulumani/asteroid_dumbbell.svg?branch=master)](https://travis-ci.org/skulumani/asteroid_dumbbell) | [![Coverage Status](https://coveralls.io/repos/github/skulumani/asteroid_dumbbell/badge.svg?branch=master)](https://coveralls.io/github/skulumani/asteroid_dumbbell?branch=master) |
+
 ## Development Environment setup
 
 This code is written in Python and uses:
