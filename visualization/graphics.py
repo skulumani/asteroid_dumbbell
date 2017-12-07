@@ -252,3 +252,10 @@ def vtk_show(renderer, width=800, height=600):
 
     renderWindow.Render()
     iren.Start()
+
+def vtk_renderer():
+    """Just creates a renderer so you don't have to import VTK everywhere
+    """
+    return vtk.vtkRenderer()
+
+# TODO: Add Mayvi polyhedron, line, and point helper functions

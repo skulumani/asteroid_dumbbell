@@ -35,6 +35,13 @@ def test_reconstruct():
     # display both and complete test
     print('Now compare the two images')
     
+def test_draw_vtk_polyhedron():
+    polydata = wavefront.read_obj_to_polydata('./data/shape_model/EROS/eros_medium.obj')
+    renderer = graphics.vtk_renderer()
+    
+    graphics.vtk_addPoly(renderer, polydata)
+    graphics.vtk_show(renderer)
 
 if __name__ == '__main__':
+    test_draw_vtk_polyhedron()
     test_reconstruct()
