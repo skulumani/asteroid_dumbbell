@@ -10,6 +10,7 @@ import vtk
 from vtk.util import numpy_support
 from mayavi import mlab
 import numpy as np
+from point_cloud import wavefront
 
 
 def draw_polyhedron_vtk(vertices, faces):
@@ -258,4 +259,114 @@ def vtk_renderer():
     """
     return vtk.vtkRenderer()
 
-# TODO: Add Mayvi polyhedron, line, and point helper functions
+def mayavi_figure():
+    """Just define a figure for mayavi to plot into
+    """
+    return mlab.figure()
+
+def mayavi_addPoly(fig, polydata, color=(0.5, 0.5, 0.5)):
+    r"""Draw a VKT polydata object to a mayavi figure
+
+    mesh = mayavi_addPoly(fig, polydata)
+
+    Convert the polydata to V,F then plot inside mayavi
+
+    Parameters
+    ----------
+    fig : mlab.figure()
+        Mayavi figure to draw into
+    polydata : vtk.vtkPolyData object
+        Polyhedron object from VTK
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
+    vertices, faces = wavefront.polydatatomesh(polydata)
+
+    scalars = np.tile(0.5, vertices.shape[0])
+    mesh = mlab.triangular_mesh(vertices[:, 0], vertices[:, 1], vertices[:, 2],
+                                faces, color=color, figure=fig,
+                                representation='surface')
+
+    return mesh
+
+def mayavi_addMesh(fig, vertices, faces, color=(0.5, 0.5, 0.5)):
+    r"""Draw a mesh to a mayavi figure
+
+    mesh = mayavi_addPoly(fig, v, f, color)
+
+    Draw mesh defined by vertices and faces to a mayavi figure
+
+    Parameters
+    ----------
+    fig : mlab.figure()
+        Mayavi figure to draw into
+    vertices : (v, 3) numpy array
+        Array holding all the vertices of the mesh
+    faces : (f, 3) numpy array
+        Array holding all of the faces of the mesh
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
+
+    scalars = np.tile(0.5, vertices.shape[0])
+    mesh = mlab.triangular_mesh(vertices[:, 0], vertices[:, 1], vertices[:, 2],
+                                faces, color=color, figure=fig,
+                                representation='surface')
+
+def mayavi_addLine(fig, p1, p2, color=[0, 0, 1]):
+    r"""Add a line to a mayavi figure
+
+    mayavi_addLine(fig, p1, p2, radius=0.1, color=[R, G, B])
+
+    Parameters
+    ----------
+    fig : mlab.figure()
+        Figure to plot into
+    p1 : (3,) array/tuple
+        Start Point to plot 
+    p2 : (3,) array/tuple
+        End Point to plot
+    radius : float
+        Size of the line( graphing units)
+    color : (3,) array
+        RGB color of line
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
+    line = mlab.plot3d([p1[0], p2[0]], 
+                       [p1[1], p2[1]],
+                       [p1[2], p2[2]],
+                       color=color,
+                       figure=fig,
+                       tube_radius=None)
+    return line
+
+def mayavi_addPoint(fig, p, radius=0.1, color=[0, 0, 1]):
+    r"""Add a point to a mayavi figure
+
+    mayavi_addPoint(fig, p, radius=0.1, color=[R, G, B])
+
+    Parameters
+    ----------
+    fig : mlab.figure()
+        Figure to plot into
+    p : (3,) array/tuple
+        Start Point to plot 
+    radius : float
+        Size of the line( graphing units)
+    color : (3,) array
+        RGB color of line
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
+    point = mlab.plot3d(p[0], p[1], p[2], color=color, radius=radius,
+                        figure=fig)
+    return point

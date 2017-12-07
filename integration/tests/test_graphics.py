@@ -34,14 +34,21 @@ def test_reconstruct():
 
     # display both and complete test
     print('Now compare the two images')
-    
-def test_draw_vtk_polyhedron():
+
+class TestPolyhedronPlotting():
     polydata = wavefront.read_obj_to_polydata('./data/shape_model/EROS/eros_medium.obj')
-    renderer = graphics.vtk_renderer()
-    
-    graphics.vtk_addPoly(renderer, polydata)
-    graphics.vtk_show(renderer)
+
+    def test_draw_vtk_polyhedron(self):
+        renderer = graphics.vtk_renderer()
+        
+        graphics.vtk_addPoly(renderer, self.polydata)
+        graphics.vtk_show(renderer)
+
+    def test_draw_mayavi_polyhedron(self):
+        fig = graphics.mayavi_figure()
+        mesh = graphics.mayavi_addPoly(fig, self.polydata)
 
 if __name__ == '__main__':
-    test_draw_vtk_polyhedron()
+    TestPolyhedronPlotting().test_draw_vtk_polyhedron()
+    TestPolyhedronPlotting().test_draw_mayavi_polyhedron()
     test_reconstruct()
