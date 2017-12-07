@@ -2,7 +2,6 @@ import numpy as np
 import itertools, pdb
 
 # TODO Add documentation about the fact that these are all unit vectors
-# TODO Add unit tests and a bigger test showing a plot of all the vectors. 
 # TODO Test out rotating and plotting that as well
 class Lidar(object):
     """LIDAR object
@@ -46,20 +45,20 @@ class Lidar(object):
         # define all the unit vectors for the sensor
         for ii, (h, w) in enumerate(itertools.product(hsteps, wsteps)):
             lidar_vec = c + h * up_axis + w * right_axis
-            lidar_arr[ii, :] = lidar_vec / np.linalg.norm(lidar_vec)
+            self.lidar_arr[ii, :] = lidar_vec / np.linalg.norm(lidar_vec)
 
         # save things to object
-        self.lidar_arr = lidar_arr
         self.up_axis = up_axis
         self.view_axis = view_axis
         self.right_axis = right_axis
-    
-    # TODO Add method to rotate lidar_arr based on an input rotation matrix
-    def rotate_fov(self, R_body2inertial):
+
+    def rotate_fov(self, R_body2frame):
         """Rotate the entire FOV by a given rotation matrix
         """
+        # initialize an object
 
         # rotate all the vector by the new rotation matrix
-    
+        self.lidar_arr = R_body2frame.dot(self.lidar_arr.T).T 
 
+        return self.lidar_arr
     
