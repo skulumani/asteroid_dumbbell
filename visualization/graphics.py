@@ -368,6 +368,16 @@ def mayavi_addPoint(fig, p, radius=0.1, color=( 0, 0, 1 )):
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
     """ 
-    point = mlab.plot3d(p[0], p[1], p[2], color=color, radius=radius,
-                        figure=fig)
-    return point
+    if p.size == 0:
+        logger.info('No points to plot')
+        return None
+    elif p.size > 3:
+        # check if an array
+        points = []
+        for pt in p:
+            points.append( mlab.points3d(pt[0], pt[1], pt[2],scale_factor=radius, color=color, figure=fig))
+            return points
+    else:
+        p = np.squeeze(p)
+        point = mlab.points3d(p[0], p[1], p[2],scale_factor=radius, color=color, figure=fig)
+        return point
