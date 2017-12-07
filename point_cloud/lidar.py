@@ -64,6 +64,9 @@ class Lidar(object):
 
         This method will rotate the lidar arr by the given rotation matrix
 
+        Only outputs the unit vectors. User can find a vector by multiplying by a distance
+
+
         """
         # initialize an object
 
@@ -71,4 +74,5 @@ class Lidar(object):
         self.lidar_arr = R_body2frame.dot(self.lidar_arr.T).T 
 
         return self.lidar_arr
+
     
