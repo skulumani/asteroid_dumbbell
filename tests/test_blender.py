@@ -3,13 +3,8 @@
 """
 import sys
 import numpy as np
-
-import bpy
 import pytest
-
-# mark as skipped
-# pytestmark = pytest.skip('Blender exists with error codes and will break Travis',
-#                          allow_module_level=True)
+pytestmark = pytest.importorskip('bpy')
 
 
 def test_python_version():
