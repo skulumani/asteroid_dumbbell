@@ -3,7 +3,8 @@
 """
 import sys
 import numpy as np
-import cv2
+import pytest
+pmark = pytest.importorskip('cv2')
 
 def test_python_version():
     req_version = (3, 5, 4, 'final', 0)
