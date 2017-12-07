@@ -4,7 +4,7 @@
 import sys
 import numpy as np
 import pytest
-pytestmark = pytest.importorskip('bpy')
+bpy = pytest.importorskip('bpy')
 
 
 def test_python_version():
