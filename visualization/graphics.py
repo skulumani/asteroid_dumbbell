@@ -138,8 +138,32 @@ def vtk_addPoint(renderer, p, radius=0.1, color=[0.0, 0.0, 1]):
     
     return 0
 
-# TODO Add docs
 def vtk_addLine(renderer, p1, p2, color=[0.0, 0.0, 1.0]):
+    r"""Add a line to a VTK render
+
+    vtk_addLine(renderer, p1, p2, radius=0.1, color=[R, G, B])
+
+    Parameters
+    ----------
+    renderer : vtk.vtkRenderer()
+        Renderer object in vtk
+    p1 : (3,) array/tuple
+        Start Point to plot in VTK
+    p2 : (3,) array/tuple
+        End Point to plot in VTK
+    radius : float
+        Size of the point ( graphing units)
+    color : (3,) array
+        RGB color of point
+
+    Returns
+    -------
+    none
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     line = vtk.vtkLineSource()
     line.SetPoint1(p1)
     line.SetPoint2(p2)
@@ -155,8 +179,28 @@ def vtk_addLine(renderer, p1, p2, color=[0.0, 0.0, 1.0]):
     
     return 0
 
-# TODO Add docs
 def vtk_addPoly(renderer, polydata, color=[0.0, 0.0, 1.0]):
+    r"""Add a polyhedron to a VTK render
+
+    vtk_addPoly(renderer, polydata, color=[R, G, B])
+
+    Parameters
+    ----------
+    renderer : vtk.vtkRenderer()
+        Renderer object in vtk
+    polydata : vtk.vtkPolyData
+        Polyhedron object ( can convert numpy arrays to mesh from wavefront)
+    color : (3,) array
+        RGB color of point
+
+    Returns
+    -------
+    none
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     # now viusalize
     mapper = vtk.vtkPolyDataMapper()
     mapper.SetInputData(polydata)
@@ -167,13 +211,28 @@ def vtk_addPoly(renderer, polydata, color=[0.0, 0.0, 1.0]):
 
     renderer.AddActor(actor)
 
-    
     return 0
 
-# TODO Add docs
 def vtk_show(renderer, width=800, height=600):
-    """Takes a vtkrenderer instance start the rendering window
-    """
+    r"""Start a vtk renderer window and interact
+
+    vtk_show(renderer, width, height)
+
+    Parameters
+    ----------
+    renderer : vtk.vtkRenderer()
+        Renderer object in vtk
+    width, height : int
+        Width and height in pixels of resulting window
+
+    Returns
+    -------
+    none
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     # now render
     camera = vtk.vtkCamera()
     camera.SetPosition(2, 2, 2)

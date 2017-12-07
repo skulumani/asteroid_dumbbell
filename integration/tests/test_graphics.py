@@ -3,6 +3,7 @@ the user visually compare things to look good
 """
 
 from point_cloud import wavefront
+from visualization import graphics
 from dynamics import asteroid
 from mayavi import mlab
 import pdb
@@ -25,9 +26,9 @@ def test_reconstruct():
     # create some figures
     orig_fig = mlab.figure()
     reconstruct_fig = mlab.figure()
-    _ = wavefront.draw_polyhedron_mayavi(v, f, orig_fig)
+    _ = graphics.draw_polyhedron_mayavi(v, f, orig_fig)
     mlab.title('Original OBJ')
-    _ = wavefront.draw_polyhedron_mayavi(rv, rf, reconstruct_fig)
+    _ = graphics.draw_polyhedron_mayavi(rv, rf, reconstruct_fig)
      
     mlab.title('Reconstructed OBJ')
 
