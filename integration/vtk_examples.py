@@ -745,7 +745,6 @@ def raycasting_visualization():
     
     intersections = caster.castray(pSource, pTarget)
     
-
     for p in intersections:
         vtk_addPoint(renderer, p, color=[0, 0, 1], radius=0.01)
 
