@@ -2,8 +2,7 @@ import vtk
 import numpy as np
 from vtk.util import numpy_support
 from point_cloud import wavefront
-import logging
-
+import logging, pdb
 logger = logging.getLogger(__name__)
 
 class RayCaster(object):
@@ -136,6 +135,18 @@ class RayCaster(object):
         intersection = numpy_support.vtk_to_numpy(pointsVTKintersection.GetData())
 
         return intersection
+    
+    # TODO Add documentation and unit testing
+    def castarray(self, ps, targets):
+        """Only append the minimum distance intersection
+        """
+        # TODO Debug the array creation
+        all_intersections = []
+        for ii, pt in enumerate(targets):
+            intersection = self.castray(ps, pt)
+            all_intersections.append(intersection)
+
+        return all_intersections
 
     def ispointinside(self, point):
         """Check if a point lies inside the mesh using vtk
