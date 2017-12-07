@@ -1,18 +1,16 @@
 import numpy as np
 import itertools, pdb
 
-# TODO Add documentation about the fact that these are all unit vectors
 # TODO Test out rotating and plotting that as well
 class Lidar(object):
-    """LIDAR object
-    
-    Hold the pointing direction of the camera in body frame
+    r"""LIDAR object
 
-    Provide methods to derive all the unit vectors for the LIDAR measurements
+    Create an object with unit vectors defining the measurement vectors
 
-    Another method to transform into another frame given a transformation matrix
-
-    """
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
 
     def __init__(self, view_axis=np.array([1, 0, 0]),
                  up_axis=np.array([0, 0, 1]),
@@ -20,12 +18,21 @@ class Lidar(object):
                  dist=1, num_step=3):
         """Initialize the object
 
-        cam_axis : define the pointing direction of center of LIDAR in the
-        body fixed frame
+        Parameters
+        ----------
+        view_axis : (3,) array
+            View axis of the sensor
+        up_axis : (3,) array
+            Up vector for the sensor (in the camera frame)
+        fov : (2) array
+            horizontal and vertical field of view in  radians
+        sigma : float
+            3sigma uncertainty in meters
+        dist : float
+            Distance to scale each unit vector
+        num_step : int
+            number of steps across the field of view to define the arrays
 
-        fov : horizontal and vertical field of view in radians
-
-        sigma : 3 sigma uncertainty in depth measurements
         """
         
 
@@ -54,6 +61,9 @@ class Lidar(object):
 
     def rotate_fov(self, R_body2frame):
         """Rotate the entire FOV by a given rotation matrix
+
+        This method will rotate the lidar arr by the given rotation matrix
+
         """
         # initialize an object
 
