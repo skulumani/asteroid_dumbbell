@@ -318,7 +318,7 @@ def mayavi_addMesh(fig, vertices, faces, color=(0.5, 0.5, 0.5)):
                                 faces, color=color, figure=fig,
                                 representation='surface')
 
-def mayavi_addLine(fig, p1, p2, color=[0, 0, 1]):
+def mayavi_addLine(fig, p1, p2, color=( 0, 0, 1 )):
     r"""Add a line to a mayavi figure
 
     mayavi_addLine(fig, p1, p2, radius=0.1, color=[R, G, B])
@@ -348,7 +348,7 @@ def mayavi_addLine(fig, p1, p2, color=[0, 0, 1]):
                        tube_radius=None)
     return line
 
-def mayavi_addPoint(fig, p, radius=0.1, color=[0, 0, 1]):
+def mayavi_addPoint(fig, p, radius=0.1, color=( 0, 0, 1 )):
     r"""Add a point to a mayavi figure
 
     mayavi_addPoint(fig, p, radius=0.1, color=[R, G, B])
