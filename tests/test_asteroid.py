@@ -1,8 +1,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import dynamics.asteroid
-import pdb
 from point_cloud import wavefront
+
 
 class TestAsteroidItokawa32():
     name = 'itokawa'

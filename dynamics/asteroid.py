@@ -2,10 +2,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import scipy.io
-import os
-import utilities
 from point_cloud import wavefront, polyhedron
-import pdb
+
 
 # TODO: Implement the ability to input a filename for OBJ shape files
 # TODO: Need to add some tests to check if the shape model is a closed polyhedron
@@ -21,8 +19,8 @@ class Asteroid(object):
         mu - M*G gravitational parameter km^3/sec^2
         axes - semi axis lengths in meters
         Ixx - Principle moment of inertia kg m^2
-        Iyy - 
-        Izz -
+        Iyy - Y MOI
+        Izz - Z MOI
         omega - rotation period rad/sec
         mass_param - mass parameter
         res_radius - resonance radius
