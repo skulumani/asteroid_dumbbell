@@ -16,9 +16,11 @@ before_install:
     - 
 install:
     - bash ./utilities/travis_setup.sh
+    - export PATH="$HOME/anaconda3/bin:$PATH"
+    - hash -r 
     - source activate asteroid
 script:
-    - pytest --cov=dynamics --cov=point_cloud --cov=eom_comparison --cov=landing .
+    - pytest --cov_config .coveragerc --cov=dynamics --cov=point_cloud --cov=eom_comparison --cov=landing .
 after_success:
     - coveralls
 
