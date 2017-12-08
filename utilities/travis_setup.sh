@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # setup script to install dependencies on Travis
-
+# TODO Setup travis cache and have logic to check if $HOME/anaconda3 already exists
+# If it does exist then only update the conda environment rather than create it
 sudo apt-get -qq update
 
 echo "Downloading and Installing Miniconda"
