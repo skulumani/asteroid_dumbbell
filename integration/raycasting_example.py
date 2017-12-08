@@ -9,7 +9,9 @@ import pdb
 filename = './data/shape_model/ITOKAWA/itokawa_high.obj'
 polydata = wavefront.read_obj_to_polydata(filename)
 
-caster = raycaster.RayCaster(polydata)
+caster_obb = raycaster.RayCaster(polydata, flag='obb')
+caster_bsp = raycaster.RayCaster(polydata, flag='bsp')
+
 sensor = raycaster.Lidar(view_axis=np.array([-1, 0, 0]))
 
 # need to translate the sensor and give it a pointing direction
@@ -18,7 +20,8 @@ dist = 1 # distance for each raycast
 
 # find the inersections
 targets = pos + sensor.lidar_arr * dist
-intersections = caster.castarray(pos, targets)
+intersections_obb = caster_obb.castarray(pos, targets)
+intersections_bsp = caster_bsp.castarray(pos, targets)
 
 # plot
 fig = graphics.mayavi_figure()
@@ -31,5 +34,8 @@ for pt in targets:
     graphics.mayavi_addLine(fig, pos, pt, color=(1, 0, 0))
 
 # draw a point at all intersections
-for ints in intersections:
+for ints in intersections_obb:
     graphics.mayavi_addPoint(fig, ints, radius=0.01, color=(0, 1, 0))
+
+for ints in intersections_bsp:
+    graphics.mayavi_addPoint(fig, ints, radius=0.01, color=(1, 1, 0))

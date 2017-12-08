@@ -183,7 +183,11 @@ class RayCaster(object):
         ------
         Shankar Kulumani		GWU		skulumani@gwu.edu
         """
-        code = self.caster.InsideOrOutside(point)
+        if self.flag == 'obb':
+            code = self.caster.InsideOrOutside(point)
+        else:
+            logger.warn('No inside check implemented for BSP tree')
+            code = 0
 
         if code == -1:
             return True
@@ -197,25 +201,6 @@ class RayCaster(object):
         distance = np.linalg.norm(pa - pb)
         return distance
 
-    def castsensor(self, state, sensor, max_depth=50):
-        """Return depth measurements from a simulated lidar
-
-        state should be in the asteroid fixed frame
-        R is the transformation from the dumbbell body frame to the asteroid frame
-
-        return all of the measurements from the FOV of sensor
-
-        """
-
-        # extract out current state of satellite (position and attitude)
-        
-        # take the sensor and get all of the unit vectors associated with senso
-
-        # determine the targets (sensor * distance)
-
-        # do the point intersection using self (caster)
-
-        pass
 
 # TODO Test out rotating and plotting that as well
 class Lidar(object):
