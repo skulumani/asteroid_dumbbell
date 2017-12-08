@@ -10,7 +10,7 @@ class RayCaster(object):
     """Ray casting object
     """
 
-    def __init__(self, polydata):
+    def __init__(self, polydata, flag='bsp'):
         """Initialize the ray caster
 
         polydata - vtkPolyData object holding the mesh
@@ -19,7 +19,8 @@ class RayCaster(object):
 
         self.polydata = polydata
         self.caster = None
-        
+        self.flag = flag
+
         # create the caster VTK object
         self.__initCaster()
 
@@ -28,7 +29,10 @@ class RayCaster(object):
 
         Internal method that just creates a vtkOBBTree object and setup
         """
-        self.caster = vtk.vtkModifiedBSPTree()
+        if self.flag == 'bsp':
+            self.caster = vtk.vtkModifiedBSPTree()
+        elif self.flag == 'obb':
+            self.caster = vtk.vtkOBBTree()
         # set the object polydata as the dataset
         self.caster.SetDataSet(self.polydata)
         self.caster.BuildLocator()
@@ -40,7 +44,7 @@ class RayCaster(object):
         self.caster.BuildLocator()
 
     @staticmethod
-    def loadmesh(v, f, scale=1.0):
+    def loadmesh(v, f, scale=1.0, flag='bsp'):
         """Create a vtkPolydata from a set of vertices and faces
 
         v : vertices
@@ -55,7 +59,7 @@ class RayCaster(object):
             return None
 
         # initialize a raycaster
-        rT = RayCaster(polydata)
+        rT = RayCaster(polydata, flag=flag)
 
         # scale the polydata if nothing is given
         if scale != 1.0:
@@ -88,7 +92,7 @@ class RayCaster(object):
         self.__updateCaster()
 
     
-    def castray(self, psource, ptarget):
+    def castray(self, psource, ptarget, all_out=False):
         """Perform ray-casting for a given ray
         
         intersection = caster.castray(source, target)
@@ -103,7 +107,9 @@ class RayCaster(object):
             Start of the ray (usually the position of the satellite)
         ptarget : numpy array (3,)
             Target of the ray ( center of the asteroid or elsewhere)
-        
+        all_out : bool
+            Output all intersections or just the first one
+
         Returns
         -------
         intersections : numpy array (n, 3)
@@ -119,9 +125,13 @@ class RayCaster(object):
         tol = 1e-9
 
         # perform the actual raycasting
-        code = self.caster.IntersectWithLine(psource, ptarget,
-                                             tol,
-                                             pointsVTKintersection, None)
+        if self.flag == 'bsp':
+            code = self.caster.IntersectWithLine(psource, ptarget,
+                                                tol,
+                                                pointsVTKintersection, None)
+        elif self.flag == 'obb':
+            code = self.caster.IntersectWithLine(psource, ptarget,
+                                                pointsVTKintersection, None)
 
         # error checking of the code
         if code == 0:
@@ -137,12 +147,10 @@ class RayCaster(object):
         # extract intersections for vtkPoints
         intersection = numpy_support.vtk_to_numpy(pointsVTKintersection.GetData())
         
-        if intersection.size > 3:
-            min_int = intersection[0]
+        if intersection.size > 3 and not all_out:
+            return intersection[0, :]
         else:
-            min_int = intersection
-
-        return min_int
+            return intersection
     
     # TODO Add documentation and unit testing
     def castarray(self, ps, targets):

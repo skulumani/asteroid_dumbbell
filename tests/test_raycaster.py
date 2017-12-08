@@ -8,7 +8,7 @@ class TestRayCaster():
     v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
 
     # define the raycaster object
-    caster = raycaster.RayCaster.loadmesh(v, f, scale=1.0)
+    caster = raycaster.RayCaster.loadmesh(v, f, flag='obb', scale=1.0)
 
     # test methods of caster
     V, F = wavefront.polydatatomesh(caster.polydata)
@@ -39,7 +39,7 @@ class TestRayCaster():
         np.testing.assert_allclose((xmin, xmax), scale * np.array([min(self.v[:, 0]), max(self.v[:, 0])]))
     
     def test_castray_number_intersections(self):
-        intersections = self.caster.castray([5, 0, 0], [-5, 0, 0])
+        intersections = self.caster.castray([5, 0, 0], [-5, 0, 0], all_out=True)
         np.testing.assert_allclose(intersections.shape, (2,3))
     
     def test_castray_no_intersections(self):
@@ -47,7 +47,7 @@ class TestRayCaster():
         np.testing.assert_allclose(intersections.shape, (0,))
 
     def test_castray_coordinates(self):
-        intersections = self.caster.castray([5, 0, 0], [-5, 0, 0])
+        intersections = self.caster.castray([5, 0, 0], [-5, 0, 0], all_out=True)
         np.testing.assert_allclose(intersections[0, :], np.array([0.29648888, 0, 0]))
         np.testing.assert_allclose(intersections[1, :], np.array([-0.2460786, 0, 0]))
     
