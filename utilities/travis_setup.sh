@@ -13,7 +13,7 @@ if [ -f "$HOME/anaconda3/bin/conda" ]; then
 else
     echo "Anaconda not installed"
     wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/miniconda.sh
-    bash $HOME/miniconda.sh -b -p $HOME/anaconda3
+    bash $HOME/miniconda.sh -b -u -p $HOME/anaconda3
 fi
 
 export PATH="$HOME/anaconda3/bin:$PATH"
