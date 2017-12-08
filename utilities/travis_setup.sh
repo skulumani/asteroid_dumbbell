@@ -8,7 +8,7 @@ sudo apt-get -qq update
 echo "Downloading and Installing Miniconda"
 # get miniconda installed
 # check if anaconda3 directory exists
-if [ -d "$HOME/anaconda3" ]; then
+if [ -f "$HOME/anaconda3/bin/conda" ]; then
     echo "Anaconda already installed"
 else
     echo "Anaconda not installed"
