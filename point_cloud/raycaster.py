@@ -5,6 +5,7 @@ from point_cloud import wavefront
 import logging, pdb
 logger = logging.getLogger(__name__)
 
+# TODO Put the LIDAR sensor class inside here as well
 class RayCaster(object):
     """Ray casting object
     """
