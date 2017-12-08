@@ -16,6 +16,7 @@ before_install:
     - 
 install:
     - bash ./utilities/travis_setup.sh
+    - source activate asteroid
 script:
     - pytest -v 
 after_success:

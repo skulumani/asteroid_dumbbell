@@ -26,7 +26,4 @@ echo "Creating the asteroid environment"
 # setup development enviornment
 conda env create --file ./utilities/asteroid_reduced.yml
 
-echo "Activate asteroid environment"
-source activate asteroid
-
 echo "Setup is complete"
