@@ -30,13 +30,10 @@ Shankar Kulumani		GWU		skulumani@gwu.edu
 """
 import numpy as np
 import vtk
-from mayavi import mlab
 from vtk.util import numpy_support
-import pdb
 from point_cloud import wavefront
 import utilities
 from multiprocessing import Pool
-from functools import partial
 import logging
 
 logger = logging.getLogger(__name__)
