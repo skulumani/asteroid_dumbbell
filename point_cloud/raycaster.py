@@ -28,7 +28,7 @@ class RayCaster(object):
 
         Internal method that just creates a vtkOBBTree object and setup
         """
-        self.caster = vtk.vtkOBBTree()
+        self.caster = vtk.vtkModifiedBSPTree()
         # set the object polydata as the dataset
         self.caster.SetDataSet(self.polydata)
         self.caster.BuildLocator()
@@ -116,9 +116,11 @@ class RayCaster(object):
         
         # create a vtkPoints object to store all the intersections
         pointsVTKintersection = vtk.vtkPoints()
+        tol = 1e-9
 
         # perform the actual raycasting
         code = self.caster.IntersectWithLine(psource, ptarget,
+                                             tol,
                                              pointsVTKintersection, None)
 
         # error checking of the code
@@ -134,8 +136,13 @@ class RayCaster(object):
 
         # extract intersections for vtkPoints
         intersection = numpy_support.vtk_to_numpy(pointsVTKintersection.GetData())
+        
+        if intersection.size > 3:
+            min_int = intersection[0]
+        else:
+            min_int = intersection
 
-        return intersection
+        return min_int
     
     # TODO Add documentation and unit testing
     def castarray(self, ps, targets):
@@ -147,7 +154,7 @@ class RayCaster(object):
             intersection = self.castray(ps, pt)
             all_intersections.append(intersection)
 
-        return all_intersections
+        return np.array(all_intersections)
 
     def ispointinside(self, point):
         """Check if a point lies inside the mesh using vtk

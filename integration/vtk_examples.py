@@ -11,6 +11,7 @@ import os
 import string
 import time
 from point_cloud import wavefront, raycaster
+from visualization import graphics
 import pdb
 
 def vtk_example():
@@ -704,17 +705,16 @@ def vtk_render_polydata(poly):
     renWin.Render()
     iren.Start()
 
-def vtk_raycasting():
-    """Testing out raycasting inside of VTK
+def vtk_raycasting_obbtree():
+    """Testing out raycasting inside of VTK using vtkOBBTree
     """
-    
+    radius = 0.01
     # read and turn OBJ to polydata
-    polydata = wavefront.read_obj_to_polydata('./data/shape_model/ITOKAWA/itokawa_low.obj')
+    polydata = wavefront.read_obj_to_polydata('./data/shape_model/ITOKAWA/itokawa_high.obj')
     renderer = vtk.vtkRenderer() 
 
-    pSource = np.array([-2.0, 0, 0])
-    pTarget = np.array([2, 0, 0])
-    
+    pSource = np.array([1, 0, 0])
+    pTarget = np.array([0.00372, -0.0609, -0.0609])
     
     # oriented bounding box for the polydata
     obbTree = vtk.vtkOBBTree()
@@ -726,13 +726,45 @@ def vtk_raycasting():
     if code:
         points_int = numpy_support.vtk_to_numpy(pointsVTKintersection.GetData())
         for p in points_int: 
-            vtk_addPoint(renderer, p , color=[0, 0, 1], radius=0.01)
+            graphics.vtk_addPoint(renderer, p , color=[0, 0, 1], radius=radius)
+    
+    print('{} intersections'.format(points_int.shape[0]))
 
-    vtk_addPoly(renderer, polydata)    
-    vtk_addPoint(renderer, pSource, color=[0, 1.0, 0], radius=0.01)
-    vtk_addPoint(renderer, pTarget, color=[1.0, 0, 0], radius=0.01)
-    vtk_addLine(renderer, pSource, pTarget)
-    vtk_show(renderer)
+    graphics.vtk_addPoly(renderer, polydata)    
+    graphics.vtk_addPoint(renderer, pSource, color=[0, 1.0, 0], radius=radius)
+    graphics.vtk_addPoint(renderer, pTarget, color=[1.0, 0, 0], radius=radius)
+    graphics.vtk_addLine(renderer, pSource, pTarget)
+    graphics.vtk_show(renderer)
+    
+def vtk_raycasting_bsptree():
+    """Testing out raycasting inside of VTK using vtkModifiedBSPTree
+    """
+    radius = 0.01
+    # read and turn OBJ to polydata
+    polydata = wavefront.read_obj_to_polydata('./data/shape_model/ITOKAWA/itokawa_high.obj')
+    renderer = vtk.vtkRenderer() 
+
+    pSource = np.array([1, 0, 0])
+    pTarget = np.array([0.00372, -0.0609, -0.0609])
+    
+    # oriented bounding box for the polydata
+    bspTree = vtk.vtkModifiedBSPTree()
+    bspTree.SetDataSet(polydata)
+    bspTree.BuildLocator()
+    pointsVTKintersection = vtk.vtkPoints()
+    code = bspTree.IntersectWithLine(pSource, pTarget, 1e-9, pointsVTKintersection, None)
+    if code:
+        points_int = numpy_support.vtk_to_numpy(pointsVTKintersection.GetData())
+        for p in points_int: 
+            graphics.vtk_addPoint(renderer, p , color=[0, 0, 1], radius=radius)
+    
+    print('{} intersections'.format(points_int.shape[0]))
+
+    graphics.vtk_addPoly(renderer, polydata)    
+    graphics.vtk_addPoint(renderer, pSource, color=[0, 1.0, 0], radius=radius)
+    graphics.vtk_addPoint(renderer, pTarget, color=[1.0, 0, 0], radius=radius)
+    graphics.vtk_addLine(renderer, pSource, pTarget)
+    graphics.vtk_show(renderer)
 
 def raycasting_visualization():
     v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
