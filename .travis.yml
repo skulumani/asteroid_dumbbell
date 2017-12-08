@@ -6,9 +6,9 @@ python:
 # addons:
 #     apt:
 #         pacakge
-# cache:
-#     directories:
-#         - $HOME/anaconda3
+cache:
+    directories:
+        - $HOME/anaconda3
 branches:
     only:
         - master
