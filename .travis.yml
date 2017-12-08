@@ -13,21 +13,11 @@ branches:
     only:
         - master
 before_install:
-    - sudo apt-get -qq update
-    - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-    - bash miniconda.sh -b -p $HOME/anaconda3
-    - export PATH="$HOME/anaconda3/bin:$PATH"
-    - hash -r
-    - conda config --set always_yes yes --set changeps1 no
-    - conda update conda
-    - wget https://github.com/skulumani/asteroid_dumbbell/releases/download/v0.3/shape_model.tar.gz -O ./data/shape_model/shape_model.tar.gz
-    - tar xf ./data/shape_model/shape_model.tar.gz -C ./data/shape_model
+    - 
 install:
-    # setup the development environment
-    - conda env create --file ./utilities/asteroid_reduced.yml
-    - source activate asteroid
+    - bash ./utilities/travis_setup.sh
 script:
-    - pytest ./tests/test_raycaster.py
+    - pytest -v 
 after_success:
     - coveralls
 
