@@ -20,7 +20,7 @@ install:
     - hash -r 
     - source activate asteroid
 script:
-    - pytest --cov_config .coveragerc --cov=dynamics --cov=point_cloud --cov=eom_comparison --cov=landing .
+    - pytest --cov-config .coveragerc --cov=dynamics --cov=point_cloud --cov=eom_comparison --cov=landing .
 after_success:
     - coveralls
 
