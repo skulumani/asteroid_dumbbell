@@ -260,10 +260,10 @@ def vtk_renderer():
     """
     return vtk.vtkRenderer()
 
-def mayavi_figure():
+def mayavi_figure(bg=(1, 1, 1)):
     """Just define a figure for mayavi to plot into
     """
-    return mlab.figure()
+    return mlab.figure(bgcolor=bg)
 
 def mayavi_addPoly(fig, polydata, color=(0.5, 0.5, 0.5)):
     r"""Draw a VKT polydata object to a mayavi figure
