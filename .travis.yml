@@ -24,7 +24,7 @@ script:
     # - travis_wait pytest tests/test_asteroid.py
     - pytest tests/test_attitude.py
     - pytest tests/test_controller.py
-    - pytest tests/test_blender.py
+    # - pytest tests/test_blender.py code 5 when all are skipped
     # - pytest tests/test_dumbell.py
     - pytest tests/test_eom.py
     - pytest tests/test_lidar.py
