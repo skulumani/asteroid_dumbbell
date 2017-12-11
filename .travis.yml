@@ -26,7 +26,7 @@ script:
     - pytest tests/test_controller.py
     - pytest tests/test_blender.py
     # - pytest tests/test_dumbell.py
-    - pytest tests/tests_eom.py
+    - pytest tests/test_eom.py
     - pytest tests/test_lidar.py
 after_success:
     - coveralls
