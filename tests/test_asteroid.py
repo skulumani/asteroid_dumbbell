@@ -770,8 +770,6 @@ class TestAsteroidCastalia32():
     def test_polyhedron_potential_Ulaplace(self):
         np.testing.assert_almost_equal(self.Ulap_true, self.Ulap)
 
-# TODO: Compare asteroid and read_obj
-
 
 class TestAsteroidItokawaOBJ():
     """Testing out the polyhedron potential model using the OBJ file directly

@@ -86,14 +86,10 @@ class TestCompareVTKAndWavefrontWritingOBJ():
         np.testing.assert_allclose(self.vtk_output_faces,
                                    self.wavefront_output_faces)
 
-# TODO: Compare with the matlab file with faces/vertices
-
 def test_reader_matches():
     """Compare faces/verts to Matlab mat file?"""
     pass
 
-
-# TODO: Test to convert OBJ to VTK to Numpy and make sure the numbers are correct
 
 class TestItokawaHighReadingAndWriting():
     filename = './data/shape_model/ITOKAWA/itokawa_high.obj'
@@ -151,7 +147,6 @@ class TestItokawaLowReadingAndWriting():
     def test_output_faces_equal(self):
         np.testing.assert_allclose(self.out_faces, self.faces)
 
-# TODO: Add tests to verify function of preserve topology/splitting settings
 class TestDecimation():
     """Ensure decimation is working properly
     """

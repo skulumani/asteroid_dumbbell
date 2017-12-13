@@ -105,7 +105,6 @@ def ismember_index(a,b):
 
     return index
 
-# TODO: Documentation
 def search_index(a, b):
     r"""Memory intensive way to find matches in single dimensional array
 
