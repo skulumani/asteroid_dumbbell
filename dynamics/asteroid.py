@@ -91,9 +91,8 @@ class Asteroid(object):
             
             self.logger.info('Using {} faces for {}'.format(self.F.shape[0],
                                                             self.name))
-            self.logger.info('Polyhedron Model : {} faces {}
-                             vertices'.format(self.F.shape[0],
-                             self.V.shape[0]))
+            self.logger.info('Polyhedron Model : {} faces {} vertices'.format(self.F.shape[0],
+                                                                              self.V.shape[0]))
         
         # define the mass properties of the asteroid
         if name == 'castalia':
