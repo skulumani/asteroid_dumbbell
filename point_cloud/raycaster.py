@@ -222,7 +222,6 @@ class RayCaster(object):
         return distance
 
 
-# TODO Test out rotating and plotting that as well
 class Lidar(object):
     r"""LIDAR object
 
