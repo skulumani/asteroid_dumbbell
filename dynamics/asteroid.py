@@ -1,13 +1,13 @@
 # Class file for the central asteroid
 from __future__ import absolute_import, division, print_function, unicode_literals
-import numpy as np
-import scipy.io
+
 from point_cloud import wavefront, polyhedron
 
+import numpy as np
+import scipy.io
+import logging
 
 # TODO: Implement the ability to input a filename for OBJ shape files
-# TODO: Need to add some tests to check if the shape model is a closed polyhedron
-#   Can check to make sure each edge is a member of exactly 2 faces (for triangular meshes)
 # TODO: Implement a Cython/C++ version of both of these methods
 class Asteroid(object):
     """An asteroid that we're orbiting about
@@ -30,35 +30,42 @@ class Asteroid(object):
         C22 - spherical harmoning coefficient
     """
     G = 6.673e-20
-    # TODO: Deprecate matlab matfile
     def __init__(self, name, num_faces, shape_flag='mat'):
         """Initialize the asteroid instance with it's properties
 
         """
+        self.logger = logging.getLogger(__name__)
+
         self.name = name
         # either use the matlab file or read the OBJ file
         if shape_flag == 'mat':  # use matlab shape data
-            if name == 'castalia':
+            self.logger.debug('Using MAT files for shape model')
 
+            if name == 'castalia':
+                self.logger.debug('Castalia MAT')
                 mat = scipy.io.loadmat(
                     "./data/shape_model/CASTALIA/castalia_model.mat")
 
             elif name == 'itokawa':
+                self.logger.debug('ITOKAWA MAT')
                 mat = scipy.io.loadmat("./data/shape_model/ITOKAWA/itokawa_model.mat")
             else:
-                print("Unknown asteroid. Use 'castalia or 'itokawa' only.")
+                self.logger.warning('Unknown asteroid name : {} '.format(name))
+                raise ValueError('Incorrect asteroid name!')
 
             if num_faces in [4092, 2048, 1024, 512, 256, 128, 64, 32]:
+                self.logger.debug('Using {} num_faces from MAT file.'.format(num_faces))
                 F_key = "F_" + str(num_faces)
                 V_key = "V_" + str(num_faces)
             else:
-                print("That number of faces is not possible.")
-                return 1
+                self.logger.warning('Incorrect number of faces')
+                raise ValueError('Incorrect number of faces for MAT files')
 
             self.F = mat[F_key] - 1
             self.V = mat[V_key]
 
         elif shape_flag == 'obj':  # read directly from the OBJ file
+            self.logger.debug('Using OBJ shape model')
             if name == 'castalia':
                 verts, faces = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj')
             elif name == 'itokawa':
@@ -70,8 +77,10 @@ class Asteroid(object):
                 # translate so center of object is at origin
                 verts = verts - np.array([0.5, 0.5, 0.5])
             else:
-                print("Unknown asteroid. Use 'castalia', 'itokawa', or 'eros' only.")
-            
+                self.logger.warning('Unknown asteroid name : {}'.format(name))
+
+                raise ValueError('Unknown asteroid name')
+
             # reduce the number of faces/vertices somehow
             # if (num_faces != 0 and num_faces < faces.shape[0]):
             #     ratio = 1 - num_faces / faces.shape[0]
@@ -79,9 +88,12 @@ class Asteroid(object):
 
             self.F = faces
             self.V = verts
-
-            # print("Using %g faces for %s." % (self.F.shape[0],self.name))
-            # print("Polyhedron Model: %g faces, %g vertices." % (self.F.shape[0],self.V.shape[0]))
+            
+            self.logger.info('Using {} faces for {}'.format(self.F.shape[0],
+                                                            self.name))
+            self.logger.info('Polyhedron Model : {} faces {}
+                             vertices'.format(self.F.shape[0],
+                             self.V.shape[0]))
         
         # define the mass properties of the asteroid
         if name == 'castalia':
