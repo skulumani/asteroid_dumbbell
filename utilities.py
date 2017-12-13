@@ -64,12 +64,30 @@ def in1d_index(a, b):
     voida, voidb = map(asvoid, (a, b))
     return np.where(np.in1d(voidb, voida))[0]
 
-# TODO: Add documentation and exmaple
 def ismember_index(a,b):
-    """Find index of matching elements
-    
-    Actually find the index of elements and their match. 
-    """
+    r"""Finds matching elements between two arrays
+
+    index = ismember_index(a, b)
+
+    Parameters
+    ----------
+    a : array_like
+    b : array_like
+
+    Returns
+    -------
+    index : array_like
+
+    Notes
+    -----
+    This allows for the comparison of multidimensional arrays (n x m).
+    It first creates a byte object for each row, then compares that to find
+    the matching elements
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     invalid = -1
 
     a[a==-0.0] = 0
@@ -89,9 +107,32 @@ def ismember_index(a,b):
 
 # TODO: Documentation
 def search_index(a, b):
-    """Memory intensive way to find matches. have to search across vertex map
+    r"""Memory intensive way to find matches in single dimensional array
 
+    inda, indb = search_index(a, b)
+
+    Parameters
+    ----------
+    a : array_like
+    b : array_like 
+        Both should be single dimensional (n,)
+
+    Returns
+    -------
+    inda : array_liek
+    indb :
+
+    Notes
+    -----
     https://stackoverflow.com/questions/8251541/numpy-for-every-element-in-one-array-find-the-index-in-another-array
+
+    inda - index for each element corresponds to the match given in indb
+
+    so a[inda[0]] = b[indb[0]] and a[inda[1]] = b[indb[1]]
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
     """
     invalid = -1
     lenb = len(b)
@@ -102,9 +143,6 @@ def search_index(a, b):
 
     inda, indb = np.where(np.equal(ae, be))
     
-    # returns locations where there are matches ( and the elements to find them)
-    # inda - index for each element corresponds to the match given in indb
-    # so a[inda[0]] = b[indb[0]] and a[inda[1]] = b[indb[1]]
     return inda, indb
 
 if __name__ == "__main__":
