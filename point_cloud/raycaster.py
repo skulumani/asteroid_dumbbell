@@ -152,11 +152,31 @@ class RayCaster(object):
         else:
             return intersection
     
-    # TODO Add documentation and unit testing
     def castarray(self, ps, targets):
-        """Only append the minimum distance intersection
-        """
-        # TODO Debug the array creation
+        r"""Cast many rays from ps to targets
+
+        intersections = Lidar.castarray(source, targets)
+
+        Parameters
+        ----------
+        ps : (3,) array
+            Location of source. Position
+        targets : (n, 3) array
+            Targets that vectors should end at (from source to target)
+
+        Returns
+        -------
+        intersection: array_like
+            The intersections of each ray with the mesh
+
+        See Also
+        --------
+        castray : does ray casting for a single ray
+
+        Author
+        ------
+        Shankar Kulumani		GWU		skulumani@gwu.edu
+        """ 
         all_intersections = []
         for ii, pt in enumerate(targets):
             intersection = self.castray(ps, pt)
