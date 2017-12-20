@@ -4,6 +4,7 @@ around an asteroid
 from __future__ import absolute_import, division, print_function, unicode_literals
 from dynamics import asteroid, dumbbell, eoms
 from kinematics import attitude
+from visualization import plotting
 
 import numpy as np
 from scipy import integrate
@@ -16,7 +17,7 @@ from scipy import integrate
 ast = asteroid.Asteroid('castalia', 4092, 'mat')
 dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
 
-time = np.linspace(0, 1000, 1000)
+time = np.linspace(0, int(1e4), int(1e4))
 initial_pos = np.array([1.5, 0, 0])
 initial_vel = np.array([0, 0, 0])
 initial_R = np.eye(3,3).reshape(-1)
@@ -27,6 +28,8 @@ t, istate, astate, bstate = eoms.inertial_eoms_driver(initial_state,
                                                       time, ast, dum)
 
 # plot the simulation
+# plotting.animate_inertial_trajectory(t, istate, ast, dum)
+plotting.plot_inertial(t, istate, ast, dum, fwidth=1)
 
 # animation in mayavi
 
