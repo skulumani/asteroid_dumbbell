@@ -4,6 +4,7 @@
 from dynamics import controller
 import numpy as np
 from kinematics import attitude
+from eom_comparison import transform
 
 from scipy import integrate
 
@@ -315,7 +316,8 @@ def eoms_controlled_inertial_quarter_equatorial(t, state, dum, ast, tf, loops):
 
     return statedot
 
-def inertial_eoms_driver(initial_state, time, ast, dum):
+def inertial_eoms_driver(initial_state, time, ast, dum, AbsTol=1e-9,
+                         RelTol=1e-9):
     """ODEINT Inertial EOMs driver
     
     This function will simulate the inertial equations of motion  using
