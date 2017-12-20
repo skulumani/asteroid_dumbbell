@@ -6,7 +6,7 @@ import numpy as np
 import scipy
 
 
-def obj(pos, ast):
+def func(pos, ast):
     """Objective function for minimization
     """
     omega = ast.omega
@@ -19,12 +19,25 @@ def obj(pos, ast):
     dF = U_grad_mat + omega**2 * np.diag([1, 1, 0])
     
     # scale both and return
-    return F*scale, dF*scale
+    return F*scale
+
+def fprime(pos, ast):
+    omega = ast.omega
+    scale = 1e6
+    # compute potential at pos
+    U, U_grad, U_grad_mat, Ulaplace = ast.polyhedron_potential(pos)
+
+    # compute potential in rotating frame
+    dF = U_grad_mat + omega**2 * np.diag([1, 1, 0])
+    
+    # scale both and return
+    return dF*scale
 
 # initial guess of equilibrium point
-x0 = np.array([1, 0, 0])
-ast = asteroid.Asteroid('castalia', 0, 'obj')
+x0 = np.array([-1, 0, 0])
+ast = asteroid.Asteroid('itokawa', 0, 'obj')
 
+xeq, infodict, ier, msg = scipy.optimize.fsolve(func=func, x0=x0, args=(ast,), full_output=True)
 # try fsolve
 
 # newton iteration
