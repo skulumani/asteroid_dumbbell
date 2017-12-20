@@ -12,7 +12,6 @@ from mayavi import mlab
 import numpy as np
 from point_cloud import wavefront
 import logging
-logger = logging.getLogger(__name__)
 
 def draw_polyhedron_vtk(vertices, faces):
     r"""Plot a polyhedron using VTK
@@ -368,6 +367,7 @@ def mayavi_addPoint(fig, p, radius=0.1, color=( 0, 0, 1 )):
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
     """ 
+    logger = logging.getLogger(__name__)
     if p.size == 0:
         logger.info('No points to plot')
         return None
@@ -381,3 +381,28 @@ def mayavi_addPoint(fig, p, radius=0.1, color=( 0, 0, 1 )):
         p = np.squeeze(p)
         point = mlab.points3d(p[0], p[1], p[2],scale_factor=radius, color=color, figure=fig)
         return point
+
+def mayavi_plot_trajectory(fig, pos, color=(1, 0, 0)):
+    r"""Draw trajectory onto mayavi figure
+
+    traj = mayavi_plot_trajectory(fig, pos, color)    
+
+    Parameters
+    ----------
+    fig : mlab.figure()
+        Figure to plot into
+    pos : (n, 3) array/tuple
+        Points of trajectory to plot into figure
+    color: (3,) array
+        RGB color of line
+
+    Returns
+    -------
+    traj: mlab.plot3d()
+        Plot3d handle to the trajectory
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
+    if 
