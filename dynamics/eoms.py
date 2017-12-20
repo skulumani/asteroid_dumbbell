@@ -5,6 +5,8 @@ from dynamics import controller
 import numpy as np
 from kinematics import attitude
 
+from scipy import integrate
+
 def eoms_controlled_relative_blender_ode(t, state, dum, ast):
     """Relative EOMS defined in the rotating asteroid frame
 
@@ -312,3 +314,129 @@ def eoms_controlled_inertial_quarter_equatorial(t, state, dum, ast, tf, loops):
     statedot = np.hstack((pos_dot, vel_dot, R_dot, ang_vel_dot))
 
     return statedot
+
+def inertial_eoms_driver(initial_state, time, ast, dum):
+    """ODEINT Inertial EOMs driver
+    
+    This function will simulate the inertial equations of motion  using
+    scipy.integrate.odeint and then convert them into the inertial and
+    asteroid frames.
+
+    Parameters
+    ----------
+    initial_state - (18,) numpy ndarray representing the initial state of the dumbbell
+        pos - initial_state[0:3] in km position of the dumbbell with respect to the
+        asteroid and defined in the inertial frame
+        vel - initial_state[3:6] in km/sec is the velocity of dumbbell wrt the asteroid
+        and defined in the inertial frame
+        R - initial_state[6:15] rotation matrix which converts vectors from the dumbbell frame to
+        the inertial frame
+        w - state[15:18] rad/sec angular velocity of the dumbbell wrt inertial frame and
+        defined in the dumbbell frame
+    time - (n,) numpy ndarray representing the simulation time span
+    ast - asteroid object instance
+    dum - dumbbell object instance
+
+    Returns
+    -------
+    time - (n,) numpy ndarray time vector. Same as the input
+    inertial_state - (n,18) ndarray with the simulation results represented in the inertial frame
+        pos - inertial_state[0:3] in km position of the dumbbell with respect to the
+        asteroid and defined in the inertial frame
+        vel - inertial_state[3:6] in km/sec is the velocity of dumbbell wrt the asteroid
+        and defined in the inertial frame
+        R - inertial_state[6:15] rotation matrix which converts vectors from the dumbbell frame to
+        the inertial frame
+        w - inertial_state[15:18] rad/sec angular velocity of the dumbbell wrt inertial frame and
+        defined in the inertial frame
+    asteroid_state - (n,18) ndarray with the simulation results represented in the asteroid frame
+        pos - asteroid_state[0:3] in km position of the dumbbell with respect to the
+        asteroid and defined in the asteroid frame
+        vel - asteroid_state[3:6] in km/sec is the velocity of dumbbell wrt the asteroid
+        and defined in the asteroid frame
+        R - asteroid_state[6:15] rotation matrix which converts vectors from the dumbbell frame to
+        the asteroid frame
+        w - asteroid_state[15:18] rad/sec angular velocity of the dumbbell wrt inertial frame and
+        defined in the asteroid frame
+    body_state - (n,18) ndarray with the simulation results represented in the inertial frame
+        pos - asteroid_state[0:3] in km position of the dumbbell with respect to the
+        asteroid and defined in the inertial frame
+        vel - asteroid_state[3:6] in km/sec is the velocity of dumbbell wrt the asteroid
+        and defined in the inertial frame
+        R - asteroid_state[6:15] rotation matrix which converts vectors from the dumbbell frame to
+        the inertial frame
+        w - asteroid_state[15:18] rad/sec angular velocity of the dumbbell wrt inertial frame and
+        defined in the dumbbell frame
+
+        This output is exactly what dum.eoms_inertial will output without any alduteration
+    """
+    body_state = integrate.odeint(dum.eoms_inertial, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
+
+    # convert to inertial and asteroid frames
+    inertial_state = transform.eoms_inertial_to_inertial(time, body_state, ast, dum)
+    asteroid_state = transform.eoms_inertial_to_asteroid(time, body_state, ast, dum)
+
+    return (time, inertial_state, asteroid_state, body_state)
+
+def hamilton_eoms_driver(initial_state, time, ast, dum):
+    """ODEINT Hamilton Relative EOMs driver
+    
+    This function will simulate the relative hamiltonian equations of motion  using
+    scipy.integrate.odeint and then convert them into the inertial and
+    asteroid frames.
+
+    Parameters
+    ----------
+    initial_state - (18,) numpy ndarray representing the initial state of the dumbbell
+        pos - initial_state[0:3] in km position of the dumbbell with respect to the
+        asteroid and defined in the asteroid frame
+        lin_mom - initial_state[3:6] in Jkm/sec is the linear momentum of dumbbell wrt the asteroid
+        and defined in the asteroid frame
+        R - initial_state[6:15] rotation matrix which converts vectors from the dumbbell frame to
+        the asteroid frame
+        ang_mom - state[15:18] rad/sec angular momentum of the dumbbell wrt inertial frame and
+        defined in the asteroid frame
+    time - (n,) numpy ndarray representing the simulation time span
+    ast - asteroid object instance
+    dum - dumbbell object instance
+
+    Returns
+    -------
+    time - (n,) numpy ndarray time vector. Same as the input
+    inertial_state - (n,18) ndarray with the simulation results represented in the inertial frame
+        pos - inertial_state[0:3] in km position of the dumbbell with respect to the
+        asteroid and defined in the inertial frame
+        vel - inertial_state[3:6] in km/sec is the velocity of dumbbell wrt the asteroid
+        and defined in the inertial frame
+        R - inertial_state[6:15] rotation matrix which converts vectors from the dumbbell frame to
+        the inertial frame
+        w - inertial_state[15:18] rad/sec angular velocity of the dumbbell wrt inertial frame and
+        defined in the inertial frame
+    asteroid_state - (n,18) ndarray with the simulation results represented in the asteroid frame
+        pos - asteroid_state[0:3] in km position of the dumbbell with respect to the
+        asteroid and defined in the asteroid frame
+        vel - asteroid_state[3:6] in km/sec is the velocity of dumbbell wrt the asteroid
+        and defined in the asteroid frame
+        R - asteroid_state[6:15] rotation matrix which converts vectors from the dumbbell frame to
+        the asteroid frame
+        w - asteroid_state[15:18] rad/sec angular velocity of the dumbbell wrt inertial frame and
+        defined in the asteroid frame
+    ast_state - (n,18) ndarray with the simulation results represented in the asteroid frame
+        pos - asteroid_state[0:3] in km position of the dumbbell with respect to the
+        asteroid and defined in the inertial frame
+        vel - asteroid_state[3:6] in km/sec is the velocity of dumbbell wrt the asteroid
+        and defined in the inertial frame
+        R - asteroid_state[6:15] rotation matrix which converts vectors from the dumbbell frame to
+        the inertial frame
+        w - asteroid_state[15:18] rad/sec angular momentum of the dumbbell wrt inertial frame and
+        defined in the asteroid frame
+
+        This output is exactly what dum.eoms_hamilton_relative  will output without any alduteration
+    """
+    ast_state = integrate.odeint(dum.eoms_hamilton_relative, initial_state, time, args=(ast,), atol=AbsTol, rtol=RelTol)
+
+    # convert to inertial and asteroid frames
+    inertial_state = transform.eoms_hamilton_relative_to_inertial(time, ast_state, ast, dum)
+    asteroid_state = transform.eoms_hamilton_relative_to_asteroid(time, ast_state, ast, dum)
+
+    return (time, inertial_state, asteroid_state, ast_state)
