@@ -4,7 +4,7 @@ around an asteroid
 from __future__ import absolute_import, division, print_function, unicode_literals
 from dynamics import asteroid, dumbbell, eoms
 from kinematics import attitude
-from visualization import plotting
+from visualization import plotting, graphics
 
 import numpy as np
 from scipy import integrate
@@ -29,7 +29,10 @@ t, istate, astate, bstate = eoms.inertial_eoms_driver(initial_state,
 
 # plot the simulation
 # plotting.animate_inertial_trajectory(t, istate, ast, dum)
-plotting.plot_inertial(t, istate, ast, dum, fwidth=1)
+# plotting.plot_inertial(t, istate, ast, dum, fwidth=1)
 
 # animation in mayavi
+mfig = graphics.mayavi_figure()
 
+graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
+graphics.mayavi_plot_trajectory(mfig, istate[:, 0:3])
