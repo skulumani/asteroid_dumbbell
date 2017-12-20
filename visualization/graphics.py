@@ -405,4 +405,7 @@ def mayavi_plot_trajectory(fig, pos, color=(1, 0, 0)):
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
     """ 
-    if 
+    logger = logging.getLogger(__name__)
+
+    l = mlab.plot3d(pos[:, 0], pos[:, 1], pos[:, 2], color=color) 
+    return l
