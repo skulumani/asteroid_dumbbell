@@ -316,7 +316,6 @@ def eoms_controlled_inertial_quarter_equatorial(t, state, dum, ast, tf, loops):
 
     return statedot
 
-# TODO Make a driver function that takes a eoms_function object and then simulates that
 def inertial_eoms_driver(initial_state, time, ast, dum, AbsTol=1e-9,
                          RelTol=1e-9):
     """ODEINT Inertial EOMs driver
@@ -444,7 +443,7 @@ def hamilton_eoms_driver(initial_state, time, ast, dum):
 
     return (time, inertial_state, asteroid_state, ast_state)
 
-def eoms_controlled_blender(t, state, dum, ast):
+def eoms_controlled_inertial(t, state, ast, dum, des_att_func, des_tran_func):
     """Inertial dumbbell equations of motion about an asteroid 
     
     This method must be used with the scipy.integrate.ode class instead of the
@@ -466,6 +465,7 @@ def eoms_controlled_blender(t, state, dum, ast):
             dumbbell frame
         ast - Asteroid class object holding the asteroid gravitational
         model and other useful parameters
+        dum -  dumbbell clas
     """
     # unpack the state
     pos = state[0:3] # location of the center of mass in the inertial frame
@@ -503,10 +503,9 @@ def eoms_controlled_blender(t, state, dum, ast):
     # of the true state
 
     # calculate the desired attitude and translational trajectory
-    des_att_tuple = controller.body_fixed_pointing_attitude(t, state)
-    des_tran_tuple = controller.traverse_then_land_vertically(t, ast, final_pos=[0.550, 0, 0],
-                                                              initial_pos=[2.550, 0, 0],
-                                                              descent_tf=3600)
+    des_att_tuple = des_att_func(t, state)
+    des_tran_tuple = des_tran_func(t, state)
+
     # input trajectory and compute the control inputs
     # compute the control input
     u_m = controller.attitude_controller(t, state, M1+M2, dum, ast, des_att_tuple)
@@ -597,3 +596,54 @@ def eoms_controlled_blender_traverse_then_land(t, state, dum, ast):
     statedot = np.hstack((pos_dot, vel_dot, R_dot, ang_vel_dot))
 
     return statedot
+
+# TODO Make a driver function that takes a eoms_function object and then simulates that
+def simulation_driver(time, initial_state,ast, dum,
+                      des_att_func=body_fixed_pointing_attitude,
+                      des_tran_func=inertial_circumnavigate, 
+                      AbsTol=1e-9, RelTol=1e-9):
+    """Relative EOMS defined in the rotating asteroid frame
+
+    This function defines the motion of a dumbbell spacecraft in orbit around
+    an asteroid.
+    The EOMS are defined relative to the asteroid itself, which is in a state
+    of constant rotation.
+    You need to use this function with scipy.integrate.ode class
+    This is setup to test Blender using a fixed asteroid
+
+    Inputs:
+        t - current time of simulation (sec)
+        state - (18,) relative state of dumbbell with respect to asteroid
+            pos - state[0:3] in km position of the dumbbell with respect to the
+            asteroid and defined in the asteroid fixed frame
+            vel - state[3:6] in km/sec is the velocity of dumbbell wrt the
+            asteroid and defined in the asteroid fixed frame
+            R - state[6:15] rotation matrix which converts vectors from the
+            dumbbell frame to the asteroid frame
+            w - state[15:18] rad/sec angular velocity of the dumbbell wrt
+            inertial frame and defined in the asteroid frame
+        ast - asteroid object
+
+    Output:
+        state_dot - (18,) derivative of state. The order is the same as the input state.
+    """
+    num_steps = time.shape[0]
+
+    system = integrate.ode(eoms_controlled_inertial)
+    system.set_integrator('lsoda', atol=AbsTol, rtol=RelTol, nsteps=num_steps)
+    system.set_initial_value(initial_state, t0)
+    system.set_f_params(ast=ast, dum=dum, des_att_func=des_att_func,
+                        des_tran_func=des_tran_func)
+
+    state = np.zeros((num_steps+1, 18))
+    time = np.zeros(num_steps+1)
+    state[0, :] = initial_state
+
+    ii = 1
+    while system.successful() and system.t < tf:
+        # integrate the system and save state to an array
+        time[ii] = (system.t + dt)
+        state[ii, :] = (system.integrate(system.t + dt))
+
+    return state
+
