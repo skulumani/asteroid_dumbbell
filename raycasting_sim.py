@@ -24,6 +24,7 @@ initial_R = np.eye(3,3).reshape(-1)
 initial_w = np.array([0, 0, 0])
 initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
+# try both a controlled and uncontrolled simulation
 t, istate, astate, bstate = eoms.inertial_eoms_driver(initial_state,
                                                       time, ast, dum)
 
