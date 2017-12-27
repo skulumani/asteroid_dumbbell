@@ -6,7 +6,6 @@ import dynamics.asteroid as asteroid
 from kinematics import attitude
 from visualization import graphics
 import pdb
-import time as ptime
 
 def test_asteroid():
     # plot the asteroid as a triangular mesh
