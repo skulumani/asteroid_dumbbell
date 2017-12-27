@@ -599,8 +599,8 @@ def eoms_controlled_blender_traverse_then_land(t, state, dum, ast):
 
 # TODO Make a driver function that takes a eoms_function object and then simulates that
 def simulation_driver(time, initial_state,ast, dum,
-                      des_att_func=body_fixed_pointing_attitude,
-                      des_tran_func=inertial_circumnavigate, 
+                      des_att_func=controller.body_fixed_pointing_attitude,
+                      des_tran_func=controller.inertial_circumnavigate, 
                       AbsTol=1e-9, RelTol=1e-9):
     """Relative EOMS defined in the rotating asteroid frame
 
