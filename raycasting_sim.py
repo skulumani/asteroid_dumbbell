@@ -63,10 +63,12 @@ while system.successful() and system.t < tf:
 
 # plot the simulation
 # plotting.animate_inertial_trajectory(t, istate, ast, dum)
-# plotting.plot_inertial(t, istate, ast, dum, fwidth=1)
+plotting.plot_inertial(t, istate, ast, dum, fwidth=1)
 
 mfig = graphics.mayavi_figure() 
 mesh = graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
+
+# TODO Add dumbbell axes to this output (tuple)
 traj = graphics.mayavi_plot_trajectory(mfig, state[0, 0:3])
 
 # TODO Plot the dumbbell body frame and the asteroid frame as well
