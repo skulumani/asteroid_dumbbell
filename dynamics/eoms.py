@@ -7,6 +7,9 @@ from kinematics import attitude
 from eom_comparison import transform
 
 from scipy import integrate
+import pdb
+
+# TODO Create a script that tests all of these funcitons
 
 def eoms_controlled_relative_blender_ode(t, state, dum, ast):
     """Relative EOMS defined in the rotating asteroid frame
@@ -501,7 +504,6 @@ def eoms_controlled_inertial(t, state, ast, dum, des_att_func, des_tran_func):
     # blender.driver(pos, R, ast.omega * t, [5, 0, 1], 'test' + str.zfill(str(t), 4))
     # use the imagery to figure out motion and pass to the controller instead
     # of the true state
-
     # calculate the desired attitude and translational trajectory
     des_att_tuple = des_att_func(t, state)
     des_tran_tuple = des_tran_func(t, state)
