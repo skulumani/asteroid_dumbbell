@@ -4,14 +4,13 @@ around an asteroid
 from __future__ import absolute_import, division, print_function, unicode_literals
 from dynamics import asteroid, dumbbell, eoms, controller
 from kinematics import attitude
-from visualization import plotting, graphics
+from visualization import plotting, graphics, animation
+from point_cloud import wavefront, raycaster
 
 import numpy as np
 from scipy import integrate
 
-# create the sensor and raycaster
-
-# create an asteroid and dumbbell
+import pdb
 
 # simulate dumbbell moving aroudn asteroid
 ast = asteroid.Asteroid('castalia', 4092, 'mat')
@@ -32,6 +31,10 @@ initial_R = np.eye(3,3).reshape(-1)
 initial_w = np.array([0, 0, 0])
 initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
+# initialize the raycaster and lidar
+polydata = wavefront.meshtopolydata(ast.V, ast.F)
+caster = raycaster.RayCaster(polydata)
+sensor = raycaster.Lidar(dist=5)
 # try both a controlled and uncontrolled simulation
 # t, istate, astate, bstate = eoms.inertial_eoms_driver(initial_state, time, ast, dum)
 
@@ -49,14 +52,16 @@ while system.successful() and system.t < tf:
     # integrate the system and save state to an array
     t[ii] = (system.t + dt)
     state[ii, :] = system.integrate(system.t + dt)
+    # create the sensor and raycaster
+
+    # create an asteroid and dumbbell
     ii+= 1
 
 # plot the simulation
 # plotting.animate_inertial_trajectory(t, istate, ast, dum)
 # plotting.plot_inertial(t, istate, ast, dum, fwidth=1)
 
-# TODO: animation in mayavi
-mfig = graphics.mayavi_figure()
-
-graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
-graphics.mayavi_plot_trajectory(mfig, state[:, 0:3])
+mfig = graphics.mayavi_figure() 
+mesh = graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
+traj = graphics.mayavi_plot_trajectory(mfig, state[0, 0:3])
+animation.inertial_asteroid_trajectory(time, state, ast, dum, mesh, traj)
