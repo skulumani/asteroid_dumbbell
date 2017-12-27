@@ -406,6 +406,9 @@ def mayavi_plot_trajectory(fig, pos, color=(1, 0, 0)):
     Shankar Kulumani		GWU		skulumani@gwu.edu
     """ 
     logger = logging.getLogger(__name__)
-
-    l = mlab.points3d(pos[:, 0], pos[:, 1], pos[:, 2], color=color) 
+    
+    if len(pos) == 3: # only a single position
+        l = mlab.points3d(pos[0], pos[1], pos[2], color=color)
+    elif len(pos) > 3:
+        l = mlab.points3d(pos[:, 0], pos[:, 1], pos[:, 2], color=color) 
     return l
