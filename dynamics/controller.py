@@ -376,6 +376,35 @@ def inertial_quarter_equatorial_plane(time, tf=3600*6, loops=2):
 
     return x_des, xd_des, xdd_des
 
+def inertial_fixed_state(time, state, des_pos=np.array([5, 0,  0])):
+    """Fixed position in the inertial frame
+
+    This function will define the translational states for the dumbbell, 
+    which is defined relative to the inertial fixed frame.
+
+    Parameters
+    ----------
+    time : float
+        Current simulation time
+    state : array
+        Current state of the dumbbell
+    des_pos : array
+        Desired position to hold
+    
+    Returns
+    -------
+    x_des : array
+        Desired position
+    xd_des : array
+        Desired velocity
+    xdd_des : array
+        Desired acceleration
+    """
+    x_des = des_pos 
+    xd_des = np.zeros(3)
+    xdd_des = np.zeros(3) 
+    return x_des, xd_des, xdd_des
+
 def inertial_circumnavigate(time, tf=3600*6, loops=2):
     """Desired translation for circumnavigation in inertial frame
 
