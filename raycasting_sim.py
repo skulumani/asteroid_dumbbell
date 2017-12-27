@@ -45,15 +45,19 @@ system.set_f_params(ast, dum, des_att_func, des_tran_func)
 
 state = np.zeros((num_steps+1, 18))
 t = np.zeros(num_steps+1)
+int_array = []
 state[0, :] = initial_state
 
 ii = 1
+# TODO Need to ensure that the pointing vectors are consistent (body frame, controller, sensor)
 while system.successful() and system.t < tf:
     # integrate the system and save state to an array
     t[ii] = (system.t + dt)
     state[ii, :] = system.integrate(system.t + dt)
     # create the sensor and raycaster
-
+    targets = state[ii, 0:3] + np.linalg.norm(state[ii, 0:3]) * sensor.rotate_fov(state[ii, 6:15].reshape((3,3)))
+    intersections = caster.castarray(state[ii, 0:3], targets)
+    int_array.append(intersections)
     # create an asteroid and dumbbell
     ii+= 1
 
@@ -64,4 +68,6 @@ while system.successful() and system.t < tf:
 mfig = graphics.mayavi_figure() 
 mesh = graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
 traj = graphics.mayavi_plot_trajectory(mfig, state[0, 0:3])
+
+# TODO Plot the dumbbell body frame and the asteroid frame as well
 animation.inertial_asteroid_trajectory(time, state, ast, dum, mesh, traj)
