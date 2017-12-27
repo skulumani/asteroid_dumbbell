@@ -3,7 +3,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from mayavi import mlab
 import numpy as np 
 import dynamics.asteroid as asteroid
+from kinematics import attitude
+from visualization import graphics
 import pdb
+import time as ptime
 
 def test_asteroid():
     # plot the asteroid as a triangular mesh
@@ -71,3 +74,24 @@ def test_triangular_mesh():
     t = np.r_[0, t]
 
     return mlab.triangular_mesh(x, y, z, triangles)
+
+@mlab.animate()
+def inertial_asteroid_trajectory(time, state, ast, dum,
+                                 mesh, traj):
+    """Animate the rotation of an asteroid and the motion of SC
+    """
+    # animate the rotation fo the asteroid
+    ms = mesh.mlab_source
+    ts = traj.mlab_source
+
+    for (t, pos) in zip(time, state[:, 0:3]):
+        # rotate teh asteroid
+        Ra = attitude.rot3(ast.omega * t, 'c')
+        # parse out the vertices x, y, z
+        new_vertices = Ra.dot(ast.V.T).T
+    
+        # update asteroid
+        ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1], z=new_vertices[:,2])
+        # update the satellite
+        ts.set(x=pos[0], y=pos[1], z=pos[2])
+        yield
