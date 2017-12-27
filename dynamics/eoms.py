@@ -600,9 +600,9 @@ def eoms_controlled_blender_traverse_then_land(t, state, dum, ast):
     return statedot
 
 # TODO Make a driver function that takes a eoms_function object and then simulates that
-def simulation_driver(time, initial_state,ast, dum,
+def sim_controlled_driver(time, initial_state,ast, dum,
                       des_att_func=controller.body_fixed_pointing_attitude,
-                      des_tran_func=controller.inertial_circumnavigate, 
+                      des_tran_func=controller.inertial_fixed_state, 
                       AbsTol=1e-9, RelTol=1e-9):
     """Relative EOMS defined in the rotating asteroid frame
 
@@ -630,22 +630,25 @@ def simulation_driver(time, initial_state,ast, dum,
         state_dot - (18,) derivative of state. The order is the same as the input state.
     """
     num_steps = time.shape[0]
+    t0 = time[0]
+    tf = time[-1]
+    dt = time[1] - time[0]
 
     system = integrate.ode(eoms_controlled_inertial)
     system.set_integrator('lsoda', atol=AbsTol, rtol=RelTol, nsteps=num_steps)
     system.set_initial_value(initial_state, t0)
-    system.set_f_params(ast=ast, dum=dum, des_att_func=des_att_func,
-                        des_tran_func=des_tran_func)
+    system.set_f_params(ast, dum, des_att_func, des_tran_func)
 
     state = np.zeros((num_steps+1, 18))
-    time = np.zeros(num_steps+1)
+    t = np.zeros(num_steps+1)
     state[0, :] = initial_state
 
     ii = 1
     while system.successful() and system.t < tf:
         # integrate the system and save state to an array
-        time[ii] = (system.t + dt)
-        state[ii, :] = (system.integrate(system.t + dt))
+        t[ii] = (system.t + dt)
+        state[ii, :] = system.integrate(system.t + dt)
+        ii+= 1
 
     return state
 
