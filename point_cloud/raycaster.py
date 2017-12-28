@@ -291,6 +291,6 @@ class Lidar(object):
         # initialize an object
 
         # rotate all the vector by the new rotation matrix
-        self.lidar_arr = R_body2frame.dot(self.lidar_arr.T).T 
+        lidar_arr = R_body2frame.dot(self.lidar_arr.T).T 
 
-        return self.lidar_arr
+        return lidar_arr
