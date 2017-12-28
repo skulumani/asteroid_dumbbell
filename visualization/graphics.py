@@ -93,8 +93,15 @@ def draw_polyhedron_mayavi(vertices, faces, fig):
     scalars = np.tile(0.5, x.shape)
     mesh = mlab.triangular_mesh(x, y, z, faces, color=(0.5, 0.5, 0.5), figure=fig,
                                 representation='surface')
+    
+    # draw the body axes of the asteroid
+    xaxis = mayavi_addLine(fig, [0, 0, 0], [2, 0, 0], color=(1, 0, 0)) 
+    yaxis = mayavi_addLine(fig, [0, 0, 0], [0, 2, 0], color=(0, 1, 0)) 
+    zaxis = mayavi_addLine(fig, [0, 0, 0], [0, 0, 2], color=(0, 0, 1)) 
+    
+    body_axes = (xaxis, yaxis, zaxis)
 
-    return mesh
+    return mesh, body_axes
 
 def vtk_addPoint(renderer, p, radius=0.1, color=[0.0, 0.0, 1]):
     r"""Add a point to a VTK render
