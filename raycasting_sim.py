@@ -60,6 +60,7 @@ while system.successful() and system.t < tf:
     targets = state[ii, 0:3] + np.linalg.norm(state[ii, 0:3]) * sensor.rotate_fov(state[ii, 6:15].reshape((3,3)))
 
     # TODO Need to update the caster with the rotated asteroid
+    # TODO Only raycast every 10 secondsd or something
     intersections = caster.castarray(state[ii, 0:3], targets)
     int_array.append(intersections)
     # create an asteroid and dumbbell
