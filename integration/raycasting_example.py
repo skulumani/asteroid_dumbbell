@@ -6,20 +6,20 @@ import numpy as np
 from visualization import graphics
 import pdb
 
-filename = './data/shape_model/ITOKAWA/itokawa_high.obj'
+filename = './data/shape_model/CASTALIA/castalia.obj'
 polydata = wavefront.read_obj_to_polydata(filename)
 
 caster_obb = raycaster.RayCaster(polydata, flag='obb')
 caster_bsp = raycaster.RayCaster(polydata, flag='bsp')
 
-sensor = raycaster.Lidar(view_axis=np.array([1, 0, 0]), num_step=5)
+sensor = raycaster.Lidar(view_axis=np.array([1, 0, 0]), num_step=3)
 
 # need to translate the sensor and give it a pointing direction
-pos = np.array([1, 0, 0])
-dist = 1 # distance for each raycast
+pos = np.array([5, 0, 0])
+dist = 5 # distance for each raycast
 
 # find the inersections
-targets = pos + sensor.rotate_fov(attitude.rot3(np.pi/2)) * dist
+targets = pos + sensor.rotate_fov(attitude.rot3(np.pi)) * dist
 intersections_obb = caster_obb.castarray(pos, targets)
 intersections_bsp = caster_bsp.castarray(pos, targets)
 
