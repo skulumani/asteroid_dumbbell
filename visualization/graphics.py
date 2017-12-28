@@ -103,6 +103,26 @@ def draw_polyhedron_mayavi(vertices, faces, fig):
 
     return mesh, body_axes
 
+def draw_dumbbell_mayavi(state, dum, fig):
+    """Draw the dumbbell rigid body model and body axes
+
+    """
+    logger = logging.getLogger(__name__)
+    pos = state[0:3]
+    R = state[6:15]
+
+    com = mlab.points3d(pos[0], pos[1], pos[2], color=(0, 0, 0), 
+                        scale_factor=0.1)
+    
+    # draw the body axes of the asteroid
+    xaxis = mayavi_addLine(fig, pos, pos+[1, 0, 0], color=(1, 0, 0)) 
+    yaxis = mayavi_addLine(fig, pos, pos+[0, 1, 0], color=(0, 1, 0)) 
+    zaxis = mayavi_addLine(fig, pos, pos+[0, 0, 1], color=(0, 0, 1)) 
+    
+    body_axes = (xaxis, yaxis, zaxis)
+
+    return com, body_axes
+
 def vtk_addPoint(renderer, p, radius=0.1, color=[0.0, 0.0, 1]):
     r"""Add a point to a VTK render
 
@@ -419,12 +439,6 @@ def mayavi_plot_trajectory(fig, pos, color=(1, 0, 0)):
     elif len(pos) > 3:
         l = mlab.points3d(pos[:, 0], pos[:, 1], pos[:, 2], color=color) 
     
-    # draw body  axes for the dumbbell
 
     return l
 
-def draw_dumbbell_mayavi(state, dum, fig):
-    """Draw the dumbbell rigid body model and body axes
-
-    """
-    pass

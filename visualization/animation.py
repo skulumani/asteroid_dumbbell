@@ -76,12 +76,13 @@ def test_triangular_mesh():
 
 @mlab.animate()
 def inertial_asteroid_trajectory(time, state, ast, dum,
-                                 mesh, traj):
+                                 mayavi_objects):
     """Animate the rotation of an asteroid and the motion of SC
     """
+    mesh, com = mayavi_objects
     # animate the rotation fo the asteroid
     ms = mesh.mlab_source
-    ts = traj.mlab_source
+    ts = com.mlab_source
 
     for (t, pos) in zip(time, state[:, 0:3]):
         # rotate teh asteroid
