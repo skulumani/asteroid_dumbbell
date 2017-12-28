@@ -27,7 +27,7 @@ dt = time[1] - time[0]
 
 initial_pos = np.array([1.5, 0, 0])
 initial_vel = np.array([0, 0, 0])
-initial_R = np.eye(3,3).reshape(-1)
+initial_R = attitude.rot3(np.pi/2).reshape(-1)
 initial_w = np.array([0, 0, 0])
 initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
@@ -63,10 +63,10 @@ while system.successful() and system.t < tf:
 
 # plot the simulation
 # plotting.animate_inertial_trajectory(t, istate, ast, dum)
-plotting.plot_inertial(t, istate, ast, dum, fwidth=1)
+# plotting.plot_controlled_inertial(t, istate, ast, dum, fwidth=1)
 
 mfig = graphics.mayavi_figure() 
-mesh = graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
+mesh, ast_axes = graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
 
 # TODO Add dumbbell axes to this output (tuple)
 traj = graphics.mayavi_plot_trajectory(mfig, state[0, 0:3])
