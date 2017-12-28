@@ -44,6 +44,7 @@ system.set_integrator('lsoda', atol=AbsTol, rtol=RelTol, nsteps=num_steps)
 system.set_initial_value(initial_state, t0)
 system.set_f_params(ast, dum, des_att_func, des_tran_func)
 
+# TODO Create a point cloud dictionary to hold intersections, sc state, time, asateroid state
 state = np.zeros((num_steps+1, 18))
 t = np.zeros(num_steps+1)
 int_array = []
@@ -57,6 +58,8 @@ while system.successful() and system.t < tf:
     state[ii, :] = system.integrate(system.t + dt)
     # create the sensor and raycaster
     targets = state[ii, 0:3] + np.linalg.norm(state[ii, 0:3]) * sensor.rotate_fov(state[ii, 6:15].reshape((3,3)))
+
+    # TODO Need to update the caster with the rotated asteroid
     intersections = caster.castarray(state[ii, 0:3], targets)
     int_array.append(intersections)
     # create an asteroid and dumbbell
