@@ -70,6 +70,6 @@ mesh, ast_axes = graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
 
 com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
 
-# TODO Plot the dumbbell body frame and the asteroid frame as well
+# TODO draw all the sensor raycasting lines
 animation.inertial_asteroid_trajectory(time, state, ast, dum, (mesh, ast_axes,
                                                                com, dum_axes))
