@@ -710,7 +710,9 @@ def plot_inertial(time, state, ast, dum, pgf_save=False, fwidth=0.5):
 
     return 0
 
-def plot_controlled_inertial(time, state, ast, dum, pgf_save=False, fwidth=0.5):
+def plot_controlled_inertial(time, state, ast, dum, 
+                             des_att_func, des_tran_func,
+                             pgf_save=False, fwidth=0.5):
     """Plot the state and desired command for the controlled system
 
     """
@@ -730,8 +732,8 @@ def plot_controlled_inertial(time, state, ast, dum, pgf_save=False, fwidth=0.5):
     ang_vel_d_des = np.zeros_like(ang_vel_des)
 
     for ii, t in enumerate(time):
-        x_des[ii,:], xd_des[ii, :], xdd_des[ii, :] = dum.desired_translation(t)
-        Rd, Rd_dot, wd, wd_dot = dum.desired_attitude(t)
+        x_des[ii,:], xd_des[ii, :], xdd_des[ii, :] = des_tran_func(t, state[ii, :])
+        Rd, Rd_dot, wd, wd_dot = des_att_func(t, state[ii, :])
         
         R_des[ii, :] = Rd.reshape(-1)
         Rd_des[ii,:] = Rd_dot.reshape(-1)
