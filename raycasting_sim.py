@@ -2,15 +2,16 @@
 around an asteroid
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
-from dynamics import asteroid, dumbbell, eoms, controller
-from kinematics import attitude
-from visualization import plotting, graphics, animation
-from point_cloud import wavefront, raycaster
+
+import pdb
 
 import numpy as np
 from scipy import integrate
 
-import pdb
+from dynamics import asteroid, dumbbell, eoms, controller
+from kinematics import attitude
+from visualization import plotting, graphics, animation
+from point_cloud import wavefront, raycaster
 
 # simulate dumbbell moving aroudn asteroid
 ast = asteroid.Asteroid('castalia', 4092, 'mat')
