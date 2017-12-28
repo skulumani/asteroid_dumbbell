@@ -74,19 +74,38 @@ def test_triangular_mesh():
 
     return mlab.triangular_mesh(x, y, z, triangles)
 
+def update_axes(axes_tuple, com, Rb2i):
+    """Update the axes given a rotation matrix
+    """
+    axes_source = (axis.mlab_source for axis in axes_tuple)
+    
+    for ii, axis_source in enumerate(axes_source):
+        axis_source.set(x=[com[0], Rb2i[0, ii]], y=[com[1], Rb2i[1, ii]],
+                        z=[com[2], Rb2i[2, ii]])
+
 @mlab.animate()
 def inertial_asteroid_trajectory(time, state, ast, dum,
                                  mayavi_objects):
     """Animate the rotation of an asteroid and the motion of SC
     """
-    mesh, com = mayavi_objects
+    mesh, ast_axes, com, dum_axes = mayavi_objects
+
     # animate the rotation fo the asteroid
     ms = mesh.mlab_source
     ts = com.mlab_source
 
-    for (t, pos) in zip(time, state[:, 0:3]):
+    ast_xs = ast_axes[0].mlab_source
+    ast_ys = ast_axes[1].mlab_source
+    ast_zs = ast_axes[2].mlab_source
+
+    dum_xs = dum_axes[0].mlab_source
+    dum_ys = dum_axes[1].mlab_source
+    dum_zs = dum_axes[2].mlab_source
+
+    for (t, pos, Rb2i) in zip(time, state[:, 0:3], state[:, 6:15]):
         # rotate teh asteroid
         Ra = attitude.rot3(ast.omega * t, 'c')
+        Rb2i = Rb2i.reshape((3,3))
         # parse out the vertices x, y, z
         new_vertices = Ra.dot(ast.V.T).T
     
@@ -94,4 +113,17 @@ def inertial_asteroid_trajectory(time, state, ast, dum,
         ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1], z=new_vertices[:,2])
         # update the satellite
         ts.set(x=pos[0], y=pos[1], z=pos[2])
+        
+        # update the asteroid axes
+        ast_xs.reset(x=[0, Ra[0,0]], y=[0,Ra[1,0]], z=[0, Ra[2,0]])
+        ast_ys.reset(x=[0, Ra[0,1]], y=[0, Ra[1,1]], z=[0, Ra[2,1]])
+        ast_zs.reset(x=[0, Ra[0,2]], y=[0, Ra[1,2]], z=[0, Ra[2,2]])
+
+        dum_xs.reset(x=[pos[0], pos[0]+Rb2i[0,0]], y=[pos[1], pos[1]+Rb2i[1,0]],
+                     z=[pos[2], pos[2]+Rb2i[2,0]])
+        dum_ys.reset(x=[pos[0], pos[0]+Rb2i[0,1]], y=[pos[1], pos[1]+Rb2i[1,1]],
+                     z=[pos[2], pos[2]+Rb2i[2,1]])
+        dum_zs.reset(x=[pos[0], pos[0]+Rb2i[0,2]], y=[pos[1], pos[1]+Rb2i[1,2]],
+                     z=[pos[2], pos[2]+Rb2i[2,2]])
+
         yield
