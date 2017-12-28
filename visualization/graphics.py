@@ -418,4 +418,13 @@ def mayavi_plot_trajectory(fig, pos, color=(1, 0, 0)):
         l = mlab.points3d(pos[0], pos[1], pos[2], color=color)
     elif len(pos) > 3:
         l = mlab.points3d(pos[:, 0], pos[:, 1], pos[:, 2], color=color) 
+    
+    # draw body  axes for the dumbbell
+
     return l
+
+def draw_dumbbell_mayavi(state, dum, fig):
+    """Draw the dumbbell rigid body model and body axes
+
+    """
+    pass
