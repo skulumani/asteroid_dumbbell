@@ -1,6 +1,6 @@
 """Script to do some raycasting with the simulated lidar
 """
-
+from kinematics import attitude
 from point_cloud import wavefront, raycaster
 import numpy as np
 from visualization import graphics
@@ -12,14 +12,14 @@ polydata = wavefront.read_obj_to_polydata(filename)
 caster_obb = raycaster.RayCaster(polydata, flag='obb')
 caster_bsp = raycaster.RayCaster(polydata, flag='bsp')
 
-sensor = raycaster.Lidar(view_axis=np.array([-1, 0, 0]), num_step=5)
+sensor = raycaster.Lidar(view_axis=np.array([1, 0, 0]), num_step=5)
 
 # need to translate the sensor and give it a pointing direction
 pos = np.array([1, 0, 0])
 dist = 1 # distance for each raycast
 
 # find the inersections
-targets = pos + sensor.lidar_arr * dist
+targets = pos + sensor.rotate_fov(attitude.rot3(np.pi/2)) * dist
 intersections_obb = caster_obb.castarray(pos, targets)
 intersections_bsp = caster_bsp.castarray(pos, targets)
 
