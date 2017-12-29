@@ -53,14 +53,16 @@ int_array = []
 state[0, :] = initial_state
 
 ii = 1
-# TODO Need to ensure that the pointing vectors are consistent (body frame, controller, sensor)
+# TODO Add a single function for the asteroid state (in the asteroid class maybe)
 while system.successful() and system.t < tf:
     # integrate the system and save state to an array
     t[ii] = (system.t + dt)
     state[ii, :] = system.integrate(system.t + dt)
 
     # now do the raycasting
-    if not (t[ii] % 10):
+    if not (np.floor(t[ii]) % 10):
+        pdb.set_trace()
+        # TODO Move this target definition inside Lidar
         targets = state[ii, 0:3] + np.linalg.norm(state[ii, 0:3]) * sensor.rotate_fov(state[ii, 6:15].reshape((3,3)))
         intersections = caster.castarray(state[ii, 0:3], targets)
 
