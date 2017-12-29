@@ -4,6 +4,7 @@ around an asteroid
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pdb
+from collections import defaultdict
 
 import numpy as np
 from scipy import integrate
@@ -44,7 +45,8 @@ system.set_integrator('lsoda', atol=AbsTol, rtol=RelTol, nsteps=num_steps)
 system.set_initial_value(initial_state, t0)
 system.set_f_params(ast, dum, des_att_func, des_tran_func)
 
-# TODO Create a point cloud dictionary to hold intersections, sc state, time, asateroid state
+point_cloud = defaultdict(list)
+
 state = np.zeros((num_steps+1, 18))
 t = np.zeros(num_steps+1)
 int_array = []
@@ -56,13 +58,19 @@ while system.successful() and system.t < tf:
     # integrate the system and save state to an array
     t[ii] = (system.t + dt)
     state[ii, :] = system.integrate(system.t + dt)
-    # create the sensor and raycaster
-    targets = state[ii, 0:3] + np.linalg.norm(state[ii, 0:3]) * sensor.rotate_fov(state[ii, 6:15].reshape((3,3)))
 
-    # TODO Need to update the caster with the rotated asteroid
-    # TODO Only raycast every 10 secondsd or something
-    intersections = caster.castarray(state[ii, 0:3], targets)
-    int_array.append(intersections)
+    # now do the raycasting
+    if not (t[ii] % 10):
+        targets = state[ii, 0:3] + np.linalg.norm(state[ii, 0:3]) * sensor.rotate_fov(state[ii, 6:15].reshape((3,3)))
+        intersections = caster.castarray(state[ii, 0:3], targets)
+
+        # TODO Need to update the caster with the rotated asteroid
+        point_cloud['time'].append(t[ii])
+        point_cloud['ast_state'].append(attitude.rot3(t[ii]).reshape(-1))
+        point_cloud['sc_state'].append(state[ii,:])
+        point_cloud['targets'].append(targets)
+        point_cloud['intersections'].append(intersections)
+
     # create an asteroid and dumbbell
     ii+= 1
 
