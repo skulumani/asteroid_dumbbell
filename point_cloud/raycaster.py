@@ -182,7 +182,7 @@ class RayCaster(object):
             intersection = self.castray(ps, pt)
             all_intersections.append(intersection)
 
-        return np.array(all_intersections)
+        return all_intersections
 
     def ispointinside(self, point):
         """Check if a point lies inside the mesh using vtk
