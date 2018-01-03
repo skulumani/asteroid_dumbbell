@@ -94,6 +94,12 @@ com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
 animation.inertial_asteroid_trajectory(time, state, ast, dum, (mesh, ast_axes,
                                                                com, dum_axes))
 
-# TODO second animation to show the points measured of the asteroid
 
 # TODO need to transform the point cloud intersections from the inertial frame into the asteroid frame
+pc_mfig = graphics.mayavi_figure()
+
+# TODO Add a funciton to draw the point cloud
+
+# TODO second animation to show the points measured of the asteroid
+
+
