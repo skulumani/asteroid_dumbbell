@@ -71,7 +71,7 @@ class TestRayCaster():
         psource = np.array([0, 0, 0])
         ptarget = np.array([5, 0, 0])
         intersections = self.caster.castray(psource, ptarget)
-        np.testing.assert_allclose(intersections.shape, (1, 3))
+        np.testing.assert_allclose(intersections.shape, (3))
 
         
 def test_update_raycasting_mesh(): 

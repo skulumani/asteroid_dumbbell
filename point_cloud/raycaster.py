@@ -154,7 +154,8 @@ class RayCaster(object):
 
         # extract intersections for vtkPoints
         intersection = numpy_support.vtk_to_numpy(pointsVTKintersection.GetData())
-        
+        intersection = np.squeeze(intersection)
+
         if intersection.size > 3 and not all_out:
             return intersection[0, :]
         else:
