@@ -1,5 +1,8 @@
-import numpy as np
 import pdb
+
+import numpy as np
+
+from dynamics import asteroid
 from point_cloud import wavefront, raycaster
 
 class TestRayCaster():
