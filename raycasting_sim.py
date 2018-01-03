@@ -61,9 +61,10 @@ while system.successful() and system.t < tf:
 
     # now do the raycasting
     if not (np.floor(t[ii]) % 10):
-        pdb.set_trace()
-        # TODO Move this target definition inside Lidar
-        targets = state[ii, 0:3] + np.linalg.norm(state[ii, 0:3]) * sensor.rotate_fov(state[ii, 6:15].reshape((3,3)))
+        targets = sensor.define_targets(state[ii, 0:3],
+                                        state[ii, 6:15].reshape((3,3)), 
+                                        np.linalg.norm(state[ii, 0:3]))
+
         intersections = caster.castarray(state[ii, 0:3], targets)
 
         # TODO Need to update the caster with the rotated asteroid
