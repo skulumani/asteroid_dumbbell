@@ -1,11 +1,13 @@
 # Class file for the central asteroid
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from point_cloud import wavefront, polyhedron
+import logging
 
 import numpy as np
 import scipy.io
-import logging
+
+from kinematics import attitude
+from point_cloud import wavefront, polyhedron
 
 # TODO: Implement the ability to input a filename for OBJ shape files
 # TODO: Implement a Cython/C++ version of both of these methods
