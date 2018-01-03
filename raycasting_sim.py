@@ -59,7 +59,7 @@ while system.successful() and system.t < tf:
     state[ii, :] = system.integrate(system.t + dt)
 
     # now do the raycasting
-    if not (np.floor(t[ii]) % 10):
+    if not (np.floor(t[ii]) % 1):
         targets = sensor.define_targets(state[ii, 0:3],
                                         state[ii, 6:15].reshape((3,3)), 
                                         np.linalg.norm(state[ii, 0:3]))
@@ -73,6 +73,7 @@ while system.successful() and system.t < tf:
         intersections = caster.castarray(state[ii, 0:3], targets)
 
         point_cloud['time'].append(t[ii])
+        # TODO Add asteroid rotation matrix function to asteroid class
         point_cloud['ast_state'].append(attitude.rot3(t[ii]).reshape(-1))
         point_cloud['sc_state'].append(state[ii,:])
         point_cloud['targets'].append(targets)
@@ -90,9 +91,12 @@ mesh, ast_axes = graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
 
 com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
 
+pc_lines = [graphics.mayavi_addLine(mfig, state[0, 0:3], p) for p in point_cloud['intersections'][0]]
+
 # TODO draw all the sensor raycasting lines
-animation.inertial_asteroid_trajectory(time, state, ast, dum, (mesh, ast_axes,
-                                                               com, dum_axes))
+animation.inertial_asteroid_trajectory(time, state, ast, dum, point_cloud,
+                                       (mesh, ast_axes, com, dum_axes,
+                                        pc_lines))
 
 
 # TODO need to transform the point cloud intersections from the inertial frame into the asteroid frame

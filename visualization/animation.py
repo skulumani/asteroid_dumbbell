@@ -84,11 +84,11 @@ def update_axes(axes_tuple, com, Rb2i):
                         z=[com[2], Rb2i[2, ii]])
 
 @mlab.animate()
-def inertial_asteroid_trajectory(time, state, ast, dum,
+def inertial_asteroid_trajectory(time, state, ast, dum, point_cloud, 
                                  mayavi_objects):
     """Animate the rotation of an asteroid and the motion of SC
     """
-    mesh, ast_axes, com, dum_axes = mayavi_objects
+    mesh, ast_axes, com, dum_axes, pc_lines = mayavi_objects
 
     # animate the rotation fo the asteroid
     ms = mesh.mlab_source
@@ -101,8 +101,11 @@ def inertial_asteroid_trajectory(time, state, ast, dum,
     dum_xs = dum_axes[0].mlab_source
     dum_ys = dum_axes[1].mlab_source
     dum_zs = dum_axes[2].mlab_source
+    
+    pc_sources = [line.mlab_source for line in pc_lines]
 
-    for (t, pos, Rb2i) in zip(time, state[:, 0:3], state[:, 6:15]):
+    for (t, pos, Rb2i, intersections) in zip(time, state[:, 0:3], state[:, 6:15],
+                                             point_cloud['intersections']):
         # rotate teh asteroid
         Ra = attitude.rot3(ast.omega * t, 'c')
         Rb2i = Rb2i.reshape((3,3))
@@ -125,5 +128,8 @@ def inertial_asteroid_trajectory(time, state, ast, dum,
                      z=[pos[2], pos[2]+Rb2i[2,1]])
         dum_zs.reset(x=[pos[0], pos[0]+Rb2i[0,2]], y=[pos[1], pos[1]+Rb2i[1,2]],
                      z=[pos[2], pos[2]+Rb2i[2,2]])
+        
+        for pcs, inter in zip(pc_sources, intersections):
+            pcs.reset(x=[pos[0], inter[0]], y=[pos[1], inter[1]], z=[pos[2], inter[2]])
 
         yield
