@@ -348,4 +348,10 @@ class Asteroid(object):
         #     print("INSIDE ASTEROID!")
 
         return (U, U_grad, U_grad_mat, Ulaplace)
-
+    
+    def rotate_vertices(self, t):
+        """New method to rotate the asteroid vertices
+        """
+        Ra = attitude.rot3(self.omega * t, 'c')
+        new_vertices = Ra.dot(self.V.T).T
+        return new_vertices

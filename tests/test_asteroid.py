@@ -1146,3 +1146,17 @@ class TestAsteroidItokawaOBJ():
 
     def test_polyhedron_potential_Ulaplace(self):
         np.testing.assert_almost_equal(self.Ulap_true, self.Ulap)
+
+def test_rotate_vertices_zero():
+    ast = dynamics.asteroid.Asteroid('castalia', 0, 'obj')
+    t = 0
+    nV = ast.rotate_vertices(t)
+    np.testing.assert_allclose(nV, ast.V)
+
+def test_rotate_vertices_full_period():
+    ast = dynamics.asteroid.Asteroid('castalia', 0, 'obj')
+    t = 2 * np.pi/ast.omega
+    nV = ast.rotate_vertices(t)
+    np.testing.assert_array_almost_equal(nV, ast.V, decimal=3)
+
+
