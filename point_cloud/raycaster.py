@@ -294,3 +294,9 @@ class Lidar(object):
         lidar_arr = R_body2frame.dot(self.lidar_arr.T).T 
 
         return lidar_arr
+
+    def define_targets(self, pos, R_b2f, dist):
+        """Define the targets for use in RayCaster.castarray
+        """
+        targets = pos + dist * self.rotate_fov(R_b2f.reshape((3,3)))
+        return targets
