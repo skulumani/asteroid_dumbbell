@@ -107,7 +107,7 @@ def inertial_asteroid_trajectory(time, state, ast, dum,
         Ra = attitude.rot3(ast.omega * t, 'c')
         Rb2i = Rb2i.reshape((3,3))
         # parse out the vertices x, y, z
-        new_vertices = Ra.dot(ast.V.T).T
+        new_vertices = ast.rotate_vertices(t)
     
         # update asteroid
         ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1], z=new_vertices[:,2])
