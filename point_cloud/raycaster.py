@@ -67,6 +67,14 @@ class RayCaster(object):
 
         return rT
 
+    @staticmethod
+    def updatemesh(v, f, scale=1.0, flag='bsp'):
+        """Recreate the caster object wiht new vertices
+
+        """
+        rT = RayCaster.loadmesh(v, f, scale, flag)
+        return rT
+
     def scalemesh(self, scale):
         """Scales (multiplies) the mesh by scale
 

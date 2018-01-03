@@ -71,3 +71,19 @@ class TestRayCaster():
         np.testing.assert_allclose(intersections.shape, (1, 3))
 
         
+def test_update_raycasting_mesh(): 
+    # load a polyhedron
+    ast = asteroid.Asteroid('castalia', 0, 'obj')
+    v, f = ast.V, ast.F
+    nv = ast.rotate_vertices(0)
+    nf = f
+
+    # define the raycaster object
+    caster = raycaster.RayCaster.loadmesh(v, f, flag='obb', scale=1.0)
+    ncaster = raycaster.RayCaster.updatemesh(nv, nf)
+
+    # test methods of caster
+    V, F = wavefront.polydatatomesh(caster.polydata)
+    nV, nF = wavefront.polydatatomesh(ncaster.polydata)
+
+    np.testing.assert_allclose(V, v)
