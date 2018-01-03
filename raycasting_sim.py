@@ -53,7 +53,6 @@ int_array = []
 state[0, :] = initial_state
 
 ii = 1
-# TODO Add a single function for the asteroid state (in the asteroid class maybe)
 while system.successful() and system.t < tf:
     # integrate the system and save state to an array
     t[ii] = (system.t + dt)
@@ -64,10 +63,15 @@ while system.successful() and system.t < tf:
         targets = sensor.define_targets(state[ii, 0:3],
                                         state[ii, 6:15].reshape((3,3)), 
                                         np.linalg.norm(state[ii, 0:3]))
+        
+        # new asteroid rotation with vertices
+        nv = ast.rotate_vertices(t[ii])
+
+        # update the mesh inside the caster
+        caster = raycaster.RayCaster.updatemesh(nv, ast.F)
 
         intersections = caster.castarray(state[ii, 0:3], targets)
 
-        # TODO Need to update the caster with the rotated asteroid
         point_cloud['time'].append(t[ii])
         point_cloud['ast_state'].append(attitude.rot3(t[ii]).reshape(-1))
         point_cloud['sc_state'].append(state[ii,:])
