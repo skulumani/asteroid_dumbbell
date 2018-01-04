@@ -33,6 +33,8 @@ initial_R = attitude.rot3(np.pi/2).reshape(-1)
 initial_w = np.array([0, 0, 0])
 initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
+# TODO Initialize a coarse asteroid mesh model and combine with piont cloud data
+
 # initialize the raycaster and lidar
 polydata = wavefront.meshtopolydata(ast.V, ast.F)
 caster = raycaster.RayCaster(polydata)
@@ -40,6 +42,8 @@ sensor = raycaster.Lidar(dist=5)
 # try both a controlled and uncontrolled simulation
 # t, istate, astate, bstate = eoms.inertial_eoms_driver(initial_state, time, ast, dum)
 
+# TODO Dynamics should be based on the course model 
+# TODO Asteroid class will need a method to update mesh
 system = integrate.ode(eoms.eoms_controlled_inertial)
 system.set_integrator('lsoda', atol=AbsTol, rtol=RelTol, nsteps=num_steps)
 system.set_initial_value(initial_state, t0)
@@ -73,11 +77,12 @@ while system.successful() and system.t < tf:
         intersections = caster.castarray(state[ii, 0:3], targets)
 
         point_cloud['time'].append(t[ii])
-        # TODO Add asteroid rotation matrix function to asteroid class
         point_cloud['ast_state'].append(ast.rot_ast2int(t[ii]).reshape(-1))
         point_cloud['sc_state'].append(state[ii,:])
         point_cloud['targets'].append(targets)
         point_cloud['intersections'].append(intersections)
+
+    # TODO Eventually call the surface reconstruction function and update asteroid model
 
     # create an asteroid and dumbbell
     ii+= 1
