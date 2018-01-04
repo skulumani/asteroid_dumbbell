@@ -130,6 +130,9 @@ def inertial_asteroid_trajectory(time, state, ast, dum, point_cloud,
                      z=[pos[2], pos[2]+Rb2i[2,2]])
         
         for pcs, inter in zip(pc_sources, intersections):
-            pcs.reset(x=[pos[0], inter[0]], y=[pos[1], inter[1]], z=[pos[2], inter[2]])
-
+            # check if intersection is empty
+            if inter.size > 2:
+                pcs.reset(x=[pos[0], inter[0]], y=[pos[1], inter[1]], z=[pos[2], inter[2]])
+            else:
+                pcs.reset(x=[pos[0], pos[0]+0.01], y=[pos[1], pos[1]+0.01], z=[pos[2], pos[2]+0.01])
         yield

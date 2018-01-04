@@ -85,26 +85,19 @@ while system.successful() and system.t < tf:
 # plot the simulation
 # plotting.animate_inertial_trajectory(t, istate, ast, dum)
 # plotting.plot_controlled_inertial(t, istate, ast, dum, fwidth=1)
-pdb.set_trace()
 graphics.point_cloud_asteroid_frame(point_cloud)
 
-mfig = graphics.mayavi_figure() 
+mfig = graphics.mayavi_figure(size=(800,600)) 
 mesh, ast_axes = graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
 
 com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
 
 pc_lines = [graphics.mayavi_addLine(mfig, state[0, 0:3], p) for p in point_cloud['intersections'][0]]
 
-# TODO draw all the sensor raycasting lines
 animation.inertial_asteroid_trajectory(time, state, ast, dum, point_cloud,
                                        (mesh, ast_axes, com, dum_axes,
                                         pc_lines))
 
-
-# TODO need to transform the point cloud intersections from the inertial frame into the asteroid frame
-pc_mfig = graphics.mayavi_figure()
-
-# TODO Add a funciton to draw the point cloud
 
 # TODO second animation to show the points measured of the asteroid
 
