@@ -403,6 +403,7 @@ def mayavi_addPoint(fig, p, radius=0.1, color=( 0, 0, 1 )):
         return None
     elif p.size > 3:
         # check if an array
+        # TODO Plot all points at once and return a single handle for all of them
         points = []
         for pt in p:
             points.append( mlab.points3d(pt[0], pt[1], pt[2],scale_factor=radius, color=color, figure=fig))
