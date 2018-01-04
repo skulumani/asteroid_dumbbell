@@ -6,12 +6,14 @@ Author
 ------
 Shankar Kulumani		GWU		skulumani@gwu.edu
 """
+import logging
+
 import vtk
 from vtk.util import numpy_support
 from mayavi import mlab
 import numpy as np
+
 from point_cloud import wavefront
-import logging
 
 def draw_polyhedron_vtk(vertices, faces):
     r"""Plot a polyhedron using VTK
