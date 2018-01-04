@@ -452,13 +452,18 @@ def point_cloud_asteroid_frame(point_cloud):
     # rotate each  one by the state of the asteroid
     rot_ast2int = point_cloud['ast_state'] # rotation from asteroid to inertial frame
     intersections = point_cloud['intersections'] # ints in the inertial frame
-    
+    ast_pts = []
+
     mfig = mayavi_figure()
 
     for Ra, pcs in zip(rot_ast2int, intersections):
         for pt in pcs:
             if pt.size > 0:
                 pt_ast = Ra.reshape((3,3)).T.dot(pt)
-                mayavi_addPoint(mfig, pt_ast, radius=0.01)
+                ast_pts.append(pt_ast)
+    
+    ast_pts = np.asarray(ast_pts)
+    mlab.points3d(ast_pts[:, 0], ast_pts[:, 1], ast_pts[:, 2],scale_factor=0.01, 
+                  color=(0, 0, 1), figure=mfig)
     # plot everything in the asteroid frame
 
