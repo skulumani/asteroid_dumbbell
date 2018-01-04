@@ -74,7 +74,7 @@ while system.successful() and system.t < tf:
 
         point_cloud['time'].append(t[ii])
         # TODO Add asteroid rotation matrix function to asteroid class
-        point_cloud['ast_state'].append(attitude.rot3(t[ii]).reshape(-1))
+        point_cloud['ast_state'].append(ast.rot_ast2int(t[ii]).reshape(-1))
         point_cloud['sc_state'].append(state[ii,:])
         point_cloud['targets'].append(targets)
         point_cloud['intersections'].append(intersections)
@@ -85,6 +85,8 @@ while system.successful() and system.t < tf:
 # plot the simulation
 # plotting.animate_inertial_trajectory(t, istate, ast, dum)
 # plotting.plot_controlled_inertial(t, istate, ast, dum, fwidth=1)
+pdb.set_trace()
+graphics.point_cloud_asteroid_frame(point_cloud)
 
 mfig = graphics.mayavi_figure() 
 mesh, ast_axes = graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
