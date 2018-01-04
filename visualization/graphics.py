@@ -7,6 +7,7 @@ Author
 Shankar Kulumani		GWU		skulumani@gwu.edu
 """
 import logging
+import pdb
 
 import vtk
 from vtk.util import numpy_support
@@ -444,3 +445,12 @@ def mayavi_plot_trajectory(fig, pos, color=(1, 0, 0)):
 
     return l
 
+def point_cloud_asteroid_frame(point_cloud):
+    """Input the point cloud data and plot all in the asteroid fixed frame
+    """
+    pdb.set_trace()
+    # rotate each  one by the state of the asteroid
+
+    # plot everything in the asteroid frame
+
+    pass
