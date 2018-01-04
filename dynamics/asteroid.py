@@ -355,3 +355,10 @@ class Asteroid(object):
         Ra = attitude.rot3(self.omega * t, 'c')
         new_vertices = Ra.dot(self.V.T).T
         return new_vertices
+
+    def rot_ast2int(self, t):
+        """Return rotation matrix to transform from asteroid frame to inertial
+        frame
+        """
+
+        return attitude.rot3(self.omega * t, 'c')
