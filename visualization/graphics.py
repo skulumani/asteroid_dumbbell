@@ -448,9 +448,16 @@ def mayavi_plot_trajectory(fig, pos, color=(1, 0, 0)):
 def point_cloud_asteroid_frame(point_cloud):
     """Input the point cloud data and plot all in the asteroid fixed frame
     """
-    pdb.set_trace()
     # rotate each  one by the state of the asteroid
+    rot_ast2int = point_cloud['ast_state'] # rotation from asteroid to inertial frame
+    intersections = point_cloud['intersections'] # ints in the inertial frame
+    
+    mfig = mayavi_figure()
 
+    for Ra, pcs in zip(rot_ast2int, intersections):
+        for pt in pcs:
+            if pt.size > 0:
+                pt_ast = Ra.reshape((3,3)).T.dot(pt)
+                mayavi_addPoint(mfig, pt_ast, radius=0.01)
     # plot everything in the asteroid frame
 
-    pass
