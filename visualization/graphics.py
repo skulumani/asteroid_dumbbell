@@ -451,7 +451,7 @@ def point_cloud_asteroid_frame(point_cloud):
     """
     # rotate each  one by the state of the asteroid
     rot_ast2int = point_cloud['ast_state'] # rotation from asteroid to inertial frame
-    intersections = point_cloud['intersections'] # ints in the inertial frame
+    intersections = point_cloud['inertial_ints'] # ints in the inertial frame
     ast_pts = []
 
     mfig = mayavi_figure()

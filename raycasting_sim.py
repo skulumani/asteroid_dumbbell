@@ -70,22 +70,32 @@ while system.successful() and system.t < tf:
         
         # new asteroid rotation with vertices
         nv = ast.rotate_vertices(t[ii])
-
+        Ra = ast.rot_ast2int(t[ii])
         # update the mesh inside the caster
         caster = raycaster.RayCaster.updatemesh(nv, ast.F)
-
+        
+        # these intersections are points in the inertial frame
         intersections = caster.castarray(state[ii, 0:3], targets)
 
         point_cloud['time'].append(t[ii])
-        point_cloud['ast_state'].append(ast.rot_ast2int(t[ii]).reshape(-1))
+        point_cloud['ast_state'].append(Ra.reshape(-1))
         point_cloud['sc_state'].append(state[ii,:])
         point_cloud['targets'].append(targets)
-        point_cloud['intersections'].append(intersections)
+        point_cloud['inertial_ints'].append(intersections)
+        ast_ints = []
+        for pt in intersections:
+            if pt.size > 0:
+                pt_ast = Ra.T.dot(pt)
+            else:
+                pt_ast = []
+            ast_ints.append(pt_ast)
+
+        point_cloud['ast_ints'].append(ast_ints)
 
     # TODO Eventually call the surface reconstruction function and update asteroid model
 
     # create an asteroid and dumbbell
-    ii+= 1
+    ii += 1
 
 # plot the simulation
 # plotting.animate_inertial_trajectory(t, istate, ast, dum)
@@ -97,7 +107,7 @@ mesh, ast_axes = graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
 
 com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
 
-pc_lines = [graphics.mayavi_addLine(mfig, state[0, 0:3], p) for p in point_cloud['intersections'][0]]
+pc_lines = [graphics.mayavi_addLine(mfig, state[0, 0:3], p) for p in point_cloud['inertial_ints'][0]]
 
 animation.inertial_asteroid_trajectory(time, state, ast, dum, point_cloud,
                                        (mesh, ast_axes, com, dum_axes,
