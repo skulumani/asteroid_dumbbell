@@ -90,7 +90,7 @@ while system.successful() and system.t < tf:
                 pt_ast = []
             ast_ints.append(pt_ast)
 
-        point_cloud['ast_ints'].append(ast_ints)
+        point_cloud['ast_ints'].append(np.asarray(ast_ints))
 
     # TODO Eventually call the surface reconstruction function and update asteroid model
 
