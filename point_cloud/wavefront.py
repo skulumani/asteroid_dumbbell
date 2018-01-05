@@ -128,6 +128,51 @@ def read_obj(filename):
     verts = np.asarray(verts) 
     return verts, faces
 
+def ellipsoid_mesh(a, b, c, density=20):
+    r"""Ellipsoid Mesh model
+
+    verts, faces = ellipsoid_mesh(a, b, c, density)
+
+    Parameters
+    ----------
+    a, b, c : floats
+        Semi axes lengths (x, y, z ) directions respectively in kilometer
+    density : int
+        Density for the sperical coordinate parameterization
+
+    Returns
+    -------
+    verts : (V, 3)
+        Vertices of the ellipsoid
+    faces : (F, 3)
+        Faces of the ellipsoid
+
+    See Also
+    --------
+    reconstruct_numpy : VTK surface reconstruction from vertices
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
+    # define spherical angles
+    theta = np.linspace(-np.pi/2, np.pi/2, num=density)
+    phi = np.linspace(-np.pi, np.pi, num=density)
+    
+    tg, pg = np.meshgrid(theta, phi)
+    # compute the vector
+    x = a * np.cos(tg) * np.cos(pg)
+    y = b * np.cos(tg) * np.sin(pg)
+    z = c * np.sin(tg)
+
+    # add to a list
+    v = np.stack((x.ravel(), y.ravel(), z.ravel()), axis=-1)
+    
+    # now need to do surface reconstruction to get the faces
+    verts, faces = reconstruct_numpy(v)
+
+    return verts, faces
+
 # TODO : Write this function
 def create_points(vertices):
     """Given a (n, 3) numpy array of vertices this will place each one inot the 
