@@ -17,7 +17,7 @@ sensor = raycaster.Lidar(view_axis=np.array([1, 0, 0]), num_step=3)
 # need to translate the sensor and give it a pointing direction
 pos = np.array([5, 0, 0])
 dist = 5 # distance for each raycast
-R = attitude.rot3(np.pi/2)
+R = attitude.rot3(np.pi)
 
 # find the inersections
 # targets = pos + sensor.rotate_fov(R) * dist
