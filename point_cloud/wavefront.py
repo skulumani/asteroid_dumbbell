@@ -261,11 +261,31 @@ def obj_mesh_comparison(filename='./data/itokawa_low.obj'):
     objWriter.SetRenderWindow(renWin)
     objWriter.Write()
 
-# TODO: Create a function to do surface reconstruction from a set of V
 def reconstruct_numpy(verts):
-    """Surface Reconstruction using VTK
-    """
+    r"""Surface Reconstruction using VTK
 
+    v, f = reconstruct_numpy(verts)
+
+    Parameters
+    ----------
+    verts : (n, 3) array
+        Array holding all of the vertices of a point cloud
+
+    Returns
+    -------
+    v : (V, 3) array
+        Array of all the vertices of the mesh
+    f : (F, 3) array
+        Array of triangular facets defining the mesh. 
+
+    Notes
+    -----
+    This is the same format used by the wavefront OBJ files
+    
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
     pointSource = vtk.vtkProgrammableSource()
 
     def read_numpy_points():
