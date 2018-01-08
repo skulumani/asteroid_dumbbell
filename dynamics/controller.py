@@ -1,7 +1,8 @@
-from kinematics import attitude
+import pdb
+
 import numpy as np
 import scipy.linalg
-import pdb
+from kinematics import attitude, sphere
 
 def attitude_controller(time, state, ext_moment, dum, ast, des_att_tuple):
     r"""Geometric attitude controller on SO(3)
