@@ -64,12 +64,16 @@ def simulate():
 
     ii = 1
     while system.successful() and system.t < tf:
+        logger.info('Step : {} Time: {}'.format(ii, t[ii]))
+
         # integrate the system and save state to an array
         t[ii] = (system.t + dt)
         state[ii, :] = system.integrate(system.t + dt)
 
         # now do the raycasting
         if not (np.floor(t[ii]) % 1):
+            logger.info('Raycasting at t = {}'.format(t[ii]))
+
             targets = sensor.define_targets(state[ii, 0:3],
                                             state[ii, 6:15].reshape((3,3)), 
                                             np.linalg.norm(state[ii, 0:3]))
@@ -88,12 +92,17 @@ def simulate():
             point_cloud['sc_state'].append(state[ii,:])
             point_cloud['targets'].append(targets)
             point_cloud['inertial_ints'].append(intersections)
+
+            logger.info('Found {} intersections'.format(len(intersections)))
+
             ast_ints = []
             for pt in intersections:
                 if pt.size > 0:
                     pt_ast = Ra.T.dot(pt)
                 else:
+                    logger.info('No intersection for this point')
                     pt_ast = []
+
                 ast_ints.append(pt_ast)
 
             point_cloud['ast_ints'].append(np.asarray(ast_ints))
