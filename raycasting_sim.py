@@ -102,6 +102,7 @@ def simulate():
             logger.info('Found {} intersections'.format(len(intersections)))
 
             ast_ints = []
+            # TODO Better system to track when rays do not intersect
             for pt in intersections:
                 if pt.size > 0:
                     pt_ast = Ra.T.dot(pt)
