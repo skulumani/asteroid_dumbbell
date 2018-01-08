@@ -105,7 +105,7 @@ def inertial_asteroid_trajectory(time, state, ast, dum, point_cloud,
     pc_sources = [line.mlab_source for line in pc_lines]
 
     for (t, pos, Rb2i, intersections) in zip(time, state[:, 0:3], state[:, 6:15],
-                                             point_cloud['intersections']):
+                                             point_cloud['inertial_ints']):
         # rotate teh asteroid
         Ra = attitude.rot3(ast.omega * t, 'c')
         Rb2i = Rb2i.reshape((3,3))
@@ -129,10 +129,10 @@ def inertial_asteroid_trajectory(time, state, ast, dum, point_cloud,
         dum_zs.reset(x=[pos[0], pos[0]+Rb2i[0,2]], y=[pos[1], pos[1]+Rb2i[1,2]],
                      z=[pos[2], pos[2]+Rb2i[2,2]])
         
-        for pcs, inter in zip(pc_sources, intersections):
-            # check if intersection is empty
-            if inter.size > 2:
-                pcs.reset(x=[pos[0], inter[0]], y=[pos[1], inter[1]], z=[pos[2], inter[2]])
-            else:
-                pcs.reset(x=[pos[0], pos[0]+0.01], y=[pos[1], pos[1]+0.01], z=[pos[2], pos[2]+0.01])
+        # for pcs, inter in zip(pc_sources, intersections):
+        #     # check if intersection is empty
+        #     if inter.size > 2:
+        #         pcs.reset(x=[pos[0], inter[0]], y=[pos[1], inter[1]], z=[pos[2], inter[2]])
+        #     else:
+        #         pcs.reset(x=[pos[0], pos[0]+0.01], y=[pos[1], pos[1]+0.01], z=[pos[2], pos[2]+0.01])
         yield
