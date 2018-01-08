@@ -16,17 +16,23 @@ from visualization import plotting, graphics, animation
 from point_cloud import wavefront, raycaster
 
 # simulate dumbbell moving aroudn asteroid
+
+logger = logging.getLogger(__name__)
+
+logger.info('Initialize asteroid and dumbbell objects')
+
 ast = asteroid.Asteroid('castalia', 4092, 'mat')
 dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
-des_att_func = controller.random_sweep_attitude
+# TODO This function is very slow
+des_att_func = controller.body_fixed_pointing_attitude
 des_tran_func = controller.inertial_fixed_state
 AbsTol = 1e-9
 RelTol = 1e-9
 
 # TODO Add logger everywhere to know what stuff is happening
+# TODO Look into the profiler for speed
 
 def simulate():
-    logger = logging.getLogger(__name__)
 
     num_steps = int(1e4)
     time = np.linspace(0, num_steps, num_steps)
@@ -101,7 +107,7 @@ def simulate():
                     pt_ast = Ra.T.dot(pt)
                 else:
                     logger.info('No intersection for this point')
-                    pt_ast = []
+                    pt_ast = np.squeeze(state[ii, 0:3])
 
                 ast_ints.append(pt_ast)
 
