@@ -36,6 +36,32 @@ class TestInertialDesiredAttitude():
         np.testing.assert_array_almost_equal(self.Rd_dot,
                 self.Rd.dot(attitude.hat_map(self.ang_vel_d)))
  
+class TestInertialDesiredAttitudePerurbedBodyFixedHovering():
+    
+    Rd, Rd_dot, ang_vel_d, ang_vel_d_dot = controller.random_sweep_attitude(1, state, cone_angle=2)
+
+    def test_desired_rotation_matrix_determinant(self):
+        np.testing.assert_almost_equal(np.linalg.det(self.Rd), 1) 
+    
+    def test_desired_rotation_matrix_orthogonal(self):
+        np.testing.assert_array_almost_equal(self.Rd.T.dot(self.Rd), 
+                np.eye(3,3))
+
+    def test_desired_attitude_satifies_kinematics(self):
+        np.testing.assert_array_almost_equal(self.Rd_dot,
+                self.Rd.dot(attitude.hat_map(self.ang_vel_d)))
+
+    def test_z_axis_aligned_with_positive_pole(self):
+        bodyz_inertial = self.Rd[:,2]
+        z_inertial = np.array([0, 0, 1])
+        angle = np.arccos(np.dot(bodyz_inertial, z_inertial))
+        np.testing.assert_array_less(angle, np.pi/2)
+
+    def test_angle_less_than_required(self):
+        b1 = - pos/ np.linalg.norm(pos)
+        b1pert = np.squeeze(self.Rd[:, 0])
+        
+
 class TestInertialDesiredAttitudeBodyFixedHovering():
     
     Rd, Rd_dot, ang_vel_d, ang_vel_d_dot = controller.body_fixed_pointing_attitude(1, state)
