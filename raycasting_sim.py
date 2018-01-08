@@ -17,7 +17,7 @@ from point_cloud import wavefront, raycaster
 # simulate dumbbell moving aroudn asteroid
 ast = asteroid.Asteroid('castalia', 4092, 'mat')
 dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
-des_att_func = controller.random_sweep_attitude
+des_att_func = controller.body_fixed_pointing_attitude
 des_tran_func = controller.inertial_fixed_state
 AbsTol = 1e-9
 RelTol = 1e-9
