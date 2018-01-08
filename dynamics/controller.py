@@ -616,7 +616,6 @@ def desired_translation(time, alpha=2*np.pi/100):
 
     return (x_des, xd_des, xdd_des)
 
-# TODO Add a attitude control function to randomly point the attitude within a cone
 def random_sweep_attitude(time, state, cone_angle=2):
     r"""Point at asteroid and randomly sweep attitude
 
@@ -671,7 +670,7 @@ def random_sweep_attitude(time, state, cone_angle=2):
     b1_des = - pos / np.linalg.norm(pos)
 
     # now need to uniformly perturb the vector
-    b1_des = sphere.perturb_vec(q, cone_half_angle=2)
+    b1_des = sphere.perturb_vec(b1_des, cone_half_angle=cone_angle)
 
     b3_des = np.array([0, 0, 1]) - (np.array([0, 0, 1]).dot(b1_des) * b1_des)   # ensure the body z axis is always parallel with the asteroid/inertial z axis
     b3_des = b3_des / np.linalg.norm(b3_des)
