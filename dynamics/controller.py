@@ -616,6 +616,76 @@ def desired_translation(time, alpha=2*np.pi/100):
 
     return (x_des, xd_des, xdd_des)
 
+# TODO Add a attitude control function to randomly point the attitude within a cone
+def random_sweep_attitude(time, state, cone_angle=2):
+    r"""Point at asteroid and randomly sweep attitude
+
+    Rd, Rd_dot, ang_vel_d, ang_vel_d_dot = random_sweep_attitude(time, state, cone_angle=2)
+
+    Parameters
+    ----------
+    time : float
+        Current simulation time in sec
+    state : (18, ) numpy array
+        Current state of the vehicle 
+    cone_angle: int
+        Cone half angle for random sweeping. The center of the FOV will 
+        uniformly be placed within this cone
+
+    Returns
+    -------
+    Rd : (3, 3) numpy array
+        Desired attitude - rotation matrix defining transformation from 
+        body frame to the inertial frame
+    Rd_dot : (3, 3) numpy array
+        Time derivative of the rotation matrix
+    ang_vel_d : (3,) numpy array
+        Angular velocity of body frame wrt inertial frame and defined in the
+        body frame
+    ang_vel_d_dot : (3,)
+        Time derivative of desired angular velocity 
+
+    See Also
+    --------
+    body_fixed_pointing_attitude : Another function with no random sweeping
+
+    Notes
+    -----
+    The desired attitude and angular velocity satisfy the following
+    relationship (Poisson Equation).
+
+    .. math:: \dot{R}_d = R_d \hat \omega_d
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """  
+    # extract out the states
+    pos = state[0:3] # location of the center of mass in the inertial frame
+    vel = state[3:6] # vel of com in inertial frame
+    R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+    ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
+
+    # compute the desired attitude to ensure that the body fixed x axis is pointing at the origin/asteroid
+    # each column of the rotation matrix is the i-th body fixed axis as represented in the inertial frame
+    b1_des = - pos / np.linalg.norm(pos)
+
+    # now need to uniformly perturb the vector
+    b1_des = sphere.perturb_vec(q, cone_half_angle=2)
+
+    b3_des = np.array([0, 0, 1]) - (np.array([0, 0, 1]).dot(b1_des) * b1_des)   # ensure the body z axis is always parallel with the asteroid/inertial z axis
+    b3_des = b3_des / np.linalg.norm(b3_des)
+    b2_des = np.cross(b3_des, b1_des)
+
+    Rd = np.stack((b1_des, b2_des, b3_des), axis=1)
+
+    Rd_dot = np.zeros((3,3))
+
+    ang_vel_d = np.zeros(3) 
+    ang_vel_d_dot = np.zeros(3) 
+
+    return (Rd, Rd_dot, ang_vel_d, ang_vel_d_dot)
+
 def body_fixed_pointing_attitude(time, state):
     """Desired attitude to ensure that the x axis is always pointing at the origin (asteroid)
 
