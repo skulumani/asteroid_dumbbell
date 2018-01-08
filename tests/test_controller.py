@@ -61,6 +61,7 @@ class TestInertialDesiredAttitudePerurbedBodyFixedHovering():
         b1 = - pos/ np.linalg.norm(pos)
         b1pert = np.squeeze(self.Rd[:, 0])
         
+        np.testing.assert_array_less(np.arccos(np.dot(b1, b1pert)), np.deg2rad(2))
 
 class TestInertialDesiredAttitudeBodyFixedHovering():
     
