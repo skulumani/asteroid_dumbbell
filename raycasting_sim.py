@@ -31,7 +31,6 @@ def initialize():
 
     ast = asteroid.Asteroid('castalia', 4092, 'mat')
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
-    # TODO This function is very slow
     des_att_func = controller.random_sweep_attitude
     des_tran_func = controller.inertial_fixed_state
     AbsTol = 1e-9
@@ -113,7 +112,6 @@ def simulate():
             logger.info('Found {} intersections'.format(len(intersections)))
 
             ast_ints = []
-            # TODO Better system to track when rays do not intersect
             for pt in intersections:
                 if pt.size > 0:
                     pt_ast = Ra.T.dot(pt)
@@ -150,9 +148,9 @@ def animate(time, state, ast, dum, point_cloud):
                                         (mesh, ast_axes, com, dum_axes,
                                             pc_lines))
 
-    # TODO second animation to show the points measured of the asteroid
 
 if __name__ == "__main__":
+    # TODO Measure time for run
     logging.basicConfig(filename='raycasting.txt', filemode='w', level=logging.INFO)
     time, state, point_cloud = simulate()
 
@@ -160,6 +158,7 @@ if __name__ == "__main__":
     np.savez('raycasting_sim', time=time, state=state,
              point_cloud=point_cloud)
     
+
     # to access the data again
     # data = np.load(filename)
     # point_cloud = data['point_cloud'][()]
