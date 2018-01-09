@@ -667,10 +667,11 @@ def random_sweep_attitude(time, state, cone_angle=2):
 
     # compute the desired attitude to ensure that the body fixed x axis is pointing at the origin/asteroid
     # each column of the rotation matrix is the i-th body fixed axis as represented in the inertial frame
-    b1_des = - pos / np.linalg.norm(pos)
-
+    vec = - pos + 0.01 * np.array([np.sin(time), np.cos(time), np.sin(time)])
+    b1_des = vec / np.linalg.norm(vec)
+    
     # now need to uniformly perturb the vector
-    b1_des = sphere.perturb_vec(b1_des, cone_half_angle=cone_angle)
+    # b1_des = sphere.perturb_vec(b1_des, cone_half_angle=2)
 
     b3_des = np.array([0, 0, 1]) - (np.array([0, 0, 1]).dot(b1_des) * b1_des)   # ensure the body z axis is always parallel with the asteroid/inertial z axis
     b3_des = b3_des / np.linalg.norm(b3_des)
