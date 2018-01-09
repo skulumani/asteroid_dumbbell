@@ -159,5 +159,8 @@ if __name__ == "__main__":
     # save data to a file
     np.savez('raycasting_sim', time=time, state=state,
              point_cloud=point_cloud)
-
+    
+    # to access the data again
+    # data = np.load(filename)
+    # point_cloud = data['point_cloud'][()]
 
