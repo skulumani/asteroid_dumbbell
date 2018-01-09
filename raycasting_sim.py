@@ -45,8 +45,8 @@ def simulate():
 
     ast, dum, des_att_func, des_tran_func, AbsTol, RelTol = initialize()
 
-    num_steps = int(1e3)
-    time = np.linspace(0, num_steps, num_steps)
+    num_steps = int(1e4)
+    time = np.linspace(0, 15000, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
 
@@ -139,7 +139,7 @@ def simulate():
 def animate(time, state, ast, dum, point_cloud):
     graphics.point_cloud_asteroid_frame(point_cloud)
 
-    mfig = graphics.mayavi_figure(size=(800,600)) 
+    mfig = graphics.mayavi_figure(size=(800,600))
     mesh, ast_axes = graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
 
     com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
