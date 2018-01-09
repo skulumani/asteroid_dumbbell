@@ -153,11 +153,11 @@ def animate(time, state, ast, dum, point_cloud):
     # TODO second animation to show the points measured of the asteroid
 
 if __name__ == "__main__":
-    logging.basicConfig(filename='./data/raycasting.log', filemode='w', level=logging.INFO)
+    logging.basicConfig(filename='raycasting.txt', filemode='w', level=logging.INFO)
     time, state, point_cloud = simulate()
 
     # save data to a file
-    np.savez('./data/raycasting_sim', time=time, state=state,
+    np.savez('raycasting_sim', time=time, state=state,
              point_cloud=point_cloud)
 
 
