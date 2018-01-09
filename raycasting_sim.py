@@ -17,24 +17,36 @@ from point_cloud import wavefront, raycaster
 
 # simulate dumbbell moving aroudn asteroid
 
-logger = logging.getLogger(__name__)
-
-logger.info('Initialize asteroid and dumbbell objects')
-
-ast = asteroid.Asteroid('castalia', 4092, 'mat')
-dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
-# TODO This function is very slow
-des_att_func = controller.body_fixed_pointing_attitude
-des_tran_func = controller.inertial_fixed_state
-AbsTol = 1e-9
-RelTol = 1e-9
-
 # TODO Add logger everywhere to know what stuff is happening
+
 # TODO Look into the profiler for speed
+
+
+logging.basicConfig(filename='/tmp/raycasting.log', filemode='w', level=logging.INFO)
+
+def initialize():
+    """Initialize all the things for the simulation
+    """
+    logger = logging.getLogger(__name__)
+    logger.info('Initialize asteroid and dumbbell objects')
+
+    ast = asteroid.Asteroid('castalia', 4092, 'mat')
+    dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
+    # TODO This function is very slow
+    des_att_func = controller.random_sweep_attitude
+    des_tran_func = controller.inertial_fixed_state
+    AbsTol = 1e-9
+    RelTol = 1e-9
+    
+    return ast, dum, des_att_func, des_tran_func, AbsTol, RelTol
 
 def simulate():
 
-    num_steps = int(1e4)
+    logger = logging.getLogger(__name__)
+
+    ast, dum, des_att_func, des_tran_func, AbsTol, RelTol = initialize()
+
+    num_steps = int(1e3)
     time = np.linspace(0, num_steps, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -57,7 +69,7 @@ def simulate():
     # TODO Dynamics should be based on the course model 
     # TODO Asteroid class will need a method to update mesh
     system = integrate.ode(eoms.eoms_controlled_inertial)
-    system.set_integrator('lsoda', atol=AbsTol, rtol=RelTol, nsteps=num_steps)
+    system.set_integrator('lsoda', atol=AbsTol, rtol=RelTol, nsteps=1e4)
     system.set_initial_value(initial_state, t0)
     system.set_f_params(ast, dum, des_att_func, des_tran_func)
 
@@ -70,12 +82,12 @@ def simulate():
 
     ii = 1
     while system.successful() and system.t < tf:
-        logger.info('Step : {} Time: {}'.format(ii, t[ii]))
 
         # integrate the system and save state to an array
         t[ii] = (system.t + dt)
         state[ii, :] = system.integrate(system.t + dt)
 
+        logger.info('Step : {} Time: {}'.format(ii, t[ii]))
         # now do the raycasting
         if not (np.floor(t[ii]) % 1):
             logger.info('Raycasting at t = {}'.format(t[ii]))
@@ -108,7 +120,7 @@ def simulate():
                     pt_ast = Ra.T.dot(pt)
                 else:
                     logger.info('No intersection for this point')
-                    pt_ast = np.squeeze(state[ii, 0:3])
+                    pt_ast = np.array([np.nan, np.nan, np.nan])
 
                 ast_ints.append(pt_ast)
 
@@ -122,11 +134,12 @@ def simulate():
     # plot the simulation
     # plotting.animate_inertial_trajectory(t, istate, ast, dum)
     # plotting.plot_controlled_inertial(t, istate, ast, dum, fwidth=1)
-    graphics.point_cloud_asteroid_frame(point_cloud)
 
     return time, state, point_cloud
 
 def animate(time, state, ast, dum, point_cloud):
+    graphics.point_cloud_asteroid_frame(point_cloud)
+
     mfig = graphics.mayavi_figure(size=(800,600)) 
     mesh, ast_axes = graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
 
@@ -139,5 +152,11 @@ def animate(time, state, ast, dum, point_cloud):
                                             pc_lines))
 
     # TODO second animation to show the points measured of the asteroid
+
+if __name__ == "__main__":
+    time, state, point_cloud = simulate()
+
+    # save data to a file
+    np.save('./data/raycasting_sim', (time, state, point_cloud))
 
 
