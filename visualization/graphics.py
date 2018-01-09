@@ -458,7 +458,7 @@ def point_cloud_asteroid_frame(point_cloud):
 
     for pcs in intersections:
         for pt in pcs:
-            if len(pt) > 0:
+            if not np.isnan(pt).any():
                 ast_pts.append(pt)
    
     ast_pts = np.asarray(ast_pts)
