@@ -22,7 +22,6 @@ from point_cloud import wavefront, raycaster
 # TODO Look into the profiler for speed
 
 
-logging.basicConfig(filename='/tmp/raycasting.log', filemode='w', level=logging.INFO)
 
 def initialize():
     """Initialize all the things for the simulation
@@ -154,9 +153,11 @@ def animate(time, state, ast, dum, point_cloud):
     # TODO second animation to show the points measured of the asteroid
 
 if __name__ == "__main__":
+    logging.basicConfig(filename='./data/raycasting.log', filemode='w', level=logging.INFO)
     time, state, point_cloud = simulate()
 
     # save data to a file
-    np.save('./data/raycasting_sim', (time, state, point_cloud))
+    np.savez('./data/raycasting_sim', time=time, state=state,
+             point_cloud=point_cloud)
 
 
