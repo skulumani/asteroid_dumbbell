@@ -149,6 +149,34 @@ def animate(time, state, ast, dum, point_cloud):
                                             pc_lines))
 
 
+def reconstruct(time, state, ast, dum, point_cloud):
+    """Reconstruct the shape given the simulation results
+    """
+
+    # transform all the point cloud to a consistent reference frame (ast frame)
+    rot_ast2int = point_cloud['ast_state']
+    intersections = point_cloud['ast_ints']
+    ast_pts = []
+    
+    for pcs in intersections:
+        for pt in pcs:
+            if not np.isnan(pt).any():
+                ast_pts.append(pt)
+                
+    ast_pts = np.asarray(ast_pts)
+
+    # pick a subset of the total amount point cloud
+    
+    # concatenate the ast_pts with the ellipsoid mesh
+
+
+    # call the reconstruct function
+    v, f = wavefront.reconstruct_numpy(ast_pts)
+
+    # plot and visualize
+    mfig = graphics.mayavi_figure(size=(800, 600))
+    mesh, ast_axes = graphics.draw_polyhedron_mayavi(v, f, mfig)
+
 if __name__ == "__main__":
     # TODO Measure time for run
     logging.basicConfig(filename='raycasting.txt', filemode='w', level=logging.INFO)
