@@ -13,3 +13,9 @@
 ### Lissajous Curve
 1. 2017-09-11T22:30:43_inertial_no_ast_rotation_lissajous.hdf5 - loop in the x=3 plane while looking at asteroid
 
+### Raycasting
+
+1. 20180110_raycasting_castalia.npz - single rotational period of castalia with
+the spacecraft at a fixed position in inertial space.
+Use script raycasting_sim.py from c43ca9b to rerun. 
+That script also has functions for plotting
