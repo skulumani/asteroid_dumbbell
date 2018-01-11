@@ -343,7 +343,7 @@ def reconstruct_numpy(verts):
     pointSource.SetExecuteMethod(read_numpy_points)
 
     surf = vtk.vtkSurfaceReconstructionFilter()
-    surf.SetNeighborhoodSize(1000) # a low value makes a craggly surface
+    surf.SetNeighborhoodSize(10) # a low value makes a craggly surface
     surf.SetInputConnection(pointSource.GetOutputPort())
     
     cf = vtk.vtkContourFilter()
