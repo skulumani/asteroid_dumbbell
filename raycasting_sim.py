@@ -170,11 +170,9 @@ def reconstruct(time, state, ast, dum, point_cloud):
     # load the ellipsoid mesh
     ve, _ = wavefront.ellipsoid_mesh(ast.axes[0], ast.axes[1], ast.axes[2], density=20)
 
-    # concatenate the ast_pts with the ellipsoid mesh
-    # ast_pts = np.concatenate((ast_pts, ve), axis=0)
-    
+    # TODO Need an intelligent method of combining shape models to fill in gaps
     # call the reconstruct function
-    v, f = wavefront.reconstruct_numpy(ast_pts)
+    v, f = wavefront.reconstruct_numpy(ve)
 
     # plot and visualize
     mfig = graphics.mayavi_figure(size=(800, 600))
