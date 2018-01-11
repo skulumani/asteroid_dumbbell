@@ -167,15 +167,19 @@ def reconstruct(time, state, ast, dum, point_cloud):
 
     # pick a subset of the total amount point cloud
     
+    # load the ellipsoid mesh
+    ve, _ = wavefront.ellipsoid_mesh(ast.axes[0], ast.axes[1], ast.axes[2], density=20)
+
     # concatenate the ast_pts with the ellipsoid mesh
-
-
+    # ast_pts = np.concatenate((ast_pts, ve), axis=0)
+    
     # call the reconstruct function
     v, f = wavefront.reconstruct_numpy(ast_pts)
 
     # plot and visualize
     mfig = graphics.mayavi_figure(size=(800, 600))
     mesh, ast_axes = graphics.draw_polyhedron_mayavi(v, f, mfig)
+    points = graphics.mayavi_points3d(ast_pts, mfig, scale=0.01)
 
 if __name__ == "__main__":
     # TODO Measure time for run
