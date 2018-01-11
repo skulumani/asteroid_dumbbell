@@ -96,11 +96,11 @@ class Asteroid(object):
             self.logger.info('Polyhedron Model : {} faces {} vertices'.format(self.F.shape[0],
                                                                               self.V.shape[0]))
         
-        self.__initAsteroid()
+        self.__initasteroid()
         # compute a bunch of parameters for the polyhedron model
         self.asteroid_grav = self.polyhedron_shape_input()
     
-    def __initAsteroid(self):
+    def __initasteroid(self):
         """Initialize the asteroid properties
         """
         # define the mass properties of the asteroid
@@ -376,4 +376,5 @@ class Asteroid(object):
         f: faces
         name: name of the asteroid
         """
+
         pass
