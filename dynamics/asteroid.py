@@ -96,8 +96,15 @@ class Asteroid(object):
             self.logger.info('Polyhedron Model : {} faces {} vertices'.format(self.F.shape[0],
                                                                               self.V.shape[0]))
         
+        self.__initAsteroid()
+        # compute a bunch of parameters for the polyhedron model
+        self.asteroid_grav = self.polyhedron_shape_input()
+    
+    def __initAsteroid(self):
+        """Initialize the asteroid properties
+        """
         # define the mass properties of the asteroid
-        if name == 'castalia':
+        if self.name == 'castalia':
             self.M = 1.4091e12
             self.sigma = 2.1  # g/cm^3
             self.axes = np.array([1.6130, 0.9810, 0.8260]) / 2.0
@@ -105,24 +112,24 @@ class Asteroid(object):
 
             # self.C20 = -7.275e-2
             # self.C22 = 2.984e-2
-        elif name == 'itokawa':
+        elif self.name == 'itokawa':
             self.M = 3.51e10
             self.sigma = 1.9  # g/cm^3
             self.axes = np.array([535, 294, 209]) / 1.0e3  # size in meters
             self.omega = 2 * np.pi / 12.132 / 3600
 
-        elif name == 'eros':
+        elif self.name == 'eros':
             self.M = 4.463e-4 / self.G
             self.sigma = 2.67 # g/cm^3
             self.axes = np.array([34.4, 11.7, 11.7])  # size in kilometers
             self.omega = 2 * np.pi / 5.27 / 3600
-        elif name == 'cube':
+        elif self.name == 'cube':
             self.M = 1
             self.sigma = 1
             self.axes=np.array([0.9, 1.0, 1.1])
             self.omega = 1
         else:
-            print("Unknown asteroid.")
+            self.logger.error('Unknown asteroid name : {}'.format(self.name))
 
         self.mu = self.G * self.M
         self.sigma = self.sigma / 1000 * \
@@ -152,9 +159,6 @@ class Asteroid(object):
         self.long = self.long[index]
         self.lat = self.lat[index]
 
-        # compute a bunch of parameters for the polyhedron model
-        self.asteroid_grav = self.polyhedron_shape_input()
-    
     # TODO: Add documentation
     def polyhedron_shape_input(self):
         """Precomputes parameters for a given polyhedron shape model
@@ -362,3 +366,14 @@ class Asteroid(object):
         """
 
         return attitude.rot3(self.omega * t, 'c')
+
+    # TODO Add a function to reintialize the asteroid object given v, f (from reconstruct)
+    @staticmethod
+    def loadmesh(v, f, name):
+        """Create an asteroid object given a mesh model
+
+        v: vertices
+        f: faces
+        name: name of the asteroid
+        """
+        pass
