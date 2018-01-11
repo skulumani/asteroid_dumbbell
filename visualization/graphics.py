@@ -446,6 +446,15 @@ def mayavi_plot_trajectory(fig, pos, color=(1, 0, 0)):
 
     return l
 
+def mayavi_points3d(points, figure, scale=0.1, color=(0, 0, 1)):
+    """Draw all the points in (n, 3)
+    """
+
+    p = mlab.points3d(points[:, 0], points[:, 1], points[:, 2],
+                      scale_factor=scale, color=color, figure=figure)
+    
+    return p
+
 def point_cloud_asteroid_frame(point_cloud):
     """Input the point cloud data and plot all in the asteroid fixed frame
     """
