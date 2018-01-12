@@ -367,14 +367,38 @@ class Asteroid(object):
 
         return attitude.rot3(self.omega * t, 'c')
 
-    # TODO Add a function to reintialize the asteroid object given v, f (from reconstruct)
-    @staticmethod
-    def loadmesh(v, f, name):
-        """Create an asteroid object given a mesh model
+    def loadmesh(self, v, f, name):
+        r"""Update asteroid instance with the given V, F mesh
 
-        v: vertices
-        f: faces
-        name: name of the asteroid
-        """
+        ast = ast.loadmesh(v, f, name)
 
-        pass
+        Parameters
+        ----------
+        v : (n, 3) numpy array
+            Array defining the vertices of the mesh
+        f : (n, 3) numpy array
+            Array defining the topology of the mesh. Each row defines the 
+            vertices which make up the respective face
+        name : str  
+            String name defining the asteroid. Used to generate the properties
+
+        Returns
+        -------
+        self : returns the class instance
+
+        See Also
+        --------
+        __initasteroid : initialize the asteroid properties
+        self.asteroid_grav : compute the polyhedron model parameters
+
+        Author
+        ------
+        Shankar Kulumani		GWU		skulumani@gwu.edu
+        """ 
+        self.F = f
+        self.V = v
+        self.name = name
+        self.__initasteroid()
+        self.asteroid_grav = self.polyhedron_shape_input()
+
+        return self
