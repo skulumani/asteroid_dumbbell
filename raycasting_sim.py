@@ -172,12 +172,16 @@ def reconstruct(time, state, ast, dum, point_cloud):
 
     # TODO Need an intelligent method of combining shape models to fill in gaps
     # call the reconstruct function
-    v, f = wavefront.reconstruct_numpy(ve)
+    ast_pts = np.concatenate((ast_pts, ve), axis=0)
+
+    v, f = wavefront.reconstruct_numpy(ast_pts)
 
     # plot and visualize
     mfig = graphics.mayavi_figure(size=(800, 600))
     mesh, ast_axes = graphics.draw_polyhedron_mayavi(v, f, mfig)
-    points = graphics.mayavi_points3d(ast_pts, mfig, scale=0.01)
+    points = graphics.mayavi_points3d(ve, mfig, scale=0.01)
+    
+    return v, f
 
 if __name__ == "__main__":
     # TODO Measure time for run
