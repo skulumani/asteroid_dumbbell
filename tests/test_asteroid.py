@@ -1,5 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import numpy as np
+
 import dynamics.asteroid
 from point_cloud import wavefront
 
@@ -1158,5 +1160,38 @@ def test_rotate_vertices_full_period():
     t = 2 * np.pi/ast.omega
     nV = ast.rotate_vertices(t)
     np.testing.assert_array_almost_equal(nV, ast.V, decimal=3)
+
+class TestAsteroidMeshLoading():
+
+    # generate a mesh
+    ve, fe = wavefront.ellipsoid_mesh(1, 1, 1, density=20)
+    # create an asteroid instance and load the mesh into it
+    ast_i = dynamics.asteroid.Asteroid('itokawa', 256, 'mat')
+    ast_e = ast_i.loadmesh(ve, fe, 'castalia')
+
+    state = np.array([2, 0, 0])
+
+    (U, U_grad, U_grad_mat, Ulaplace) = ast_e.polyhedron_potential(state)
+    def test_asteroid_name(self):
+        # do some testing
+        np.testing.assert_string_equal(self.ast_e.name, 'castalia')
+
+    def test_vertices_shape(self):
+        np.testing.assert_allclose(self.ast_e.V.shape, self.ve.shape)
+
+    def test_faces_shape(self):
+        np.testing.assert_allclose(self.ast_e.F.shape, self.fe.shape)
+
+    def test_potential(self):
+        np.testing.assert_equal(np.isscalar(self.U), True)
+    
+    def test_gradient(self):
+        np.testing.assert_allclose(self.U_grad.shape, (3,))
+
+    def test_gradient_matrix(self):
+        np.testing.assert_allclose(self.U_grad_mat.shape, (3, 3))
+
+    def test_laplace(self):
+        np.testing.assert_almost_equal(self.Ulaplace, 0)
 
 
