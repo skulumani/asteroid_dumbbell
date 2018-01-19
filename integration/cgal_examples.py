@@ -25,4 +25,5 @@ def points_and_segments():
     
     print("m = {}".format(m))
     print("sqdist(seg(p,q, m)) = {}".format(kernel.squared_distance(s, m)))
+    print("s = {}".format(s))
 
