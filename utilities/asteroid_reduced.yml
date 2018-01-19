@@ -2,8 +2,10 @@ name: asteroid
 channels:
 - menpo
 - anaconda
+- conda-forge
 - defaults
 dependencies:
+- cgal
 - astropy
 - h5py
 - ipython
