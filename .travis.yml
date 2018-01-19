@@ -28,6 +28,7 @@ script:
     # - pytest tests/test_dumbell.py
     - pytest tests/test_eom.py
     - pytest tests/test_lidar.py
+    - pytest tests/test_cgal.py
 after_success:
     - coveralls
 
