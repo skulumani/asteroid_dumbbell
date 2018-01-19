@@ -32,7 +32,8 @@ echo "Creating the asteroid environment"
 # setup development enviornment
 if [ -d "$HOME/anaconda3/envs/asteroid" ]; then
     echo "asteroid enviornment exists. Just update"
-    conda env update -n asteroid ./utilities/asteroid_reduced.yml
+    conda install anaconda-client
+    conda env update --name asteroid ./utilities/asteroid_reduced.yml
 else
     echo "No asteroid enviornment"
     conda env create --file ./utilities/asteroid_reduced.yml
