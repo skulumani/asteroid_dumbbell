@@ -583,4 +583,22 @@ class TestDistArray():
         dist, ind = wavefront.dist_array(self.pt, self.array)
         np.testing.assert_allclose(ind, 1)
         np.testing.assert_allclose(dist, np.linalg.norm([4, -1, -1]))
-    
+
+class TestSignOfLargest():
+
+    def test_positive_numbers(self):
+
+        array = np.arange(1, 5)
+        sgn = wavefront.sign_of_largest(array)
+        np.testing.assert_allclose(sgn, 1)
+
+    def test_with_zero(self):
+        array = np.arange(-1, 3)
+        sgn = wavefront.sign_of_largest(array)
+        np.testing.assert_allclose(sgn, 1)
+
+    def test_negative_numbers(self):
+        array = np.arange(-10, 5)
+        sgn = wavefront.sign_of_largest(array)
+        np.testing.assert_allclose(sgn, -1)
+

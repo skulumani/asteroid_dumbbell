@@ -30,6 +30,7 @@ Shankar Kulumani		GWU		skulumani@gwu.edu
 """
 import logging
 from multiprocessing import Pool
+import pdb
 
 import numpy as np
 import vtk
@@ -1180,6 +1181,32 @@ def dist_array(pt, array):
     dist = np.einsum('ij,ij->i', delta, delta)
     ind = np.argmin(dist)
     return np.sqrt(dist[ind]), ind
+
+def sign_of_largest(array):
+    r"""Return sign of largest element of array
+
+    sgn = sign_of_largest(array)
+
+    Parameters
+    ----------
+    array : numpy array (n,)
+        input array. Should be one dimensional
+
+    Returns
+    -------
+    sgn : int
+        Sign of largest element. Sign will either be 1 or -1. If largest 
+        element is zero then sgn = 1
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
+    index = np.argmax(np.absolute(array))
+    sgn = np.sign(array[ index ])
+    if sgn == 0:
+        sgn = 1
+    return sgn
 
 def point2trimesh():
     """Find the distance from a point to a triangular mesh surface
