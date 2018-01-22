@@ -27,6 +27,7 @@ dependencies:
 - traitsui
 - vtk
 - pip:
+  - ipdb
   - line-profiler
   - snakeviz
   - astro
