@@ -243,6 +243,13 @@ class TestReadingCubeOBJ():
         np.testing.assert_allclose(self.e3_normal.shape, (self.num_f, 3))
     def test_center_face(self):
         np.testing.assert_allclose(self.center_face.shape, (self.num_f, 3))
+    def test_normal_face_function(self):
+        normal_face = wavefront.normal_face(self.v, self.f)
+        np.testing.assert_allclose(normal_face, self.normal_face)
+    def test_center_face_function(self):
+        cof = wavefront.center_of_face(self.v, self.f)
+        np.testing.assert_allclose(cof, self.center_face)
+
 class TestEdgeSearchingItokawaMat32():
     # load mat file
     mat = scipy.io.loadmat('./data/shape_model/ITOKAWA/itokawa_model.mat')
@@ -352,6 +359,13 @@ class TestEdgeSearchingItokawaMat32():
         np.testing.assert_allclose(self.e3_ind1b_new, self.e3_ind1b)
         np.testing.assert_allclose(self.e3_ind2b_new, self.e3_ind2b)
         np.testing.assert_allclose(self.e3_ind3b_new, self.e3_ind3b)
+    def test_normal_face_function(self):
+        normal_face = wavefront.normal_face(self.v, self.f)
+        np.testing.assert_allclose(normal_face, self.normal_face)
+    def test_center_face_function(self):
+        cof = wavefront.center_of_face(self.v, self.f)
+        np.testing.assert_allclose(cof, self.center_face)
+
 class TestEdgeSearchingItokawaMat2048():
     # load mat file
     mat = scipy.io.loadmat('./data/shape_model/ITOKAWA/itokawa_model.mat')
@@ -461,6 +475,12 @@ class TestEdgeSearchingItokawaMat2048():
         np.testing.assert_allclose(self.e3_ind1b_new, self.e3_ind1b)
         np.testing.assert_allclose(self.e3_ind2b_new, self.e3_ind2b)
         np.testing.assert_allclose(self.e3_ind3b_new, self.e3_ind3b)
+    def test_normal_face_function(self):
+        normal_face = wavefront.normal_face(self.v, self.f)
+        np.testing.assert_allclose(normal_face, self.normal_face)
+    def test_center_face_function(self):
+        cof = wavefront.center_of_face(self.v, self.f)
+        np.testing.assert_allclose(cof, self.center_face)
 
 class TestEdgeSearchingCastaliaMat4092():
     # load mat file
@@ -571,6 +591,13 @@ class TestEdgeSearchingCastaliaMat4092():
         np.testing.assert_allclose(self.e3_ind1b_new, self.e3_ind1b)
         np.testing.assert_allclose(self.e3_ind2b_new, self.e3_ind2b)
         np.testing.assert_allclose(self.e3_ind3b_new, self.e3_ind3b)
+
+    def test_normal_face_function(self):
+        normal_face = wavefront.normal_face(self.v, self.f)
+        np.testing.assert_allclose(normal_face, self.normal_face)
+    def test_center_face_function(self):
+        cof = wavefront.center_of_face(self.v, self.f)
+        np.testing.assert_allclose(cof, self.center_face)
 
 class TestDistArray():
     pt = np.array([5, 0, 0])

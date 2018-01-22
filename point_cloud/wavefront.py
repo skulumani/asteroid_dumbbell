@@ -717,6 +717,92 @@ def decimate_numpy(vertices, faces, ratio=0.5, preserve_topology=True,
     # return faces/vertices
     return dec_vertices, dec_faces
 
+def normal_face(V, F):
+    r"""Compute the normal to each face
+
+    normal_face = normal_face(V, F)
+
+    Parameters
+    ----------
+    V : numpy array (v, 3)
+        Array defining all the vertices of the mesh
+    F : numpy array (f, 3)
+        Array defining the topology of the mesh. Each row has vertex indices
+        (zero based) which define the face
+
+    Returns
+    -------
+    normal_face : (f, 3)
+        The normal vector (unit) to each face
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
+    num_v = V.shape[0]
+    num_f = F.shape[0]
+    num_e = 3 * (num_v - 2)
+
+    # calculate all the edges - zero indexing for python
+    Fa = F[:, 0] 
+    Fb = F[:, 1]
+    Fc = F[:, 2]
+
+    V1 = V[Fa, :]
+    V2 = V[Fb, :]
+    V3 = V[Fc, :]
+    
+    # Get all edge vectors
+    e1 = V2 - V1
+    e2 = V3 - V2
+    e3 = V1 - V3
+
+    # normal to face
+    normal_face = np.cross(e1, e2)
+    normal_face = normal_face / \
+        np.tile(np.reshape(
+            np.sqrt(np.sum(normal_face**2, axis=1)), (num_f, 1)), (1, 3))
+
+    return normal_face
+
+def center_of_face(V, F):
+    r"""Find center of each face of mesh
+
+    Extended description of the function.
+
+    Parameters
+    ----------
+    V : numpy array (v, 3)
+        Array defining all the vertices of the mesh
+    F : numpy array (f, 3)
+        Array defining the topology of the mesh. Each row has vertex indices
+        (zero based) which define the face
+
+    Returns
+    -------
+    cof : numpy array (f, 3)
+        The center of each face of the mesh.
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
+    num_v = V.shape[0]
+    num_f = F.shape[0]
+    num_e = 3 * (num_v - 2)
+
+    # calculate all the edges - zero indexing for python
+    Fa = F[:, 0] 
+    Fb = F[:, 1]
+    Fc = F[:, 2]
+
+    V1 = V[Fa, :]
+    V2 = V[Fb, :]
+    V3 = V[Fc, :]
+
+    cof = (V1 + V2 + V3) / 3
+
+    return cof
 
 # TODO: Add unit testing
 def polyhedron_parameters(V, F):
