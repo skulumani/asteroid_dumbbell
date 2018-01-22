@@ -1363,3 +1363,54 @@ def distance_to_vertices(pt, v, f, normal_face):
     D = dist * sgn
     
     return D, P, F, V
+
+def distance_to_edges(pt, V, F, normal_face):
+    """Compute distance between pt and all edges
+    """
+    num_v = V.shape[0]
+    num_f = V.shape[0]
+    num_e = 3 * (num_v - 2)
+    # put all the edges in an array
+
+    # calculate all the edges - zero indexing for python
+    Fa = F[:, 0] 
+    Fb = F[:, 1]
+    Fc = F[:, 2]
+
+    e1_vertex_map = np.stack((Fb, Fa), axis=1)
+    e2_vertex_map = np.stack((Fc, Fb), axis=1)
+    e3_vertex_map = np.stack((Fa, Fc), axis=1)
+    
+    edges = np.concatenate((e1_vertex_map, e2_vertex_map, e3_vertex_map))
+    
+    # find the parameteric intersection parameter for every edge (t)
+    v1 = V[edges[:, 1], :]
+    v2 = V[edges[:, 0], :]
+    
+    a = v1 - pt
+    b = v2 - v1
+
+    edge_param = - np.einsum('ij,ij->i', a, b) / np.linalg.norm(b, axis=1)
+    
+    # exclude intersections that are outside of the range 0, 1
+    edge_param[edge_param<= 0] = np.nan
+    edge_param[edge_param>= 1] = np.nan
+
+    # find the distance between intersection (on edge) and point
+    edge_intersections = v1 +edge_param[:, np.newaxis] * b
+    edge_dist = pt - edge_intersections
+    dist = np.sqrt(np.einsum('ij,ij->i', edge_dist, edge_dist))
+    
+    # find minimum distance and edge index and intersection piont
+    ind = np.nanargmin(dist)
+    D = dist[ind]
+    P = edge_intersections[ind,:]
+
+    # determine the faces and the edge associated with this intersection
+
+    # signed distance (outside/inside body)
+
+    # output the distance, intersectino point on edge, edge index location, face index location, vertex index location
+
+    pdb.set_trace()
+
