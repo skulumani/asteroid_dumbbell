@@ -572,4 +572,15 @@ class TestEdgeSearchingCastaliaMat4092():
         np.testing.assert_allclose(self.e3_ind2b_new, self.e3_ind2b)
         np.testing.assert_allclose(self.e3_ind3b_new, self.e3_ind3b)
 
+class TestDistArray():
+    pt = np.array([5, 0, 0])
+    array = np.array([[0, 0, 0],
+                      [1, 1, 1],
+                      [1, 2, 3]])
+    array_random = np.random.rand(100, 3)
 
+    def test_known_array(self):
+        dist, ind = wavefront.dist_array(self.pt, self.array)
+        np.testing.assert_allclose(ind, 1)
+        np.testing.assert_allclose(dist, np.linalg.norm([4, -1, -1]))
+    
