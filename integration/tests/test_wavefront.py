@@ -20,6 +20,7 @@ def test_normal_face_plot():
         graphics.mayavi_addPoint(mfig, p1, radius=0.1, color=(1, 0, 0))
         graphics.mayavi_addLine(mfig, p1, u + p1)
 
+# TODO Add a funciton to plot pt, and closest vertex, edge, and face in a color
 if __name__ == "__main__":
     test_normal_face_plot()
 
