@@ -1151,3 +1151,35 @@ def edge_dyad_loop(e1_face_map, e2_face_map, e3_face_map,
 
     return E1_edge, E2_edge, E3_edge
 
+def dist_array(pt, array):
+    """Vectorized/Fast way to compute the distance between pt and every
+    vector of array (n x 3)
+    """
+    # dist = np.sum((pt - array)**2, axis=1)
+
+    delta = array - pt
+    dist = np.einsum('ij,ij->i', delta, delta)
+    return np.argmin(dist)
+
+def point2trimesh():
+    """Find the distance from a point to a triangular mesh surface
+    """
+    # calculate the normal to each face
+    
+    # linear loop over each point
+    
+    # fucntion find distance to every vertex
+    
+    # function distance to edges
+
+    # function distance to surfaces
+
+    pass
+
+def distance_to_vertices(pt, f, v, face_normal):
+    """Find the distance to the closest vertex
+
+    Output the associated faces/edges that this vertex defines
+    """
+    
+    pass
