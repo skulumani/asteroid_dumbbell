@@ -1309,10 +1309,57 @@ def point2trimesh():
 
     pass
 
-def distance_to_vertices(pt, f, v, face_normal):
-    """Find the distance to the closest vertex
+def distance_to_vertices(pt, v, f, normal_face):
+    r"""Find closest vertex in mesh to a given point
 
-    Output the associated faces/edges that this vertex defines
+    D, P, F, V = distance_vertices(pt, v, f, normal_face)
+
+    Parameters
+    ----------
+    pt : numpy array (3,)
+        Point to check in 3D
+    v : numpy array (v, 3)
+        Vertices defining the mesh
+    f : numpy array (f, 3)
+        Topological connection of mesh
+    normal_face : numpy array ( f, 3)
+        Normal to the center of each face
+
+    Returns
+    -------
+    D : float
+        Signed distance from pt to the closest vertex (+ outside, - inside)
+    P : numpy array (3, )
+        Location of the closest vertices. extracted from v
+    F : numpy array (m, )
+        Indices of all the faces associated with the vertex P
+    V : int
+        Index of the closest points in v. So P = v[V,:]. There may be many 
+        points
+
+    See Also
+    --------
+    sign_of_largest : Finds the sign of largest element in array
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
     """
+    # determine the vertex that is closest to pt
+    dist, ind = dist_array(pt, v)
+    P = v[ind, :]
+    V = ind
+
+    # determine the faces that are associated with this vertex
+    F = np.where(f == ind)[0]
+    assert (len(F ) >= 1), "Vertex {} is not connected to any face.".format(ind)
+
+    # find normal associated with these faces
+    N = normal_face[F , :]
+
+    # return the signed distance (inside or outside of face)
+    coefficients = np.dot(N, pt-P)
+    sgn = sign_of_largest(coefficients)
+    D = dist * sgn
     
-    pass
+    return D, P, F, V
