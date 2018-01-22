@@ -1153,11 +1153,28 @@ def edge_dyad_loop(e1_face_map, e2_face_map, e3_face_map,
 
 # TODO Figure out which version is fastest( sum vs einsum)
 def dist_array(pt, array):
-    """Vectorized/Fast way to compute the distance between pt and every
-    vector of array (n x 3) need to also return the element of array and dist
+    r"""Distance between a point and an array of points
 
-    Return the distance (minimum) and element of array
-    """
+    dist, ind = dist_array(pt, array)
+
+    Parameters
+    ----------
+    pt : numpy array (n, )
+        Point to check
+    array : numpy array (m, n)
+        Array of points, each row is a n-dimensional vector
+
+    Returns
+    -------
+    dist : float
+        Euclidean distance between pt and the minimum point in array
+    ind : int
+        Array index (row location) of the minimum distance piont in array
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """ 
     # dist = np.sum((pt - array)**2, axis=1)
     delta = array - pt
     dist = np.einsum('ij,ij->i', delta, delta)
