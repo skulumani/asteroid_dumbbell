@@ -1368,7 +1368,48 @@ def distance_to_vertices(pt, v, f, normal_face):
 
 def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
                       edge_face_map):
-    """Compute distance between pt and all edges
+    r"""Compute distance to all edges and output minimum
+
+    D, P, F, V = distance_to_edges(pt, V, F, normal_face,
+                                   edge_vertex_map, edge_face_map)
+
+    Parameters
+    ----------
+    pt : numpy array (3,)
+        Point to check in 3D
+    v : numpy array (v, 3)
+        Vertices defining the mesh
+    f : numpy array (f, 3)
+        Topological connection of mesh
+    normal_face : numpy array ( f, 3)
+        Normal to the center of each face
+    edge_vertex_map : 3 - tuple 
+        (e1_vertex_map, e2_vertex_map, e3_vertex_map)
+        Each element is size (# faces, 2). The elements represent the edges
+        for each face. To find an edge you need to subtract the first column 
+        minus the second column.
+    edge_face_map : 3 - tuple
+        (e1_face_map, e2_face_map, e3_face_map)
+        Each element of tuple defines the mapping between the vertices and edges.
+        The size in each are (# faces, 4). The first column defines the face number.
+        The last three columns give you the matching edge and the associated face.
+        Columns show, e1, e2, e3 and rows are the face numbers.
+
+    Returns
+    -------
+    D : float
+        Signed distance from pt to the closest edge (+ outside, - inside)
+    P : numpy array (3, )
+        Location of the closest point. This will lie on the closest edge
+    F : numpy array (m, )
+        Indices of all the faces associated with the edge (in V)
+    V : int
+        This defines the closest edge. e = v[V[0],:] - v[V[1], :] It holds
+        the element numbers in the list of vertices which make up the edge
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
     """
     num_v = V.shape[0]
     num_f = F.shape[0]
@@ -1392,7 +1433,7 @@ def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
     a = v1 - pt
     b = v2 - v1
 
-    edge_param = - np.einsum('ij,ij->i', a, b) / np.linalg.norm(b, axis=1)
+    edge_param = - np.einsum('ij,ij->i', a, b) / np.linalg.norm(b, axis=1)**2
     
     # exclude intersections that are outside of the range 0, 1
     edge_param[edge_param <= 0] = np.nan
