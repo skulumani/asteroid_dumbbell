@@ -1366,11 +1366,12 @@ def distance_to_vertices(pt, v, f, normal_face):
     # TODO Better variables names
     return D, P, F, V
 
-def distance_to_edges(pt, V, F, normal_face):
+def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
+                      edge_face_map):
     """Compute distance between pt and all edges
     """
     num_v = V.shape[0]
-    num_f = V.shape[0]
+    num_f = F.shape[0]
     num_e = 3 * (num_v - 2)
     # put all the edges in an array
 
@@ -1379,10 +1380,9 @@ def distance_to_edges(pt, V, F, normal_face):
     Fb = F[:, 1]
     Fc = F[:, 2]
 
-    e1_vertex_map = np.stack((Fb, Fa), axis=1)
-    e2_vertex_map = np.stack((Fc, Fb), axis=1)
-    e3_vertex_map = np.stack((Fa, Fc), axis=1)
-    
+    e1_vertex_map, e2_vertex_map, e3_vertex_map = edge_vertex_map
+    e1_face_map, e2_face_map, e3_face_map = edge_face_map
+
     edges = np.concatenate((e1_vertex_map, e2_vertex_map, e3_vertex_map))
     
     # find the parameteric intersection parameter for every edge (t)
@@ -1395,8 +1395,11 @@ def distance_to_edges(pt, V, F, normal_face):
     edge_param = - np.einsum('ij,ij->i', a, b) / np.linalg.norm(b, axis=1)
     
     # exclude intersections that are outside of the range 0, 1
-    edge_param[edge_param<= 0] = np.nan
-    edge_param[edge_param>= 1] = np.nan
+    edge_param[edge_param <= 0] = np.nan
+
+    mask = ~np.isnan(edge_param)
+    mask[mask] &= edge_param[mask] >= 1
+    edge_param[mask] = np.nan
 
     # find the distance between intersection (on edge) and point
     edge_intersections = v1 +edge_param[:, np.newaxis] * b
@@ -1405,10 +1408,22 @@ def distance_to_edges(pt, V, F, normal_face):
     
     # find minimum distance and edge index and intersection piont
     ind = np.nanargmin(dist)
-    D = dist[ind]
-    P = edge_intersections[ind,:]
+    D = dist[ind] # minimum distance to the edge
+    P = edge_intersections[ind,:] # point on edge that is closest
+    
+    # find out which edge (e1, e2, e3) for ind (the minimum)
+    edge_face_map_row = edge_face_map[ind // num_f][ind % num_f, :]
+    F = edge_face_map_row[edge_face_map_row != -1] # faces associated with minimum edge
+    
+    N = normal_face[F, :]
+
+    # return the signed distance (inside or outside of face)
+    coefficients = np.dot(N, pt-P)
+    sgn = sign_of_largest(coefficients)
+    D = D * sgn 
 
     # determine the faces and the edge associated with this intersection
+    V = edges[ind, :] # vertices that define this minimum edge
 
     # signed distance (outside/inside body)
 
