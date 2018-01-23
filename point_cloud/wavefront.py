@@ -1115,6 +1115,7 @@ def search_edge_vertex_map(e1_vertex_map, e2_vertex_map, e3_vertex_map):
             e2_ind1b, e2_ind2b, e2_ind3b,
             e3_ind1b, e3_ind2b, e3_ind3b)
 
+# TODO Add documentation for this function and the face map
 def build_edge_face_map(e1_ind1b, e1_ind2b, e1_ind3b,
                         e2_ind1b, e2_ind2b, e2_ind3b,
                         e3_ind1b, e3_ind2b, e3_ind3b):
@@ -1362,6 +1363,7 @@ def distance_to_vertices(pt, v, f, normal_face):
     sgn = sign_of_largest(coefficients)
     D = dist * sgn
     
+    # TODO Better variables names
     return D, P, F, V
 
 def distance_to_edges(pt, V, F, normal_face):
@@ -1411,6 +1413,5 @@ def distance_to_edges(pt, V, F, normal_face):
     # signed distance (outside/inside body)
 
     # output the distance, intersectino point on edge, edge index location, face index location, vertex index location
-
-    pdb.set_trace()
-
+    # TODO Better variables names
+    return D, P, F, V
