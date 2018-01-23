@@ -1465,9 +1465,5 @@ def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
 
     # determine the faces and the edge associated with this intersection
     V = edges[ind, :] # vertices that define this minimum edge
-
-    # signed distance (outside/inside body)
-
-    # output the distance, intersectino point on edge, edge index location, face index location, vertex index location
     # TODO Better variables names
     return D, P, F, V
