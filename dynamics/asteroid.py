@@ -11,6 +11,7 @@ from point_cloud import wavefront, polyhedron
 
 # TODO: Implement the ability to input a filename for OBJ shape files
 # TODO: Implement a Cython/C++ version of both of these methods
+# TODO Add option to not load anything and then use loadmesh instead
 class Asteroid(object):
     """An asteroid that we're orbiting about
 
