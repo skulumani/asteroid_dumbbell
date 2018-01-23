@@ -638,17 +638,17 @@ class TestDistanceToVertices():
     normal_face_itokawa = wavefront.normal_face(v_itokawa, f_itokawa)
     
     def test_cube_outside(self):
-        pt_out = np.array([2, 0, 0])
+        pt_out = np.array([1, 0.5, 0.5])
         D, P, F, V = wavefront.distance_to_vertices(pt_out, self.v_cube, 
                                                     self.f_cube,
                                                     self.normal_face_cube)
-        np.testing.assert_allclose(D, 1)
-        np.testing.assert_allclose(P, self.v_cube[4,:])
-        np.testing.assert_allclose(F, np.array([0, 6, 7, 8]))
-        np.testing.assert_allclose(V, 4)
+        np.testing.assert_allclose(D, 0.5)
+        np.testing.assert_allclose(P, np.array([0.5, 0.5, 0.5]))
+        np.testing.assert_allclose(F, np.array([4, 5, 6, 7, 10, 11]))
+        np.testing.assert_allclose(V, 7)
 
     def test_cube_inside(self):
-        pt_out = np.array([0.5, 0.5, 0.5])
+        pt_out = np.array([0, 0, 0])
         D, P, F, V = wavefront.distance_to_vertices(pt_out, self.v_cube, 
                                                     self.f_cube,
                                                     self.normal_face_cube)
@@ -656,10 +656,9 @@ class TestDistanceToVertices():
         np.testing.assert_allclose(P, self.v_cube[0,:])
         np.testing.assert_allclose(F, np.array([0, 1, 2, 3, 8, 9]))
         np.testing.assert_allclose(V, 0)
-        pass
 
     def test_cube_orthogonal(self):
-        pt_out = np.array([1.1, 0, 0])
+        pt_out = np.array([1.1-0.5, -0.5, -0.5])
         D, P, F, V = wavefront.distance_to_vertices(pt_out, self.v_cube, 
                                                     self.f_cube,
                                                     self.normal_face_cube)
@@ -668,7 +667,6 @@ class TestDistanceToVertices():
         np.testing.assert_allclose(F, np.array([0, 6, 7, 8]))
         np.testing.assert_allclose(V, 4)
 
-        pass
     
     def test_center_of_faces(self):
         cof = wavefront.center_of_face(self.v_cube, self.f_cube)
