@@ -455,6 +455,32 @@ def mayavi_points3d(points, figure, scale=0.1, color=(0, 0, 1)):
     
     return p
 
+def mayavi_addTitle(fig, string, **kwargs):
+    r"""Add a title to mayavi figure
+
+    t = mayavi_addTitle(fig, string, **kwargs)
+
+    Parameters
+    ----------
+    fig : mayavi figure
+        Figure to add the title
+    string : str
+        Title string
+    **kwargs : keyword list matching documentation
+        Height, color, size are useful
+
+    Returns
+    -------
+    t : mayavi object
+        Title object
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
+    t = mlab.title(string, figure=fig, **kwargs)
+    return t
+
 def point_cloud_asteroid_frame(point_cloud):
     """Input the point cloud data and plot all in the asteroid fixed frame
     """
