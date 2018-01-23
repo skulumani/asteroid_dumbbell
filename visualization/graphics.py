@@ -446,10 +446,31 @@ def mayavi_plot_trajectory(fig, pos, color=(1, 0, 0)):
 
     return l
 
-def mayavi_points3d(points, figure, scale=0.1, color=(0, 0, 1)):
-    """Draw all the points in (n, 3)
-    """
+def mayavi_points3d(points, figure, scale=0.1, color=(0, 0, 1), **kwargs):
+    r"""Scatter plot of points in mayavi
 
+    p = mayavi_points3d(points, figure, scale, color)
+
+    Parameters
+    ----------
+    points : numpy array (n, 3)
+        Array of point locations, each row is a single point
+    figure : mayavi figure
+        Figure to draw the points
+    scale : float
+        Scale for the points
+    color : tuple
+        RGB color
+
+    Returns
+    -------
+    p : mayavi object
+        Points3d object defining all the points
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
     p = mlab.points3d(points[:, 0], points[:, 1], points[:, 2],
                       scale_factor=scale, color=color, figure=figure)
     
