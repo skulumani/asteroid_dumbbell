@@ -1,8 +1,12 @@
-import vtk
-import numpy as np
-from point_cloud import wavefront
-import scipy.io
 import pdb
+
+import numpy as np
+import vtk
+import scipy.io
+from kinematics import sphere
+
+from point_cloud import wavefront
+
 
 def test_vtk_major_version():
     np.testing.assert_allclose(vtk.VTK_MAJOR_VERSION, 7)
@@ -667,15 +671,42 @@ class TestDistanceToVertices():
         np.testing.assert_allclose(F, np.array([0, 6, 7, 8]))
         np.testing.assert_allclose(V, 4)
 
-    
-    def test_center_of_faces(self):
+    def test_center_of_faces_cube(self):
         cof = wavefront.center_of_face(self.v_cube, self.f_cube)
         np.testing.assert_allclose(cof.shape, self.f_cube.shape)
+
+    def test_center_of_faces_itokawa(self):
+        cof = wavefront.center_of_face(self.v_itokawa, self.f_itokawa)
+        np.testing.assert_allclose(cof.shape, self.f_itokawa.shape)
 
     def test_itokawa_outside(self):
         pt = np.array([2, 0, 0])
 
-        D, P, F, V = wavefront.distance_to_vertices(pt, self.v_cube, 
-                                                    self.f_cube,
-                                                    self.normal_face_cube)
+        D, P, F, V = wavefront.distance_to_vertices(pt, self.v_itokawa, 
+                                                    self.f_itokawa,
+                                                    self.normal_face_itokawa)
         np.testing.assert_equal(D > 0, True)
+
+    def test_random_vector_cube_outside(self):
+        for ii in range(0, 100):
+            pt = np.random.uniform(1.5, 2) * sphere.rand(2)
+
+            D, P, F, V = wavefront.distance_to_vertices(pt, self.v_cube, 
+                                                        self.f_cube,
+                                                        self.normal_face_cube)
+            np.testing.assert_equal(D > 0, True)
+            np.testing.assert_allclose(P.shape, (3,))
+            np.testing.assert_almost_equal(F.shape[0] > 0, True)
+            np.testing.assert_allclose(V > 0, True)
+
+    def test_random_vector_itokawa_outside(self):
+        for ii in range(0, 100):
+            pt = np.random.uniform(1.5, 2) * sphere.rand(2)
+
+            D, P, F, V = wavefront.distance_to_vertices(pt, self.v_itokawa, 
+                                                        self.f_itokawa,
+                                                        self.normal_face_itokawa)
+            np.testing.assert_equal(D > 0, True)
+            np.testing.assert_allclose(P.shape, (3,))
+            np.testing.assert_almost_equal(F.shape[0] > 0, True)
+            np.testing.assert_allclose(V > 0, True)

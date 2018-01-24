@@ -1564,7 +1564,7 @@ def distance_to_faces(pt, V, F, normal_face):
     beta = s_param
     gamma = t_param
     
-    # TODO Raise assertion if alpha + beta + gamma not 1
+    np.testing.assert_allclose(alpha + beta + gamma, 1, err_msg='Barycentric coordinates are not valid') 
 
     barycentric = np.stack((alpha, beta, gamma), axis=1)
     # exclude intersections that don't lie inside the faces
