@@ -1516,10 +1516,21 @@ def distance_to_faces(pt, V, F, normal_face):
 
     # determine the closest face
     # TODO: Better variable names
-    ind = np.nanargmin(np.absolute(dist))
-    D = dist[ind]
-    P = surf_intersections[ind, :]
-    V = V[F[ind,:], :]
-    F = ind
+    # TODO: Handle case of no face intersection
+    try:
+        ind = np.nanargmin(np.absolute(dist))
+        D = dist[ind]
+        P = surf_intersections[ind, :]
+        V = V[F[ind,:], :]
+        F = ind
+
+    except ValueError as err:
+        logger.warn('The point {} is not in view of any face: {}'.format(pt, err))
+
+        D = []
+        P = []
+        V = []
+        F = []
 
     return D, P, F, V
+
