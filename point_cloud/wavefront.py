@@ -1467,3 +1467,52 @@ def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
     V = edges[ind, :] # vertices that define this minimum edge
     # TODO Better variables names
     return D, P, F, V
+
+def distance_to_faces(pt, V, F, normal_face):
+    """Compute teh distance from pt to each face
+    """
+    num_v = V.shape[0]
+    num_f = F.shape[0]
+    num_e = 3 * (num_v - 2)
+
+    # extract out all the  vertices
+    Fa, Fb, Fc = F[:, 0], F[:, 1], F[:, 2]
+    v1, v2, v3 = V[Fa, :], V[Fb, :], V[Fc, :]
+
+    # compute distance from pt to surface plane
+    ptv1 = pt - v1
+    dist = np.einsum('ij,ij->i', normal_face, ptv1)
+    surf_intersections = pt - dist[:, np.newaxis] * normal_face
+
+    # determine teh barycentric coordinates of each intersection point
+    v31 = v3 - v1
+    v21 = v2 - v1
+    # form all the dot products
+    v31dotv31 = np.einsum('ij,ij->i', v31, v31)
+    ptv1dotv21 = np.einsum('ij,ij->i',ptv1, v21)
+    v31dotv21 = np.einsum('ij,ij->i', v31, v21)
+    ptv1dotv31 = np.einsum('ij,ij->i', ptv1, v31)
+    v21dotv21 = np.einsum('ij,ij->i', v21, v21)
+
+    denom = v31dotv21**2 - v31dotv31*v21dotv21
+    s_param = - (v31dotv31 * ptv1dotv21 - v31dotv31*ptv1dotv31) / denom
+    t_param = (v31dotv21 *  ptv1dotv21 - v21dotv21 * ptv1dotv31) / denom
+
+    alpha = 1 - s_param - t_param
+    beta = s_param
+    gamma = t_param
+    
+    barycentric = np.stack((alpha, beta, gamma), axis=1)
+    # exclude intersections that don't lie inside the faces
+    dist[np.absolute(dist) <= np.finfo(float).eps] = np.nan
+    dist[np.any(barycentric < 0, axis=1)] = np.nan
+    dist[np.any(barycentric >= 1, axis=1)] = np.nan
+
+    # determine the closest face
+    ind = np.nanargmin(np.absolute(dist))
+    D = dist[ind]
+    P = surf_intersections[ind, :]
+    F = ind
+    V = F[ind, :]
+
+    return D, P, F, V
