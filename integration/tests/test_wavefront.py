@@ -147,7 +147,7 @@ def test_closest_face_plot_cube():
     ast = asteroid.Asteroid('castalia', 256, 'mat')
     v, f = wavefront.read_obj('./integration/cube.obj')
     ast = ast.loadmesh(v, f, 'cube')
-    pt = np.random.uniform(1.5, 2) * sphere.rand(2)
+    pt = np.array([1, 0.1, 0.1])
     D, P, F, V = wavefront.distance_to_faces(pt, v, f, 
                                              ast.asteroid_grav['normal_face'])
     # draw the mayavi figure
@@ -171,7 +171,7 @@ def test_closest_face_plot_asteroid():
     ast = asteroid.Asteroid('castalia', 256, 'mat')
     v, f = ast.asteroid_grav['V'], ast.asteroid_grav['F']
 
-    pt = np.array([0.8, 0, 0])
+    pt = np.array([1, 0, 0])
     D, P, F, V = wavefront.distance_to_faces(pt, v, f, 
                                              ast.asteroid_grav['normal_face'])
     # draw the mayavi figure
@@ -196,5 +196,4 @@ if __name__ == "__main__":
 
     test_closest_face_plot_cube()
     test_closest_face_plot_asteroid()
-
 

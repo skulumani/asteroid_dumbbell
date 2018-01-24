@@ -646,67 +646,157 @@ class TestDistanceToVertices():
         D, P, F, V = wavefront.distance_to_vertices(pt_out, self.v_cube, 
                                                     self.f_cube,
                                                     self.normal_face_cube)
+        pdb.set_trace()
         np.testing.assert_allclose(D, 0.5)
         np.testing.assert_allclose(P, np.array([0.5, 0.5, 0.5]))
-        np.testing.assert_allclose(F, np.array([4, 5, 6, 7, 10, 11]))
+        np.testing.assert_allclose(F, 0)
         np.testing.assert_allclose(V, 7)
 
-    def test_cube_inside(self):
-        pt_out = np.array([0, 0, 0])
-        D, P, F, V = wavefront.distance_to_vertices(pt_out, self.v_cube, 
-                                                    self.f_cube,
-                                                    self.normal_face_cube)
-        np.testing.assert_allclose(np.sign(D), -1)
-        np.testing.assert_allclose(P, self.v_cube[0,:])
-        np.testing.assert_allclose(F, np.array([0, 1, 2, 3, 8, 9]))
-        np.testing.assert_allclose(V, 0)
+    # def test_cube_inside(self):
+    #     pt_out = np.array([0, 0, 0])
+    #     D, P, F, V = wavefront.distance_to_vertices(pt_out, self.v_cube, 
+    #                                                 self.f_cube,
+    #                                                 self.normal_face_cube)
+    #     np.testing.assert_allclose(np.sign(D), -1)
+    #     np.testing.assert_allclose(P, self.v_cube[0,:])
+    #     np.testing.assert_allclose(F, np.array([0, 1, 2, 3, 8, 9]))
+    #     np.testing.assert_allclose(V, 0)
 
-    def test_cube_orthogonal(self):
-        pt_out = np.array([1.1-0.5, -0.5, -0.5])
-        D, P, F, V = wavefront.distance_to_vertices(pt_out, self.v_cube, 
-                                                    self.f_cube,
-                                                    self.normal_face_cube)
-        np.testing.assert_allclose(D, 0.1)
-        np.testing.assert_allclose(P, self.v_cube[4,:])
-        np.testing.assert_allclose(F, np.array([0, 6, 7, 8]))
-        np.testing.assert_allclose(V, 4)
+    # def test_cube_orthogonal(self):
+    #     pt_out = np.array([1.1-0.5, -0.5, -0.5])
+    #     D, P, F, V = wavefront.distance_to_vertices(pt_out, self.v_cube, 
+    #                                                 self.f_cube,
+    #                                                 self.normal_face_cube)
+    #     np.testing.assert_allclose(D, 0.1)
+    #     np.testing.assert_allclose(P, self.v_cube[4,:])
+    #     np.testing.assert_allclose(F, np.array([0, 6, 7, 8]))
+    #     np.testing.assert_allclose(V, 4)
 
-    def test_center_of_faces_cube(self):
-        cof = wavefront.center_of_face(self.v_cube, self.f_cube)
-        np.testing.assert_allclose(cof.shape, self.f_cube.shape)
+    # def test_center_of_faces_cube(self):
+    #     cof = wavefront.center_of_face(self.v_cube, self.f_cube)
+    #     np.testing.assert_allclose(cof.shape, self.f_cube.shape)
 
-    def test_center_of_faces_itokawa(self):
-        cof = wavefront.center_of_face(self.v_itokawa, self.f_itokawa)
-        np.testing.assert_allclose(cof.shape, self.f_itokawa.shape)
+    # def test_center_of_faces_itokawa(self):
+    #     cof = wavefront.center_of_face(self.v_itokawa, self.f_itokawa)
+    #     np.testing.assert_allclose(cof.shape, self.f_itokawa.shape)
 
-    def test_itokawa_outside(self):
-        pt = np.array([2, 0, 0])
+    # def test_itokawa_outside(self):
+    #     pt = np.array([2, 0, 0])
 
-        D, P, F, V = wavefront.distance_to_vertices(pt, self.v_itokawa, 
-                                                    self.f_itokawa,
-                                                    self.normal_face_itokawa)
-        np.testing.assert_equal(D > 0, True)
+    #     D, P, F, V = wavefront.distance_to_vertices(pt, self.v_itokawa, 
+    #                                                 self.f_itokawa,
+    #                                                 self.normal_face_itokawa)
+    #     np.testing.assert_equal(D > 0, True)
 
-    def test_random_vector_cube_outside(self):
-        for ii in range(0, 100):
-            pt = np.random.uniform(1.5, 2) * sphere.rand(2)
+    # def test_random_vector_cube_outside(self):
+    #     for ii in range(0, 100):
+    #         pt = np.random.uniform(1.5, 2) * sphere.rand(2)
 
-            D, P, F, V = wavefront.distance_to_vertices(pt, self.v_cube, 
-                                                        self.f_cube,
-                                                        self.normal_face_cube)
-            np.testing.assert_equal(D > 0, True)
-            np.testing.assert_allclose(P.shape, (3,))
-            np.testing.assert_almost_equal(F.shape[0] > 0, True)
-            np.testing.assert_allclose(V > 0, True)
+    #         D, P, F, V = wavefront.distance_to_vertices(pt, self.v_cube, 
+    #                                                     self.f_cube,
+    #                                                     self.normal_face_cube)
+    #         np.testing.assert_equal(D > 0, True)
+    #         np.testing.assert_allclose(P.shape, (3,))
+    #         np.testing.assert_almost_equal(F.shape[0] > 0, True)
+    #         np.testing.assert_allclose(V > 0, True)
 
-    def test_random_vector_itokawa_outside(self):
-        for ii in range(0, 100):
-            pt = np.random.uniform(1.5, 2) * sphere.rand(2)
+    # def test_random_vector_itokawa_outside(self):
+    #     for ii in range(0, 100):
+    #         pt = np.random.uniform(1.5, 2) * sphere.rand(2)
 
-            D, P, F, V = wavefront.distance_to_vertices(pt, self.v_itokawa, 
-                                                        self.f_itokawa,
-                                                        self.normal_face_itokawa)
-            np.testing.assert_equal(D > 0, True)
-            np.testing.assert_allclose(P.shape, (3,))
-            np.testing.assert_almost_equal(F.shape[0] > 0, True)
-            np.testing.assert_allclose(V > 0, True)
+    #         D, P, F, V = wavefront.distance_to_vertices(pt, self.v_itokawa, 
+    #                                                     self.f_itokawa,
+    #                                                     self.normal_face_itokawa)
+    #         np.testing.assert_equal(D > 0, True)
+    #         np.testing.assert_equal(P.shape[0] > 0,True)
+    #         np.testing.assert_almost_equal(F.shape[0] > 0, True)
+    #         np.testing.assert_allclose(len(V) > 0, True)
+
+# TODO Need to implement these test functions
+# class TestDistanceToVertices():
+
+#     v_cube, f_cube = wavefront.read_obj('./integration/cube.obj')
+#     normal_face_cube = wavefront.normal_face(v_cube, f_cube)
+
+#     v_itokawa, f_itokawa = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_very_high.obj')
+#     normal_face_itokawa = wavefront.normal_face(v_itokawa, f_itokawa)
+    
+#     def test_multiple_vertices(self):
+#         pt = np.zeros(3)
+#         D, P, F, V = wavefront.distance_to_vertices(pt, self.v_cube,
+#                                                     self.f_cube,
+#                                                     self.normal_face_cube)
+#         np.testing.assert_allclose(np.absolute(D), 0.5 * np.sqrt(3))
+#         np.testing.assert_allclose(P, v)
+#         np.testing.assert_allclose(len(F), 8)
+#         np.testing.assert_allclose(len(V), 8)
+
+#     def test_cube_outside(self):
+#         pt_out = np.array([1, 0.5, 0.5])
+#         D, P, F, V = wavefront.distance_to_vertices(pt_out, self.v_cube, 
+#                                                     self.f_cube,
+#                                                     self.normal_face_cube)
+#         np.testing.assert_allclose(D, 0.5)
+#         np.testing.assert_allclose(P, np.array([0.5, 0.5, 0.5]))
+#         np.testing.assert_allclose(F, np.array([4, 5, 6, 7, 10, 11]))
+#         np.testing.assert_allclose(V, 7)
+
+#     def test_cube_inside(self):
+#         pt_out = np.array([0, 0, 0])
+#         D, P, F, V = wavefront.distance_to_vertices(pt_out, self.v_cube, 
+#                                                     self.f_cube,
+#                                                     self.normal_face_cube)
+#         np.testing.assert_allclose(np.sign(D), -1)
+#         np.testing.assert_allclose(P, self.v_cube[0,:])
+#         np.testing.assert_allclose(F, np.array([0, 1, 2, 3, 8, 9]))
+#         np.testing.assert_allclose(V, 0)
+
+#     def test_cube_orthogonal(self):
+#         pt_out = np.array([1.1-0.5, -0.5, -0.5])
+#         D, P, F, V = wavefront.distance_to_vertices(pt_out, self.v_cube, 
+#                                                     self.f_cube,
+#                                                     self.normal_face_cube)
+#         np.testing.assert_allclose(D, 0.1)
+#         np.testing.assert_allclose(P, self.v_cube[4,:])
+#         np.testing.assert_allclose(F, np.array([0, 6, 7, 8]))
+#         np.testing.assert_allclose(V, 4)
+
+#     def test_center_of_faces_cube(self):
+#         cof = wavefront.center_of_face(self.v_cube, self.f_cube)
+#         np.testing.assert_allclose(cof.shape, self.f_cube.shape)
+
+#     def test_center_of_faces_itokawa(self):
+#         cof = wavefront.center_of_face(self.v_itokawa, self.f_itokawa)
+#         np.testing.assert_allclose(cof.shape, self.f_itokawa.shape)
+
+#     def test_itokawa_outside(self):
+#         pt = np.array([2, 0, 0])
+
+#         D, P, F, V = wavefront.distance_to_vertices(pt, self.v_itokawa, 
+#                                                     self.f_itokawa,
+#                                                     self.normal_face_itokawa)
+#         np.testing.assert_equal(D > 0, True)
+
+#     def test_random_vector_cube_outside(self):
+#         for ii in range(0, 100):
+#             pt = np.random.uniform(1.5, 2) * sphere.rand(2)
+
+#             D, P, F, V = wavefront.distance_to_vertices(pt, self.v_cube, 
+#                                                         self.f_cube,
+#                                                         self.normal_face_cube)
+#             np.testing.assert_equal(D > 0, True)
+#             np.testing.assert_allclose(P.shape, (3,))
+#             np.testing.assert_almost_equal(F.shape[0] > 0, True)
+#             np.testing.assert_allclose(V > 0, True)
+
+#     def test_random_vector_itokawa_outside(self):
+#         for ii in range(0, 100):
+#             pt = np.random.uniform(1.5, 2) * sphere.rand(2)
+
+#             D, P, F, V = wavefront.distance_to_vertices(pt, self.v_itokawa, 
+#                                                         self.f_itokawa,
+#                                                         self.normal_face_itokawa)
+#             np.testing.assert_equal(D > 0, True)
+#             np.testing.assert_allclose(P.shape, (3,))
+#             np.testing.assert_almost_equal(F.shape[0] > 0, True)
+#             np.testing.assert_allclose(V > 0, True)
