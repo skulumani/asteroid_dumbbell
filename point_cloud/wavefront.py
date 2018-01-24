@@ -1345,6 +1345,12 @@ def distance_to_vertices(pt, v, f, normal_face):
     Author
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    References
+    ----------
+
+    .. [1] OROURKE, Joseph. Computational Geometry in C. 2 ed. Cambridge
+    University Press, 1998.
     """
     # determine the vertex that is closest to pt
     dist, ind = dist_array(pt, v)
@@ -1410,6 +1416,12 @@ def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
     Author
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    References
+    ----------
+
+    .. [1] OROURKE, Joseph. Computational Geometry in C. 2 ed. Cambridge
+    University Press, 1998.
     """
     num_v = V.shape[0]
     num_f = F.shape[0]
@@ -1469,10 +1481,56 @@ def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
     return D, P, F, V
 
 def distance_to_faces(pt, V, F, normal_face):
-    """Compute teh distance from pt to each face
-    """
+    r"""Find distance to every face and output the closest one
 
-    # TODO Check that directions of vectors are correct
+    D, P, F, V = distance_to_faces(pt, V, F, normal_face)
+
+    Parameters
+    ----------
+    pt : numpy array (3,)
+        Point to check in 3D
+    v : numpy array (v, 3)
+        Vertices defining the mesh
+    f : numpy array (f, 3)
+        Topological connection of mesh
+    normal_face : numpy array ( f, 3)
+        Normal to the center of each face
+         
+    Returns
+    -------
+    D : float
+        Signed distance from pt to the closest face (+ outside, - inside)
+    P : numpy array (3, )
+        Location of the closest point. This will lie in the closest face
+    F : int
+        Index of the face that is closest
+    V : numpy array (3, 3)
+        Define the vertices of this closest face
+        V = vertices[faces[F, :], :]
+
+    Raises
+    ------
+    AssertionError : barycentric coordinates should sum to 1
+
+    Notes
+    -----
+    This finds the distance from the pt to every face, then the minimum 
+    distance is output.
+    The algorithm projects each point onto the plane of each face, then 
+    computes if the point lies inside the face or not.
+    If it is not inside the face then it's not output.
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    References
+    ----------
+
+    .. [1] OROURKE, Joseph. Computational Geometry in C. 2 ed. Cambridge
+    University Press, 1998. 
+
+    """
     num_v = V.shape[0]
     num_f = F.shape[0]
     num_e = 3 * (num_v - 2)
@@ -1516,7 +1574,6 @@ def distance_to_faces(pt, V, F, normal_face):
 
     # determine the closest face
     # TODO: Better variable names
-    # TODO: Handle case of no face intersection
     try:
         ind = np.nanargmin(np.absolute(dist))
         D = dist[ind]
