@@ -137,7 +137,7 @@ def test_closest_face_plot_cube():
     ast = asteroid.Asteroid('castalia', 256, 'mat')
     v, f = wavefront.read_obj('./integration/cube.obj')
     ast = ast.loadmesh(v, f, 'cube')
-    pt = np.array([0.5, 0, 0])
+    pt = np.array([0.6, 0.2, 0])
     D, P, F, V = wavefront.distance_to_faces(pt, v, f, 
                                              ast.asteroid_grav['normal_face'])
 
@@ -155,11 +155,13 @@ def test_closest_face_plot_cube():
 
 # TODO Add a funciton to plot pt, and closest vertex, edge, and face in a color
 if __name__ == "__main__":
-    test_normal_face_plot()
-    test_closest_vertex_plot_cube()
-    test_closest_vertex_plot_asteroid()
+    # test_normal_face_plot()
+    # test_closest_vertex_plot_cube()
+    # test_closest_vertex_plot_asteroid()
 
-    test_closest_edge_plot_cube()
-    test_closest_edge_plot_asteroid()
+    # test_closest_edge_plot_cube()
+    # test_closest_edge_plot_asteroid()
+
+    test_closest_face_plot_cube()
 
 

@@ -1500,7 +1500,7 @@ def distance_to_faces(pt, V, F, normal_face):
 
     denom = adotb**2 - bdotb*adota
     s_param = (adotb * cdotb - bdotb * cdota) / denom
-    t_param = (bdota *  cdota - adota * cdotb) / denom
+    t_param = (adotb *  cdota - adota * cdotb) / denom
 
     alpha = 1 - s_param - t_param
     beta = s_param
