@@ -1487,18 +1487,20 @@ def distance_to_faces(pt, V, F, normal_face):
     surf_intersections = pt - dist[:, np.newaxis] * normal_face
 
     # determine teh barycentric coordinates of each intersection point
-    v31 = v3 - v1
-    v21 = v2 - v1
-    # form all the dot products
-    v31dotv31 = np.einsum('ij,ij->i', v31, v31)
-    ptv1dotv21 = np.einsum('ij,ij->i',ptv1, v21)
-    v31dotv21 = np.einsum('ij,ij->i', v31, v21)
-    ptv1dotv31 = np.einsum('ij,ij->i', ptv1, v31)
-    v21dotv21 = np.einsum('ij,ij->i', v21, v21)
+    a = v2 - v1
+    b = v3 - v1
+    c = ptv1
 
-    denom = v31dotv21**2 - v31dotv31*v21dotv21
-    s_param = - (v31dotv31 * ptv1dotv21 - v31dotv31*ptv1dotv31) / denom
-    t_param = (v31dotv21 *  ptv1dotv21 - v21dotv21 * ptv1dotv31) / denom
+    # form all the dot products
+    adota = np.einsum('ij,ij->i', a, a)
+    bdotb = np.einsum('ij,ij->i', b, b)
+    adotb = np.einsum('ij,ij->i', a, b)
+    cdota = np.einsum('ij,ij->i', c, a)
+    cdotb = np.einsum('ij,ij->i', c, b)
+
+    denom = adotb**2 - bdotb*adota
+    s_param = (adotb * cdotb - bdotb * cdota) / denom
+    t_param = (bdota *  cdota - adota * cdotb) / denom
 
     alpha = 1 - s_param - t_param
     beta = s_param
