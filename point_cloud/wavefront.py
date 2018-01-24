@@ -1266,7 +1266,7 @@ def dist_array(pt, array):
     # dist = np.sum((pt - array)**2, axis=1)
     delta = array - pt
     dist = np.einsum('ij,ij->i', delta, delta)
-    ind = np.argmin(dist)
+    ind = np.where(dist == np.min(dist))[0]
     return np.sqrt(dist[ind]), ind
 
 def sign_of_largest(array):
@@ -1289,10 +1289,10 @@ def sign_of_largest(array):
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
     """
-    index = np.argmax(np.absolute(array))
-    sgn = np.sign(array[ index ])
-    if sgn == 0:
-        sgn = 1
+    array_abs = np.absolute(array)
+    index = np.where(array_abs == np.max(array_abs))
+    sgn = np.sign(array[index])
+    sgn[sgn ==0] = 1
     return sgn
 
 def point2trimesh():
@@ -1356,17 +1356,17 @@ def distance_to_vertices(pt, v, f, normal_face):
     dist, ind = dist_array(pt, v)
     P = v[ind, :]
     V = ind
-
-    # determine the faces that are associated with this vertex
-    F = np.where(f == ind)[0]
-    assert (len(F ) >= 1), "Vertex {} is not connected to any face.".format(ind)
+    
+    # determine the faces that are associated with any of the vertices in ind
+    F = np.where(np.isin(ind, f) == True)[0]
+    assert (len(F) >= 1), "Vertex {} is not connected to any face.".format(ind)
 
     # find normal associated with these faces
-    N = normal_face[F , :]
+    N = normal_face[F, :]
 
     # return the signed distance (inside or outside of face)
-    coefficients = np.dot(N, pt-P)
-    sgn = sign_of_largest(coefficients)
+    coeff = np.einsum('ij,ij->i',N, pt-P)
+    sgn = sign_of_largest(coeff)
     D = dist * sgn
     
     # TODO Better variables names
