@@ -2,11 +2,15 @@
 """
 import pdb
 import numpy as np
+import warnings
 
 from point_cloud import wavefront
 from visualization import graphics
 from dynamics import asteroid
 from kinematics import sphere
+
+warnings.filterwarnings(action="ignore", category=FutureWarning,
+                        message=r"Conversion")
 
 def test_normal_face_plot():
     """Plot the normals to the faces on a mesh and view in Mayavi
@@ -134,7 +138,7 @@ def test_closest_vertex_plot_cube():
 
     graphics.mayavi_addTitle(mfig, 'Closest Vertex', color=(0, 0, 0), size=0.5)
 
-def test_closest_face_plot_cube_xaxis():
+def test_closest_face_plot_cube():
     """Needs to be aligned with a face
     
         i.e. not in the corners
@@ -143,67 +147,14 @@ def test_closest_face_plot_cube_xaxis():
     ast = asteroid.Asteroid('castalia', 256, 'mat')
     v, f = wavefront.read_obj('./integration/cube.obj')
     ast = ast.loadmesh(v, f, 'cube')
-    pt = np.array([1, np.random.uniform(-0.5, 0.5), np.random.uniform(-0.5, 0.5)])
-
-    D, P, F, V = wavefront.distance_to_faces(pt, v, f, 
-                                             ast.asteroid_grav['normal_face'])
-
-    # draw the mayavi figure
-    mfig = graphics.mayavi_figure()
-    graphics.mayavi_addMesh(mfig, v, f)
-
-    graphics.mayavi_addPoint(mfig, pt, radius=0.1, color=(0, 1, 0))
-    graphics.mayavi_addPoint(mfig, P, radius=0.1, color=(1, 0, 0))
-    
-    # different color for each face
-    graphics.mayavi_addMesh(mfig, V,[(0, 1, 2)], color=tuple(np.random.rand(3)))
-
-    graphics.mayavi_addTitle(mfig, 'Closest Face', color=(0, 0, 0), size=0.5)
-
-def test_closest_face_plot_cube_yaxis():
-    """Needs to be aligned with a face
-    
-        i.e. not in the corners
-    """
-
-    ast = asteroid.Asteroid('castalia', 256, 'mat')
-    v, f = wavefront.read_obj('./integration/cube.obj')
-    ast = ast.loadmesh(v, f, 'cube')
-    pt = np.array([np.random.uniform(-0.5, 0.5), 1, np.random.uniform(-0.5, 0.5)])
-
-    D, P, F, V = wavefront.distance_to_faces(pt, v, f, 
-                                             ast.asteroid_grav['normal_face'])
-
-    # draw the mayavi figure
-    mfig = graphics.mayavi_figure()
-    graphics.mayavi_addMesh(mfig, v, f)
-
-    graphics.mayavi_addPoint(mfig, pt, radius=0.1, color=(0, 1, 0))
-    graphics.mayavi_addPoint(mfig, P, radius=0.1, color=(1, 0, 0))
-    
-    # different color for each face
-    graphics.mayavi_addMesh(mfig, V,[(0, 1, 2)], color=tuple(np.random.rand(3)))
-
-    graphics.mayavi_addTitle(mfig, 'Closest Face', color=(0, 0, 0), size=0.5)
-
-def test_closest_face_plot_cube_zaxis():
-    """Needs to be aligned with a face
-    
-        i.e. not in the corners
-    """
-
-    ast = asteroid.Asteroid('castalia', 256, 'mat')
-    v, f = wavefront.read_obj('./integration/cube.obj')
-    ast = ast.loadmesh(v, f, 'cube')
-    # pt = np.array([np.random.uniform(-0.5, 0.5), np.random.uniform(-0.5, 0.5), 1])
-    pt = np.array([1, 1, 1])
+    pt = np.random.uniform(1.5, 2) * sphere.rand(2)
     D, P, F, V = wavefront.distance_to_faces(pt, v, f, 
                                              ast.asteroid_grav['normal_face'])
     # draw the mayavi figure
     mfig = graphics.mayavi_figure()
-    graphics.mayavi_addTitle(mfig, 'Closest Face', color=(0, 0, 0), size=0.5)
     graphics.mayavi_addMesh(mfig, v, f)
     graphics.mayavi_addPoint(mfig, pt, radius=0.1, color=(0, 1, 0))
+    graphics.mayavi_addTitle(mfig, 'Closest Face', color=(0, 0, 0), size=0.5)
 
     if D:
         graphics.mayavi_addPoint(mfig, P, radius=0.1, color=(1, 0, 0))
