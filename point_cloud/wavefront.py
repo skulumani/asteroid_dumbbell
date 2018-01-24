@@ -1368,9 +1368,9 @@ def distance_to_vertices(pt, v, f, normal_face):
     coeff = np.einsum('ij,ij->i',N, pt-P)
     sgn = sign_of_largest(coeff)
     D = dist * sgn
-    
+    pdb.set_trace() 
     # TODO Better variables names
-    return D, P, F, V
+    return np.squeeze(D), np.squeeze(P), np.squeeze(F), np.squeeze(V)
 
 def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
                       edge_face_map):
