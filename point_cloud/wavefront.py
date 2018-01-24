@@ -1460,23 +1460,29 @@ def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
     dist = np.sqrt(np.einsum('ij,ij->i', edge_dist, edge_dist))
     
     # find minimum distance and edge index and intersection piont
-    ind = np.nanargmin(dist)
-    D = dist[ind] # minimum distance to the edge
-    P = edge_intersections[ind,:] # point on edge that is closest
-    
-    # find out which edge (e1, e2, e3) for ind (the minimum)
-    edge_face_map_row = edge_face_map[ind // num_f][ind % num_f, :]
-    F = edge_face_map_row[edge_face_map_row != -1] # faces associated with minimum edge
-    
-    N = normal_face[F, :]
+    try:
+        ind = np.nanargmin(dist)
+        D = dist[ind] # minimum distance to the edge
+        P = edge_intersections[ind,:] # point on edge that is closest
+        
+        # find out which edge (e1, e2, e3) for ind (the minimum)
+        edge_face_map_row = edge_face_map[ind // num_f][ind % num_f, :]
+        F = edge_face_map_row[edge_face_map_row != -1] # faces associated with minimum edge
+        
+        N = normal_face[F, :]
 
-    # return the signed distance (inside or outside of face)
-    coefficients = np.dot(N, pt-P)
-    sgn = sign_of_largest(coefficients)
-    D = D * sgn 
+        # return the signed distance (inside or outside of face)
+        coefficients = np.dot(N, pt-P)
+        sgn = sign_of_largest(coefficients)
+        D = D * sgn 
 
-    # determine the faces and the edge associated with this intersection
-    V = edges[ind, :] # vertices that define this minimum edge
+        # determine the faces and the edge associated with this intersection
+        V = edges[ind, :] # vertices that define this minimum edge
+    except ValueError as err:
+        logger.warn('The point {} is not in view of any edge: {}'.format(pt, err))
+        
+        D = P = F = V = []
+
     # TODO Better variables names
     return D, P, F, V
 
@@ -1584,10 +1590,7 @@ def distance_to_faces(pt, V, F, normal_face):
     except ValueError as err:
         logger.warn('The point {} is not in view of any face: {}'.format(pt, err))
 
-        D = []
-        P = []
-        V = []
-        F = []
+        D = P = F = V = []
 
     return D, P, F, V
 
