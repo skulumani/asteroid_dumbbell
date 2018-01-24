@@ -133,6 +133,26 @@ def test_closest_vertex_plot_cube():
 
     graphics.mayavi_addTitle(mfig, 'Closest Vertex', color=(0, 0, 0), size=0.5)
 
+def test_closest_face_plot_cube():
+    ast = asteroid.Asteroid('castalia', 256, 'mat')
+    v, f = wavefront.read_obj('./integration/cube.obj')
+    ast = ast.loadmesh(v, f, 'cube')
+    pt = np.array([0.5, 0, 0])
+    D, P, F, V = wavefront.distance_to_faces(pt, v, f, 
+                                             ast.asteroid_grav['normal_face'])
+
+    # draw the mayavi figure
+    mfig = graphics.mayavi_figure()
+    graphics.mayavi_addMesh(mfig, v, f)
+
+    graphics.mayavi_addPoint(mfig, pt, radius=0.1, color=(0, 1, 0))
+    graphics.mayavi_addPoint(mfig, P, radius=0.1, color=(1, 0, 0))
+    
+    # different color for each face
+    graphics.mayavi_addMesh(mfig, V,[(0, 1, 2)], color=tuple(np.random.rand(3)))
+
+    graphics.mayavi_addTitle(mfig, 'Closest Face', color=(0, 0, 0), size=0.5)
+
 # TODO Add a funciton to plot pt, and closest vertex, edge, and face in a color
 if __name__ == "__main__":
     test_normal_face_plot()
