@@ -1471,6 +1471,8 @@ def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
 def distance_to_faces(pt, V, F, normal_face):
     """Compute teh distance from pt to each face
     """
+
+    # TODO Check that directions of vectors are correct
     num_v = V.shape[0]
     num_f = F.shape[0]
     num_e = 3 * (num_v - 2)
@@ -1502,6 +1504,8 @@ def distance_to_faces(pt, V, F, normal_face):
     beta = s_param
     gamma = t_param
     
+    # TODO Raise assertion if alpha + beta + gamma not 1
+
     barycentric = np.stack((alpha, beta, gamma), axis=1)
     # exclude intersections that don't lie inside the faces
     dist[np.absolute(dist) <= np.finfo(float).eps] = np.nan
@@ -1509,10 +1513,11 @@ def distance_to_faces(pt, V, F, normal_face):
     dist[np.any(barycentric >= 1, axis=1)] = np.nan
 
     # determine the closest face
+    # TODO: Better variable names
     ind = np.nanargmin(np.absolute(dist))
     D = dist[ind]
     P = surf_intersections[ind, :]
+    V = V[F[ind,:], :]
     F = ind
-    V = F[ind, :]
 
     return D, P, F, V
