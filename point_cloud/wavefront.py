@@ -1303,10 +1303,10 @@ def sign_of_largest(array):
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
     """
-    array_abs = np.absolute(array)
-    index = np.where(array_abs == np.max(array_abs))
+    index = np.argmax(np.absolute(array))
     sgn = np.sign(array[index])
-    sgn[sgn ==0] = 1
+    if sgn == 0:
+        sgn = 1
     return sgn
 
 def point2trimesh():
@@ -1324,7 +1324,7 @@ def point2trimesh():
 
     pass
 
-def distance_to_vertices(pt, v, f, normal_face):
+def distance_to_vertices(pt, v, f, normal_face, vertex_face_map):
     r"""Find closest vertex in mesh to a given point
 
     D, P, F, V = distance_vertices(pt, v, f, normal_face)
@@ -1370,20 +1370,21 @@ def distance_to_vertices(pt, v, f, normal_face):
     dist, ind = dist_array(pt, v)
     P = v[ind, :]
     V = ind
-    
+    D = np.zeros_like(ind)
+
     # determine the faces that are associated with any of the vertices in ind
-    pdb.set_trace()
     # TODO Need to create a vertex face map. Big array of size (# vertices, 6?) so that each row lists the faces that contain a given vertex
-    F = np.unique(np.where(np.isin(f, ind) == True)[0])
+    F = vertex_face_map[ind]
     assert (len(F) >= 1), "Vertex {} is not connected to any face.".format(ind)
 
-    # find normal associated with these faces
-    N = normal_face[F, :]
-
-    # return the signed distance (inside or outside of face)
-    coeff = np.einsum('ij,ij->i',N, pt-P)
-    D = dist * np.sign(coeff)
+    # for each vertex we need to compute the signed distance to its faces
+    for ii, (faces, int_point) in enumerate(zip(F, P)):
+        N = normal_face[faces, :]
+        coeff = np.dot( N,pt - int_point)
+        sgn = sign_of_largest(coeff)
+        D[ii] = dist[ii] * sgn 
     # TODO Better variables names
+    pdb.set_trace()
     return np.squeeze(D), np.squeeze(P), np.squeeze(F), np.squeeze(V)
 
 def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
