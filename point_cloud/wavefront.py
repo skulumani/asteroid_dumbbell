@@ -717,6 +717,20 @@ def decimate_numpy(vertices, faces, ratio=0.5, preserve_topology=True,
     # return faces/vertices
     return dec_vertices, dec_faces
 
+# TODO: Add documenation
+def vertex_face_map(V, F):
+    """Create an array listing the faces for each vertex
+    """
+    vertex_face_map = [list() for _ in range(V.shape[0])]
+    pdb.set_trace() 
+    # loop through F
+    for face,verts in enumerate(F):
+        for v in verts:
+            vertex_face_map[v].append(face)
+
+     
+    return np.array(vertex_face_map)
+
 def normal_face(V, F):
     r"""Compute the normal to each face
 
@@ -1359,6 +1373,7 @@ def distance_to_vertices(pt, v, f, normal_face):
     
     # determine the faces that are associated with any of the vertices in ind
     pdb.set_trace()
+    # TODO Need to create a vertex face map. Big array of size (# vertices, 6?) so that each row lists the faces that contain a given vertex
     F = np.unique(np.where(np.isin(f, ind) == True)[0])
     assert (len(F) >= 1), "Vertex {} is not connected to any face.".format(ind)
 
