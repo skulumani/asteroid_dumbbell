@@ -55,19 +55,21 @@ def test_closest_vertex_plot_cube():
     graphics.mayavi_addTitle(mfig, 'Closest Vertex', color=(0, 0, 0), size=0.5)
 
 def test_closest_vertex_plot_asteroid():
+    pt = np.random.uniform(1, 1.5) * sphere.rand(2)
+
     ast = asteroid.Asteroid('castalia', 256, 'mat')
     v =  ast.asteroid_grav['V']
     f = ast.asteroid_grav['F']
-    pt = np.array([1, 0, 0])
     D, P, F, V = wavefront.distance_to_vertices(pt, v, f, 
-                                                ast.asteroid_grav['normal_face'])
+                                                ast.asteroid_grav['normal_face'],
+                                                ast.asteroid_grav['vertex_face_map'])
 
     # draw the mayavi figure
     mfig = graphics.mayavi_figure()
     graphics.mayavi_addMesh(mfig, v, f)
 
     graphics.mayavi_addPoint(mfig, pt, radius=0.1, color=(0, 1, 0))
-    graphics.mayavi_addPoint(mfig, P, radius=0.1, color=(1, 0, 0))
+    graphics.mayavi_points3d(mfig, P,scale_factor=0.1, color=(1, 0, 0))
     
     # different color for each face
     for f_ind in F:
