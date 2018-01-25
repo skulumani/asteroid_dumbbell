@@ -213,7 +213,7 @@ class TestDistanceToVerticesCubeOutsideRandom():
 
 class TestDistanceToEdgesCubeOutsideFixedSingle():
 
-    pt_out = np.array([1, 0, 0])
+    pt_out = np.array([1, 0.5, 0.5])
     ast = asteroid.Asteroid('castalia', 256, 'mat')
     v, f = wavefront.read_obj('./integration/cube.obj')
     ast = ast.loadmesh(v, f, 'cube')
@@ -227,9 +227,9 @@ class TestDistanceToEdgesCubeOutsideFixedSingle():
                                              edge_vertex_map,
                                              edge_face_map)
     D_exp = 0.5
-    P_exp = np.array([0.5, -0, -0])
+    P_exp = np.array([0.5, 0.5, 0.5])
     F_exp = [7, 6]
-    V_exp = [7, 4]
+    V_exp = [7]
 
     def test_distance(self):
         np.testing.assert_allclose(self.D, self.D_exp)
@@ -244,7 +244,7 @@ class TestDistanceToEdgesCubeOutsideFixedMultiple():
     """This point is equally close to vertex so hopefully multiple edges
     have equal distance
     """
-    pt_out = np.array([1,0.5, 0.5])
+    pt_out = np.array([1, 0, 0])
     ast = asteroid.Asteroid('castalia', 256, 'mat')
     v, f = wavefront.read_obj('./integration/cube.obj')
     ast = ast.loadmesh(v, f, 'cube')
@@ -257,22 +257,17 @@ class TestDistanceToEdgesCubeOutsideFixedMultiple():
                                              normal_face, 
                                              edge_vertex_map,
                                              edge_face_map)
-    pdb.set_trace()
-    D_exp = np.ones_like(D) * 0.5 * np.sqrt(3)
-    P_exp = np.array([[ 0.5, -0.5, -0.5],         
-                      [ 0.5, -0.5,  0.5],         
-                      [ 0.5,  0.5, -0.5],         
-                      [ 0.5,  0.5,  0.5]])  
-    F_exp = np.array([list([0, 6, 7, 8]),
-                      list([7, 8, 9, 10]),
-                      list([0, 1, 4, 6]),
-                      list([4, 5, 6, 7, 10, 11])])
-    V_exp = np.array([4, 5, 6, 7])
+    D_exp = np.array([0.5, 0.5]) 
+    P_exp = np.array([[0.5, -0, -0],
+                      [0.5, 0, 0]])
+    F_exp = np.array([[7, 6],
+                      [6, 7]])
+    V_exp = np.array([7, 30])
 
     def test_distance(self):
         np.testing.assert_allclose(np.absolute(self.D), self.D_exp)
     def test_point(self):
-        np.testing.assert_allclose(self.P, self.P_exp)
+        np.testing.assert_array_almost_equal(self.P, self.P_exp)
     def test_face(self):
         for F, F_exp in zip(self.F, self.F_exp):
             np.testing.assert_allclose(F, F_exp)

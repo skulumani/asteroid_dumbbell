@@ -1418,7 +1418,7 @@ def distance_to_vertices(pt, v, f, normal_face, vf_map):
     return np.squeeze(D), np.squeeze(P), np.squeeze(F), np.squeeze(V)
 
 def distance_to_edges(pt, v, f, normal_face, edge_vertex_map,
-                      edge_face_map):
+                      edge_face_map, vf_map):
     r"""Compute distance to all edges and output minimum
 
     D, P, F, V = distance_to_edges(pt, v, f, normal_face,
@@ -1445,6 +1445,9 @@ def distance_to_edges(pt, v, f, normal_face, edge_vertex_map,
         The size in each are (# faces, 4). The first column defines the face number.
         The last three columns give you the matching edge and the associated face.
         Columns show, e1, e2, e3 and rows are the face numbers.
+    vf_map : numpy array (# v, m)
+        This is a list object of lists which tells you the faces that contain
+        any given vertex
 
     Returns
     -------
@@ -1489,7 +1492,6 @@ def distance_to_edges(pt, v, f, normal_face, edge_vertex_map,
     
     a = v1 - pt
     b = v2 - v1
-
     edge_param = - np.einsum('ij,ij->i', a, b) / np.linalg.norm(b, axis=1)**2
     
     # exclude intersections that are outside of the range 0, 1
@@ -1503,17 +1505,17 @@ def distance_to_edges(pt, v, f, normal_face, edge_vertex_map,
     edge_intersections = v1 + edge_param[:, np.newaxis] * b
     dist, index = dist_array(pt, edge_intersections)
     P = edge_intersections[index, :]
-    V = index
-    F = []
+    V = edges[index, :]
+    F = [vf_map[ii] for ii in np.unique(V)]
     N = []
     D = []
     # determine which edge for the given ind (closest)
     for ii, ind in enumerate(index):
+        pdb.set_trace()
         edge_face_map_row = edge_face_map[ind // num_f][ind % num_f, :]
         face_index = edge_face_map_row[edge_face_map_row != -1]
         face_normals = normal_face[face_index, :]
 
-        F.append(face_index) # faces associated with this edge
         N.append(face_normals)
         
         coeff = np.dot(face_normals, pt - P[ii, :])
