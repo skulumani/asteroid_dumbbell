@@ -29,6 +29,53 @@ def test_normal_face_plot():
 
     graphics.mayavi_addTitle(mfig, 'Normals to each face', color=(0, 0, 0), size=0.5)
 
+def test_closest_vertex_plot_cube():
+    pt = np.random.uniform(0.6 * np.sqrt(3), 1) * sphere.rand(2)
+
+    ast = asteroid.Asteroid('castalia', 256, 'mat')
+    v, f = wavefront.read_obj('./integration/cube.obj')
+    ast = ast.loadmesh(v, f, 'cube')
+    D, P, F, V = wavefront.distance_to_vertices(pt, v, f, 
+                                                ast.asteroid_grav['normal_face'],
+                                                ast.asteroid_grav['vertex_face_map'])
+
+    # draw the mayavi figure
+    mfig = graphics.mayavi_figure()
+    graphics.mayavi_addMesh(mfig, v, f)
+
+    pdb.set_trace()
+    graphics.mayavi_addPoint(mfig, pt, radius=0.1, color=(0, 1, 0))
+    graphics.mayavi_points3d(mfig, P, scale_factor=0.1, color=(1, 0, 0))
+    
+    # different color for each face
+    for f_ind in F:
+        face_verts = v[f[f_ind,:],:]
+        graphics.mayavi_addMesh(mfig, face_verts,[(0, 1, 2)], color=tuple(np.random.rand(3)))
+
+    graphics.mayavi_addTitle(mfig, 'Closest Vertex', color=(0, 0, 0), size=0.5)
+
+def test_closest_vertex_plot_asteroid():
+    ast = asteroid.Asteroid('castalia', 256, 'mat')
+    v =  ast.asteroid_grav['V']
+    f = ast.asteroid_grav['F']
+    pt = np.array([1, 0, 0])
+    D, P, F, V = wavefront.distance_to_vertices(pt, v, f, 
+                                                ast.asteroid_grav['normal_face'])
+
+    # draw the mayavi figure
+    mfig = graphics.mayavi_figure()
+    graphics.mayavi_addMesh(mfig, v, f)
+
+    graphics.mayavi_addPoint(mfig, pt, radius=0.1, color=(0, 1, 0))
+    graphics.mayavi_addPoint(mfig, P, radius=0.1, color=(1, 0, 0))
+    
+    # different color for each face
+    for f_ind in F:
+        face_verts = v[f[f_ind,:],:]
+        graphics.mayavi_addMesh(mfig, face_verts,[(0, 1, 2)], color=tuple(np.random.rand(3)))
+
+    graphics.mayavi_addTitle(mfig, 'Closest Vertex', color=(0, 0, 0), size=0.5)
+
 def test_closest_edge_plot_cube():
     ast = asteroid.Asteroid('castalia', 256, 'mat')
     v, f = wavefront.read_obj('./integration/cube.obj')
@@ -94,49 +141,6 @@ def test_closest_edge_plot_asteroid():
     
     graphics.mayavi_addTitle(mfig, 'Closest Edge', color=(0, 0, 0), size=0.5)
 
-def test_closest_vertex_plot_asteroid():
-    ast = asteroid.Asteroid('castalia', 256, 'mat')
-    v =  ast.asteroid_grav['V']
-    f = ast.asteroid_grav['F']
-    pt = np.array([1, 0, 0])
-    D, P, F, V = wavefront.distance_to_vertices(pt, v, f, 
-                                                ast.asteroid_grav['normal_face'])
-
-    # draw the mayavi figure
-    mfig = graphics.mayavi_figure()
-    graphics.mayavi_addMesh(mfig, v, f)
-
-    graphics.mayavi_addPoint(mfig, pt, radius=0.1, color=(0, 1, 0))
-    graphics.mayavi_addPoint(mfig, P, radius=0.1, color=(1, 0, 0))
-    
-    # different color for each face
-    for f_ind in F:
-        face_verts = v[f[f_ind,:],:]
-        graphics.mayavi_addMesh(mfig, face_verts,[(0, 1, 2)], color=tuple(np.random.rand(3)))
-
-    graphics.mayavi_addTitle(mfig, 'Closest Vertex', color=(0, 0, 0), size=0.5)
-
-def test_closest_vertex_plot_cube():
-    ast = asteroid.Asteroid('castalia', 256, 'mat')
-    v, f = wavefront.read_obj('./integration/cube.obj')
-    ast = ast.loadmesh(v, f, 'cube')
-    pt = np.array([2, 0, 0])
-    D, P, F, V = wavefront.distance_to_vertices(pt, v, f, 
-                                                ast.asteroid_grav['normal_face'])
-
-    # draw the mayavi figure
-    mfig = graphics.mayavi_figure()
-    graphics.mayavi_addMesh(mfig, v, f)
-
-    graphics.mayavi_addPoint(mfig, pt, radius=0.1, color=(0, 1, 0))
-    graphics.mayavi_addPoint(mfig, P, radius=0.1, color=(1, 0, 0))
-    
-    # different color for each face
-    for f_ind in F:
-        face_verts = v[f[f_ind,:],:]
-        graphics.mayavi_addMesh(mfig, face_verts,[(0, 1, 2)], color=tuple(np.random.rand(3)))
-
-    graphics.mayavi_addTitle(mfig, 'Closest Vertex', color=(0, 0, 0), size=0.5)
 
 def test_closest_face_plot_cube():
     """Needs to be aligned with a face
@@ -160,7 +164,6 @@ def test_closest_face_plot_cube():
         graphics.mayavi_addPoint(mfig, P, radius=0.1, color=(1, 0, 0))
         # different color for each face
         graphics.mayavi_addMesh(mfig, V,[(0, 1, 2)], color=tuple(np.random.rand(3)))
-
 
 def test_closest_face_plot_asteroid():
     """Needs to be aligned with a face
