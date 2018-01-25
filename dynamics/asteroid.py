@@ -193,6 +193,7 @@ class Asteroid(object):
         e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face, e_vertex_map, unique_index) = wavefront.polyhedron_parameters(V, F)
         
         edge_vertex_map = (e1_vertex_map, e2_vertex_map, e3_vertex_map)
+        vertex_face_map = wavefront.vertex_face_map(V, F)
 
         # compute F dyad
         F_face = np.einsum('ij,ik->jki', normal_face, normal_face)
@@ -233,6 +234,7 @@ class Asteroid(object):
             'e2_vertex_map':    e2_vertex_map,
             'e3_vertex_map':    e3_vertex_map,
             'edge_vertex_map':  edge_vertex_map,
+            'vertex_face_map':  vertex_face_map,
             'e_vertex_map':     e_vertex_map,
             'unique_index':     unique_index,
             'e1_ind1b':         e1_ind1b,
