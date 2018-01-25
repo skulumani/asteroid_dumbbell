@@ -717,9 +717,34 @@ def decimate_numpy(vertices, faces, ratio=0.5, preserve_topology=True,
     # return faces/vertices
     return dec_vertices, dec_faces
 
-# TODO: Add documenation and unit test
 def vertex_face_map(V, F):
-    """Create an array listing the faces for each vertex
+    r"""Create mapping between vertices and the connected faces
+
+    vf_map = vertex_face_map(V, F)
+
+    Parameters
+    ----------
+    V : numpy array (# vertices, 3)
+        The list of vertices defining the mesh
+    F : numpy array (# faces, 3)
+        Connection between the vertices to define the triangular surface
+
+    Returns
+    -------
+    vf_map : list object of lists (# verts, )
+        Each element represents the indices of faces that are composed of that 
+        vertex.
+        For example, vf_map[0] = list([0, 1, 2]) means that vertex zero, ie.
+        V[0, :] is used to define faces 0, 1, 2. Or equivalently that each of the 
+        following F[[0, 1, 2], :] contains a 0 somewhere in that row.
+
+    See Also
+    --------
+    polyhedron_parameters : another function to compute lots of useful stuff
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
     """
     vertex_face_map = [list() for _ in range(V.shape[0])]
     # loop through F
@@ -1337,6 +1362,9 @@ def distance_to_vertices(pt, v, f, normal_face, vf_map):
         Topological connection of mesh
     normal_face : numpy array ( f, 3)
         Normal to the center of each face
+    vf_map : numpy array (# v, m)
+        This is a list object of lists which tells you the faces that contain
+        any given vertex
 
     Returns
     -------
