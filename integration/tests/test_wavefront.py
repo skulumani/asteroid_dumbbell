@@ -43,7 +43,6 @@ def test_closest_vertex_plot_cube():
     mfig = graphics.mayavi_figure()
     graphics.mayavi_addMesh(mfig, v, f)
 
-    pdb.set_trace()
     graphics.mayavi_addPoint(mfig, pt, radius=0.1, color=(0, 1, 0))
     graphics.mayavi_points3d(mfig, P, scale_factor=0.1, color=(1, 0, 0))
     
