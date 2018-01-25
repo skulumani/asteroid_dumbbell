@@ -1417,11 +1417,11 @@ def distance_to_vertices(pt, v, f, normal_face, vf_map):
     # TODO Better variables names
     return np.squeeze(D), np.squeeze(P), np.squeeze(F), np.squeeze(V)
 
-def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
+def distance_to_edges(pt, v, f, normal_face, edge_vertex_map,
                       edge_face_map):
     r"""Compute distance to all edges and output minimum
 
-    D, P, F, V = distance_to_edges(pt, V, F, normal_face,
+    D, P, F, V = distance_to_edges(pt, v, f, normal_face,
                                    edge_vertex_map, edge_face_map)
 
     Parameters
@@ -1441,7 +1441,7 @@ def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
         minus the second column.
     edge_face_map : 3 - tuple
         (e1_face_map, e2_face_map, e3_face_map)
-        Each element of tuple defines the mapping between the vertices and edges.
+        Each element of tuple defines the mapping between the opposite edges.
         The size in each are (# faces, 4). The first column defines the face number.
         The last three columns give you the matching edge and the associated face.
         Columns show, e1, e2, e3 and rows are the face numbers.
@@ -1468,15 +1468,15 @@ def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
     .. [1] OROURKE, Joseph. Computational Geometry in C. 2 ed. Cambridge
     University Press, 1998.
     """
-    num_v = V.shape[0]
-    num_f = F.shape[0]
+    num_v = v.shape[0]
+    num_f = f.shape[0]
     num_e = 3 * (num_v - 2)
     # put all the edges in an array
 
     # calculate all the edges - zero indexing for python
-    Fa = F[:, 0] 
-    Fb = F[:, 1]
-    Fc = F[:, 2]
+    Fa = f[:, 0] 
+    Fb = f[:, 1]
+    Fc = f[:, 2]
 
     e1_vertex_map, e2_vertex_map, e3_vertex_map = edge_vertex_map
     e1_face_map, e2_face_map, e3_face_map = edge_face_map
@@ -1484,8 +1484,8 @@ def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
     edges = np.concatenate((e1_vertex_map, e2_vertex_map, e3_vertex_map))
     
     # find the parameteric intersection parameter for every edge (t)
-    v1 = V[edges[:, 1], :]
-    v2 = V[edges[:, 0], :]
+    v1 = v[edges[:, 1], :]
+    v2 = v[edges[:, 0], :]
     
     a = v1 - pt
     b = v2 - v1
@@ -1500,36 +1500,27 @@ def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,
     edge_param[mask] = np.nan
 
     # find the distance between intersection (on edge) and point
-    edge_intersections = v1 +edge_param[:, np.newaxis] * b
-    edge_dist = pt - edge_intersections
-    dist = np.sqrt(np.einsum('ij,ij->i', edge_dist, edge_dist))
-    
-    # find minimum distance and edge index and intersection piont
-    try:
-        ind = np.nanargmin(dist)
-        D = dist[ind] # minimum distance to the edge
-        P = edge_intersections[ind,:] # point on edge that is closest
-        
-        # find out which edge (e1, e2, e3) for ind (the minimum)
+    edge_intersections = v1 + edge_param[:, np.newaxis] * b
+    dist, index = dist_array(pt, edge_intersections)
+    P = edge_intersections[index, :]
+    V = index
+    F = []
+    N = []
+    D = []
+    # determine which edge for the given ind (closest)
+    for ii, ind in enumerate(index):
         edge_face_map_row = edge_face_map[ind // num_f][ind % num_f, :]
-        F = edge_face_map_row[edge_face_map_row != -1] # faces associated with minimum edge
+        face_index = edge_face_map_row[edge_face_map_row != -1]
+        face_normals = normal_face[face_index, :]
+
+        F.append(face_index) # faces associated with this edge
+        N.append(face_normals)
         
-        N = normal_face[F, :]
+        coeff = np.dot(face_normals, pt - P[ii, :])
+        sign = sign_of_largest(coeff)
+        D.append(dist[ii] * sign)
 
-        # return the signed distance (inside or outside of face)
-        coefficients = np.dot(N, pt-P)
-        sgn = sign_of_largest(coefficients)
-        D = D * sgn 
-
-        # determine the faces and the edge associated with this intersection
-        V = edges[ind, :] # vertices that define this minimum edge
-    except ValueError as err:
-        logger.warn('The point {} is not in view of any edge: {}'.format(pt, err))
-        
-        D = P = F = V = []
-
-    # TODO Better variables names
-    return D, P, F, V
+    return np.squeeze(D), np.squeeze(P), np.squeeze(F), np.squeeze(V)
 
 def distance_to_faces(pt, V, F, normal_face):
     r"""Find distance to every face and output the closest one
