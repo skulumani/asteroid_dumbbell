@@ -642,7 +642,6 @@ class TestDistanceToVerticesCubeOutsideFixedSingle():
     D, P, F, V = wavefront.distance_to_vertices(pt_out, v_cube, f_cube,
                                                 normal_face_cube, 
                                                 vertex_face_map)
-    pdb.set_trace()
     D_exp = 0.5 * np.sqrt(3)
     P_exp = np.array([0.5, 0.5, 0.5])
     F_exp = [4, 5, 6, 7, 10, 11]
@@ -657,24 +656,36 @@ class TestDistanceToVerticesCubeOutsideFixedSingle():
     def test_vertex(self):
         np.testing.assert_allclose(self.V, self.V_exp)
 
-class TestDistanceToVerticesCubeInsideFixed():
+class TestDistanceToVerticesCubeOutsideFixedMultiple():
+    """This point is equally close to an entire face of the cube
 
-    pt_out = np.array([0, 0, 0])
+    So there are 4 vertices equidistant from pt
+    """
+    pt_out = np.array([1,0, 0])
     v_cube, f_cube = wavefront.read_obj('./integration/cube.obj')
     normal_face_cube = wavefront.normal_face(v_cube, f_cube)
+    vertex_face_map = wavefront.vertex_face_map(v_cube, f_cube)
     D, P, F, V = wavefront.distance_to_vertices(pt_out, v_cube, f_cube,
-                                                normal_face_cube)
-    D_exp = np.full(v_cube.shape[0],0.5 * np.sqrt(3))
-    P_exp = v_cube
-    F_exp = np.arange(0, 8)
-    V_exp = np.arange(0, 8)
+                                                normal_face_cube, 
+                                                vertex_face_map)
+    D_exp = np.ones_like(D) * 0.5 * np.sqrt(3)
+    P_exp = np.array([[ 0.5, -0.5, -0.5],         
+                      [ 0.5, -0.5,  0.5],         
+                      [ 0.5,  0.5, -0.5],         
+                      [ 0.5,  0.5,  0.5]])  
+    F_exp = np.array([list([0, 6, 7, 8]),
+                      list([7, 8, 9, 10]),
+                      list([0, 1, 4, 6]),
+                      list([4, 5, 6, 7, 10, 11])])
+    V_exp = np.array([4, 5, 6, 7])
 
     def test_distance(self):
         np.testing.assert_allclose(np.absolute(self.D), self.D_exp)
     def test_point(self):
         np.testing.assert_allclose(self.P, self.P_exp)
     def test_face(self):
-        np.testing.assert_allclose(self.F, self.F_exp)
+        for F, F_exp in zip(self.F, self.F_exp):
+            np.testing.assert_allclose(F, F_exp)
     def test_vertex(self):
         np.testing.assert_allclose(self.V, self.V_exp)
 
