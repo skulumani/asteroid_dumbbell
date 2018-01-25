@@ -641,6 +641,17 @@ class TestCenterOfFace():
     def test_size(self):
         np.testing.assert_allclose(self.cof.shape, self.f_cube.shape)
 
+class TestVertexFaceMap():
+    v_cube, f_cube = wavefront.read_obj('./integration/cube.obj')
+    vf_map = wavefront.vertex_face_map(v_cube, f_cube)
+    
+    def test_size(self):
+        np.testing.assert_allclose(len(self.vf_map), self.v_cube.shape[0])
+
+    def test_each_vertex_inside_a_face(self):
+        for faces in self.vf_map:
+            np.testing.assert_allclose(len(faces) >=1, True)
+
 class TestDistanceToVerticesCubeOutsideFixedSingle():
 
     pt_out = np.array([1,1, 1])
