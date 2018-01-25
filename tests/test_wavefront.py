@@ -633,34 +633,47 @@ class TestSignOfLargest():
         sgn = wavefront.sign_of_largest(array)
         np.testing.assert_allclose(sgn, -1)
 
-class TestDistanceToVertices():
+class TestDistanceToVerticesCubeOutsideFixed():
 
+    pt_out = np.array([1, 0.5, 0.5])
     v_cube, f_cube = wavefront.read_obj('./integration/cube.obj')
     normal_face_cube = wavefront.normal_face(v_cube, f_cube)
+    D, P, F, V = wavefront.distance_to_vertices(pt_out, v_cube, f_cube,
+                                                normal_face_cube)
+    D_exp = 0.5
+    P_exp = np.array([0.5, 0.5, 0.5])
+    F_exp = 0
+    V_exp = 7
 
-    v_itokawa, f_itokawa = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_very_high.obj')
-    normal_face_itokawa = wavefront.normal_face(v_itokawa, f_itokawa)
-    
-    def test_cube_outside(self):
-        pt_out = np.array([1, 0.5, 0.5])
-        D, P, F, V = wavefront.distance_to_vertices(pt_out, self.v_cube, 
-                                                    self.f_cube,
-                                                    self.normal_face_cube)
-        pdb.set_trace()
-        np.testing.assert_allclose(D, 0.5)
-        np.testing.assert_allclose(P, np.array([0.5, 0.5, 0.5]))
-        np.testing.assert_allclose(F, 0)
-        np.testing.assert_allclose(V, 7)
+    def test_distance(self):
+        np.testing.assert_allclose(self.D, self.D_exp)
+    def test_point(self):
+        np.testing.assert_allclose(self.P, self.P_exp)
+    def test_face(self):
+        np.testing.assert_allclose(self.F, self.F_exp)
+    def test_vertex(self):
+        np.testing.assert_allclose(self.V, self.V_exp)
 
-    # def test_cube_inside(self):
-    #     pt_out = np.array([0, 0, 0])
-    #     D, P, F, V = wavefront.distance_to_vertices(pt_out, self.v_cube, 
-    #                                                 self.f_cube,
-    #                                                 self.normal_face_cube)
-    #     np.testing.assert_allclose(np.sign(D), -1)
-    #     np.testing.assert_allclose(P, self.v_cube[0,:])
-    #     np.testing.assert_allclose(F, np.array([0, 1, 2, 3, 8, 9]))
-    #     np.testing.assert_allclose(V, 0)
+class TestDistanceToVerticesCubeInsideFixed():
+
+    pt_out = np.array([0, 0, 0])
+    v_cube, f_cube = wavefront.read_obj('./integration/cube.obj')
+    normal_face_cube = wavefront.normal_face(v_cube, f_cube)
+    D, P, F, V = wavefront.distance_to_vertices(pt_out, v_cube, f_cube,
+                                                normal_face_cube)
+    D_exp = np.full(v_cube.shape[0],0.5 * np.sqrt(3))
+    P_exp = v_cube
+    F_exp = np.arange(0, 8)
+    V_exp = np.arange(0, 8)
+
+    def test_distance(self):
+        np.testing.assert_allclose(np.absolute(self.D), self.D_exp)
+    def test_point(self):
+        np.testing.assert_allclose(self.P, self.P_exp)
+    def test_face(self):
+        np.testing.assert_allclose(self.F, self.F_exp)
+    def test_vertex(self):
+        np.testing.assert_allclose(self.V, self.V_exp)
 
     # def test_cube_orthogonal(self):
     #     pt_out = np.array([1.1-0.5, -0.5, -0.5])
