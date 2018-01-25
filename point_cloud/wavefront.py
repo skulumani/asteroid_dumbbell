@@ -1303,7 +1303,7 @@ def dist_array(pt, array):
     # dist = np.sum((pt - array)**2, axis=1)
     delta = array - pt
     dist = np.einsum('ij,ij->i', delta, delta)
-    ind = np.where(dist == np.min(dist))[0]
+    ind = np.where(dist == np.nanmin(dist))[0]
     return np.sqrt(dist[ind]), ind
 
 def sign_of_largest(array):
