@@ -1358,7 +1358,8 @@ def distance_to_vertices(pt, v, f, normal_face):
     V = ind
     
     # determine the faces that are associated with any of the vertices in ind
-    F = np.where(np.isin(ind, f) == True)[0]
+    pdb.set_trace()
+    F = np.unique(np.where(np.isin(f, ind) == True)[0])
     assert (len(F) >= 1), "Vertex {} is not connected to any face.".format(ind)
 
     # find normal associated with these faces
@@ -1366,8 +1367,7 @@ def distance_to_vertices(pt, v, f, normal_face):
 
     # return the signed distance (inside or outside of face)
     coeff = np.einsum('ij,ij->i',N, pt-P)
-    sgn = sign_of_largest(coeff)
-    D = dist * sgn
+    D = dist * np.sign(coeff)
     # TODO Better variables names
     return np.squeeze(D), np.squeeze(P), np.squeeze(F), np.squeeze(V)
 
