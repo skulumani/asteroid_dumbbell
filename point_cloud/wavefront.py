@@ -717,19 +717,17 @@ def decimate_numpy(vertices, faces, ratio=0.5, preserve_topology=True,
     # return faces/vertices
     return dec_vertices, dec_faces
 
-# TODO: Add documenation
+# TODO: Add documenation and unit test
 def vertex_face_map(V, F):
     """Create an array listing the faces for each vertex
     """
     vertex_face_map = [list() for _ in range(V.shape[0])]
-    pdb.set_trace() 
     # loop through F
     for face,verts in enumerate(F):
         for v in verts:
             vertex_face_map[v].append(face)
-
      
-    return np.array(vertex_face_map)
+    return vertex_face_map
 
 def normal_face(V, F):
     r"""Compute the normal to each face
@@ -1324,7 +1322,7 @@ def point2trimesh():
 
     pass
 
-def distance_to_vertices(pt, v, f, normal_face, vertex_face_map):
+def distance_to_vertices(pt, v, f, normal_face, vf_map):
     r"""Find closest vertex in mesh to a given point
 
     D, P, F, V = distance_vertices(pt, v, f, normal_face)
@@ -1342,19 +1340,25 @@ def distance_to_vertices(pt, v, f, normal_face, vertex_face_map):
 
     Returns
     -------
-    D : float
+    D : float [3]
         Signed distance from pt to the closest vertex (+ outside, - inside)
-    P : numpy array (3, )
+    P : numpy array (n, 3)
         Location of the closest vertices. extracted from v
-    F : numpy array (m, )
-        Indices of all the faces associated with the vertex P
-    V : int
+    F : numpy array (m, q)
+        Indices of all the faces associated with the vertices given in P
+    V : int (n,)
         Index of the closest points in v. So P = v[V,:]. There may be many 
         points
 
     See Also
     --------
     sign_of_largest : Finds the sign of largest element in array
+
+    Notes
+    -----
+    This function may return many points if there are multiple vertices
+    that are exactly the same distance. In such a case, the rows are defining
+    a single vertex and the associated properties
 
     Author
     ------
@@ -1370,21 +1374,19 @@ def distance_to_vertices(pt, v, f, normal_face, vertex_face_map):
     dist, ind = dist_array(pt, v)
     P = v[ind, :]
     V = ind
-    D = np.zeros_like(ind)
+    D = []
 
     # determine the faces that are associated with any of the vertices in ind
-    # TODO Need to create a vertex face map. Big array of size (# vertices, 6?) so that each row lists the faces that contain a given vertex
-    F = vertex_face_map[ind]
+    F = [vf_map[ii] for ii in ind]
     assert (len(F) >= 1), "Vertex {} is not connected to any face.".format(ind)
-
     # for each vertex we need to compute the signed distance to its faces
     for ii, (faces, int_point) in enumerate(zip(F, P)):
         N = normal_face[faces, :]
         coeff = np.dot( N,pt - int_point)
-        sgn = sign_of_largest(coeff)
-        D[ii] = dist[ii] * sgn 
+        sign_of_value = sign_of_largest(coeff)
+        D.append(dist[ii] * sign_of_value)
+
     # TODO Better variables names
-    pdb.set_trace()
     return np.squeeze(D), np.squeeze(P), np.squeeze(F), np.squeeze(V)
 
 def distance_to_edges(pt, V, F, normal_face, edge_vertex_map,

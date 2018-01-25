@@ -633,16 +633,19 @@ class TestSignOfLargest():
         sgn = wavefront.sign_of_largest(array)
         np.testing.assert_allclose(sgn, -1)
 
-class TestDistanceToVerticesCubeOutsideFixed():
+class TestDistanceToVerticesCubeOutsideFixedSingle():
 
-    pt_out = np.array([1, 0.5, 0.5])
+    pt_out = np.array([1,1, 1])
     v_cube, f_cube = wavefront.read_obj('./integration/cube.obj')
     normal_face_cube = wavefront.normal_face(v_cube, f_cube)
+    vertex_face_map = wavefront.vertex_face_map(v_cube, f_cube)
     D, P, F, V = wavefront.distance_to_vertices(pt_out, v_cube, f_cube,
-                                                normal_face_cube)
-    D_exp = 0.5
+                                                normal_face_cube, 
+                                                vertex_face_map)
+    pdb.set_trace()
+    D_exp = 0.5 * np.sqrt(3)
     P_exp = np.array([0.5, 0.5, 0.5])
-    F_exp = 0
+    F_exp = [4, 5, 6, 7, 10, 11]
     V_exp = 7
 
     def test_distance(self):
