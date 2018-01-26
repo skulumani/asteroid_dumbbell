@@ -1403,21 +1403,32 @@ def distance_to_vertices(pt, v, f, normal_face, edge_vertex_map,
     """
     # determine the vertex that is closest to pt
     dist, ind = dist_array(pt, v)
-    P = v[ind, :]
+    P = np.squeeze(v[ind, :])
     V = ind
     D = []
 
     edges = np.concatenate(edge_vertex_map)
-    E = [edges[np.where(edges == ii)[0],:] for ii in V]
-    # determine the faces that are associated with any of the vertices in ind
-    F = [vf_map[ii] for ii in ind]
+    if V.size > 1:
+        E = [edges[np.where(edges == ii)[0],:] for ii in V]
+        # determine the faces that are associated with any of the vertices in ind
+        F = [vf_map[ii] for ii in ind]
+
+        for ii, (faces, int_point) in enumerate(zip(F, P)):
+            N = normal_face[faces, :]
+            coeff = np.dot( N,pt - int_point)
+            sign_of_value = sign_of_largest(coeff)
+            D.append(dist[ii] * sign_of_value)
+    else:
+        E = edges[np.where(edges == V)[0], :]
+        F = vf_map[int(ind)] 
+
+        N = normal_face[F, :]
+        coeff = np.dot(N, pt - P)
+        sign_of_value = sign_of_largest(coeff)
+        D.append(dist * sign_of_value)
+
     assert (len(F) >= 1), "Vertex {} is not connected to any face.".format(ind)
     # for each vertex we need to compute the signed distance to its faces
-    for ii, (faces, int_point) in enumerate(zip(F, P)):
-        N = normal_face[faces, :]
-        coeff = np.dot( N,pt - int_point)
-        sign_of_value = sign_of_largest(coeff)
-        D.append(dist[ii] * sign_of_value)
 
     # TODO Better variables names
     return np.squeeze(D), np.squeeze(P), np.squeeze(V), np.squeeze(E), np.squeeze(F)

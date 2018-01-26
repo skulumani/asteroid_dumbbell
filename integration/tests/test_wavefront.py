@@ -52,7 +52,6 @@ def test_closest_vertex_plot_cube(pt=np.random.uniform(0.6 * np.sqrt(3), 1) * sp
 
     graphics.mayavi_addPoint(mfig, pt, radius=0.1, color=(0, 1, 0))
     graphics.mayavi_points3d(mfig, P, scale_factor=0.1, color=(1, 0, 0))
-    pdb.set_trace()    
     # different color for each face
     try:
         _ = iter(F[0])
