@@ -39,6 +39,8 @@ from vtk.util import numpy_support
 
 import utilities
 
+warnings.filterwarnings(action="ignore", category=RuntimeWarning,
+                        message=r"All-NaN")
 logger = logging.getLogger(__name__)
 
 # TODO: Create better function names
