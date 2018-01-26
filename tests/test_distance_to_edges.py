@@ -88,3 +88,78 @@ class TestDistanceToEdgesCubeOutsideFixedMultiple():
 
     def test_face(self):
         np.testing.assert_allclose(self.F, self.F_exp)
+
+class TestDistanceToEdgesCubeInside():
+
+    pt_out = np.array([0.4, 0.4, 0.4])
+    v_cube, f_cube = wavefront.read_obj('./integration/cube.obj')
+    ast = asteroid.Asteroid('castalia', 256, 'mat')
+    ast = ast.loadmesh(v_cube, f_cube, 'cube')
+    edge_vertex_map = ast.asteroid_grav['edge_vertex_map']
+    edge_face_map = ast.asteroid_grav['edge_face_map']
+    normal_face = ast.asteroid_grav['normal_face']
+    vf_map = ast.asteroid_grav['vertex_face_map']
+
+    D, P, V, E, F = wavefront.distance_to_vertices(pt_out, v_cube, f_cube,
+                                                   normal_face,
+                                                   edge_vertex_map,
+                                                   edge_face_map,
+                                                   vf_map)
+    D_exp = -0.4 * np.sqrt(2) * np.ones_like(D)
+    P_exp = np.array([[0.5, 0.5, 0],
+                      [0.5, 0.5, 0]])
+    V_exp = np.array([6, 7])
+    E_exp = np.arra([[6, 7], 
+                     [7, 6]])
+    F_exp = np.array([[4, 6],
+                      [4, 6]])
+
+    def test_distance(self):
+        np.testing.assert_allclose(self.D, self.D_exp)
+
+    def test_point(self):
+        np.testing.assert_allclose(self.P, self.P_exp)
+
+    def test_vertex(self):
+        np.testing.assert_allclose(self.V, self.V_exp)
+
+    def test_edge(self):
+        for E, E_exp in zip(self.E, self.E_exp):
+            np.testing.assert_allclose(E, E_exp)
+
+    def test_face(self):
+        np.testing.assert_allclose(self.F, self.F_exp)
+
+class TestDistanceToEdgesCubeOutsideEdge():
+
+    pt_out = np.array([0.6, 0.6, 0.6])
+    v_cube, f_cube = wavefront.read_obj('./integration/cube.obj')
+    ast = asteroid.Asteroid('castalia', 256, 'mat')
+    ast = ast.loadmesh(v_cube, f_cube, 'cube')
+
+    edge_vertex_map = ast.asteroid_grav['edge_vertex_map']
+    edge_face_map = ast.asteroid_grav['edge_face_map']
+    normal_face = ast.asteroid_grav['normal_face']
+    vf_map = ast.asteroid_grav['vertex_face_map']
+
+    D, P, V, E, F = wavefront.distance_to_vertices(pt_out, v_cube, f_cube,
+                                                   normal_face,
+                                                   edge_vertex_map,
+                                                   edge_face_map,
+                                                   vf_map)
+    D_exp = P_exp = V_exp = E_exp = F_exp = []
+
+    def test_distance(self):
+        np.testing.assert_allclose(self.D, self.D_exp)
+
+    def test_point(self):
+        np.testing.assert_allclose(self.P, self.P_exp)
+
+    def test_vertex(self):
+        np.testing.assert_allclose(self.V, self.V_exp)
+
+    def test_edge(self):
+        np.testing.assert_allclose(E, E_exp)
+
+    def test_face(self):
+        np.testing.assert_allclose(self.F, self.F_exp)
