@@ -23,7 +23,7 @@ def plot_data(pt, v, f, D, P, V, E, F, string='Closest Primitive'):
         graphics.mayavi_points3d(mfig, P, scale_factor=0.1, color=(1, 0, 0))
 
     # different color for each face
-    if F.any():
+    if F.size:
         try:
             _ = iter(F[0])
             for f_list in F:
@@ -40,25 +40,27 @@ def plot_data(pt, v, f, D, P, V, E, F, string='Closest Primitive'):
 
     
     # draw the points which make up the edges and draw a line for the edge
-    try:
-        _ = iter(V)
-        for v_ind in V:
-            graphics.mayavi_addPoint(mfig, v[v_ind,:], radius=0.1, color=(0, 0, 1))
-    except TypeError as err:
-        graphics.mayavi_addPoint(mfig, v[V, :], radius=0.1, color=(0, 0, 1))
+    if V.size:
+        try:
+            _ = iter(V)
+            for v_ind in V:
+                graphics.mayavi_addPoint(mfig, v[v_ind,:], radius=0.1, color=(0, 0, 1))
+        except TypeError as err:
+            graphics.mayavi_addPoint(mfig, v[V, :], radius=0.1, color=(0, 0, 1))
     
     # draw edges
-    try:
-        _ = iter(E[0][0])
-        for e_list in E:
-            for e_ind in e_list:
-                graphics.mayavi_addLine(mfig, v[e_ind[0],:], v[e_ind[1], :], color=(0, 0, 0))
-    except IndexError as err:
-        graphics.mayavi_addLine(mfig, v[E[0],:], v[E[1], :], color=(0, 0, 0))
-    except (TypeError,) as err:
+    if E.size:
+        try:
+            _ = iter(E[0][0])
+            for e_list in E:
+                for e_ind in e_list:
+                    graphics.mayavi_addLine(mfig, v[e_ind[0],:], v[e_ind[1], :], color=(0, 0, 0))
+        except IndexError as err:
+            graphics.mayavi_addLine(mfig, v[E[0],:], v[E[1], :], color=(0, 0, 0))
+        except (TypeError,) as err:
 
-        for e_ind in E:
-            graphics.mayavi_addLine(mfig, v[e_ind[0],:], v[e_ind[1], :], color=(0, 0, 0))
+            for e_ind in E:
+                graphics.mayavi_addLine(mfig, v[e_ind[0],:], v[e_ind[1], :], color=(0, 0, 0))
 
     graphics.mayavi_addTitle(mfig, string, color=(0, 0, 0), size=0.5)
 
