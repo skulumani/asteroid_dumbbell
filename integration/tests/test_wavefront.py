@@ -52,32 +52,36 @@ def test_closest_vertex_plot_cube(pt=np.random.uniform(0.6 * np.sqrt(3), 1) * sp
 
     graphics.mayavi_addPoint(mfig, pt, radius=0.1, color=(0, 1, 0))
     graphics.mayavi_points3d(mfig, P, scale_factor=0.1, color=(1, 0, 0))
-    
+    pdb.set_trace()    
     # different color for each face
-    if F.size > 1:
+    try:
+        _ = iter(F[0])
         for f_list in F:
             for f_ind in f_list:
                 face_verts = v[f[f_ind,:],:]
                 graphics.mayavi_addMesh(mfig, face_verts, [(0, 1, 2)], color=tuple(np.random.rand(3)))
-    else:
+    except (TypeError,) as err:
         for f_ind in F:
             face_verts = v[f[f_ind,:],:]
             graphics.mayavi_addMesh(mfig, face_verts, [(0, 1, 2)], color=tuple(np.random.rand(3)))
 
     
     # draw the points which make up the edges and draw a line for the edge
-    if V.size >  1:
+    try:
+        _ = iter(V)
         for v_ind in V:
             graphics.mayavi_addPoint(mfig, v[v_ind,:], radius=0.1, color=(0, 0, 1))
-    else:
+    except TypeError as err:
         graphics.mayavi_addPoint(mfig, v[V, :], radius=0.1, color=(0, 0, 1))
     
     # draw edges
-    if E.size > 1:
+    try:
+        _ = iter(E[0][0])
         for e_list in E:
             for e_ind in e_list:
                 graphics.mayavi_addLine(mfig, v[e_ind[0],:], v[e_ind[1], :], color=(0, 0, 0))
-    else:
+    except TypeError as err:
+
         for e_ind in E:
             graphics.mayavi_addLine(mfig, v[e_ind[0],:], v[e_ind[1], :], color=(0, 0, 0))
 
