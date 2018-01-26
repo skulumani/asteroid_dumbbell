@@ -29,15 +29,22 @@ def test_normal_face_plot():
 
     graphics.mayavi_addTitle(mfig, 'Normals to each face', color=(0, 0, 0), size=0.5)
 
-def test_closest_vertex_plot_cube():
-    pt = np.random.uniform(0.6 * np.sqrt(3), 1) * sphere.rand(2)
+def test_closest_vertex_plot_cube(pt=np.random.uniform(0.6 * np.sqrt(3), 1) * sphere.rand(2)):
 
     ast = asteroid.Asteroid('castalia', 256, 'mat')
     v, f = wavefront.read_obj('./integration/cube.obj')
     ast = ast.loadmesh(v, f, 'cube')
-    D, P, F, V = wavefront.distance_to_vertices(pt, v, f, 
-                                                ast.asteroid_grav['normal_face'],
-                                                ast.asteroid_grav['vertex_face_map'])
+
+    edge_vertex_map = ast.asteroid_grav['edge_vertex_map']
+    edge_face_map = ast.asteroid_grav['edge_face_map']
+    normal_face = ast.asteroid_grav['normal_face']
+    vf_map = ast.asteroid_grav['vertex_face_map']
+
+    D, P, V, E, F = wavefront.distance_to_vertices(pt, v, f, 
+                                                   normal_face,
+                                                   edge_vertex_map,
+                                                   edge_face_map,
+                                                   vf_map)
 
     # draw the mayavi figure
     mfig = graphics.mayavi_figure()
@@ -47,11 +54,36 @@ def test_closest_vertex_plot_cube():
     graphics.mayavi_points3d(mfig, P, scale_factor=0.1, color=(1, 0, 0))
     
     # different color for each face
-    for f_ind in F:
-        face_verts = v[f[f_ind,:],:]
-        graphics.mayavi_addMesh(mfig, face_verts,[(0, 1, 2)], color=tuple(np.random.rand(3)))
+    if F.size > 1:
+        for f_list in F:
+            for f_ind in f_list:
+                face_verts = v[f[f_ind,:],:]
+                graphics.mayavi_addMesh(mfig, face_verts, [(0, 1, 2)], color=tuple(np.random.rand(3)))
+    else:
+        for f_ind in F:
+            face_verts = v[f[f_ind,:],:]
+            graphics.mayavi_addMesh(mfig, face_verts, [(0, 1, 2)], color=tuple(np.random.rand(3)))
+
+    
+    # draw the points which make up the edges and draw a line for the edge
+    if V.size >  1:
+        for v_ind in V:
+            graphics.mayavi_addPoint(mfig, v[v_ind,:], radius=0.1, color=(0, 0, 1))
+    else:
+        graphics.mayavi_addPoint(mfig, v[V, :], radius=0.1, color=(0, 0, 1))
+    
+    # draw edges
+    if E.size > 1:
+        for e_list in E:
+            for e_ind in e_list:
+                graphics.mayavi_addLine(mfig, v[e_ind[0],:], v[e_ind[1], :], color=(0, 0, 0))
+    else:
+        for e_ind in E:
+            graphics.mayavi_addLine(mfig, v[e_ind[0],:], v[e_ind[1], :], color=(0, 0, 0))
 
     graphics.mayavi_addTitle(mfig, 'Closest Vertex', color=(0, 0, 0), size=0.5)
+
+    return D, P, V, E, F
 
 def test_closest_vertex_plot_asteroid():
     pt = np.random.uniform(1, 1.5) * sphere.rand(2)

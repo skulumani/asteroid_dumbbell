@@ -1347,7 +1347,8 @@ def point2trimesh():
 
     pass
 
-def distance_to_vertices(pt, v, f, normal_face, vf_map):
+def distance_to_vertices(pt, v, f, normal_face, edge_vertex_map, 
+                         edge_face_map,vf_map):
     r"""Find closest vertex in mesh to a given point
 
     D, P, F, V = distance_vertices(pt, v, f, normal_face)
@@ -1372,11 +1373,13 @@ def distance_to_vertices(pt, v, f, normal_face, vf_map):
         Signed distance from pt to the closest vertex (+ outside, - inside)
     P : numpy array (n, 3)
         Location of the closest vertices. extracted from v
-    F : numpy array (m, q)
-        Indices of all the faces associated with the vertices given in P
     V : int (n,)
         Index of the closest points in v. So P = v[V,:]. There may be many 
         points
+    E : int
+        Vertex elements for the edges. Each edge = v[E[0], :] - v[E[1], :]
+    F : numpy array (m, q)
+        Indices of all the faces associated with the vertices given in P
 
     See Also
     --------
@@ -1404,6 +1407,8 @@ def distance_to_vertices(pt, v, f, normal_face, vf_map):
     V = ind
     D = []
 
+    edges = np.concatenate(edge_vertex_map)
+    E = [edges[np.where(edges == ii)[0],:] for ii in V]
     # determine the faces that are associated with any of the vertices in ind
     F = [vf_map[ii] for ii in ind]
     assert (len(F) >= 1), "Vertex {} is not connected to any face.".format(ind)
@@ -1415,7 +1420,7 @@ def distance_to_vertices(pt, v, f, normal_face, vf_map):
         D.append(dist[ii] * sign_of_value)
 
     # TODO Better variables names
-    return np.squeeze(D), np.squeeze(P), np.squeeze(F), np.squeeze(V)
+    return np.squeeze(D), np.squeeze(P), np.squeeze(V), np.squeeze(E), np.squeeze(F)
 
 def distance_to_edges(pt, v, f, normal_face, edge_vertex_map,
                       edge_face_map, vf_map):
