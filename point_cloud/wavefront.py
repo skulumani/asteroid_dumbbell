@@ -1455,15 +1455,21 @@ def distance_to_edges(pt, v, f, normal_face, edge_vertex_map,
         Signed distance from pt to the closest edge (+ outside, - inside)
     P : numpy array (3, )
         Location of the closest point. This will lie on the closest edge
+    V : int
+        The unique vertices in the closest edges. This is a list of locations 
+        for v
+    E : int array
+        The vertices for each closest edge. edge = V[E[0],:] - V[E[1], :] 
     F : numpy array (m, )
         Indices of all the faces associated with the edge (in V)
-    V : int
-        This defines the closest edge. e = v[V[0],:] - v[V[1], :] It holds
-        the element numbers in the list of vertices which make up the edge
 
     Author
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    Notes
+    -----
+    Can automatically handle a single closest edge or multiple
 
     References
     ----------
@@ -1505,13 +1511,23 @@ def distance_to_edges(pt, v, f, normal_face, edge_vertex_map,
     edge_intersections = v1 + edge_param[:, np.newaxis] * b
     dist, index = dist_array(pt, edge_intersections)
     P = edge_intersections[index, :]
-    V = edges[index, :]
-    F = [vf_map[ii] for ii in np.unique(V)]
+    E = edges[index, :]
+    V = np.unique(E)
+    F = []
+    # find associated faces for this edge (match the edge values
+    for e_ind in E:
+        va, vb = e_ind
+
+        va_ind = np.where(f == va)[0]
+        vb_ind = np.where(f == vb)[0]
+        
+        F.append(np.intersect1d(va_ind, vb_ind))
+
     N = []
     D = []
+
     # determine which edge for the given ind (closest)
     for ii, ind in enumerate(index):
-        pdb.set_trace()
         edge_face_map_row = edge_face_map[ind // num_f][ind % num_f, :]
         face_index = edge_face_map_row[edge_face_map_row != -1]
         face_normals = normal_face[face_index, :]
@@ -1521,8 +1537,10 @@ def distance_to_edges(pt, v, f, normal_face, edge_vertex_map,
         coeff = np.dot(face_normals, pt - P[ii, :])
         sign = sign_of_largest(coeff)
         D.append(dist[ii] * sign)
-
-    return np.squeeze(D), np.squeeze(P), np.squeeze(F), np.squeeze(V)
+    
+    return (np.squeeze(D), np.squeeze(P), np.squeeze(V), np.squeeze(E),
+            np.squeeze(F))
+            
 
 def distance_to_faces(pt, V, F, normal_face):
     r"""Find distance to every face and output the closest one
