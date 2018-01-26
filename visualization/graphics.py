@@ -369,12 +369,20 @@ def mayavi_addLine(fig, p1, p2, color=( 0, 0, 1 )):
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
     """ 
-    line = mlab.plot3d([p1[0], p2[0]], 
-                       [p1[1], p2[1]],
-                       [p1[2], p2[2]],
-                       color=color,
-                       figure=fig,
-                       tube_radius=None)
+    if p1.size == 3:
+        line = mlab.plot3d([p1[0], p2[0]], 
+                           [p1[1], p2[1]],
+                           [p1[2], p2[2]],
+                           color=color,
+                           figure=fig,
+                           tube_radius=None)
+    elif p1.size > 3:
+        line = [mlab.plot3d([p1[ii, 0], p2[ii, 0]],
+                            [p1[ii, 1], p2[ii, 1]],
+                            [p1[ii, 2], p2[ii, 2]],
+                            color=color, figure=fig, tube_radius=None) 
+                for ii in range(p1.shape[0])]
+
     return line
 
 def mayavi_addPoint(fig, p, radius=0.1, color=( 0, 0, 1 )):
