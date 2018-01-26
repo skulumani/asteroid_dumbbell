@@ -30,6 +30,7 @@ Shankar Kulumani		GWU		skulumani@gwu.edu
 """
 import logging
 from multiprocessing import Pool
+import warnings
 import pdb
 
 import numpy as np
@@ -1558,10 +1559,11 @@ def distance_to_edges(pt, v, f, normal_face, edge_vertex_map,
             np.squeeze(F))
             
 
-def distance_to_faces(pt, V, F, normal_face):
+def distance_to_faces(pt, v, f, normal_face, edge_vertex_map,
+                      edge_face_map, vf_map):
     r"""Find distance to every face and output the closest one
 
-    D, P, F, V = distance_to_faces(pt, V, F, normal_face)
+    D, P, V, E, F = distance_to_faces(pt, V, F, normal_face)
 
     Parameters
     ----------
@@ -1609,13 +1611,13 @@ def distance_to_faces(pt, V, F, normal_face):
     University Press, 1998. 
 
     """
-    num_v = V.shape[0]
-    num_f = F.shape[0]
+    num_v = v.shape[0]
+    num_f = f.shape[0]
     num_e = 3 * (num_v - 2)
 
     # extract out all the  vertices
-    Fa, Fb, Fc = F[:, 0], F[:, 1], F[:, 2]
-    v1, v2, v3 = V[Fa, :], V[Fb, :], V[Fc, :]
+    Fa, Fb, Fc = f[:, 0], f[:, 1], f[:, 2]
+    v1, v2, v3 = v[Fa, :], v[Fb, :], v[Fc, :]
 
     # compute distance from pt to surface plane
     ptv1 = pt - v1
@@ -1653,16 +1655,18 @@ def distance_to_faces(pt, V, F, normal_face):
     # determine the closest face
     # TODO: Better variable names
     try:
-        ind = np.nanargmin(np.absolute(dist))
+        ind = np.where(np.absolute(dist) == np.nanmin(np.absolute(dist)))[0]
         D = dist[ind]
         P = surf_intersections[ind, :]
-        V = V[F[ind,:], :]
+        V = [f[ii,:] for ii in ind]
+        E=[np.stack((edge_vertex_map[0][ii], edge_vertex_map[1][ii],
+                           edge_vertex_map[2][ii])) for ii in ind]
         F = ind
 
-    except ValueError as err:
-        logger.warn('The point {} is not in view of any face: {}'.format(pt, err))
+    except (ValueError,RuntimeWarning) as err:
+        logger.warn('The point {} is not in view of any face: {}'.format(pt))
 
         D = P = F = V = []
 
-    return D, P, F, V
+    return np.squeeze(D), np.squeeze(P), np.squeeze(V), np.squeeze(E), np.squeeze(F)
 
