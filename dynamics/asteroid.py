@@ -410,3 +410,5 @@ class Asteroid(object):
         self.asteroid_grav = self.polyhedron_shape_input()
 
         return self
+
+    # TODO: Add an initializemesh static method look at raycaster
