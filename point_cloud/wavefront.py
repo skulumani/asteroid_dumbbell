@@ -30,6 +30,7 @@ Shankar Kulumani		GWU		skulumani@gwu.edu
 """
 import logging
 from multiprocessing import Pool
+from collections import namedtuple
 import warnings
 import pdb
 
@@ -42,6 +43,20 @@ import utilities
 warnings.filterwarnings(action="ignore", category=RuntimeWarning,
                         message=r"All-NaN")
 logger = logging.getLogger(__name__)
+
+# named tuple to hold all the parameters (pre-computed) for a mesh
+MESH_PARAM = namedtuple('MESH_PARAM', ['Fa', 'Fb', 'Fc', 'V1', 'V2', 'V3',
+                                       'e1', 'e2', 'e3', 'e1_vertex_map',
+                                       'e2_vertex_map', 'e3_vertex_map',
+                                       'normal_face', 'e1_normal', 'e2_normal',
+                                       'e3_normal', 'center_face',
+                                       'e_vertex_map', 'unique_index',
+                                       'edge_vertex_map', 'edge_face_map',
+                                       'vertex_face_map', 'e1_face_map',
+                                       'e2_face_map', 'e3_face_map',
+                                       'e1_ind1b', 'e1_ind2b', 'e1_ind3b',
+                                       'e2_ind1b', 'e2_ind2b', 'e2_ind3b',
+                                       'e3_ind1b', 'e3_ind2b', 'e3_ind3b'])
 
 # TODO: Create better function names
 
@@ -922,7 +937,11 @@ def polyhedron_parameters(V, F):
     e2_vertex_map = np.vstack((Fc, Fb)).T
     e3_vertex_map = np.vstack((Fa, Fc)).T
     
-    e_vertex_map, unique_index = np.unique(np.sort(np.vstack((e1_vertex_map, e2_vertex_map, e3_vertex_map)), axis=1), axis=0, return_index=True)
+    e_vertex_map, unique_index = np.unique(np.sort(np.vstack((e1_vertex_map,
+                                                              e2_vertex_map,
+                                                              e3_vertex_map)),
+                                                   axis=1), axis=0,
+                                           return_index=True)
 
     # Normalize edge vectors
     # e1_norm=e1./repmat(sqrt(e1(:,1).^2+e1(:,2).^2+e1(:,3).^2),1,3);
@@ -956,11 +975,40 @@ def polyhedron_parameters(V, F):
 
     # Calculate Angle of face seen from vertices
     # Angle =  [acos(dot(e1_norm',-e3_norm'));acos(dot(e2_norm',-e1_norm'));acos(dot(e3_norm',-e2_norm'))]';
-    # TODO : Make this a dictionary or a named tuple for ease of use
+    
+    edge_vertex_map = (e1_vertex_map, e2_vertex_map, e3_vertex_map)
+    vf_map = vertex_face_map(V, F)
 
-    return (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3,
-            e1_vertex_map, e2_vertex_map, e3_vertex_map, 
-            normal_face, e1_normal, e2_normal,e3_normal, center_face, e_vertex_map, unique_index)
+    (e1_ind1b, e1_ind2b, e1_ind3b,
+    e2_ind1b, e2_ind2b, e2_ind3b,
+    e3_ind1b, e3_ind2b, e3_ind3b) = search_edge_vertex_map(e1_vertex_map,
+                                                                        e2_vertex_map, 
+                                                                        e3_vertex_map)
+    # build the edge face maps
+    e1_face_map, e2_face_map, e3_face_map = build_edge_face_map(e1_ind1b, e1_ind2b, e1_ind3b,
+                                                                            e2_ind1b, e2_ind2b, e2_ind3b,
+                                                                            e3_ind1b, e3_ind2b, e3_ind3b)
+    
+    edge_face_map = (e1_face_map, e2_face_map, e3_face_map)
+
+    mesh_parameters = MESH_PARAM(Fa=Fa, Fb=Fb, Fc=Fc, V1=V1, V2=V2, V3=V3,
+                                 e1=e1, e2=e2, e3=e3,
+                                 e1_vertex_map=e1_vertex_map,
+                                 e2_vertex_map=e2_vertex_map,
+                                 e3_vertex_map=e3_vertex_map,
+                                 normal_face=normal_face, e1_normal=e1_normal,
+                                 e2_normal=e2_normal, e3_normal=e3_normal,
+                                 center_face=center_face,
+                                 e_vertex_map=e_vertex_map,
+                                 unique_index=unique_index,
+                                 edge_vertex_map=edge_vertex_map,vertex_face_map=vf_map,
+                                 e1_face_map=e1_face_map, e2_face_map=e2_face_map,
+                                 e3_face_map=e3_face_map, edge_face_map=edge_face_map,
+                                 e1_ind1b=e1_ind1b, e1_ind2b=e1_ind2b, e1_ind3b=e1_ind3b,
+                                 e2_ind1b=e2_ind1b, e2_ind2b=e2_ind2b, e2_ind3b=e2_ind3b,
+                                 e3_ind1b=e3_ind1b, e3_ind2b=e3_ind2b, e3_ind3b=e3_ind3b)
+
+    return mesh_parameters
 
 def search_edge(e1, e2, e3):
     r"""Search for matching edges by looking directly at teh computed edges,
@@ -1340,7 +1388,7 @@ def distance_to_mesh(pt, v, f, mesh_parameters):
     """Find the distance from a point to a triangular mesh surface
     """
     # compute or pass in the polyhedron parameters
-
+    # TODO Named tuple for all mesh parametersx
     D_all = P_all = V_all = E_all = F_all = []
     dist_funcs = (distance_vertices, distance_to_edges, distance_to_faces)
 
