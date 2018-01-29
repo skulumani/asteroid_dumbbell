@@ -1336,18 +1336,25 @@ def sign_of_largest(array):
     return sgn
 
 # TODO: implement this function
-def distance_to_mesh(pt, v, f):
+def distance_to_mesh(pt, v, f, mesh_parameters):
     """Find the distance from a point to a triangular mesh surface
     """
     # compute or pass in the polyhedron parameters
 
-    # compute distance to vertices
+    D_all = P_all = V_all = E_all = F_all = []
+    dist_funcs = (distance_vertices, distance_to_edges, distance_to_faces)
 
-    # compute distance to edges
+    for dist_fun in dist_funcs:
+        D, P, V, E, F = dist_fun(pt, v, f, normal_face, edge_vertex_map,
+                                 edge_face_map, vf_map)
+        D_all.append(D)
+        P_all.append(P)
+        V_all.append(V)
+        E_all.append(E)
+        F_all.append(F)
 
-    # compute distance to faces
-    
     # figure out the minimum and output that
+
     pass
 
 def insert_vertex():
