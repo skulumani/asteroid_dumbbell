@@ -1335,21 +1335,31 @@ def sign_of_largest(array):
         sgn = 1
     return sgn
 
-def point2trimesh():
+# TODO: implement this function
+def distance_to_mesh(pt, v, f):
     """Find the distance from a point to a triangular mesh surface
     """
-    # calculate the normal to each face
-    
-    # linear loop over each point
-    
-    # fucntion find distance to every vertex
-    
-    # function distance to edges
+    # compute or pass in the polyhedron parameters
 
-    # function distance to surfaces
+    # compute distance to vertices
 
+    # compute distance to edges
+
+    # compute distance to faces
+    
+    # figure out the minimum and output that
     pass
 
+def insert_vertex():
+
+    # based on closest distance insert the vertex
+    
+    # if closest to vertex, then just swap that vertex
+
+    # if closest to an edge, then delete the edge and create two more edges, and faces
+
+    # if closet to a face then connect the point to the face vertices
+    pass
 def distance_to_vertices(pt, v, f, normal_face, edge_vertex_map, 
                          edge_face_map,vf_map):
     r"""Find closest vertex in mesh to a given point
