@@ -1388,22 +1388,52 @@ def distance_to_mesh(pt, v, f, mesh_parameters):
     """Find the distance from a point to a triangular mesh surface
     """
     # compute or pass in the polyhedron parameters
-    # TODO Named tuple for all mesh parametersx
-    D_all = P_all = V_all = E_all = F_all = []
-    dist_funcs = (distance_vertices, distance_to_edges, distance_to_faces)
+    D_min = np.inf
+    dist_funcs = (distance_to_vertices, distance_to_edges, distance_to_faces)
+    
+    normal_face = mesh_parameters.normal_face
+    edge_vertex_map = mesh_parameters.edge_vertex_map
+    edge_face_map = mesh_parameters.edge_face_map
+    vf_map = mesh_parameters.vertex_face_map
 
     for dist_fun in dist_funcs:
         D, P, V, E, F = dist_fun(pt, v, f, normal_face, edge_vertex_map,
                                  edge_face_map, vf_map)
-        D_all.append(D)
-        P_all.append(P)
-        V_all.append(V)
-        E_all.append(E)
-        F_all.append(F)
 
-    # figure out the minimum and output that
+        # figure out the minimum and output that
+        D_min, P_min, V_min, E_min, F_min = distance_minimum(D, P, V, E, F)
+        
+        # check if less than what we've seen already
 
-    pass
+    
+    return D_min, P_min, V_min, E_min, F_min
+
+def distance_minimum(D, P, V, E, F):
+    """Given an output from distance functions, output the minimum one
+    """
+    pdb.set_trace()
+    # determine if scalar or array output (many pionts are equidistant)
+    if D.size == 1: # scalar closest point
+        D_min = D
+        P_min = P
+        V_min = V
+        E_min = E
+        F_min = F
+    elif D.size > 1: # multiple minimum points
+        ind = np.argmin(D)
+        D_min = D[ind]
+        P_min = P[ind]
+        V_min = V[ind]
+        E_min = E[ind]
+        F_min = F[ind]
+    elif D.size == 0: # empty minimum point
+        D_min = []
+        P_min = []
+        V_min = []
+        E_min = []
+        F_min = []
+
+    return D_min, P_min, V_min, E_min, F_min
 
 def insert_vertex():
 
