@@ -1384,7 +1384,8 @@ def sign_of_largest(array):
     return sgn
 
 def distance_to_mesh(pt, v, f, mesh_parameters):
-    """Find the distance from a point to a triangular mesh surface
+    """Find minimum distance/primitives from a point to a mesh
+
     """
     # compute or pass in the polyhedron parameters
     D_min = np.inf
