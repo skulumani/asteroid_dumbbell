@@ -1383,7 +1383,6 @@ def sign_of_largest(array):
         sgn = 1
     return sgn
 
-# TODO: implement this function
 def distance_to_mesh(pt, v, f, mesh_parameters):
     """Find the distance from a point to a triangular mesh surface
     """
@@ -1395,23 +1394,32 @@ def distance_to_mesh(pt, v, f, mesh_parameters):
     edge_vertex_map = mesh_parameters.edge_vertex_map
     edge_face_map = mesh_parameters.edge_face_map
     vf_map = mesh_parameters.vertex_face_map
-
+    
+    D_buffer = np.inf
     for dist_fun in dist_funcs:
+        pdb.set_trace()
         D, P, V, E, F = dist_fun(pt, v, f, normal_face, edge_vertex_map,
                                  edge_face_map, vf_map)
 
         # figure out the minimum and output that
-        D_min, P_min, V_min, E_min, F_min = distance_minimum(D, P, V, E, F)
+        D_temp, P_temp, V_temp, E_temp, F_temp = distance_minimum(D, P, V, E, F)
         
+        if D_temp < D_buffer: # new distance is less. Reset the minimum
+            D_min = D_temp
+            P_min = P_temp
+            V_min = V_temp
+            E_min = E_temp
+            F_min = F_temp
+            D_buffer = D_min
+        else:
+            pass
         # check if less than what we've seen already
-
     
     return D_min, P_min, V_min, E_min, F_min
 
 def distance_minimum(D, P, V, E, F):
     """Given an output from distance functions, output the minimum one
     """
-    pdb.set_trace()
     # determine if scalar or array output (many pionts are equidistant)
     if D.size == 1: # scalar closest point
         D_min = D
