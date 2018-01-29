@@ -30,6 +30,7 @@ Shankar Kulumani		GWU		skulumani@gwu.edu
 """
 import logging
 from multiprocessing import Pool
+from collections import namedtuple
 import warnings
 import pdb
 
@@ -42,6 +43,16 @@ import utilities
 warnings.filterwarnings(action="ignore", category=RuntimeWarning,
                         message=r"All-NaN")
 logger = logging.getLogger(__name__)
+
+(Fa, Fb, Fc, V1, V2, V3, e1, e2, e3,
+            e1_vertex_map, e2_vertex_map, e3_vertex_map, 
+            normal_face, e1_normal, e2_normal,e3_normal, center_face, e_vertex_map, unique_index)
+
+# named tuple to hold all the parameters (pre-computed) for a mesh
+MESH_PARAM = namedtuple('MESH_PARAM', ['Fa', 'Fb', 'Fc', 'V1', 'V2', 'V3', 'e1', 'e2', 'e3',
+                           'e1_vertex_map', 'e2_vertex_map', 'e3_vertex_map',
+                           'normal_face', 'e1_normal', 'e2_normal', 'e3_normal',
+                           'center_face', 'e_vertex_map', 'unique_index'])
 
 # TODO: Create better function names
 
@@ -956,11 +967,15 @@ def polyhedron_parameters(V, F):
 
     # Calculate Angle of face seen from vertices
     # Angle =  [acos(dot(e1_norm',-e3_norm'));acos(dot(e2_norm',-e1_norm'));acos(dot(e3_norm',-e2_norm'))]';
-    # TODO : Make this a dictionary or a named tuple for ease of use
+    
+    mesh_parameters = MESH_PARAM(Fa=Fa, Fb=Fb, Fc=Fc, V1=V1, V2=V2, V3=V3,
+                                 e1=e1, e2=e2, e3=e3, 
+                                 e1_vertex_map=e1_vertex_map, e2_vertex_map=e2_vertex_map,
+                                 normal_face=normal_face, e1_normal=e1_normal, e2_normal=e2_normal,
+                                 e3_normal=e3_normal, center_face=center_face,
+                                 e_vertex_map=e_vertex_map, unique_index=unique_index)
 
-    return (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3,
-            e1_vertex_map, e2_vertex_map, e3_vertex_map, 
-            normal_face, e1_normal, e2_normal,e3_normal, center_face, e_vertex_map, unique_index)
+    return mesh_parameters
 
 def search_edge(e1, e2, e3):
     r"""Search for matching edges by looking directly at teh computed edges,
@@ -1340,7 +1355,7 @@ def distance_to_mesh(pt, v, f, mesh_parameters):
     """Find the distance from a point to a triangular mesh surface
     """
     # compute or pass in the polyhedron parameters
-
+    # TODO Named tuple for all mesh parametersx
     D_all = P_all = V_all = E_all = F_all = []
     dist_funcs = (distance_vertices, distance_to_edges, distance_to_faces)
 
