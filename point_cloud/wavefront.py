@@ -1397,8 +1397,8 @@ def distance_to_mesh(pt, v, f, mesh_parameters):
     vf_map = mesh_parameters.vertex_face_map
     
     D_buffer = np.inf
+
     for dist_fun in dist_funcs:
-        pdb.set_trace()
         D, P, V, E, F = dist_fun(pt, v, f, normal_face, edge_vertex_map,
                                  edge_face_map, vf_map)
 
@@ -1635,7 +1635,7 @@ def distance_to_edges(pt, v, f, normal_face, edge_vertex_map,
     dist, index = dist_array(pt, edge_intersections)
     P = edge_intersections[index, :]
     E = edges[index, :]
-    V = np.unique(E)
+    V = E
     F = []
     # find associated faces for this edge (match the edge values
     for e_ind in E:
