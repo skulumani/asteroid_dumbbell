@@ -1384,8 +1384,45 @@ def sign_of_largest(array):
     return sgn
 
 def distance_to_mesh(pt, v, f, mesh_parameters):
-    """Find minimum distance/primitives from a point to a mesh
+    r"""Minimum distance to a mesh
 
+    D, P, V, E, F = distance_to_mesh(pt, v, f, mesh_parameters)
+
+    Parameters
+    ----------
+    pt : numpy array (3,)
+        Point to check in 3D
+    v : numpy array (v, 3)
+        Vertices defining the mesh
+    f : numpy array (f, 3)
+        Topological connection of mesh
+    mesh_parameters : named tuple
+        Tuple output from polyhedron parameters
+
+    Returns
+    -------
+    D : float
+        Signed distance from pt to the closest edge (+ outside, - inside)
+    P : numpy array (3, )
+        Location of the closest point. This will lie on the closest edge
+    V : int
+        The unique vertices in the closest edges. This is a list of locations 
+        for v
+    E : int array
+        The vertices for each closest edge. edge = V[E[0],:] - V[E[1], :] 
+    F : numpy array (m, )
+        Indices of all the faces associated with the edge (in V)
+
+    See Also
+    --------
+    polyhedron_parameters : computes all the parameters for a mesh
+    distance_to_vertices : finds closest vertex in mesh
+    distance_to_edges : finds closest edge in mesh
+    distance_to_faces : finds the closest face in mesh
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
     """
     # compute or pass in the polyhedron parameters
     D_min = np.inf
