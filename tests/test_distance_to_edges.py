@@ -26,7 +26,7 @@ class TestDistanceToEdgesCubeOutsideFixedSingle():
                                                 vf_map)
     D_exp = 0.5
     P_exp = np.array([0.5, 0.5, 0.5])
-    V_exp = [4, 7]
+    V_exp = [7, 4]
     E_exp = [7, 4]
     F_exp = [6, 7]
 
@@ -68,7 +68,7 @@ class TestDistanceToEdgesCubeOutsideFixedMultiple():
     D_exp = np.array([0.5, 0.5])
     P_exp = np.array([[0.5, -0, -0],
                       [0.5, 0, 0]])
-    V_exp = np.array([4, 7])
+    V_exp = np.array([[7, 4], [4, 7]])
     E_exp = np.array([[7, 4],
                       [4, 7]])
     F_exp = np.array([[6, 7],
@@ -108,7 +108,7 @@ class TestDistanceToEdgesCubeInside():
     D_exp = -0.1 * np.sqrt(2) * np.ones_like(D)
     P_exp = np.array([[0.5, 0.5, 0.2],
                       [0.5, 0.5, 0.2]])
-    V_exp = np.array([6, 7])
+    V_exp = np.array([[6, 7], [7, 6]])
     E_exp = np.array([[6, 7], 
                      [7, 6]])
     F_exp = np.array([[4, 6],
@@ -147,7 +147,7 @@ class TestDistanceToEdgesCubeOutsideEdge():
                                                    edge_vertex_map,
                                                    edge_face_map,
                                                    vf_map)
-    D_exp = P_exp = V_exp = E_exp = F_exp = []
+    D_exp = P_exp = E_exp = F_exp = []
 
     def test_distance(self):
         np.testing.assert_allclose(self.D, self.D_exp)
@@ -156,7 +156,7 @@ class TestDistanceToEdgesCubeOutsideEdge():
         np.testing.assert_allclose(self.P, np.empty(shape=(0, 3)))
 
     def test_vertex(self):
-        np.testing.assert_allclose(self.V, self.V_exp)
+        np.testing.assert_allclose(self.V, np.empty(shape=(0, 2)))
 
     def test_edge(self):
         np.testing.assert_allclose(self.E, np.empty(shape=(0,2)))
@@ -183,7 +183,7 @@ class TestDistanceToEdgesCubeSurfaceMultiple():
     D_exp=0.1 * np.sqrt(2)
     P_exp=np.array([[0.5, 0.1, 0.1],
                     [0.5, 0.1, 0.1]])
-    V_exp=np.array([4, 7])
+    V_exp=np.array([[7, 4], [4, 7]])
     E_exp = np.array([[7, 4],
                       [4, 7]])
     F_exp=np.array([[6, 7],
