@@ -1461,14 +1461,14 @@ def distance_minimum(D, P, V, E, F):
     """
     # determine if scalar or array output (many pionts are equidistant)
     if D.size == 1: # scalar closest point
-        D_min = D
+        D_min = np.absolute(D)
         P_min = P
         V_min = V
         E_min = E
         F_min = F
     elif D.size > 1: # multiple minimum points
-        ind = np.argmin(D)
-        D_min = D[ind]
+        ind = np.argmin(np.absolute(D))
+        D_min = np.absolute(D[ind])
         P_min = P[ind]
         V_min = V[ind]
         E_min = E[ind]
