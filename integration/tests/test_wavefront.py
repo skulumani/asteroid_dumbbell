@@ -198,6 +198,17 @@ def test_closest_face_plot_asteroid(pt=np.random.uniform(0.8, 1.5)*sphere.rand(2
 
     return D, P, V, E, F
 
+def test_distance_to_mesh(pt=np.random.uniform(0.8, 1.5)*sphere.rand(2)):
+    """Test out the point processing function
+    """
+    v, f = wavefront.read_obj('./integration/cube.obj')
+    mesh_parameters = wavefront.polyhedron_parameters(v, f)
+    D, P, V, E, F = wavefront.distance_to_mesh(pt, v, f, mesh_parameters)
+
+    plot_data(pt, v, f, D, P, V, E, F, 'Minimum distance to mesh')
+    
+    return D, P, V, E, F
+
 if __name__ == "__main__":
     test_normal_face_plot()
 
