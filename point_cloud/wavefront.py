@@ -1435,7 +1435,7 @@ def distance_to_mesh(pt, v, f, mesh_parameters):
     
     D_buffer = np.inf
 
-    for dist_fun in dist_funcs:
+    for primitive, dist_fun in zip(('vertex', 'edge', 'face'), dist_funcs):
         D, P, V, E, F = dist_fun(pt, v, f, normal_face, edge_vertex_map,
                                  edge_face_map, vf_map)
 
@@ -1449,11 +1449,12 @@ def distance_to_mesh(pt, v, f, mesh_parameters):
             E_min = E_temp
             F_min = F_temp
             D_buffer = D_min
+            primitive_buffer = primitive
         else:
             pass
         # check if less than what we've seen already
     
-    return D_min, P_min, V_min, E_min, F_min
+    return D_min, P_min, V_min, E_min, F_min, primitive_buffer
 
 def distance_minimum(D, P, V, E, F):
     """Given an output from distance functions, output the minimum one
@@ -1555,7 +1556,7 @@ def distance_to_vertices(pt, v, f, normal_face, edge_vertex_map,
     if V.size > 1:
         E = [edges[np.where(edges == ii)[0],:] for ii in V]
         # determine the faces that are associated with any of the vertices in ind
-        F = [vf_map[ii] for ii in ind]
+        F = np.array([np.array(vf_map[ii]) for ii in ind])
 
         for ii, (faces, int_point) in enumerate(zip(F, P)):
             N = normal_face[faces, :]
@@ -1564,7 +1565,7 @@ def distance_to_vertices(pt, v, f, normal_face, edge_vertex_map,
             D.append(dist[ii] * sign_of_value)
     else:
         E = edges[np.where(edges == V)[0], :]
-        F = vf_map[int(ind)] 
+        F = np.array(vf_map[int(ind)])
 
         N = normal_face[F, :]
         coeff = np.dot(N, pt - P)
