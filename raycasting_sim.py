@@ -29,7 +29,7 @@ def initialize():
     logger = logging.getLogger(__name__)
     logger.info('Initialize asteroid and dumbbell objects')
 
-    ast = asteroid.Asteroid('castalia', 4092, 'mat')
+    ast = asteroid.Asteroid('itokawa', 0, 'obj')
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
     des_att_func = controller.random_sweep_attitude
     des_tran_func = controller.inertial_fixed_state
@@ -44,8 +44,8 @@ def simulate():
 
     ast, dum, des_att_func, des_tran_func, AbsTol, RelTol = initialize()
 
-    num_steps = int(1e4)
-    time = np.linspace(0, 15000, num_steps)
+    num_steps = int(1e3)
+    time = np.linspace(0, num_steps, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
 
@@ -189,7 +189,7 @@ if __name__ == "__main__":
     time, state, point_cloud = simulate()
 
     # save data to a file
-    np.savez('raycasting_sim', time=time, state=state,
+    np.savez('20180131_itokawa_raycasting_sim', time=time, state=state,
              point_cloud=point_cloud)
     
 

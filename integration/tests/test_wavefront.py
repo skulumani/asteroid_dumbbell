@@ -12,15 +12,15 @@ from kinematics import sphere
 warnings.filterwarnings(action="ignore", category=FutureWarning,
                         message=r"Conversion")
 
-def plot_data(pt, v, f, D, P, V, E, F, string='Closest Primitive'):
+def plot_data(pt, v, f, D, P, V, E, F, string='Closest Primitive', radius=0.1):
 
     # draw the mayavi figure
     mfig = graphics.mayavi_figure()
     graphics.mayavi_addMesh(mfig, v, f)
 
-    graphics.mayavi_addPoint(mfig, pt, radius=0.1, color=(0, 1, 0))
+    graphics.mayavi_addPoint(mfig, pt, radius=radius, color=(0, 1, 0))
     if P.any():
-        graphics.mayavi_points3d(mfig, P, scale_factor=0.1, color=(1, 0, 0))
+        graphics.mayavi_points3d(mfig, P, scale_factor=radius, color=(1, 0, 0))
 
     # different color for each face
     if F.size:
@@ -44,9 +44,9 @@ def plot_data(pt, v, f, D, P, V, E, F, string='Closest Primitive'):
         try:
             _ = iter(V)
             for v_ind in V:
-                graphics.mayavi_addPoint(mfig, v[v_ind,:], radius=0.1, color=(0, 0, 1))
+                graphics.mayavi_addPoint(mfig, v[v_ind,:], radius=radius, color=(0, 0, 1))
         except TypeError as err:
-            graphics.mayavi_addPoint(mfig, v[V, :], radius=0.1, color=(0, 0, 1))
+            graphics.mayavi_addPoint(mfig, v[V, :], radius=radius, color=(0, 0, 1))
     
     # draw edges
     if E.size:
@@ -98,13 +98,13 @@ def test_closest_vertex_plot_cube(pt=np.random.uniform(0.6 * np.sqrt(3), 1) * sp
                                                    edge_face_map,
                                                    vf_map)
 
-    plot_data(pt, v, f, D, P, V, E, F, 'Closest Vertex')
+    plot_data(pt, v, f, D, P, V, E, F, '')
 
     return D, P, V, E, F
 
-def test_closest_vertex_plot_asteroid(pt=np.random.uniform(1, 1.5) * sphere.rand(2)):
+def test_closest_vertex_plot_asteroid(pt=np.random.uniform(0.5, 1) * sphere.rand(2)):
 
-    ast = asteroid.Asteroid('castalia', 256, 'mat')
+    ast = asteroid.Asteroid('itokawa',0, 'obj')
     v,f = ast.asteroid_grav['V'], ast.asteroid_grav['F']
     edge_vertex_map = ast.asteroid_grav['edge_vertex_map']
     edge_face_map = ast.asteroid_grav['edge_face_map']
@@ -133,11 +133,11 @@ def test_closest_edge_plot_cube(pt=np.random.uniform(0.9, 1.5)*sphere.rand(2)):
     D, P, V, E, F = wavefront.distance_to_edges(pt, v, f, normal_face,
                                              edge_vertex_map, edge_face_map,
                                              vf_map)
-    plot_data(pt, v, f, D, P, V, E, F, 'Closest Edge')
+    plot_data(pt, v, f, D, P, V, E, F, '')
     return D, P, V, E, F
 
 def test_closest_edge_plot_asteroid(pt=np.random.uniform(0.8, 1.5)*sphere.rand(2)):
-    ast = asteroid.Asteroid('castalia', 256, 'mat')
+    ast = asteroid.Asteroid('itokawa', 0, 'obj')
     
     v,f = ast.asteroid_grav['V'], ast.asteroid_grav['F']
     edge_vertex_map = ast.asteroid_grav['edge_vertex_map']
@@ -171,7 +171,7 @@ def test_closest_face_plot_cube(pt=np.random.uniform(0.8, 1.5)*sphere.rand(2)):
                                                 edge_vertex_map,
                                                 edge_face_map,
                                                 vf_map)
-    plot_data(pt, v, f, D, P, V, E, F, 'Closest Face')
+    plot_data(pt, v, f, D, P, V, E, F, '')
 
     return D, P, V, E, F
 
@@ -181,7 +181,7 @@ def test_closest_face_plot_asteroid(pt=np.random.uniform(0.8, 1.5)*sphere.rand(2
         i.e. not in the corners
     """
 
-    ast = asteroid.Asteroid('castalia', 256, 'mat')
+    ast = asteroid.Asteroid('itokawa', 0, 'obj')
 
     v,f = ast.asteroid_grav['V'], ast.asteroid_grav['F']
     edge_vertex_map = ast.asteroid_grav['edge_vertex_map']

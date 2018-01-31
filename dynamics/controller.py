@@ -377,7 +377,7 @@ def inertial_quarter_equatorial_plane(time, tf=3600*6, loops=2):
 
     return x_des, xd_des, xdd_des
 
-def inertial_fixed_state(time, state, des_pos=np.array([5, 0,  0])):
+def inertial_fixed_state(time, state, des_pos=np.array([1, 0,  0])):
     """Fixed position in the inertial frame
 
     This function will define the translational states for the dumbbell, 
