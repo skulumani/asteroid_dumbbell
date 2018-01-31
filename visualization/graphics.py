@@ -98,9 +98,9 @@ def draw_polyhedron_mayavi(vertices, faces, fig):
                                 representation='surface')
     
     # draw the body axes of the asteroid
-    xaxis = mayavi_addLine(fig, [0, 0, 0], [2, 0, 0], color=(1, 0, 0)) 
-    yaxis = mayavi_addLine(fig, [0, 0, 0], [0, 2, 0], color=(0, 1, 0)) 
-    zaxis = mayavi_addLine(fig, [0, 0, 0], [0, 0, 2], color=(0, 0, 1)) 
+    xaxis = mayavi_addLine(fig, np.array([0, 0, 0]), np.array([2, 0, 0]), color=(1, 0, 0)) 
+    yaxis = mayavi_addLine(fig, np.array([0, 0, 0]), np.array([0, 2, 0]), color=(0, 1, 0)) 
+    zaxis = mayavi_addLine(fig, np.array([0, 0, 0]), np.array([0, 0, 2]), color=(0, 0, 1)) 
     
     body_axes = (xaxis, yaxis, zaxis)
 

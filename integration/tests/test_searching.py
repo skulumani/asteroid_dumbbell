@@ -23,9 +23,11 @@ def polyhedron_setup():
     num_f = f.shape[0]
     num_e = 3 * (num_v - 2)
 
-    (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3,
-     e1_vertex_map, e2_vertex_map, e3_vertex_map, 
-     normal_face, e1_normal, e2_normal,e3_normal, center_face, e_vertex_map, unique_index) = wavefront.polyhedron_parameters(v, f)
+    (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map,
+     e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face,
+     e_vertex_map, unique_index, edge_vertex_map, vertex_face_map, e1_face_map,
+     e2_face_map, e3_face_map, edge_face_map, e1_ind1b, e1_ind2b,  e1_ind3b,
+     e2_ind1b, e2_ind2b, e2_ind3b, e3_ind1b,  e3_ind2b, e3_ind3b) = wavefront.polyhedron_parameters(v, f)
 
     return (Fa, Fb, Fc, V1, V2, V3, e1, e2, e3, e1_vertex_map, e2_vertex_map,
     e3_vertex_map, normal_face, e1_normal, e2_normal,e3_normal, center_face)

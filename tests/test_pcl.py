@@ -2,10 +2,8 @@
 """
 import numpy as np
 import pickle
-try:
-    import pcl
-except ImportError:
-    print("PCL not installed. Run utilities/build_pcl.sh")
+import pytest
+pcl = pytest.importorskip('pcl')
 
 _data = [(i, 2 * i, 3 * i + 0.2) for i in range(5)]
 _DATA = """0.0, 0.0, 0.2;
