@@ -21,7 +21,7 @@ from point_cloud import wavefront, raycaster
 
 # TODO Look into the profiler for speed
 
-
+# TODO Save the ast, dum, objects to the numpy
 
 def initialize():
     """Initialize all the things for the simulation
@@ -168,18 +168,18 @@ def reconstruct(time, state, ast, dum, point_cloud):
     # pick a subset of the total amount point cloud
     
     # load the ellipsoid mesh
-    ve, _ = wavefront.ellipsoid_mesh(ast.axes[0], ast.axes[1], ast.axes[2], density=20)
+    # ve, _ = wavefront.ellipsoid_mesh(ast.axes[0], ast.axes[1], ast.axes[2], density=20)
 
     # TODO Need an intelligent method of combining shape models to fill in gaps
     # call the reconstruct function
-    ast_pts = np.concatenate((ast_pts, ve), axis=0)
+    # ast_pts = np.concatenate((ast_pts, ve), axis=0)
 
     v, f = wavefront.reconstruct_numpy(ast_pts)
 
     # plot and visualize
-    mfig = graphics.mayavi_figure(size=(800, 600))
+    mfig = graphics.mayavi_figure(size=(800, 600), bg=(0, 0, 0))
     mesh, ast_axes = graphics.draw_polyhedron_mayavi(v, f, mfig)
-    points = graphics.mayavi_points3d(ve, mfig, scale=0.01)
+    # points = graphics.mayavi_points3d(ve, mfig, scale=0.01)
     
     return v, f
 

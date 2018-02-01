@@ -6,7 +6,7 @@ import numpy as np
 from visualization import graphics
 import pdb
 
-filename = './data/shape_model/ITOKAWA/itokawa_very_high.obj'
+filename = './data/shape_model/CASTALIA/castalia.obj'
 polydata = wavefront.read_obj_to_polydata(filename)
 
 caster_obb = raycaster.RayCaster(polydata, flag='obb')
@@ -15,8 +15,8 @@ caster_bsp = raycaster.RayCaster(polydata, flag='bsp')
 sensor = raycaster.Lidar(view_axis=np.array([1, 0, 0]), num_step=3)
 
 # need to translate the sensor and give it a pointing direction
-pos = np.array([1, 0, 0])
-dist = 1# distance for each raycast
+pos = np.array([2, 0, 0])
+dist = 2# distance for each raycast
 R = attitude.rot3(np.pi)
 
 # find the inersections
