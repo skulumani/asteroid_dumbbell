@@ -1457,7 +1457,44 @@ def distance_to_mesh(pt, v, f, mesh_parameters):
     return D_min, P_min, V_min, E_min, F_min, primitive_buffer
 
 def distance_minimum(D, P, V, E, F):
-    """Given an output from distance functions, output the minimum one
+    """Determine the minimum distance in case there or multiple
+
+    Dm, Pm, Vm, Em, Fm = distance_minimum(D, P, V, E, F)
+
+    Parameters
+    ----------
+    D : float
+        Signed distance from pt to the closest edge (+ outside, - inside)
+    P : numpy array (3, )
+        Location of the closest point. This will lie on the closest edge
+    V : int
+        The unique vertices in the closest edges. This is a list of locations 
+        for v
+    E : int array
+        The vertices for each closest edge. edge = V[E[0],:] - V[E[1], :] 
+    F : numpy array (m, )
+        Indices of all the faces associated with the edge (in V)
+
+    Returns
+    -------
+    D : float
+        Signed distance from pt to the closest edge (+ outside, - inside)
+    P : numpy array (3, )
+        Location of the closest point. This will lie on the closest edge
+    V : int
+        The unique vertices in the closest edges. This is a list of locations 
+        for v
+    E : int array
+        The vertices for each closest edge. edge = V[E[0],:] - V[E[1], :] 
+    F : numpy array (m, )
+        Indices of all the faces associated with the edge (in V)
+
+    See Also
+    --------
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
     """
     # determine if scalar or array output (many pionts are equidistant)
     if D.size == 1: # scalar closest point
