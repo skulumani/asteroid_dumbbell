@@ -517,7 +517,7 @@ def mayavi_addTitle(fig, string, **kwargs):
     t = mlab.title(string, figure=fig, **kwargs)
     return t
 
-def point_cloud_asteroid_frame(point_cloud):
+def point_cloud_asteroid_frame(point_cloud, bg=(0,0,0)):
     """Input the point cloud data and plot all in the asteroid fixed frame
     """
     # rotate each  one by the state of the asteroid
@@ -525,7 +525,7 @@ def point_cloud_asteroid_frame(point_cloud):
     intersections = point_cloud['ast_ints'] # ints in the inertial frame
     ast_pts = []
 
-    mfig = mayavi_figure()
+    mfig = mayavi_figure(bg=bg)
 
     for pcs in intersections:
         for pt in pcs:
@@ -533,7 +533,7 @@ def point_cloud_asteroid_frame(point_cloud):
                 ast_pts.append(pt)
    
     ast_pts = np.asarray(ast_pts)
-    mlab.points3d(ast_pts[:, 0], ast_pts[:, 1], ast_pts[:, 2],scale_factor=0.01, 
+    mlab.points3d(ast_pts[:, 0], ast_pts[:, 1], ast_pts[:, 2],scale_factor=0.005, 
                   color=(0, 0, 1), figure=mfig)
     # plot everything in the asteroid frame
 
