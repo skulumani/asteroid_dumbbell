@@ -1519,8 +1519,10 @@ def distance_minimum(D, P, V, E, F):
 
     return D_min, P_min, V_min, E_min, F_min
 
-def insert_vertex():
+def insert_vertex(pt, v, f):
+    """Insert a vertex into a mesh
 
+    """
     # based on closest distance insert the vertex
     
     # if closest to vertex, then just swap that vertex
@@ -1529,6 +1531,7 @@ def insert_vertex():
 
     # if closet to a face then connect the point to the face vertices
     pass
+
 def distance_to_vertices(pt, v, f, normal_face, edge_vertex_map, 
                          edge_face_map,vf_map):
     r"""Find closest vertex in mesh to a given point
