@@ -1519,19 +1519,55 @@ def distance_minimum(D, P, V, E, F):
 
     return D_min, P_min, V_min, E_min, F_min
 
-def insert_vertex(pt, v, f):
+# TODO Docs and unit test
+def vertex_insertion(pt, v, f, D, P, V, E, F):
     """Insert a vertex into a mesh
+    
+    This assumes that pt is closest to a vertex in the mesh
 
+    and that you've already run and input the data from distance_to_vertices
     """
     # based on closest distance insert the vertex
+    new_v = v
+    new_v[V,:] = pt
+
+    new_f = f
+    return new_v, new_f
+
+# TODO Documentation
+def edge_insertion(pt, v, f, D, P, V, E, F):
+    """Insert a vertex when it's closest to the edge
+    """
+    nv = np.concatenate((v, pt[np.newaxis]))
+    new_vertex_index = nv.shape[0]-1
+
+    new_faces = []
+    # find the vertices of the attached faces
+    attached_vertices = f[F, :]
+    # figure out which vertices are in the minimum edge
+    face1_index = attached_vertices[0, :] == E[:, np.newaxis]
+    face2_index = attached_vertices[1, :] == E[:, np.newaxis]
+
+
+    # add two new faces associated with face 1
+    for ii in range(2):
+        nface = attached_vertices[0, :].copy()
+        nface[face1_index[ii, :]] = new_vertex_index
+        new_faces.append(nface)
+
+    for ii in range(2):
+        nface = attached_vertices[1, :].copy()
+        nface[face2_index[ii, :]] = new_vertex_index
+        new_faces.append(nface)
+
+    nf = np.delete(f, F, axis=0)
+    nf = np.concatenate((nf, np.array(new_faces)))
     
-    # if closest to vertex, then just swap that vertex
+    # TODO Check on normal direction
+    return nv, nf
 
-    # if closest to an edge, then delete the edge and create two more edges, and faces
-
-    # if closet to a face then connect the point to the face vertices
+def face_insertion(pt, v, f, D, P, V, E, F):
     pass
-
 def distance_to_vertices(pt, v, f, normal_face, edge_vertex_map, 
                          edge_face_map,vf_map):
     r"""Find closest vertex in mesh to a given point
