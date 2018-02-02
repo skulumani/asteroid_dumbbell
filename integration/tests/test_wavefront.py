@@ -233,7 +233,29 @@ def test_face_insertion(pt=np.array([1, 0.1, 0])):
     mfig = graphics.mayavi_figure()
     graphics.mayavi_addMesh(mfig, nv, nf)
 
+def test_point_insertion_random():
 
+    num_points = 100
+    nv, nf = wavefront.read_obj('./integration/cube.obj')
+    
+
+    # loop over random points and add them to the cube
+    for ii in range(num_points):
+
+        pt = np.random.uniform(0.5, 0.7)*sphere.rand(2)
+        mesh_parameters = wavefront.polyhedron_parameters(nv, nf)
+        D, P, V, E, F, primitive = wavefront.distance_to_mesh(pt, nv, nf, mesh_parameters)
+        if primitive == 'vertex':
+            nv, nf = wavefront.vertex_insertion(pt, nv, nf, D, P, V, E, F)
+        elif primitive == 'edge':
+            nv, nf = wavefront.edge_insertion(pt, nv, nf, D, P, V, E, F)
+        elif primitive == 'face':
+            nv, nf = wavefront.face_insertion(pt, nv, nf, D, P, V, E, F)
+
+    mfig = graphics.mayavi_figure()
+    mesh = graphics.mayavi_addMesh(mfig, nv, nf)
+
+        
 if __name__ == "__main__":
     test_normal_face_plot()
 
