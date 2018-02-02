@@ -242,7 +242,7 @@ def test_point_insertion_random():
     # loop over random points and add them to the cube
     for ii in range(num_points):
 
-        pt = np.random.uniform(0.5, 0.7)*sphere.rand(2)
+        pt = np.random.uniform(0.6, 0.7)*sphere.rand(2)
         mesh_parameters = wavefront.polyhedron_parameters(nv, nf)
         D, P, V, E, F, primitive = wavefront.distance_to_mesh(pt, nv, nf, mesh_parameters)
         if primitive == 'vertex':
