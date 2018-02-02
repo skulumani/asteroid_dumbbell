@@ -1567,7 +1567,21 @@ def edge_insertion(pt, v, f, D, P, V, E, F):
     return nv, nf
 
 def face_insertion(pt, v, f, D, P, V, E, F):
-    pass
+    """ Insert a new face into the mesh
+    """
+    nv = np.concatenate((v, pt[np.newaxis]))
+    new_vertex_index = nv.shape[0]-1
+    # find vertices of the face
+    A, B, C = f[F, :]
+    
+    new_faces = np.array([[A, B, new_vertex_index],
+                          [B, C, new_vertex_index],
+                          [C, A, new_vertex_index]])
+
+    nf = np.delete(f, F, axis=0)
+    nf = np.concatenate((nf, np.array(new_faces)))
+    return nv, nf
+
 def distance_to_vertices(pt, v, f, normal_face, edge_vertex_map, 
                          edge_face_map,vf_map):
     r"""Find closest vertex in mesh to a given point
