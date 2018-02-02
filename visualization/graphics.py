@@ -345,7 +345,7 @@ def mayavi_addMesh(fig, vertices, faces, color=(0.5, 0.5, 0.5)):
     scalars = np.tile(0.5, vertices.shape[0])
     mesh = mlab.triangular_mesh(vertices[:, 0], vertices[:, 1], vertices[:, 2],
                                 faces, color=color, figure=fig,
-                                representation='wireframe')
+                                representation='surface')
 
 def mayavi_addLine(fig, p1, p2, color=( 0, 0, 1 )):
     r"""Add a line to a mayavi figure
