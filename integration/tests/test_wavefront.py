@@ -203,7 +203,6 @@ def test_distance_to_mesh(pt=np.random.uniform(0.8, 1.5)*sphere.rand(2)):
     """
     v, f = wavefront.read_obj('./integration/cube.obj')
     mesh_parameters = wavefront.polyhedron_parameters(v, f)
-    pdb.set_trace()
     D, P, V, E, F, primitive = wavefront.distance_to_mesh(pt, v, f, mesh_parameters)
     plot_data(pt, v, f, D, P, V, E, F, 'Min Primitive: ' + primitive)
     
