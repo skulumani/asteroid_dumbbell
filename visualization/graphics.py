@@ -321,7 +321,8 @@ def mayavi_addPoly(fig, polydata, color=(0.5, 0.5, 0.5)):
 
     return mesh
 
-def mayavi_addMesh(fig, vertices, faces, color=(0.5, 0.5, 0.5)):
+def mayavi_addMesh(fig, vertices, faces, color=(0.5, 0.5, 0.5), 
+                   representation='surface', **kwargs):
     r"""Draw a mesh to a mayavi figure
 
     mesh = mayavi_addPoly(fig, v, f, color)
@@ -345,7 +346,7 @@ def mayavi_addMesh(fig, vertices, faces, color=(0.5, 0.5, 0.5)):
     scalars = np.tile(0.5, vertices.shape[0])
     mesh = mlab.triangular_mesh(vertices[:, 0], vertices[:, 1], vertices[:, 2],
                                 faces, color=color, figure=fig,
-                                representation='surface')
+                                representation=representation, **kwargs)
     return mesh
 
 def mayavi_addLine(fig, p1, p2, color=( 0, 0, 1 )):
