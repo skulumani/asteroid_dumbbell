@@ -12,3 +12,12 @@ conda env create -f ${DIR}/asteroid.yml
 # build mayavi
 bash ${DIR}/build_mayavi.sh
 
+# build blender
+
+# build pcl
+
+# build opencv
+
+# build numba
+
+# build cgal
