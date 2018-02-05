@@ -1637,7 +1637,44 @@ def edge_insertion(pt, v, f, D, P, V, E, F):
     return nv, nf
 
 def face_insertion(pt, v, f, D, P, V, E, F):
-    """ Insert a new face into the mesh
+    r"""Remove a face and add a new vertex
+
+    nv, nf = face_insertion(pt, v, f, D, P, V, E, F)
+
+    Parameters
+    ----------
+    pt : (3,) numpy array
+        The point to incorporate into the mesh
+    v : (# verts, 3) numpy array
+        The current vertices of the mesh
+    f : (# faces, 3) numpy array
+        Current faces of the mesh
+    D : float
+        Signed distance from pt to the closest edge (+ outside, - inside)
+    P : numpy array (3, )
+        Location of the closest point. This will lie on the closest edge
+    V : int
+        The unique vertices in the closest edges. This is a list of locations 
+        for v
+    E : int array
+        The vertices for each closest edge. edge = V[E[0],:] - V[E[1], :] 
+    F : numpy array (m, )
+        Indices of all the faces associated with the edge (in V)
+
+    Returns
+    -------
+    nv : (# vertices , 3) numpy array
+        The new vertices of the mesh
+    nf : (# faces, 3) numpy array
+        The new faces of the mesh
+
+    See Also
+    --------
+    distance_minimum : find the minimum distance to the mesh
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
     """
     nv = np.concatenate((v, pt[np.newaxis]))
     new_vertex_index = nv.shape[0]-1
