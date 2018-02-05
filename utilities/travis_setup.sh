@@ -35,7 +35,7 @@ if [ -d "$HOME/anaconda3/envs/asteroid" ]; then
     conda env update --name asteroid --file ./utilities/asteroid_reduced.yml
 else
     echo "No asteroid enviornment"
-    conda env create --file ./utilities/asteroid_reduced.yml
+    conda env create --file ./utilities/asteroid.yml
 fi
 
 echo "Setup is complete"
