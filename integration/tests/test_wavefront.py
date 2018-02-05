@@ -215,15 +215,18 @@ def test_vertex_insertion(pt=np.array([1, 1, 1])):
     nv, nf = wavefront.vertex_insertion(pt, v ,f, D, P, V, E, F)
     mfig = graphics.mayavi_figure()
     graphics.mayavi_addMesh(mfig, nv, nf)
+    
+    return D, P, V, E, F, primitive
 
 def test_edge_insertion(pt=np.array([1, 1, 0])):
     v, f = wavefront.read_obj('./integration/cube.obj')
     mesh_parameters = wavefront.polyhedron_parameters(v, f)
     D, P, V, E, F, primitive = wavefront.distance_to_mesh(pt, v, f, mesh_parameters)
-    nv, nf = wavefront.edge_insertion(pt, v ,f, D, P, V, E, F)
+    nv, nf = wavefront.edge_insertion(pt, v,f, D, P, V, E, F)
     mfig = graphics.mayavi_figure()
     graphics.mayavi_addMesh(mfig, nv, nf)
 
+    return D, P, V, E, F, primitive
 
 def test_face_insertion(pt=np.array([1, 0.1, 0])):
     v, f = wavefront.read_obj('./integration/cube.obj')
