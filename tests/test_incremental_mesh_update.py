@@ -43,3 +43,6 @@ class TestVertexInsertion():
 
     def test_faces(self):
         np.testing.assert_allclose(self.nf, self.nf_exp)
+
+    def test_vertices_shape(self):
+        np.testing.assert_allclose(self.nv.shape, self.v.shape)
