@@ -936,11 +936,12 @@ def polyhedron_parameters(V, F):
     e1_vertex_map = np.vstack((Fb, Fa)).T
     e2_vertex_map = np.vstack((Fc, Fb)).T
     e3_vertex_map = np.vstack((Fa, Fc)).T
-    
+     
     e_vertex_map, unique_index = np.unique(np.sort(np.vstack((e1_vertex_map,
                                                               e2_vertex_map,
                                                               e3_vertex_map)),
-                                                   axis=1), axis=0,
+                                                   axis=1),
+                                           axis=0,
                                            return_index=True)
 
     # Normalize edge vectors

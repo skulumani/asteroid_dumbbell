@@ -39,7 +39,7 @@ class TestDistanceToMeshCubeEdge():
     def test_face(self):
         np.testing.assert_allclose(self.F, self.F_exp)
     def test_primitive(self):
-        np.testing.assert_allclose(self.primitive, self.primitive_exp)
+        np.testing.assert_string_equal(self.primitive, self.primitive_exp)
 
 
 class TestDistanceToMeshCubeVertex():
@@ -84,13 +84,13 @@ class TestDistanceToMeshCubeVertex():
         np.testing.assert_allclose(self.F, self.F_exp)
 
     def test_primitive(self):
-        np.testing.assert_allclose(self.primitive, self.primitive_exp)
+        np.testing.assert_string_equal(self.primitive, self.primitive_exp)
 
 class TestDistanceToMeshCubeFace():
 
     v, f = wavefront.read_obj('./integration/cube.obj')
     mesh_parameters = wavefront.polyhedron_parameters(v, f)
-    pt = np.array([1, 0.5, 0.5])
+    pt = np.array([1, 0.2, 0])
     D, P, V, E, F, primitive = wavefront.distance_to_mesh(
         pt, v, f, mesh_parameters)
 
@@ -119,4 +119,4 @@ class TestDistanceToMeshCubeFace():
         np.testing.assert_allclose(self.F, self.F_exp)
 
     def test_primitive(self):
-        np.testing.assert_allclose(self.primitive, self.primitive_exp)
+        np.testing.assert_string_equal(self.primitive, self.primitive_exp)

@@ -9,7 +9,7 @@ from point_cloud import wavefront
 
 
 def test_vtk_major_version():
-    np.testing.assert_allclose(vtk.VTK_MAJOR_VERSION, 7)
+    np.testing.assert_allclose(vtk.VTK_MAJOR_VERSION, 8)
 
 class TestVTKReadingOBJFilesItokawaLow():
     filename = './data/shape_model/ITOKAWA/itokawa_low.obj'
