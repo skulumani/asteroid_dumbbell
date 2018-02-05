@@ -183,6 +183,20 @@ def reconstruct(time, state, ast, dum, point_cloud):
     
     return v, f
 
+def incremental_reconstruction(time, state, point_cloud, asteroid_name='castalia'):
+    """Incrementally update the mesh
+    """
+
+    # define the asteroid and dumbbell objects
+    
+    # define a simple mesh to start
+
+    # extract out all the points in the asteroid frame
+
+    # loop over the points in order and update the mesh
+
+    # create a graphic and save and image
+
 if __name__ == "__main__":
     # TODO Measure time for run
     logging.basicConfig(filename='raycasting.txt', filemode='w', level=logging.INFO)
