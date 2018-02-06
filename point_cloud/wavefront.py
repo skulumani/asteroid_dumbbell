@@ -1384,6 +1384,22 @@ def sign_of_largest(array):
         sgn = 1
     return sgn
 
+def mesh_incremental_update(pt, v, f):
+    """Add a pt to the mesh 
+
+    """
+    mesh_parameters = polyhedron_parameters(v, f)
+
+    D, P, V, E, F, primitive = distance_to_mesh(pt, v, f, mesh_parameters)
+    if primitive == 'vertex':
+        nv, nf = vertex_insertion(pt, v, f, D, P, V, E, F)
+    elif primitive == 'edge':
+        nv, nf = edge_insertion(pt, v, f, D, P, V, E, F)
+    elif primitive == 'face':
+        nv, nf = face_insertion(pt, v, f, D, P, V, E, F)
+
+    return nv, nf
+
 def distance_to_mesh(pt, v, f, mesh_parameters):
     r"""Minimum distance to a mesh
 
@@ -1520,7 +1536,6 @@ def distance_minimum(D, P, V, E, F):
 
     return D_min, P_min, V_min, E_min, F_min
 
-# TODO Docs and unit test
 def vertex_insertion(pt, v, f, D, P, V, E, F):
     r"""Insert a vertex into a mesh
 
@@ -1568,7 +1583,6 @@ def vertex_insertion(pt, v, f, D, P, V, E, F):
     new_f = f
     return new_v, new_f
 
-# TODO Documentation
 def edge_insertion(pt, v, f, D, P, V, E, F):
     r"""Remove edge and insert a new vertex
 
