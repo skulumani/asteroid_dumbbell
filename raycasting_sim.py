@@ -23,6 +23,7 @@ from point_cloud import wavefront, raycaster
 
 # TODO Save the ast, dum, objects to the numpy
 
+
 def initialize():
     """Initialize all the things for the simulation
     """
@@ -35,8 +36,9 @@ def initialize():
     des_tran_func = controller.inertial_fixed_state
     AbsTol = 1e-9
     RelTol = 1e-9
-    
+
     return ast, dum, des_att_func, des_tran_func, AbsTol, RelTol
+
 
 def simulate():
 
@@ -51,7 +53,7 @@ def simulate():
 
     initial_pos = np.array([1.5, 0, 0])
     initial_vel = np.array([0, 0, 0])
-    initial_R = attitude.rot3(np.pi/2).reshape(-1)
+    initial_R = attitude.rot3(np.pi / 2).reshape(-1)
     initial_w = np.array([0, 0, 0])
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
@@ -64,7 +66,7 @@ def simulate():
     # try both a controlled and uncontrolled simulation
     # t, istate, astate, bstate = eoms.inertial_eoms_driver(initial_state, time, ast, dum)
 
-    # TODO Dynamics should be based on the course model 
+    # TODO Dynamics should be based on the course model
     # TODO Asteroid class will need a method to update mesh
     system = integrate.ode(eoms.eoms_controlled_inertial)
     system.set_integrator('lsoda', atol=AbsTol, rtol=RelTol, nsteps=1e4)
@@ -73,8 +75,8 @@ def simulate():
 
     point_cloud = defaultdict(list)
 
-    state = np.zeros((num_steps+1, 18))
-    t = np.zeros(num_steps+1)
+    state = np.zeros((num_steps + 1, 18))
+    t = np.zeros(num_steps + 1)
     int_array = []
     state[0, :] = initial_state
 
@@ -91,21 +93,21 @@ def simulate():
             logger.info('Raycasting at t = {}'.format(t[ii]))
 
             targets = sensor.define_targets(state[ii, 0:3],
-                                            state[ii, 6:15].reshape((3,3)), 
+                                            state[ii, 6:15].reshape((3, 3)),
                                             np.linalg.norm(state[ii, 0:3]))
-            
+
             # new asteroid rotation with vertices
             nv = ast.rotate_vertices(t[ii])
             Ra = ast.rot_ast2int(t[ii])
             # update the mesh inside the caster
             caster = raycaster.RayCaster.updatemesh(nv, ast.F)
-            
+
             # these intersections are points in the inertial frame
             intersections = caster.castarray(state[ii, 0:3], targets)
 
             point_cloud['time'].append(t[ii])
             point_cloud['ast_state'].append(Ra.reshape(-1))
-            point_cloud['sc_state'].append(state[ii,:])
+            point_cloud['sc_state'].append(state[ii, :])
             point_cloud['targets'].append(targets)
             point_cloud['inertial_ints'].append(intersections)
 
@@ -134,18 +136,20 @@ def simulate():
 
     return time, state, point_cloud
 
+
 def animate(time, state, ast, dum, point_cloud):
     graphics.point_cloud_asteroid_frame(point_cloud)
 
-    mfig = graphics.mayavi_figure(size=(800,600))
+    mfig = graphics.mayavi_figure(size=(800, 600))
     mesh, ast_axes = graphics.draw_polyhedron_mayavi(ast.V, ast.F, mfig)
 
     com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
 
-    pc_lines = [graphics.mayavi_addLine(mfig, state[0, 0:3], p) for p in point_cloud['inertial_ints'][0]]
+    pc_lines = [graphics.mayavi_addLine(
+        mfig, state[0, 0:3], p) for p in point_cloud['inertial_ints'][0]]
 
     animation.inertial_asteroid_trajectory(time, state, ast, dum, point_cloud,
-                                        (mesh, ast_axes, com, dum_axes,
+                                           (mesh, ast_axes, com, dum_axes,
                                             pc_lines))
 
 
@@ -157,16 +161,16 @@ def reconstruct(time, state, ast, dum, point_cloud):
     rot_ast2int = point_cloud['ast_state']
     intersections = point_cloud['ast_ints']
     ast_pts = []
-    
+
     for pcs in intersections:
         for pt in pcs:
             if not np.isnan(pt).any():
                 ast_pts.append(pt)
-                
+
     ast_pts = np.asarray(ast_pts)
 
     # pick a subset of the total amount point cloud
-    
+
     # load the ellipsoid mesh
     # ve, _ = wavefront.ellipsoid_mesh(ast.axes[0], ast.axes[1], ast.axes[2], density=20)
 
@@ -180,34 +184,62 @@ def reconstruct(time, state, ast, dum, point_cloud):
     mfig = graphics.mayavi_figure(size=(800, 600), bg=(0, 0, 0))
     mesh, ast_axes = graphics.draw_polyhedron_mayavi(v, f, mfig)
     # points = graphics.mayavi_points3d(ve, mfig, scale=0.01)
-    
+
     return v, f
 
-def incremental_reconstruction(time, state, point_cloud, asteroid_name='castalia'):
+
+def incremental_reconstruction(filename, asteroid_name='castalia'):
     """Incrementally update the mesh
     """
+    data = np.load(filename)
+    point_cloud = data['point_cloud'][()]
 
     # define the asteroid and dumbbell objects
-    
+    ast = asteroid.Asteroid(asteroid_name, 4092, 'mat')
+    dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
+
     # define a simple mesh to start
+    v, f = wavefront.ellipsoid_mesh(
+        ast.axes[0], ast.axes[1], ast.axes[2], density=20)
+    v_est, f_est = v, f
 
     # extract out all the points in the asteroid frame
+    time = point_cloud['time']
+    ast_ints = point_cloud['ast_ints']
 
     # loop over the points in order and update the mesh
+    # mfig = graphics.mayavi_figure()
+    # mesh = graphics.mayavi_addMesh(mfig, v, f)
+
+    # points = graphics.mayavi_points3d(mfig, ast_ints[0], scale_factor=0.1)
+    # ms = mesh.mlab_source
+
+    for (t, points) in zip(time, ast_ints):
+        # check if points is empty
+        for pt in points:
+            # incremental update for each point in points
+            # check to make sure each pt is not nan
+            if not np.any(np.isnan(pt)):
+                v_est, f_est = wavefront.mesh_incremental_update(pt, v_est, f_est)
+
+        # input("Press enter to continue")
 
     # create a graphic and save and image
+    # ms.reset(x=v_est[:, 0], y=v_est[:, 1], z=v_est[:, 2],
+    #              triangles=f_est)
+
+    return v_est, f_est
 
 if __name__ == "__main__":
     # TODO Measure time for run
-    logging.basicConfig(filename='raycasting.txt', filemode='w', level=logging.INFO)
+    logging.basicConfig(filename='raycasting.txt',
+                        filemode='w', level=logging.INFO)
     time, state, point_cloud = simulate()
 
     # save data to a file
     np.savez('20180131_itokawa_raycasting_sim', time=time, state=state,
              point_cloud=point_cloud)
-    
 
     # to access the data again
     # data = np.load(filename)
     # point_cloud = data['point_cloud'][()]
-
