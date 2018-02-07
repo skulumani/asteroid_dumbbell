@@ -6,6 +6,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import pdb
 import logging
 from collections import defaultdict
+import os
 
 import numpy as np
 from scipy import integrate
@@ -192,6 +193,7 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
     """Incrementally update the mesh
     """
     logger = logging.getLogger(__name__)
+    output_filename = filename[0:-4] + '_reconstruct.npz'
 
     logger.info('Loading {}'.format(filename))
     data = np.load(filename)
@@ -222,7 +224,7 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
     # ms = mesh.mlab_source
     
     logger.info('Starting loop over point cloud')
-    for (t, points) in zip(time, ast_ints):
+    for ii, (t, points) in enumerate(zip(time, ast_ints)):
         # check if points is empty
         logger.info('Current : t = {} with {} points'.format(t, len(points)))
         for pt in points:
@@ -234,10 +236,31 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
         # input("Press enter to continue")
         v_array.append(v_est)
         f_array.append(f_est)
-        logger.info('Saving data to file')
-        np.savez(filename + '_reconstruct', v_array=v_array, f_array=f_array, time=time,
-                 point_cloud=point_cloud, ast=ast, dum=dum)
 
+        # save every so often and delete v_array,f_array to save memory
+        if (ii % 1000) == 0:  
+            logger.info('Saving data to file. ii = {}, t = {}'.format(ii, t))
+            if os.path.exists(output_filename):
+                logger.info('Exisiting data file. Now appending')
+                data = np.load(output_filename) 
+                v_array_old = data['v_array'][()]
+                f_array_old = data['f_array'][()]
+
+                v_array_old.append(v_array)
+                f_array_old.append(f_array)
+
+                np.savez(output_filename, v_array=v_array_old, f_array=f_array_old,
+                        time=time)
+
+                v_array = []
+                f_array = []
+            else:
+                logger.info('No data file. Creating new one')
+
+                np.savez(output_filename, v_array=v_array, f_array=f_array,
+                         time=time)
+                v_array = []
+                f_array = []
 
     logger.info('Completed the reconstruction')
     return v_array, f_array
@@ -262,5 +285,5 @@ if __name__ == "__main__":
                         filemode='w', level=logging.INFO)
     
     v_array, f_array = incremental_reconstruction(filename, 'castalia')
-    np.savez('20180110_raycasting_reconstruct', v_array=v_array,
+    np.savez('20180110_raycasting_reconstruct.npz', v_array=v_array,
              f_array=f_array)
