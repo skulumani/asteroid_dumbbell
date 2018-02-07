@@ -211,8 +211,8 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
     f_array = []
 
     # extract out all the points in the asteroid frame
-    time = point_cloud['time'][0:100]
-    ast_ints = point_cloud['ast_ints'][0:100]
+    time = point_cloud['time']
+    ast_ints = point_cloud['ast_ints']
 
     # loop over the points in order and update the mesh
     # mfig = graphics.mayavi_figure()
@@ -229,17 +229,17 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
             # incremental update for each point in points
             # check to make sure each pt is not nan
             if not np.any(np.isnan(pt)):
-                logger.info('Point {}'.format(pt))
                 v_est, f_est = wavefront.mesh_incremental_update(pt, v_est, f_est)
-                v_array.append(v_est)
-                f_array.append(f_est)
 
         # input("Press enter to continue")
+        v_array.append(v_est)
+        f_array.append(f_est)
+        logger.info('Saving data to file')
+        np.savez(filename + '_reconstruct', v_array=v_array, f_array=f_array, time=time,
+                 point_cloud=point_cloud, ast=ast, dum=dum)
 
-    # create a graphic and save and image
-    # ms.reset(x=v_est[:, 0], y=v_est[:, 1], z=v_est[:, 2],
-    #              triangles=f_est)
 
+    logger.info('Completed the reconstruction')
     return v_array, f_array
 
 if __name__ == "__main__":
