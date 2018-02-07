@@ -1,4 +1,8 @@
-"""Script/Functions to generate plots for the mesh update algorithm
+"""Generate example cube plots for dissertation
+
+Author
+------
+Shankar Kulumani		GWU		skulumani@gwu.edu
 """
 import os
 
@@ -6,6 +10,10 @@ import numpy as np
 
 from point_cloud import wavefront
 from visualization import graphics
+
+view = {'azimuth': 16.944197132093564, 'elevation': 66.34177792039738,
+        'distance': 2.9356815748114435, 
+        'focalpoint': np.array([0.20105769, -0.00420018, -0.016934045])}
 
 def plot_data(pt, v, f, D, P, V, E, F, string='Closest Primitive', radius=0.1,
               size=(800*1.6, 800)):
@@ -86,16 +94,15 @@ def cube_mesh_with_vertices_edges_faces(img_path):
     mesh_edges = graphics.mayavi_addMesh(mfig, v, f, 
                                          color=(1, 0, 0),
                                          representation='mesh')
+    graphics.mlab.view(azimuth=view['azimuth'], elevation=view['elevation'],
+                       distance=view['distance'], focalpoint=view['focalpoint'],
+                       figure=mfig)
 
     # save the figure to eps
     graphics.mlab.savefig(filename, magnification=4)
 
 def cube_closest_vertex(img_path):
     filename = os.path.join(img_path, 'cube_closest_vertex.jpg')
-
-    view = {'azimuth': 16.944197132093564, 'elevation': 66.34177792039738,
-            'distance': 2.9356815748114435, 
-            'focalpoint': np.array([0.20105769, -0.00420018, -0.016934045])}
 
     size = (800*1.618, 800) 
     pt = np.array([0.7, 0.7, 0.7])
@@ -122,6 +129,61 @@ def cube_closest_vertex(img_path):
 
     return mfig
 
+def cube_closest_edge(img_path):
+    filename = os.path.join(img_path, 'cube_closest_edge.jpg')
+
+    size = (800*1.618, 800) 
+    pt = np.array([0.7, 0.7, 0])
+    v, f = wavefront.read_obj('./integration/cube.obj')
+    
+    mesh_parameters = wavefront.polyhedron_parameters(v, f)
+    edge_vertex_map = mesh_parameters.edge_vertex_map
+    edge_face_map = mesh_parameters.edge_face_map
+    normal_face = mesh_parameters.normal_face
+    vf_map = mesh_parameters.vertex_face_map
+
+    D, P, V, E, F = wavefront.distance_to_edges(pt, v, f, 
+                                                normal_face,
+                                                edge_vertex_map,
+                                                edge_face_map,
+                                                vf_map)
+    
+    mfig = plot_data(pt, v, f, D, P, V, E, F, '')
+    graphics.mlab.view(azimuth=view['azimuth'], elevation=view['elevation'],
+                       distance=view['distance'], focalpoint=view['focalpoint'],
+                       figure=mfig)
+
+    graphics.mlab.savefig(filename, magnification=4)
+
+    return mfig
+
+def cube_closest_face(img_path):
+    filename = os.path.join(img_path, 'cube_closest_face.jpg')
+
+    size = (800*1.618, 800) 
+    pt = np.array([0.7, 0.2, 0])
+    v, f = wavefront.read_obj('./integration/cube.obj')
+    
+    mesh_parameters = wavefront.polyhedron_parameters(v, f)
+    edge_vertex_map = mesh_parameters.edge_vertex_map
+    edge_face_map = mesh_parameters.edge_face_map
+    normal_face = mesh_parameters.normal_face
+    vf_map = mesh_parameters.vertex_face_map
+
+    D, P, V, E, F = wavefront.distance_to_faces(pt, v, f, 
+                                                normal_face,
+                                                edge_vertex_map,
+                                                edge_face_map,
+                                                vf_map)
+    
+    mfig = plot_data(pt, v, f, D, P, V, E, F, '')
+    graphics.mlab.view(azimuth=view['azimuth'], elevation=view['elevation'],
+                       distance=view['distance'], focalpoint=view['focalpoint'],
+                       figure=mfig)
+
+    graphics.mlab.savefig(filename, magnification=4)
+
+    return mfig
 if __name__ == "__main__":
     img_path = '/tmp/mayavi_figure'
     if not os.path.exists(img_path):
@@ -129,3 +191,5 @@ if __name__ == "__main__":
 
     cube_mesh_with_vertices_edges_faces(img_path)
     cube_closest_vertex(img_path)
+    cube_closest_edge(img_path)
+    cube_closest_face(img_path)
