@@ -191,21 +191,28 @@ def reconstruct(time, state, ast, dum, point_cloud):
 def incremental_reconstruction(filename, asteroid_name='castalia'):
     """Incrementally update the mesh
     """
+    logger = logging.getLogger(__name__)
+
+    logger.info('Loading {}'.format(filename))
     data = np.load(filename)
     point_cloud = data['point_cloud'][()]
 
     # define the asteroid and dumbbell objects
     ast = asteroid.Asteroid(asteroid_name, 4092, 'mat')
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
-
+    
+    logger.info('Creating ellipsoid mesh')
     # define a simple mesh to start
     v, f = wavefront.ellipsoid_mesh(
         ast.axes[0], ast.axes[1], ast.axes[2], density=20)
     v_est, f_est = v, f
 
+    v_array = []
+    f_array = []
+
     # extract out all the points in the asteroid frame
-    time = point_cloud['time']
-    ast_ints = point_cloud['ast_ints']
+    time = point_cloud['time'][0:100]
+    ast_ints = point_cloud['ast_ints'][0:100]
 
     # loop over the points in order and update the mesh
     # mfig = graphics.mayavi_figure()
@@ -213,14 +220,19 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
 
     # points = graphics.mayavi_points3d(mfig, ast_ints[0], scale_factor=0.1)
     # ms = mesh.mlab_source
-
+    
+    logger.info('Starting loop over point cloud')
     for (t, points) in zip(time, ast_ints):
         # check if points is empty
+        logger.info('Current : t = {} with {} points'.format(t, len(points)))
         for pt in points:
             # incremental update for each point in points
             # check to make sure each pt is not nan
             if not np.any(np.isnan(pt)):
+                logger.info('Point {}'.format(pt))
                 v_est, f_est = wavefront.mesh_incremental_update(pt, v_est, f_est)
+                v_array.append(v_est)
+                f_array.append(f_est)
 
         # input("Press enter to continue")
 
@@ -228,18 +240,27 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
     # ms.reset(x=v_est[:, 0], y=v_est[:, 1], z=v_est[:, 2],
     #              triangles=f_est)
 
-    return v_est, f_est
+    return v_array, f_array
 
 if __name__ == "__main__":
     # TODO Measure time for run
-    logging.basicConfig(filename='raycasting.txt',
-                        filemode='w', level=logging.INFO)
-    time, state, point_cloud = simulate()
+    # logging.basicConfig(filename='raycasting.txt',
+                        # filemode='w', level=logging.INFO)
+    # time, state, point_cloud = simulate()
 
     # save data to a file
-    np.savez('20180131_itokawa_raycasting_sim', time=time, state=state,
-             point_cloud=point_cloud)
+    # np.savez('20180131_itokawa_raycasting_sim', time=time, state=state,
+    #          point_cloud=point_cloud)
 
     # to access the data again
     # data = np.load(filename)
     # point_cloud = data['point_cloud'][()]
+
+    # now reconstruct
+    filename = './data/raycasting/20180110_raycasting_castalia.npz'
+    logging.basicConfig(filename='reconstruct.txt',
+                        filemode='w', level=logging.INFO)
+    
+    v_array, f_array = incremental_reconstruction(filename, 'castalia')
+    np.savez('20180110_raycasting_reconstruct', v_array=v_array,
+             f_array=f_array)
