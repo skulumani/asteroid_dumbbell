@@ -4,6 +4,12 @@
 # If it does exist then only update the conda environment rather than create it
 sudo apt-get -qq update
 
+# Script to download and install mayavi from source
+MAYAVI_REPO="https://github.com/enthought/mayavi.git"
+
+ANACONDA_ENV="asteroid"
+ANACONDA_PATH="$HOME/anaconda3/envs"
+
 echo "Downloading and Installing Miniconda"
 # get miniconda installed
 # check if anaconda3 directory exists
@@ -50,5 +56,27 @@ else
     # build mayavi
     bash ./utilities/build_mayavi.sh
 fi
+
+
+echo "Make sure you've installed the conda environment!!!"
+# read -p "Enter the conda enviornment to install mayavi: " ANACONDA_ENV
+
+# clone mayavi repo
+if [ -d "/tmp/mayavi" ]; then
+    echo "Mayavi source directory already exits"
+    cd "/tmp/mayavi"
+    git checkout master
+else
+    mkdir -p "/tmp/mayavi"
+    cd "/tmp/mayavi"
+    git clone ${MAYAVI_REPO} .
+    git checkout master
+fi
+
+conda activate ${ANACONDA_ENV}
+
+python setup.py install
+
+echo "Mayavi installed"
 
 echo "Setup is complete"
