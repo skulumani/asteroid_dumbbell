@@ -238,7 +238,7 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
         f_array.append(f_est)
 
         # save every so often and delete v_array,f_array to save memory
-        if (ii % 1000) == 0:  
+        if (ii % 10) == 0:  
             logger.info('Saving data to file. ii = {}, t = {}'.format(ii, t))
             if os.path.exists(output_filename):
                 logger.info('Exisiting data file. Now appending')
