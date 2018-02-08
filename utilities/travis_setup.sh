@@ -22,6 +22,10 @@ echo "Configuring Conda settings"
 # configure conda
 conda config --set always_yes yes --set changeps1 no
 conda update conda
+echo ". /home/travis/anaconda3/etc/profile.d/conda.sh" >> ~/.bashrc
+export PATH="$HOME/anaconda3/bin:$PATH"
+hash -r 
+source $HOME/anaconda3/bin/activate
 
 echo "Downloading the shape models"
 # download the shape model
@@ -35,7 +39,7 @@ if [ -d "$HOME/anaconda3/envs/asteroid" ]; then
     conda env update --name asteroid --file ./utilities/asteroid.yml
 else
     echo "No asteroid enviornment"
-    conda env create -n ${CONDA_ENV} -f ${DIR}/asteroid.yml
+    conda env create --name asteroid --face ${DIR}/asteroid.yml
 
     conda activate asteroid
     conda uninstall --verbose mayavi vtk
