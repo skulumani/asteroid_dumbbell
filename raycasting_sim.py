@@ -10,6 +10,7 @@ import os
 
 import numpy as np
 from scipy import integrate
+import h5py
 
 from dynamics import asteroid, dumbbell, eoms, controller
 from kinematics import attitude
@@ -193,7 +194,8 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
     """Incrementally update the mesh
     """
     logger = logging.getLogger(__name__)
-    output_filename = filename[0:-4] + '_reconstruct.npz'
+    output_filename = filename[0:-4] + '_reconstruct.hdf5'
+    
 
     logger.info('Loading {}'.format(filename))
     data = np.load(filename)
@@ -209,12 +211,9 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
         ast.axes[0], ast.axes[1], ast.axes[2], density=20)
     v_est, f_est = v, f
 
-    v_array = []
-    f_array = []
-
     # extract out all the points in the asteroid frame
-    time = point_cloud['time']
-    ast_ints = point_cloud['ast_ints']
+    time = point_cloud['time'][0:100]
+    ast_ints = point_cloud['ast_ints'][0:100]
 
     # loop over the points in order and update the mesh
     # mfig = graphics.mayavi_figure()
@@ -222,49 +221,31 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
 
     # points = graphics.mayavi_points3d(mfig, ast_ints[0], scale_factor=0.1)
     # ms = mesh.mlab_source
-    
-    logger.info('Starting loop over point cloud')
-    for ii, (t, points) in enumerate(zip(time, ast_ints)):
-        # check if points is empty
-        logger.info('Current : t = {} with {} points'.format(t, len(points)))
-        for pt in points:
-            # incremental update for each point in points
-            # check to make sure each pt is not nan
-            if not np.any(np.isnan(pt)):
-                v_est, f_est = wavefront.mesh_incremental_update(pt, v_est, f_est)
+    logger.info('Create HDF5 file {}'.format(output_filename))
+    with h5py.File(output_filename, 'w') as fout:
+        v_group = fout.create_group('vertex_array')
+        f_group = fout.create_group('face_array')
 
-        # input("Press enter to continue")
-        v_array.append(v_est)
-        f_array.append(f_est)
-        
-        # use HD5py instead
-        # save every so often and delete v_array,f_array to save memory
-        if (ii % 10) == 0:  
-            logger.info('Saving data to file. ii = {}, t = {}'.format(ii, t))
-            if os.path.exists(output_filename):
-                logger.info('Exisiting data file. Now appending')
-                data = np.load(output_filename) 
-                v_array_old = data['v_array'][()]
-                f_array_old = data['f_array'][()]
+        logger.info('Starting loop over point cloud')
+        for ii, (t, points) in enumerate(zip(time, ast_ints)):
+            # check if points is empty
+            logger.info('Current : t = {} with {} points'.format(t, len(points)))
+            for pt in points:
+                # incremental update for each point in points
+                # check to make sure each pt is not nan
+                if not np.any(np.isnan(pt)):
+                    v_est, f_est = wavefront.mesh_incremental_update(pt, v_est, f_est)
 
-                v_array_old.append(v_array)
-                f_array_old.append(f_array)
+            # use HD5py instead
+            # save every so often and delete v_array,f_array to save memory
+            if (ii % 10) == 0:  
+                logger.info('Saving data to HDF5. ii = {}, t = {}'.format(ii, t))
+                v_group.create_dataset('v_est_' + str(ii), data=v_est)
+                f_group.create_dataset('f_est_' + str(ii), data=f_est)
 
-                np.savez(output_filename, v_array=v_array_old, f_array=f_array_old,
-                        time=time)
+        logger.info('Completed the reconstruction')
 
-                v_array = []
-                f_array = []
-            else:
-                logger.info('No data file. Creating new one')
-
-                np.savez(output_filename, v_array=v_array, f_array=f_array,
-                         time=time)
-                v_array = []
-                f_array = []
-
-    logger.info('Completed the reconstruction')
-    return v_array, f_array
+    return v_est, f_est
 
 if __name__ == "__main__":
     # TODO Measure time for run
@@ -286,5 +267,3 @@ if __name__ == "__main__":
                         filemode='w', level=logging.INFO)
     
     v_array, f_array = incremental_reconstruction(filename, 'castalia')
-    np.savez('20180110_raycasting_reconstruct.npz', v_array=v_array,
-             f_array=f_array)
