@@ -23,7 +23,7 @@ else
     git checkout master
 fi
 
-source activate ${ANACONDA_ENV}
+conda activate ${ANACONDA_ENV}
 
 python setup.py install
 
