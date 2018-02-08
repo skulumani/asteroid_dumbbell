@@ -6,10 +6,9 @@ set -e
 MAYAVI_REPO="https://github.com/enthought/mayavi.git"
 
 ANACONDA_PATH="/home/shankar/anaconda3/envs"
-ANACONDA_ENV="asteroid"  # change to the specific anaconda enviornment you want
 
-echo "Make sure you've installed the asteroid conda environment!!!"
-read -p "Press Enter to continue"
+echo "Make sure you've installed the conda environment!!!"
+read -p "Enter the conda enviornment to install mayavi: " ANACONDA_ENV
 
 # clone mayavi repo
 if [ -d "/tmp/mayavi" ]; then

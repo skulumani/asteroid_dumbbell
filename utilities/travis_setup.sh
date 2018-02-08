@@ -32,10 +32,19 @@ echo "Creating the asteroid environment"
 # setup development enviornment
 if [ -d "$HOME/anaconda3/envs/asteroid" ]; then
     echo "asteroid enviornment exists. Just update"
-    conda env update --name asteroid --file ./utilities/asteroid_reduced.yml
+    conda env update --name asteroid --file ./utilities/asteroid.yml
 else
     echo "No asteroid enviornment"
-    conda env create --file ./utilities/asteroid.yml
+    conda env create -n ${CONDA_ENV} -f ${DIR}/asteroid.yml
+
+    conda activate asteroid
+    conda uninstall --verbose mayavi vtk
+
+    conda clean --all
+    conda activate asteroid
+    pip install vtk
+    # build mayavi
+    bash ./utilities/build_mayavi.sh
 fi
 
 echo "Setup is complete"
