@@ -236,7 +236,8 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
         # input("Press enter to continue")
         v_array.append(v_est)
         f_array.append(f_est)
-
+        
+        # use HD5py instead
         # save every so often and delete v_array,f_array to save memory
         if (ii % 10) == 0:  
             logger.info('Saving data to file. ii = {}, t = {}'.format(ii, t))
