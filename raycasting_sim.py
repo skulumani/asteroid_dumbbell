@@ -207,13 +207,12 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
     
     logger.info('Creating ellipsoid mesh')
     # define a simple mesh to start
-    v, f = wavefront.ellipsoid_mesh(
-        ast.axes[0], ast.axes[1], ast.axes[2], density=20)
-    v_est, f_est = v, f
+    v_est, f_est = wavefront.ellipsoid_mesh(ast.axes[0], ast.axes[1], ast.axes[2],
+                                    density=20)
 
     # extract out all the points in the asteroid frame
-    time = point_cloud['time'][0:100]
-    ast_ints = point_cloud['ast_ints'][0:100]
+    time = point_cloud['time']
+    ast_ints = point_cloud['ast_ints']
 
     # loop over the points in order and update the mesh
     # mfig = graphics.mayavi_figure()
@@ -238,14 +237,24 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
 
             # use HD5py instead
             # save every so often and delete v_array,f_array to save memory
-            if (ii % 10) == 0:  
+            if (ii % 10) == 0:
                 logger.info('Saving data to HDF5. ii = {}, t = {}'.format(ii, t))
                 v_group.create_dataset('v_est_' + str(ii), data=v_est)
                 f_group.create_dataset('f_est_' + str(ii), data=f_est)
 
-        logger.info('Completed the reconstruction')
+    logger.info('Completed the reconstruction')
 
-    return v_est, f_est
+    return 0
+
+def read_mesh_reconstruct(filename):
+    """Use H5PY to read the data back and plot
+    """
+    with h5py.File(filename, 'r') as hf:
+        face_array = hf['face_array']
+        vertex_array = hf['vertex_array']
+
+        # loop over keys in both and plot
+        for vk, fk in zip(face_array, vertex_array):
 
 if __name__ == "__main__":
     # TODO Measure time for run
@@ -266,4 +275,4 @@ if __name__ == "__main__":
     logging.basicConfig(filename='reconstruct.txt',
                         filemode='w', level=logging.INFO)
     
-    v_array, f_array = incremental_reconstruction(filename, 'castalia')
+    incremental_reconstruction(filename, 'castalia')
