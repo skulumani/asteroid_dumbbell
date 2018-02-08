@@ -16,7 +16,7 @@ before_install:
     - 
 install:
     - bash ./utilities/travis_setup.sh
-    - export PATH="$HOME/anaconda3/bin:$PATH"
+    - echo ". /home/travis/anaconda3/etc/profile.d/conda.sh" >> ~/.bashrc
     - hash -r 
     - conda activate asteroid
 script:
