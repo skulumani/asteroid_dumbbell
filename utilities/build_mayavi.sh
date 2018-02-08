@@ -8,7 +8,8 @@ MAYAVI_REPO="https://github.com/enthought/mayavi.git"
 ANACONDA_PATH="/home/shankar/anaconda3/envs"
 
 echo "Make sure you've installed the conda environment!!!"
-read -p "Enter the conda enviornment to install mayavi: " ANACONDA_ENV
+# read -p "Enter the conda enviornment to install mayavi: " ANACONDA_ENV
+ANACONDA_ENV="asteroid"
 
 # clone mayavi repo
 if [ -d "/tmp/mayavi" ]; then
