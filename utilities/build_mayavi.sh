@@ -22,7 +22,7 @@ else
     git clone ${MAYAVI_REPO} .
     git checkout master
 fi
-
+conda activate base
 conda activate ${ANACONDA_ENV}
 
 python setup.py install
