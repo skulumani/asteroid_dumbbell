@@ -1,11 +1,15 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-import numpy as np
+
 import sys
 import pdb
+import re
+
+import numpy as np
+
 
 def save_to_interactive(dct):
     """Save variables from debugger to main interpreter
-    
+
     import utilities
     utilities.save_to_interactive({'F1':F1, 'F2':F2, 'M1':M1, 'M2':M2})
     """
@@ -25,6 +29,7 @@ def save_to_interactive(dct):
             cur_frame.f_globals.update(dct)
             break
 
+
 def ismember_rows(a, b):
     '''Equivalent of 'ismember' from Matlab
     a.shape = (nRows_a, nCol)
@@ -32,20 +37,22 @@ def ismember_rows(a, b):
     return the idx where b[idx] == a
     '''
     invalid = -1
-    indx = np.full(a.shape[0],invalid,dtype='int')
+    indx = np.full(a.shape[0], invalid, dtype='int')
 
-    indxa, indxb = np.nonzero(np.all(b == a[:,np.newaxis], axis=2))
+    indxa, indxb = np.nonzero(np.all(b == a[:, np.newaxis], axis=2))
 
     indx[indxa] = indxb
     indx[indxb] = indxa
 
     return indx
 
-def ismember(a,b):
 
-    indx = np.nonzero(np.all(b == a[:,np.newaxis], axis=2))[0]
+def ismember(a, b):
+
+    indx = np.nonzero(np.all(b == a[:, np.newaxis], axis=2))[0]
 
     return indx
+
 
 def asvoid(arr):
     """
@@ -60,11 +67,13 @@ def asvoid(arr):
     arr = np.ascontiguousarray(arr)
     return arr.view(np.dtype((np.void, arr.dtype.itemsize * arr.shape[-1])))
 
+
 def in1d_index(a, b):
     voida, voidb = map(asvoid, (a, b))
     return np.where(np.in1d(voidb, voida))[0]
 
-def ismember_index(a,b):
+
+def ismember_index(a, b):
     r"""Finds matching elements between two arrays
 
     index = ismember_index(a, b)
@@ -87,16 +96,16 @@ def ismember_index(a,b):
     Author
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
-    """ 
+    """
     invalid = -1
 
-    a[a==-0.0] = 0
-    b[b==-0.0] = 0
-    
-    voida, voidb = map(asvoid,(a,b))
+    a[a == -0.0] = 0
+    b[b == -0.0] = 0
+
+    voida, voidb = map(asvoid, (a, b))
 
     index = np.full(a.shape[0], invalid, dtype='int')
-    
+
     for ii in range(a.shape[0]):
         match = np.where(voida[ii] == voidb)[0]
 
@@ -104,6 +113,7 @@ def ismember_index(a,b):
             index[ii] = match[0]
 
     return index
+
 
 def search_index(a, b):
     r"""Memory intensive way to find matches in single dimensional array
@@ -141,9 +151,21 @@ def search_index(a, b):
     be = np.broadcast_to(a, (lenb, lena)).T
 
     inda, indb = np.where(np.equal(ae, be))
-    
+
     return inda, indb
 
+
+def sorted_nicely(l):
+    """Sort an iterable in a human expected fashion
+
+    """
+    def convert(text): return int(text) if text.isdigit() else text
+
+    def alphanum_key(key): return [convert(c)
+                                   for c in re.split('([0-9]+)', key)]
+    return sorted(l, key=alphanum_key)
+
+
 if __name__ == "__main__":
-    
+
     print("Some versions of trying to duplicate Matlab's ismember function.")
