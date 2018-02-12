@@ -252,10 +252,14 @@ def read_mesh_reconstruct(filename):
     with h5py.File(filename, 'r') as hf:
         face_array = hf['face_array']
         vertex_array = hf['vertex_array']
+        
+        # get all the keys for both groups
+        face_keys = list(face_array.keys())
+        vertex_keys = list(vertex_array.keys())
 
         # loop over keys in both and plot
         for vk, fk in zip(face_array, vertex_array):
-
+            
 if __name__ == "__main__":
     # TODO Measure time for run
     # logging.basicConfig(filename='raycasting.txt',
