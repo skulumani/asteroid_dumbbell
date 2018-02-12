@@ -16,6 +16,7 @@ from dynamics import asteroid, dumbbell, eoms, controller
 from kinematics import attitude
 from visualization import plotting, graphics, animation
 from point_cloud import wavefront, raycaster
+import utilities
 
 # simulate dumbbell moving aroudn asteroid
 
@@ -32,7 +33,7 @@ def initialize():
     logger = logging.getLogger(__name__)
     logger.info('Initialize asteroid and dumbbell objects')
 
-    ast = asteroid.Asteroid('itokawa', 0, 'obj')
+    ast = asteroid.Asteroid('castalia', 4092, 'obj')
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
     des_att_func = controller.random_sweep_attitude
     des_tran_func = controller.inertial_fixed_state
@@ -249,17 +250,33 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
 def read_mesh_reconstruct(filename):
     """Use H5PY to read the data back and plot
     """
+    
     with h5py.File(filename, 'r') as hf:
         face_array = hf['face_array']
         vertex_array = hf['vertex_array']
         
         # get all the keys for both groups
-        face_keys = list(face_array.keys())
-        vertex_keys = list(vertex_array.keys())
+        face_keys = utilities.sorted_nicely(list(face_array.keys()))
+        vertex_keys = utilities.sorted_nicely(list(vertex_array.keys()))
 
         # loop over keys in both and plot
-        for vk, fk in zip(face_array, vertex_array):
+        mfig = graphics.mayavi_figure()
+        mesh = graphics.mayavi_addMesh(mfig, vertex_array['v_est_0'][()], 
+                                       face_array['f_est_0'][()])
+        ms = mesh.mlab_source
+        graphics.mlab.view(azimuth=-45)
+        for vk, fk in zip(vertex_keys, face_keys):
+            filename = os.path.join('/tmp/mayavi_figure', 'est_' + str.zfill(vk[6:], 6) +'.jpg')
+            v, f = (vertex_array[vk][()], face_array[fk][()])
+            # draw the mesh
+            ms.reset(x=v[:,0], y=v[:,1], z=v[:,2], triangles=f)
+            # save the figure
+            graphics.mlab.savefig(filename, magnification=4)
+            # input('Press enter to continue...')
             
+    
+    return mfig
+
 if __name__ == "__main__":
     # TODO Measure time for run
     # logging.basicConfig(filename='raycasting.txt',
