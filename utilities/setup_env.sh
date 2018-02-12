@@ -11,11 +11,9 @@ read -p "Enter the conda enviornment name" CONDA_ENV
 conda env create -n ${CONDA_ENV} -f ${DIR}/asteroid.yml
 
 conda activate asteroid
-conda uninstall --verbos mayavi vtk
 
 conda clean --all
-conda activate asteroid
-pip install vtk
+
 # build mayavi
 bash ${DIR}/build_mayavi.sh
 

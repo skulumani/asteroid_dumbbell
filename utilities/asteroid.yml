@@ -1,15 +1,13 @@
 name: asteroid
 channels:
-  - menpo
-  - conda-forge
+  - defaults
 dependencies:
   - python=3.5.4
-  - mayavi
   - h5py
   - ipython
   - numpy>=1.14
-  - matplotlib>=2
   - scipy>=1
+  - pyqt=4
   - pip
   - pytest
   - pytest-cov
@@ -17,5 +15,12 @@ dependencies:
   - pip:
     - astro
     - kinematics
+    - matplotlib
+    - vtk
+    - traits
+    - traitsui
+    - pyface
+    - envisage
+    - mayavi
 prefix: /home/shankar/anaconda3/envs/asteroid
 

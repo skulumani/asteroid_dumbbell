@@ -25,6 +25,8 @@ fi
 
 conda activate ${ANACONDA_ENV}
 
+pip uninstall mayavi
+
 python setup.py install
 
 echo "Mayavi installed"
