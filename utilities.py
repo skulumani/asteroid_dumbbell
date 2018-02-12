@@ -156,13 +156,30 @@ def search_index(a, b):
 
 
 def sorted_nicely(l):
-    """Sort an iterable in a human expected fashion
+    r"""Sort the iterable into a human expected fashion
 
+    l_out = sorted_nicely(l_in)
+
+    Parameters
+    ----------
+    l_in : iterable
+        Array of mixed alphanumeric items
+
+    Returns
+    -------
+    l_out : iterable
+        Sorted list in a human fashion way
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
     """
-    def convert(text): return int(text) if text.isdigit() else text
+    def convert(text): 
+        return int(text) if text.isdigit() else text
 
-    def alphanum_key(key): return [convert(c)
-                                   for c in re.split('([0-9]+)', key)]
+    def alphanum_key(key): 
+        return [convert(c) for c in re.split('([0-9]+)', key)]
+
     return sorted(l, key=alphanum_key)
 
 

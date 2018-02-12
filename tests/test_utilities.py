@@ -637,3 +637,9 @@ class TestIsmember_256():
 
     def test_ismember_rows(self):
         np.testing.assert_allclose(self.e1_ind1b_matlab-1, utilities.ismember_rows(-self.e1,self.e1))
+
+def TestSortedNicely():
+    s = ['booklet', '4 sheets', '48 sheets', '12 sheets']
+    s_sorted = utilities.sorted_nicely(s)
+    s_sorted_exp = ['4 sheets', '12 sheets', '48 sheets', 'booklet']
+    np.testing.assert_allclose(s_sorted, s_sorted_exp)
