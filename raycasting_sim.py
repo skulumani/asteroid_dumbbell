@@ -195,9 +195,8 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
     """Incrementally update the mesh
     """
     logger = logging.getLogger(__name__)
-    output_filename = filename[0:-4] + '_reconstruct.hdf5'
+    output_filename = filename[0:-4] + '_reconstruct_vertexonly.hdf5'
     
-
     logger.info('Loading {}'.format(filename))
     data = np.load(filename)
     point_cloud = data['point_cloud'][()]
@@ -209,18 +208,12 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
     logger.info('Creating ellipsoid mesh')
     # define a simple mesh to start
     v_est, f_est = wavefront.ellipsoid_mesh(ast.axes[0], ast.axes[1], ast.axes[2],
-                                    density=20)
+                                    density=60)
 
     # extract out all the points in the asteroid frame
-    time = point_cloud['time']
-    ast_ints = point_cloud['ast_ints']
+    time = point_cloud['time'][::10]
+    ast_ints = point_cloud['ast_ints'][::10]
 
-    # loop over the points in order and update the mesh
-    # mfig = graphics.mayavi_figure()
-    # mesh = graphics.mayavi_addMesh(mfig, v, f)
-
-    # points = graphics.mayavi_points3d(mfig, ast_ints[0], scale_factor=0.1)
-    # ms = mesh.mlab_source
     logger.info('Create HDF5 file {}'.format(output_filename))
     with h5py.File(output_filename, 'w') as fout:
         v_group = fout.create_group('vertex_array')
@@ -238,7 +231,7 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
 
             # use HD5py instead
             # save every so often and delete v_array,f_array to save memory
-            if (ii % 10) == 0:
+            if (ii % 1) == 0:
                 logger.info('Saving data to HDF5. ii = {}, t = {}'.format(ii, t))
                 v_group.create_dataset('v_est_' + str(ii), data=v_est)
                 f_group.create_dataset('f_est_' + str(ii), data=f_est)
