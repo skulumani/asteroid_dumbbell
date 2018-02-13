@@ -1,18 +1,19 @@
 """Testing out vtk
 
 """
-
-import vtk
-import numpy as np
-from vtk.util import numpy_support
-from vtk.util.colors import tomato
-from vtk.util.misc import vtkGetDataRoot
 import os
 import string
 import time
+import pdb
+
+import numpy as np
+import vtk
+from vtk.util import numpy_support
+from vtk.util.colors import tomato
+from vtk.util.misc import vtkGetDataRoot
+
 from point_cloud import wavefront, raycaster
 from visualization import graphics
-import pdb
 
 def vtk_example():
     # generate a polygon data for a cube
@@ -782,6 +783,18 @@ def raycasting_visualization():
 
     vtk_addPoly(renderer, caster.polydata)
     vtk_show(renderer)
+
+def vtk_mesh_subdivision():
+    """Subdivide a mesh into more triangles
+    """
+    
+    # get the polydata for a mesh
+
+    # subdivide using appropriate filter
+
+    # output to a new v, f array
+    
+    pass
 
 if __name__ == '__main__':
     vtk_cylinder()
