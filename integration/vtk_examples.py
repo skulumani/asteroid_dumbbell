@@ -789,12 +789,56 @@ def vtk_mesh_subdivision():
     """
     
     # get the polydata for a mesh
+    v, f = wavefront.ellipsoid_mesh(1, 2, 3, density=20)
+    polydata = wavefront.meshtopolydata(v, f)
 
     # subdivide using appropriate filter
+    smooth_loop = vtk.vtkLoopSubdivisionFilter()
+    smooth_loop.SetNumberOfSubdivisions(1) # can define the number of subdivisions
+    smooth_loop.SetInputConnection(polydata.GetOutputPort())
 
+    smooth_butterfly = vtk.vtkButterflySubdivisionFilter()
+    smooth_butterfly.SetNumberOfSubdivisions(1)
+    smooth_butterfly.SetInputConnection(polydata.GetOutputConnection())
+    
+    # Create a mapper and actor for initial dataset
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputData(polydata)
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+    
+    # Create a mapper and actor for smoothed dataset (vtkLoopSubdivisionFilter)
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputConnection(smooth_loop.GetOutputPort())
+    actor_loop = vtk.vtkActor()
+    actor_loop.SetMapper(mapper)
+    actor_loop.SetPosition(32, 0, 0)
+    
+    # Create a mapper and actor for smoothed dataset (vtkButterflySubdivisionFilter)
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputConnection(smooth_butterfly.GetOutputPort())
+    actor_butterfly = vtk.vtkActor()
+    actor_butterfly.SetMapper(mapper)
+    actor_butterfly.SetPosition(64, 0, 0)
+    
+    # Visualise
+    renderer = vtk.vtkRenderer()
+    renderWindow = vtk.vtkRenderWindow()
+    renderWindow.AddRenderer(renderer)
+    renderWindowInteractor = vtk.vtkRenderWindowInteractor()
+    renderWindowInteractor.SetRenderWindow(renderWindow)
+    
+    # Add actors and render
+    renderer.AddActor(actor)
+    renderer.AddActor(actor_loop)
+    renderer.AddActor(actor_butterfly)
+    
+    renderer.SetBackground(1, 1, 1) # Background color white
+    renderWindow.SetSize(800, 800)
+    renderWindow.Render()
+    renderWindowInteractor.Start()
     # output to a new v, f array
     
-    pass
 
 if __name__ == '__main__':
     vtk_cylinder()
