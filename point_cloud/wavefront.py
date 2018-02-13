@@ -1384,19 +1384,62 @@ def sign_of_largest(array):
         sgn = 1
     return sgn
 
-def mesh_incremental_update(pt, v, f):
-    """Add a pt to the mesh 
+def mesh_incremental_update(pt, v, f, method='all'):
+    r"""Incorporate pt into the mesh defined by v,f
 
+    v_new, f_new = mesh_incremental_update(pt, v, f, method='all')
+
+    Parameters
+    ----------
+    pt : numpy array (3,)
+        Point to check in 3D
+    v : numpy array (v, 3)
+        Vertices defining the mesh
+    f : numpy array (f, 3)
+        Topological connection of mesh
+    method : string
+        Type of method to use
+        'all' : Can add as a vertex, face, or edge
+        'vertex' : Only modify the vertex and never add a vertex
+
+    Returns
+    -------
+    v : numpy array (v, 3)
+        New vertices
+    f : numpy array (f, 3)
+        New faces
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
     """
     mesh_parameters = polyhedron_parameters(v, f)
+    
+    if method == 'all':
+        D, P, V, E, F, primitive = distance_to_mesh(pt, v, f, mesh_parameters)
 
-    D, P, V, E, F, primitive = distance_to_mesh(pt, v, f, mesh_parameters)
-    if primitive == 'vertex':
+
+        if primitive == 'vertex':
+            nv, nf = vertex_insertion(pt, v, f, D, P, V, E, F)
+        elif primitive == 'edge':
+            nv, nf = edge_insertion(pt, v, f, D, P, V, E, F)
+        elif primitive == 'face':
+            nv, nf = face_insertion(pt, v, f, D, P, V, E, F)
+    elif method == 'vertex': # only check for closest vertex
+        normal_face = mesh_parameters.normal_face
+        edge_vertex_map = mesh_parameters.edge_vertex_map
+        edge_face_map = mesh_parameters.edge_face_map
+        vf_map = mesh_parameters.vertex_face_map
+        
+
+        D, P, V, E, F = distance_to_vertices(pt, v, f, normal_face,
+                                             edge_vertex_map, edge_face_map,
+                                             vf_map)
+
+        # figure out the minimum and output that
+        D, P, V , E , F  = distance_minimum(D, P, V, E, F)
+
         nv, nf = vertex_insertion(pt, v, f, D, P, V, E, F)
-    elif primitive == 'edge':
-        nv, nf = edge_insertion(pt, v, f, D, P, V, E, F)
-    elif primitive == 'face':
-        nv, nf = face_insertion(pt, v, f, D, P, V, E, F)
 
     return nv, nf
 
