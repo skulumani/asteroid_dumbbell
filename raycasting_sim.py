@@ -208,12 +208,11 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
     logger.info('Creating ellipsoid mesh')
     # define a simple mesh to start
     v_est, f_est = wavefront.ellipsoid_mesh(ast.axes[0], ast.axes[1], ast.axes[2],
-                                    density=60)
+                                    density=40)
 
     # extract out all the points in the asteroid frame
     time = point_cloud['time'][::10]
     ast_ints = point_cloud['ast_ints'][::10]
-
     logger.info('Create HDF5 file {}'.format(output_filename))
     with h5py.File(output_filename, 'w') as fout:
         v_group = fout.create_group('vertex_array')
@@ -227,14 +226,14 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
                 # incremental update for each point in points
                 # check to make sure each pt is not nan
                 if not np.any(np.isnan(pt)):
-                    v_est, f_est = wavefront.mesh_incremental_update(pt, v_est, f_est)
+                    v_est, f_est = wavefront.mesh_incremental_update(pt, v_est, f_est, 'vertex')
 
             # use HD5py instead
             # save every so often and delete v_array,f_array to save memory
             if (ii % 1) == 0:
                 logger.info('Saving data to HDF5. ii = {}, t = {}'.format(ii, t))
-                v_group.create_dataset('v_est_' + str(ii), data=v_est)
-                f_group.create_dataset('f_est_' + str(ii), data=f_est)
+                v_group.create_dataset(str(ii), data=v_est)
+                f_group.create_dataset(str(ii), data=f_est)
 
     logger.info('Completed the reconstruction')
 
@@ -254,12 +253,12 @@ def read_mesh_reconstruct(filename):
 
         # loop over keys in both and plot
         mfig = graphics.mayavi_figure()
-        mesh = graphics.mayavi_addMesh(mfig, vertex_array['v_est_0'][()], 
-                                       face_array['f_est_0'][()])
+        mesh = graphics.mayavi_addMesh(mfig, vertex_array[vertex_keys[0]][()], 
+                                       face_array[face_keys[0]][()])
         ms = mesh.mlab_source
         graphics.mlab.view(azimuth=-45)
-        for vk, fk in zip(vertex_keys, face_keys):
-            filename = os.path.join('/tmp/mayavi_figure', 'est_' + str.zfill(vk[6:], 6) +'.jpg')
+        for ii, (vk, fk) in enumerate(zip(vertex_keys, face_keys)):
+            filename = os.path.join('/tmp/mayavi_figure', str.zfill(str(ii), 6) +'.jpg')
             v, f = (vertex_array[vk][()], face_array[fk][()])
             # draw the mesh
             ms.reset(x=v[:,0], y=v[:,1], z=v[:,2], triangles=f)
@@ -287,6 +286,8 @@ if __name__ == "__main__":
     # now reconstruct
     filename = './data/raycasting/20180110_raycasting_castalia.npz'
     logging.basicConfig(filename='reconstruct.txt',
-                        filemode='w', level=logging.INFO)
+                        filemode='w', level=logging.INFO,
+                        format='%(asctime)s %(levelname)-8s %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
     
     incremental_reconstruction(filename, 'castalia')
