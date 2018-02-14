@@ -794,12 +794,12 @@ def vtk_mesh_subdivision():
 
     # subdivide using appropriate filter
     smooth_loop = vtk.vtkLoopSubdivisionFilter()
-    smooth_loop.SetNumberOfSubdivisions(1) # can define the number of subdivisions
-    smooth_loop.SetInputConnection(polydata.GetOutputPort())
+    smooth_loop.SetNumberOfSubdivisions(3) # can define the number of subdivisions
+    smooth_loop.SetInputData(polydata)
 
     smooth_butterfly = vtk.vtkButterflySubdivisionFilter()
-    smooth_butterfly.SetNumberOfSubdivisions(1)
-    smooth_butterfly.SetInputConnection(polydata.GetOutputConnection())
+    smooth_butterfly.SetNumberOfSubdivisions(3)
+    smooth_butterfly.SetInputData(polydata)
     
     # Create a mapper and actor for initial dataset
     mapper = vtk.vtkPolyDataMapper()
@@ -812,14 +812,14 @@ def vtk_mesh_subdivision():
     mapper.SetInputConnection(smooth_loop.GetOutputPort())
     actor_loop = vtk.vtkActor()
     actor_loop.SetMapper(mapper)
-    actor_loop.SetPosition(32, 0, 0)
+    actor_loop.SetPosition(3, 0, 0)
     
     # Create a mapper and actor for smoothed dataset (vtkButterflySubdivisionFilter)
     mapper = vtk.vtkPolyDataMapper()
     mapper.SetInputConnection(smooth_butterfly.GetOutputPort())
     actor_butterfly = vtk.vtkActor()
     actor_butterfly.SetMapper(mapper)
-    actor_butterfly.SetPosition(64, 0, 0)
+    actor_butterfly.SetPosition(6, 0, 0)
     
     # Visualise
     renderer = vtk.vtkRenderer()
@@ -839,6 +839,7 @@ def vtk_mesh_subdivision():
     renderWindowInteractor.Start()
     # output to a new v, f array
     
+    # output some statistics
 
 if __name__ == '__main__':
     vtk_cylinder()
