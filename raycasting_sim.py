@@ -195,7 +195,7 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
     """Incrementally update the mesh
     """
     logger = logging.getLogger(__name__)
-    output_filename = filename[0:-4] + '_reconstruct_vertexonly.hdf5'
+    output_filename = filename[0:-4] + '_reconstruct_vertexonly_smaller.hdf5'
     
     logger.info('Loading {}'.format(filename))
     data = np.load(filename)
@@ -207,12 +207,11 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
     
     logger.info('Creating ellipsoid mesh')
     # define a simple mesh to start
-    v_est, f_est = wavefront.ellipsoid_mesh(ast.axes[0], ast.axes[1], ast.axes[2],
-                                    density=40)
-
+    v_est, f_est = wavefront.ellipsoid_mesh(ast.axes[0]-0.1, ast.axes[1]-0.1, ast.axes[2]-0.1,
+                                    density=10, subdivisions=1)
     # extract out all the points in the asteroid frame
-    time = point_cloud['time'][::10]
-    ast_ints = point_cloud['ast_ints'][::10]
+    time = point_cloud['time'][::5]
+    ast_ints = point_cloud['ast_ints'][::5]
     logger.info('Create HDF5 file {}'.format(output_filename))
     with h5py.File(output_filename, 'w') as fout:
         v_group = fout.create_group('vertex_array')

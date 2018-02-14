@@ -147,7 +147,7 @@ def read_obj(filename):
     verts = np.asarray(verts) 
     return verts, faces
 
-def ellipsoid_mesh(a, b, c, density=20, subdivisions=3):
+def ellipsoid_mesh(a, b, c, density=20, subdivisions=1):
     r"""Ellipsoid Mesh model
 
     verts, faces = ellipsoid_mesh(a, b, c, density)
@@ -192,8 +192,9 @@ def ellipsoid_mesh(a, b, c, density=20, subdivisions=3):
     
     # now need to do surface reconstruction to get the faces
     verts, faces = reconstruct_numpy(v)
+    verts, faces = mesh_subdivide(verts, faces, subdivisions, 'loop')
 
-    return mesh_subdivide(verts, faces, subdivisions, 'loop')
+    return verts, faces
 
 # TODO : Write this function
 def create_points(vertices):
