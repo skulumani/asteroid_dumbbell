@@ -382,6 +382,88 @@ def reconstruct_numpy(verts):
 
     return v_new, f_new
 
+def polydata_subdivide(polydata, subdivisions=1, style='loop'):
+    r"""Subdivide a polydata
+
+    poly_out = polydata_subdivide(polydata, subdivisions, style)
+
+    Parameters
+    ----------
+    polydata : vtkPolyData
+        The polydata to subdivide
+    subdivisions : int
+        Number of subdivisions. New faces will be 4**subdivision
+    loop : string
+        Loop or Butterfly method to subdivide
+
+    Returns
+    -------
+    polydata : vtkPolyData
+        The subdivided polydata
+
+    See Also
+    --------
+    mesh_subdivide : Subdivide a numpy array mesh
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
+    if style=='loop':
+        logger.info('Loop Subdivision')
+        subdivider = vtk.vtkLoopSubdivisionFilter()
+    elif style=='butterfly':
+        logger.info('Butterfly Subdivision')
+        subdivider = vtk.vtkButterflySubdivisionFilter()
+
+    subdivider.SetNumberOfSubdivisions(subdivisions)
+    subdivider.SetInputData(polydata)
+    subdivider.Update()
+    poly_output = vtk.vtkPolyData()
+    poly_output.ShallowCopy(subdivider.GetOutput())
+    return poly_output
+
+def mesh_subdivide(v, f, subdivisions=1, style='loop'):
+    r"""Subdivide a numpy mesh array
+
+    nv, nf = mesh_subdivide(v, f, subdivisions, style)
+
+    Parameters
+    ----------
+    v : numpy array (n, 3)
+        Vertices
+    f : numpy array (f, 3)
+        Faces 
+    subdivisions : int
+        Number of subdivisions. New faces will be 4**subdivision
+    loop : string
+        Loop or Butterfly method to subdivide
+
+    Returns
+    -------
+    nv : numpy array (n, 3)
+        Vertices
+    nf : numpy array (f, 3)
+        Faces 
+
+    See Also
+    --------
+    polydata_subdivide : Subdivide a polydata object
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
+
+    # convert mesh to poly data
+    polydata = meshtopolydata(v, f)
+
+    # do the subdivision on the polydata
+    poly_subdivide = polydata_subdivide(polydata, subdivisions, style)
+
+    # convert back to mesh and output
+    return polydatatomesh(poly_subdivide)
+
 def reduced_mesh_generation(filename='./data/itokawa_low.obj', step=1):
     """Read in the OBJ shape file, degrade the number of vectors and then 
     create a surface

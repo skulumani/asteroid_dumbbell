@@ -786,6 +786,8 @@ def raycasting_visualization():
 
 def vtk_mesh_subdivision():
     """Subdivide a mesh into more triangles
+
+    The subdivisions are increasing the faces by 4^# subdivisions
     """
     
     # get the polydata for a mesh
@@ -794,13 +796,19 @@ def vtk_mesh_subdivision():
 
     # subdivide using appropriate filter
     smooth_loop = vtk.vtkLoopSubdivisionFilter()
-    smooth_loop.SetNumberOfSubdivisions(3) # can define the number of subdivisions
+    smooth_loop.SetNumberOfSubdivisions(1) # can define the number of subdivisions
     smooth_loop.SetInputData(polydata)
+    smooth_loop.Update()
+    poly_loop = vtk.vtkPolyData()
+    poly_loop.ShallowCopy(smooth_loop.GetOutput())
 
     smooth_butterfly = vtk.vtkButterflySubdivisionFilter()
     smooth_butterfly.SetNumberOfSubdivisions(3)
     smooth_butterfly.SetInputData(polydata)
-    
+    smooth_butterfly.Update() 
+    poly_butterfly = vtk.vtkPolyData()
+    poly_butterfly.ShallowCopy(smooth_butterfly.GetOutput())
+
     # Create a mapper and actor for initial dataset
     mapper = vtk.vtkPolyDataMapper()
     mapper.SetInputData(polydata)
@@ -837,8 +845,14 @@ def vtk_mesh_subdivision():
     renderWindow.SetSize(800, 800)
     renderWindow.Render()
     renderWindowInteractor.Start()
-    # output to a new v, f array
     
+    # output to a new v, f array
+    # convert polydata to numpy
+    v_loop, f_loop = wavefront.polydatatomesh(poly_loop)
+    v_butterfly, f_butterfly = wavefront.polydatatomesh(poly_butterfly)
+    print('Original #V : {} #F : {}'.format(v.shape[0], f.shape[0]))
+    print('Loop     #V : {} #F : {}'.format(v_loop.shape[0], f_loop.shape[0]))
+    print('BFly     #V : {} #F : {}'.format(v_butterfly.shape[0], f_butterfly.shape[0]))
     # output some statistics
 
 if __name__ == '__main__':
