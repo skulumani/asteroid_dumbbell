@@ -46,16 +46,17 @@ if [ -d "$HOME/anaconda3/envs/asteroid" ]; then
     conda env update --name asteroid --file ./utilities/asteroid.yml
 else
     echo "No asteroid enviornment"
-    conda env create --name asteroid --file ${DIR}/asteroid.yml
+    conda env create --name asteroid --file ./utilities/asteroid.yml
 
-    conda activate asteroid
-    conda clean --all
 fi
+
+conda activate asteroid
 
 
 echo "Make sure you've installed the conda environment!!!"
 # read -p "Enter the conda enviornment to install mayavi: " ANACONDA_ENV
 
+pip install -y mayavi
 # clone mayavi repo
 if [ -d "/tmp/mayavi" ]; then
     echo "Mayavi source directory already exits"
@@ -69,7 +70,7 @@ else
 fi
 
 conda activate ${ANACONDA_ENV}
-pip uninstall mayavi
+pip uninstall -y mayavi
 python setup.py install
 
 echo "Mayavi installed"

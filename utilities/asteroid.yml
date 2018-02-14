@@ -21,6 +21,6 @@ dependencies:
     - traitsui
     - pyface
     - envisage
-    - mayavi
+    # - mayavi
 prefix: /home/shankar/anaconda3/envs/asteroid
 
