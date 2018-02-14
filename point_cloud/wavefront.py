@@ -147,7 +147,7 @@ def read_obj(filename):
     verts = np.asarray(verts) 
     return verts, faces
 
-def ellipsoid_mesh(a, b, c, density=20):
+def ellipsoid_mesh(a, b, c, density=20, subdivisions=3):
     r"""Ellipsoid Mesh model
 
     verts, faces = ellipsoid_mesh(a, b, c, density)
@@ -158,6 +158,8 @@ def ellipsoid_mesh(a, b, c, density=20):
         Semi axes lengths (x, y, z ) directions respectively in kilometer
     density : int
         Density for the sperical coordinate parameterization
+    subdivisions : int
+        subdivisions for the mesh
 
     Returns
     -------
@@ -169,6 +171,7 @@ def ellipsoid_mesh(a, b, c, density=20):
     See Also
     --------
     reconstruct_numpy : VTK surface reconstruction from vertices
+    mesh_subdivide : use this to subdivide the mesh into more faces
 
     Author
     ------
@@ -190,7 +193,7 @@ def ellipsoid_mesh(a, b, c, density=20):
     # now need to do surface reconstruction to get the faces
     verts, faces = reconstruct_numpy(v)
 
-    return verts, faces
+    return mesh_subdivide(verts, faces, subdivisions, 'loop')
 
 # TODO : Write this function
 def create_points(vertices):
