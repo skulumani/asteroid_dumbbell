@@ -20,7 +20,7 @@ install:
     - export PATH="$HOME/anaconda3/bin:$PATH"
     - hash -r 
     - source $HOME/anaconda3/bin/activate
-    - conda activate asteroid
+    - source activate asteroid
 script:
     # - pytest --cov-config .coveragerc --cov=dynamics --cov=point_cloud --cov=eom_comparison --cov=landing  tests/test_raycaster.py tests/test_attitude.py tests/test_controller.py tests/test_simply.py
     # - travis_wait pytest tests/test_asteroid.py

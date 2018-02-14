@@ -9,6 +9,7 @@ MAYAVI_REPO="https://github.com/enthought/mayavi.git"
 
 ANACONDA_ENV="asteroid"
 ANACONDA_PATH="$HOME/anaconda3/envs"
+DIR="$(pwd)"
 
 echo "Downloading and Installing Miniconda"
 # get miniconda installed
