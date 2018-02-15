@@ -655,27 +655,27 @@ class TestVertexFaceMap():
             np.testing.assert_allclose(len(faces) >=1, True)
 
 class TestSubdivision():
-    v, f = wavefront.ellipsoid_mesh(1, 2, 3, density=20)
+    v, f = wavefront.ellipsoid_mesh(1, 2, 3, density=20, subdivisions=1)
     poly_ellip = wavefront.meshtopolydata(v, f)
     
     def test_polydata_subdivision_loop(self):
         poly_out = wavefront.polydata_subdivide(self.poly_ellip, 1, 'loop')
         v, f = wavefront.polydatatomesh(poly_out)
-        np.testing.assert_allclose(v.shape[0], 1146)
+        np.testing.assert_allclose(v.shape[0],4578)
         np.testing.assert_allclose(f.shape[0], self.f.shape[0]*4)
 
     def test_polydata_subdivision_butterfly(self):
         poly_out = wavefront.polydata_subdivide(self.poly_ellip, 1, 'butterfly')
         v, f = wavefront.polydatatomesh(poly_out)
-        np.testing.assert_allclose(v.shape[0], 1146)
+        np.testing.assert_allclose(v.shape[0],4578)
         np.testing.assert_allclose(f.shape[0], self.f.shape[0]*4)
 
     def test_mesh_subdivision_loop(self):
         v, f = wavefront.mesh_subdivide(self.v, self.f, 1, 'loop')
-        np.testing.assert_allclose(v.shape[0], 1146)
+        np.testing.assert_allclose(v.shape[0],4578)
         np.testing.assert_allclose(f.shape[0], self.f.shape[0]*4)
 
     def test_mesh_subdivision_butterfly(self):
         v, f = wavefront.mesh_subdivide(self.v, self.f, 1, 'butterfly')
-        np.testing.assert_allclose(v.shape[0], 1146)
+        np.testing.assert_allclose(v.shape[0],4578)
         np.testing.assert_allclose(f.shape[0], self.f.shape[0]*4)
