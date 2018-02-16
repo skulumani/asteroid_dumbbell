@@ -2180,11 +2180,19 @@ def cartesian2spherical(vertices):
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
     """
-    r = np.sqrt(vertices[:, 0]**2 + vertices[:, 1]**2 + vertices[:, 2]**2)
-    longitude = np.arctan2(vertices[:, 1], vertices[:, 0])
-    latitude = np.arcsin(vertices[:, 2] / r)
+    if len(vertices) == 3:
+        r = np.sqrt(vertices[0]**2 + vertices[1]**2 + vertices[2]**2)
+        longitude = np.arctan2(vertices[1], vertices[0])
+        latitude = np.arcsin(vertices[2] / r)
+
+        spherical = np.array([r,latitude,longitude])
+    else:
+        r = np.sqrt(vertices[:, 0]**2 + vertices[:, 1]**2 + vertices[:, 2]**2)
+        longitude = np.arctan2(vertices[:, 1], vertices[:, 0])
+        latitude = np.arcsin(vertices[:, 2] / r)
     
-    return np.stack((r, latitude, longitude), axis=1)
+        spherical = np.stack((r, latitude, longitude), axis=1)
+    return spherical
 
 def spherical2cartesian(spherical):
     r"""Convert spherical to cartesian coordinates
@@ -2205,11 +2213,21 @@ def spherical2cartesian(spherical):
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
     """
-    r, latitude, longitude = polar[:, 0], polar[:, 1], polar[:, 2]
+    if len(spherical) == 3:
+        r, latitude, longitude = spherical[0], spherical[1], spherical[2]
 
-    x = r * np.cos(latitude) * np.cos(longitude)
-    y = r * np.cos(latitude) * np.sin(longitude)
-    z = r * np.sin(latitude)
+        x = r * np.cos(latitude) * np.cos(longitude)
+        y = r * np.cos(latitude) * np.sin(longitude)
+        z = r * np.sin(latitude)
 
-    vertices = np.stack((x, y, z), axis=1)
+        vertices = np.array([x, y, z])
+    else:
+        r, latitude, longitude = spherical[:, 0], spherical[:, 1], spherical[:, 2]
+
+        x = r * np.cos(latitude) * np.cos(longitude)
+        y = r * np.cos(latitude) * np.sin(longitude)
+        z = r * np.sin(latitude)
+
+        vertices = np.stack((x, y, z), axis=1)
+
     return vertices

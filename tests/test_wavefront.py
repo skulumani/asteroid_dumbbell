@@ -688,3 +688,11 @@ class TestCartesianAndSphericalTransformation():
 
     def test_transformation_equal(self):
         np.testing.assert_array_almost_equal(self.v, self.verts_transformed, decimal=3)
+
+    def test_single_vector_cartesian2spherical(self):
+        spherical = wavefront.cartesian2spherical(np.array([1, 0, 0]))
+        np.testing.assert_allclose(spherical, (1, 0, 0))
+
+    def test_single_vector_spherical2cartesian(self):
+        cartesian = wavefront.spherical2cartesian(np.array([1, 0, 0]))
+        np.testing.assert_allclose(cartesian, (1, 0, 0))
