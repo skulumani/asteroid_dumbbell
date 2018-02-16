@@ -1533,6 +1533,19 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters):
     """Add a pt to the mesh (v, f) by modifying the radius of the k-th nearest 
     vertices
     """
+    
+    # find the spherical representation of both pt and v
+    pt_sph = cartesian2spherical(pt)
+    v_sph = cartesian2spherical(v)
+
+    # determine the closest vector in v to pt
+    dist, ind = dist_array(pt_sph[1:2], v_sph[:, 1:2])
+
+    # find projection of pt onto v
+
+    # modify the radius of v
+
+    # convert v back to cartesian and return
 
     pass
 
