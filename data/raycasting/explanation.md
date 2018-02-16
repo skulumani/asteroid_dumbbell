@@ -1,7 +1,28 @@
 ## Castalia simulations
 
-20180110_raycasting_castalia.npz - one full period of castlia
-20180110_raycasting_castalia_reconstruct.hdf5 - uses face, edge, vertex contributions
+### Point Cloud
+All of these use the point cloud data contained inside
+
+* 20180110_raycasting_castalia.npz - one full period of castlia that holds all
+of the point cloud data
+
+### Reconstruction
+
+* 20180110_raycasting_castalia_reconstruct.hdf5
+    * uses face, edge, vertex contributions by finding the closest primitive 
+    and then adding it
+    * The process crashed because it took forever
+    * The mesh was kind of crazy
+* 20180110_raycasting_castalia_reconstruct_vertexonly_smaller.hdf5
+    * Only modifies the closest vertex to a given point measurement
+    * The initial ellipse is smaller than the asteroid
+* 20180215_castalia_highres_ellipse_reconstruct_vertexonly_smaller.hdf5
+    * Uses the reconstruction by only modifying the closest vertex
+    * The ellipse is a higher resolution
+    * Some of the points are skipped to save on time
+* 20180110_raycasting_castalia_reconstruct_vertexonly.hdf5
+    * Uses only the vertices and modifies the closest vertex to a point
+    * The size of the initial asteroid mesh is the semimajor axes of castalia
 
 ## Itokawa simulations
 
