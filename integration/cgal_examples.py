@@ -2,8 +2,10 @@
 
 https://doc.cgal.org/latest/Manual/tutorial_hello_world.html
 """
+import pdb
 
 import numpy as np
+
 import CGAL.CGAL_Kernel as kernel
 from CGAL import CGAL_Convex_hull_2
 
@@ -82,6 +84,11 @@ def AABB_polyhedron_facet_intersection():
     AABB (axis aligned bounding boxes)
 
     The AABB is a data structure for finding intersections
+
+    We do the following:
+        * Create a polyhedron
+        * Create a segment and plane
+        * Find the intersection of segment and plane with polyhedron
     """
 
     from CGAL.CGAL_Kernel import Point_3
@@ -130,8 +137,7 @@ def AABB_polyhedron_facet_intersection():
 
     # construct plane query
     vec = Vector_3(0, 0, 1.0)
-    plane_query = Plane_3(a, vec)
-
+    plane_query = Plane_3(Point_3(0, 0, 0.5), vec)
     # compute first intersection of tetrahedron and plane
     intersection = tree.any_intersection(plane_query)
     if not intersection.empty():
