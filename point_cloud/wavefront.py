@@ -1529,6 +1529,13 @@ def mesh_incremental_update(pt, v, f, method='all'):
 
     return nv, nf
 
+def radius_mesh_incremental_update(pt, v, f, mesh_parameters):
+    """Add a pt to the mesh (v, f) by modifying the radius of the k-th nearest 
+    vertices
+    """
+
+    pass
+
 def distance_to_mesh(pt, v, f, mesh_parameters):
     r"""Minimum distance to a mesh
 
@@ -2154,3 +2161,55 @@ def distance_to_faces(pt, v, f, normal_face, edge_vertex_map,
 
     return np.squeeze(D), np.squeeze(P), np.squeeze(V), np.squeeze(E), np.squeeze(F)
 
+def cartesian2spherical(vertices):
+    r"""Convert cartesian to spherical coordinates  
+
+    spherical = cartesian2spherical(vertices)
+
+    Parameters
+    ----------
+    vertices: (v, 3)
+        Array of vertices in body frame (x, y, z)
+
+    Returns
+    -------
+    spherical : (v, 3) numpy array
+        Spherical representation of vertices, (r, lat, long)
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
+    r = np.sqrt(vertices[:, 0]**2 + vertices[:, 1]**2 + vertices[:, 2]**2)
+    longitude = np.arctan2(vertices[:, 1], vertices[:, 0])
+    latitude = np.arcsin(vertices[:, 2] / r)
+    
+    return np.stack((r, latitude, longitude), axis=1)
+
+def spherical2cartesian(spherical):
+    r"""Convert spherical to cartesian coordinates
+
+    vertices = spherical2cartesian(spherical)
+
+    Parameters
+    ----------
+    spherical : (v, 3)
+        Spherical representation of vertices (r, lat, long)
+
+    Returns
+    -------
+    vertices : (v, 3) numpy array
+        Cartesian vertices [x, y, z]
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
+    r, latitude, longitude = polar[:, 0], polar[:, 1], polar[:, 2]
+
+    x = r * np.cos(latitude) * np.cos(longitude)
+    y = r * np.cos(latitude) * np.sin(longitude)
+    z = r * np.sin(latitude)
+
+    vertices = np.stack((x, y, z), axis=1)
+    return vertices

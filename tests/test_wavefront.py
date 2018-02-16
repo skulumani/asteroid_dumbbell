@@ -679,3 +679,12 @@ class TestSubdivision():
         v, f = wavefront.mesh_subdivide(self.v, self.f, 1, 'butterfly')
         np.testing.assert_allclose(v.shape[0],4578)
         np.testing.assert_allclose(f.shape[0], self.f.shape[0]*4)
+
+class TestCartesianAndSphericalTransformation():
+
+    v, f = wavefront.ellipsoid_mesh(1, 2, 3)
+    spherical = wavefront.cartesian2spherical(v)
+    verts_transformed = wavefront.spherical2cartesian(spherical)
+
+    def test_transformation_equal(self):
+        np.testing.assert_array_almost_equal(self.v, self.verts_transformed, decimal=3)
