@@ -1534,38 +1534,35 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters):
     vertices
     """
     
-    # find the spherical representation of both pt and v
-    pt_sph = cartesian2spherical(pt)
-    v_sph = cartesian2spherical(v)
-
-    # determine the closest vector in v to pt
-    dist, ind = dist_array(pt_sph[1:2], v_sph[:, 1:2])
-
-    # find projection of pt onto v
-
-    # find the parameteric intersection parameter for every edge (t)
-    v1 = v[edges[:, 1], :]
-    v2 = v[edges[:, 0], :]
+    # # find the spherical representation of both pt and v
+    # pt_sph = cartesian2spherical(pt)
+    # v_sph = cartesian2spherical(v)
+    # # determine the closest vector in v to pt
+    # _, ind = dist_array(pt_sph[1:2], v_sph[:, 1:2])
+    # v_min = v[ind, :]
     
-    a = v1 - pt
-    b = v2 - v1
-    edge_param = - np.einsum('ij,ij->i', a, b) / np.linalg.norm(b, axis=1)**2
-    
-    # exclude intersections that are outside of the range 0, 1
-    edge_param[edge_param <= 0] = np.nan
+    # just find the minimum vertex directly
+    dist, ind = dist_array(pt, v)
+    if ind.size == 1:
+        pass
+    else:
+        ind = ind[0]
 
-    mask = ~np.isnan(edge_param)
-    mask[mask] &= edge_param[mask] >= 1
-    edge_param[mask] = np.nan
+    v_min = v[ind, :]
 
-    # find the distance between intersection (on edge) and point
-    edge_intersections = v1 + edge_param[:, np.newaxis] * b
-    dist, index = dist_array(pt, edge_intersections)
-    # modify the radius of v
+    v_min_sph = cartesian2spherical(v_min)
+    # find projection of pt onto v_min (scalar projection)
+    new_rad = np.inner(pt, v_min) / np.linalg.norm(v_min)
 
     # convert v back to cartesian and return
+    v_min_sph[0] = new_rad
+    vmin_cartesian = spherical2cartesian(v_min_sph)
+    
+    nv = v
+    nv[ind, :] = vmin_cartesian
+    nf = f
 
-    pass
+    return nv, nf
 
 def distance_to_mesh(pt, v, f, mesh_parameters):
     r"""Minimum distance to a mesh
