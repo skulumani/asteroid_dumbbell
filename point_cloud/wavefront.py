@@ -1543,6 +1543,24 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters):
 
     # find projection of pt onto v
 
+    # find the parameteric intersection parameter for every edge (t)
+    v1 = v[edges[:, 1], :]
+    v2 = v[edges[:, 0], :]
+    
+    a = v1 - pt
+    b = v2 - v1
+    edge_param = - np.einsum('ij,ij->i', a, b) / np.linalg.norm(b, axis=1)**2
+    
+    # exclude intersections that are outside of the range 0, 1
+    edge_param[edge_param <= 0] = np.nan
+
+    mask = ~np.isnan(edge_param)
+    mask[mask] &= edge_param[mask] >= 1
+    edge_param[mask] = np.nan
+
+    # find the distance between intersection (on edge) and point
+    edge_intersections = v1 + edge_param[:, np.newaxis] * b
+    dist, index = dist_array(pt, edge_intersections)
     # modify the radius of v
 
     # convert v back to cartesian and return
