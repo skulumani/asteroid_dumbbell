@@ -272,6 +272,20 @@ def test_radius_mesh_update_cube(pt=np.array([1, 0, 0])):
     graphics.mayavi_addPoint(mfig, pt)
     graphics.mayavi_points3d(mfig, v, color=(0,  1, 0))
 
+def test_radius_cube_into_sphere():
+    """Transform a cube into a sphere
+    """
+    vc, fc = wavefront.read_obj('./integration/cube.obj')
+    vs, fs = wavefront.ellipsoid_mesh(2, 2, 2, density=10, subdivisions=0)
+
+    mfig = graphics.mayavi_figure()
+    mesh = graphics.mayavi_addMesh(mfig, vc,fc)
+    ms = mesh.mlab_source
+    for pt in vs:
+        vc, fc = wavefront.radius_mesh_incremental_update(pt, vc, fc)
+        ms.reset(x=vc[:, 0], y=vc[:, 1], z=vc[:, 2], triangles=fc)
+        pdb.set_trace()
+
 def test_radius_sphere_into_ellipse():
     """See if we can turn a sphere into an ellipse by changing the radius of
     vertices
