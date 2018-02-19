@@ -1,17 +1,13 @@
 #!/bin/bash
 
 CGAL_VER='CGAL-4.11'
-INSTALL_DIR="$HOME/$CGAL_VER"
-
+TEMP_DIR="$(mktemp -d)"
 CGAL_RELEASE_URL='https://github.com/CGAL/cgal/releases/download/releases%2F'${CGAL_VER}'/'${CGAL_VER}'.tar.xz'
 
 # check if the temp dir was created
-if [[ ! "$INSTALL_DIR" || ! -d "$INSTALL_DIR" ]]; then
-    echo "Creating CGAL Dir"
-    mkdir $INSTALL_DIR
-else
-    mv $INSTALL_DIR /tmp/CGAL
-    mkdir $INSTALL_DIR
+if [[ ! "$TEMP_DIR" || ! -d "$TEMP_DIR" ]]; then
+    echo "Could not create temp dir"
+    exit 1
 fi
 
 # # delete the temp directory on cleanup
@@ -34,11 +30,11 @@ read -p "Enter to install CGAL"
 # conda install -c conda-forge cgal
 
 # download the source tarball
-cd ${INSTALL_DIR}
-wget ${CGAL_RELEASE_URL} $INSTALL_DIR
+cd ${TEMP_DIR}
+wget ${CGAL_RELEASE_URL} $TEMP_DIR
 tar xf ${CGAL_VER}.tar.* 
 
-cd $INSTALL_DIR/$CGAL_VER
+cd $CGAL_VER
 cmake -DWITH_examples=ON -DWITH_demos=ON -DWITH_CGAL_Qt5=OFF .
 make 
 # make examples
