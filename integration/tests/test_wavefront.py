@@ -258,19 +258,42 @@ def test_point_insertion_random():
     mfig = graphics.mayavi_figure()
     mesh = graphics.mayavi_addMesh(mfig, nv, nf)
 
-def test_radius_mesh_update_cube():
+def test_radius_mesh_update_cube(pt=np.array([1, 0, 0])):
     """Update the mesh by modifying the radius of the closest point
     """
-    pt = np.array([1, 0, 0])
     # load the cube
     v, f = wavefront.read_obj('./integration/cube.obj')
-    mesh_parameters = wavefront.polyhedron_parameters(v, f)
     # pick a point
-    nv, nf = wavefront.radius_mesh_incremental_update(pt, v, f, mesh_parameters)
+    nv, nf = wavefront.radius_mesh_incremental_update(pt, v, f)
 
     # plot the new mesh
     mfig = graphics.mayavi_figure()
     graphics.mayavi_addMesh(mfig, nv, nf)
+    graphics.mayavi_addPoint(mfig, pt)
+    graphics.mayavi_points3d(mfig, v, color=(0,  1, 0))
+
+def test_radius_sphere_into_ellipse():
+    """See if we can turn a sphere into an ellipse by changing the radius of
+    vertices
+
+    """
+    # TODO Try with different densities
+
+    # define the sphere
+    vs, fs = wavefront.ellipsoid_mesh(1, 1, 1, density=10, subdivisions=0)
+    ve, fe = wavefront.ellipsoid_mesh(2, 3, 4, density=10, subdivisions=0)
+    
+    mfig = graphics.mayavi_figure()
+    mesh = graphics.mayavi_addMesh(mfig, vs, fs)
+    ms = mesh.mlab_source
+    # in a loop add each vertex of the ellipse into the sphere mesh
+    for pt in ve:
+        vs, fs = wavefront.radius_mesh_incremental_update(pt, vs,fs)
+        ms.reset(x=vs[:,0], y=vs[:,1], z=vs[:,2], triangles=fs)
+        input('Enter to continue')
+
+    # visualize the mesh
+
 
 if __name__ == "__main__":
     test_normal_face_plot()
