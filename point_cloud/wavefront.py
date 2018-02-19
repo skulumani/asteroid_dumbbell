@@ -1548,9 +1548,13 @@ def radius_mesh_incremental_update(pt, v, f):
     #         pass
     #     else:
     #         ind = ind[0]
-    
+    # vp = -np.dot(v, -pt)/np.linalg.norm(v, axis=1)**2
+    # vi = vp[:, np.newaxis]*v
+    # rc = np.linalg.norm(v - vi, axis=1)
+    # min_radius = np.nonzero(rc == np.min(rc))[0]
+
     # find minimum angular seperatiaon 
-    cos_angle = np.absolute(np.dot(v, pt)/np.linalg.norm(v, axis=1)/np.linalg.norm(pt))
+    cos_angle = np.dot(v, pt)/np.linalg.norm(v, axis=1)/np.linalg.norm(pt)
     
     # now find index of minimum angle (closest to 1)
     ind_angle = np.nonzero(cos_angle == np.max(cos_angle))[0]
