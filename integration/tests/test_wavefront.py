@@ -335,4 +335,6 @@ if __name__ == "__main__":
 
     test_closest_face_plot_cube()
     test_closest_face_plot_asteroid()
-
+    
+    test_radius_cube_into_sphere()
+    test_radius_sphere_into_ellipse()
