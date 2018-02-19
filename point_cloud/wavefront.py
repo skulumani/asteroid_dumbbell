@@ -1565,9 +1565,10 @@ def radius_mesh_incremental_update(pt, v, f):
     radius_change = np.linalg.norm(b - vertex_intersections, axis=1)
     min_radius = np.nonzero(radius_change == np.min(radius_change))[0]
     min_ind = ind_angle[min_radius]
-    nv = v
+
+    nv = v.copy()
     nv[min_ind, :] = vertex_intersections[min_radius, :]
-    nf = f
+    nf = f.copy()
 
     return nv, nf
 
