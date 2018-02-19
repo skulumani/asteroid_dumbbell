@@ -1534,24 +1534,6 @@ def radius_mesh_incremental_update(pt, v, f):
     vertices (multiple are modified if they are all the same distance)
     """
     
-    # # find the spherical representation of both pt and v
-    # pt_sph = cartesian2spherical(pt)
-    # v_sph = cartesian2spherical(v)
-    # # determine the closest vector in v to pt
-    # _, ind = dist_array(pt_sph[1:2], v_sph[:, 1:2])
-    # v_min = v[ind, :]
-    
-    # just find the minimum vertex directly
-    # dist, ind = dist_array(pt, v)
-
-    #     if ind.size == 1:
-    #         pass
-    #     else:
-    #         ind = ind[0]
-    # vp = -np.dot(v, -pt)/np.linalg.norm(v, axis=1)**2
-    # vi = vp[:, np.newaxis]*v
-    # rc = np.linalg.norm(v - vi, axis=1)
-    # min_radius = np.nonzero(rc == np.min(rc))[0]
 
     # find minimum angular seperatiaon 
     cos_angle = np.dot(v, pt)/np.linalg.norm(v, axis=1)/np.linalg.norm(pt)
