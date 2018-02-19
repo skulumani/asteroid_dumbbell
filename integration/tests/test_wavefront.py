@@ -290,13 +290,14 @@ def test_radius_cube_into_sphere():
 def test_radius_sphere_into_ellipse():
     """See if we can turn a sphere into an ellipse by changing the radius of
     vertices
-
+    
+    The point cloud (ellipse) should have more points than the initial mesh.
+    When the intial mesh is coarse the resulting mesh will also be heavily faceted, but this will avoid the big holes, and large changes in depth
     """
-    # TODO Try with different densities
 
     # define the sphere
-    vs, fs = wavefront.ellipsoid_mesh(1, 1, 1, density=20, subdivisions=0)
-    ve, fe = wavefront.ellipsoid_mesh(2, 3, 4, density=30, subdivisions=2)
+    vs, fs = wavefront.ellipsoid_mesh(1, 1, 1, density=30, subdivisions=2)
+    ve, fe = wavefront.ellipsoid_mesh(2, 3, 4, density=30, subdivisions=3)
     
     mfig = graphics.mayavi_figure()
     mesh = graphics.mayavi_addMesh(mfig, vs, fs)
@@ -306,7 +307,6 @@ def test_radius_sphere_into_ellipse():
         vs, fs = wavefront.radius_mesh_incremental_update(pt, vs,fs)
         ms.reset(x=vs[:,0], y=vs[:,1], z=vs[:,2], triangles=fs)
 
-    # visualize the mesh
 
 
 if __name__ == "__main__":
