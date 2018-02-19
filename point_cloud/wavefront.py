@@ -1529,7 +1529,7 @@ def mesh_incremental_update(pt, v, f, method='all'):
 
     return nv, nf
 
-def radius_mesh_incremental_update(pt, v, f, mesh_parameters):
+def radius_mesh_incremental_update(pt, v, f):
     """Add a pt to the mesh (v, f) by modifying the radius of the k-th nearest 
     vertices (multiple are modified if they are all the same distance)
     """
