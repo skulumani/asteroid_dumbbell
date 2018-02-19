@@ -280,11 +280,12 @@ def test_radius_cube_into_sphere():
 
     mfig = graphics.mayavi_figure()
     mesh = graphics.mayavi_addMesh(mfig, vc,fc)
+    graphics.mayavi_points3d(mfig, vc, color=(0, 1, 0))
     ms = mesh.mlab_source
     for pt in vs:
         vc, fc = wavefront.radius_mesh_incremental_update(pt, vc, fc)
         ms.reset(x=vc[:, 0], y=vc[:, 1], z=vc[:, 2], triangles=fc)
-        pdb.set_trace()
+        graphics.mayavi_addPoint(mfig, pt)
 
 def test_radius_sphere_into_ellipse():
     """See if we can turn a sphere into an ellipse by changing the radius of
@@ -294,8 +295,8 @@ def test_radius_sphere_into_ellipse():
     # TODO Try with different densities
 
     # define the sphere
-    vs, fs = wavefront.ellipsoid_mesh(1, 1, 1, density=10, subdivisions=0)
-    ve, fe = wavefront.ellipsoid_mesh(2, 3, 4, density=10, subdivisions=0)
+    vs, fs = wavefront.ellipsoid_mesh(1, 1, 1, density=20, subdivisions=0)
+    ve, fe = wavefront.ellipsoid_mesh(2, 3, 4, density=30, subdivisions=2)
     
     mfig = graphics.mayavi_figure()
     mesh = graphics.mayavi_addMesh(mfig, vs, fs)
@@ -304,7 +305,6 @@ def test_radius_sphere_into_ellipse():
     for pt in ve:
         vs, fs = wavefront.radius_mesh_incremental_update(pt, vs,fs)
         ms.reset(x=vs[:,0], y=vs[:,1], z=vs[:,2], triangles=fs)
-        input('Enter to continue')
 
     # visualize the mesh
 
