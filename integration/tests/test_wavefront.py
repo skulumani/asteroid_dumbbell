@@ -261,7 +261,7 @@ def test_point_insertion_random():
 def test_radius_mesh_update_cube():
     """Update the mesh by modifying the radius of the closest point
     """
-    pt = np.array([0.2, 0.2, 0.2])
+    pt = np.array([1, 0, 0])
     # load the cube
     v, f = wavefront.read_obj('./integration/cube.obj')
     mesh_parameters = wavefront.polyhedron_parameters(v, f)
@@ -271,7 +271,6 @@ def test_radius_mesh_update_cube():
     # plot the new mesh
     mfig = graphics.mayavi_figure()
     graphics.mayavi_addMesh(mfig, nv, nf)
-
 
 if __name__ == "__main__":
     test_normal_face_plot()

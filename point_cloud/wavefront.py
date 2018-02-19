@@ -1531,7 +1531,7 @@ def mesh_incremental_update(pt, v, f, method='all'):
 
 def radius_mesh_incremental_update(pt, v, f, mesh_parameters):
     """Add a pt to the mesh (v, f) by modifying the radius of the k-th nearest 
-    vertices
+    vertices (multiple are modified if they are all the same distance)
     """
     
     # # find the spherical representation of both pt and v
@@ -1542,24 +1542,31 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters):
     # v_min = v[ind, :]
     
     # just find the minimum vertex directly
-    dist, ind = dist_array(pt, v)
-    if ind.size == 1:
-        pass
-    else:
-        ind = ind[0]
+    # dist, ind = dist_array(pt, v)
 
-    v_min = v[ind, :]
-
-    v_min_sph = cartesian2spherical(v_min)
-    # find projection of pt onto v_min (scalar projection)
-    new_rad = np.inner(pt, v_min) / np.linalg.norm(v_min)
-
-    # convert v back to cartesian and return
-    v_min_sph[0] = new_rad
-    vmin_cartesian = spherical2cartesian(v_min_sph)
+    #     if ind.size == 1:
+    #         pass
+    #     else:
+    #         ind = ind[0]
     
+    # find minimum angular seperatiaon 
+    cos_angle = np.absolute(np.dot(v, pt)/np.linalg.norm(v, axis=1)/np.linalg.norm(pt))
+    
+    # now find index of minimum angle (closest to 1)
+    ind_angle = np.nonzero(cos_angle == np.max(cos_angle))[0]
+    a = - pt
+    b = v[ind_angle, :]
+    vertex_param = - np.dot(b, a) / np.linalg.norm(b, axis=1)**2
+
+    # this is the candidate new point
+    vertex_intersections = vertex_param[:, np.newaxis] * b
+    
+    # now find the index of the smallest change (minimum radius change)
+    radius_change = np.linalg.norm(b - vertex_intersections, axis=1)
+    min_radius = np.nonzero(radius_change == np.min(radius_change))[0]
+    min_ind = ind_angle[min_radius]
     nv = v
-    nv[ind, :] = vmin_cartesian
+    nv[min_ind, :] = vertex_intersections[min_radius, :]
     nf = f
 
     return nv, nf
