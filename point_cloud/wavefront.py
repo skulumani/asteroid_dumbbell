@@ -1594,7 +1594,6 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
         nf = f.copy()
     else: # no point lies within the angle constraint. Now we'll add a vertex
 
-        pdb.set_trace() 
         # find closest edge and face
         De, Pe, Ve, Ee, Fe = distance_to_edges(pt, v, f, normal_face,
                                                edge_vertex_map, edge_face_map,
@@ -1607,7 +1606,6 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
         Df, Pf, Vf, Ef, Ff = distance_minimum(Df, Pf, Vf, Ef, Ff)
 
         if De <= Df: # add vertex by replacing an edge
-            
             nv, nf = edge_insertion(pt, v, f, De, Pe, Ve, Ee, Fe)
         else:
             nv, nf = face_insertion(pt, v, f, Df, Pf, Vf, Ef, Ff)
