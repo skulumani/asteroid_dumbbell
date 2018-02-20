@@ -56,3 +56,12 @@ add_to_cached_list( CGAL_EXECUTABLE_TARGETS surprising )
 # Link the executable to CGAL and third-party libraries
 target_link_libraries(surprising   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
+# Creating entries for target: exact
+# ############################
+
+add_executable( exact exact.cpp )
+
+add_to_cached_list( CGAL_EXECUTABLE_TARGETS exact )
+
+# Link the executable to CGAL and third-party libraries
+target_link_libraries(exact   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
