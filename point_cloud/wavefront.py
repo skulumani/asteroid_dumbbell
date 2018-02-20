@@ -1575,7 +1575,7 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
     mask = np.ma.masked_less(cos_angle, np.cos(max_angle))
     # now find index of minimum angle (closest to 1)
     ind_angle = np.nonzero(mask == np.max(mask))[0]
-    if ind_angle.any(): # some points satisfy the constraint
+    if ind_angle.size: # some points satisfy the constraint
         # TODO Think about changing all of these points by a given radius
         a = - pt
         b = v[ind_angle, :]
