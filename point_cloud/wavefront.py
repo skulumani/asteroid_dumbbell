@@ -1530,29 +1530,40 @@ def mesh_incremental_update(pt, v, f, method='all'):
     return nv, nf
 
 def radius_mesh_incremental_update(pt, v, f):
-    """Add a pt to the mesh (v, f) by modifying the radius of the k-th nearest 
-    vertices (multiple are modified if they are all the same distance)
+    r"""Update a mesh by radially moving vertices
+
+    nv, nf = radius_mesh_incremental_update(pt, v, f)
+
+    Parameters
+    ----------
+    pt : (3,) numpy array
+        The point to incorporate into the mesh
+    v : (# v, 3) numpy array
+        The vertices of the initial mesh
+    f : (# f, 3) numpy array
+        The connections between the vertices to form triangular faces
+
+    Returns
+    -------
+    nv : numpy array (v, 3)
+        New vertices
+    nf : numpy array (f, 3)
+        New faces
+
+    Notes
+    -----
+    This will find the angular seperation between all the vertices and the 
+    candidate point.
+    The one the lies the closest, in the same direction (angle is close to zero),
+    will be modified radially.
+    This means that the orthogonal projection of the point onto the canditidate
+    vertex is found.
+    The vertex is modified and the mesh is returned.
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
     """
-    
-    # # find the spherical representation of both pt and v
-    # pt_sph = cartesian2spherical(pt)
-    # v_sph = cartesian2spherical(v)
-    # # determine the closest vector in v to pt
-    # _, ind = dist_array(pt_sph[1:2], v_sph[:, 1:2])
-    # v_min = v[ind, :]
-    
-    # just find the minimum vertex directly
-    # dist, ind = dist_array(pt, v)
-
-    #     if ind.size == 1:
-    #         pass
-    #     else:
-    #         ind = ind[0]
-    # vp = -np.dot(v, -pt)/np.linalg.norm(v, axis=1)**2
-    # vi = vp[:, np.newaxis]*v
-    # rc = np.linalg.norm(v - vi, axis=1)
-    # min_radius = np.nonzero(rc == np.min(rc))[0]
-
     # find minimum angular seperatiaon 
     cos_angle = np.dot(v, pt)/np.linalg.norm(v, axis=1)/np.linalg.norm(pt)
     

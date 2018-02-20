@@ -282,21 +282,27 @@ def test_radius_cube_into_sphere():
     mesh = graphics.mayavi_addMesh(mfig, vc,fc)
     graphics.mayavi_points3d(mfig, vc, color=(0, 1, 0))
     ms = mesh.mlab_source
-    for pt in vs:
-        vc, fc = wavefront.radius_mesh_incremental_update(pt, vc, fc)
+    for ii in range(5):
+        for pt in vs:
+            vc, fc = wavefront.radius_mesh_incremental_update(pt, vc, fc)
+            ms.reset(x=vc[:, 0], y=vc[:, 1], z=vc[:, 2], triangles=fc)
+            graphics.mayavi_addPoint(mfig, pt)
+        
+        input('Mesh subdivison')
+        vc, fc = wavefront.mesh_subdivide(vc, fc, 1)
         ms.reset(x=vc[:, 0], y=vc[:, 1], z=vc[:, 2], triangles=fc)
-        graphics.mayavi_addPoint(mfig, pt)
 
 def test_radius_sphere_into_ellipse():
     """See if we can turn a sphere into an ellipse by changing the radius of
     vertices
-
+    
+    The point cloud (ellipse) should have more points than the initial mesh.
+    When the intial mesh is coarse the resulting mesh will also be heavily faceted, but this will avoid the big holes, and large changes in depth
     """
-    # TODO Try with different densities
 
     # define the sphere
-    vs, fs = wavefront.ellipsoid_mesh(1, 1, 1, density=20, subdivisions=0)
-    ve, fe = wavefront.ellipsoid_mesh(2, 3, 4, density=30, subdivisions=2)
+    vs, fs = wavefront.ellipsoid_mesh(1, 1, 1, density=10, subdivisions=0)
+    ve, fe = wavefront.ellipsoid_mesh(2, 3, 4, density=10, subdivisions=2)
     
     mfig = graphics.mayavi_figure()
     mesh = graphics.mayavi_addMesh(mfig, vs, fs)
@@ -305,9 +311,18 @@ def test_radius_sphere_into_ellipse():
     for pt in ve:
         vs, fs = wavefront.radius_mesh_incremental_update(pt, vs,fs)
         ms.reset(x=vs[:,0], y=vs[:,1], z=vs[:,2], triangles=fs)
+    
+    input('Enter for mesh subdivision')
+    vs, fs = wavefront.mesh_subdivide(vs, fs,  1)
+    ms.reset(x=vs[:,0], y=vs[:,1], z=vs[:,2], triangles=fs)
 
-    # visualize the mesh
+    input('Enter for second round of updating')
+    ve, fe = wavefront.ellipsoid_mesh(2, 3, 4, density=20, subdivisions=2)
+    for pt in ve:
+        vs, fs = wavefront.radius_mesh_incremental_update(pt, vs,fs)
+        ms.reset(x=vs[:,0], y=vs[:,1], z=vs[:,2], triangles=fs)
 
+    return vs, fs
 
 if __name__ == "__main__":
     test_normal_face_plot()
@@ -320,4 +335,6 @@ if __name__ == "__main__":
 
     test_closest_face_plot_cube()
     test_closest_face_plot_asteroid()
-
+    
+    test_radius_cube_into_sphere()
+    test_radius_sphere_into_ellipse()

@@ -1,8 +1,7 @@
 #!/bin/bash
 
-TEMP_DIR="$(mktemp -d)"
-
 CGAL_VER='CGAL-4.11'
+TEMP_DIR="$(mktemp -d)"
 CGAL_RELEASE_URL='https://github.com/CGAL/cgal/releases/download/releases%2F'${CGAL_VER}'/'${CGAL_VER}'.tar.xz'
 
 # check if the temp dir was created
@@ -11,11 +10,11 @@ if [[ ! "$TEMP_DIR" || ! -d "$TEMP_DIR" ]]; then
     exit 1
 fi
 
-# delete the temp directory on cleanup
-function cleanup {
-    rm -rf "$TEMP_DIR"
-    echo "Deleted temp working directory $TEMP_DIR"
-}
+# # delete the temp directory on cleanup
+# function cleanup {
+#     rm -rf "$TEMP_DIR"
+#     echo "Deleted temp working directory $TEMP_DIR"
+# }
 
 # trap cleanup EXIT
 
@@ -33,11 +32,11 @@ read -p "Enter to install CGAL"
 # download the source tarball
 cd ${TEMP_DIR}
 wget ${CGAL_RELEASE_URL} $TEMP_DIR
-tar xf ${CGAL_VER}.tar.*
+tar xf ${CGAL_VER}.tar.* 
 
 cd $CGAL_VER
-cmake -DWITH_examples=ON -DWITH_demos=ON .
+cmake -DWITH_examples=ON -DWITH_demos=ON -DWITH_CGAL_Qt5=OFF .
 make 
-make examples
-make demos
-make install
+# make examples
+# make demos
+sudo make install
