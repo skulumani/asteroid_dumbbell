@@ -288,7 +288,10 @@ def test_radius_cube_into_sphere():
     ms = mesh.mlab_source
     for ii in range(5):
         for pt in vs:
-            vc, fc = wavefront.radius_mesh_incremental_update(pt, vc, fc)
+            mesh_param = wavefront.polyhedron_parameters(vc, fc)
+            vc, fc = wavefront.radius_mesh_incremental_update(pt, vc, fc,
+                                                              mesh_param,
+                                                              max_angle=np.deg2rad(45))
             ms.reset(x=vc[:, 0], y=vc[:, 1], z=vc[:, 2], triangles=fc)
             graphics.mayavi_addPoint(mfig, pt)
         
