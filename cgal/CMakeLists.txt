@@ -46,3 +46,13 @@ add_to_cached_list( CGAL_EXECUTABLE_TARGETS points_and_segments )
 # Link the executable to CGAL and third-party libraries
 target_link_libraries(points_and_segments   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
+# Creating entries for target: surprising
+# ############################
+
+add_executable( surprising surprising.cpp )
+
+add_to_cached_list( CGAL_EXECUTABLE_TARGETS surprising )
+
+# Link the executable to CGAL and third-party libraries
+target_link_libraries(surprising   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+
