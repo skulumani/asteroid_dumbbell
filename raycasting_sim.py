@@ -229,7 +229,10 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
                 # check to make sure each pt is not nan
                 if not np.any(np.isnan(pt)):
                     # v_est, f_est = wavefront.mesh_incremental_update(pt, v_est, f_est, 'vertex')
-                    v_est, f_est = wavefront.radius_mesh_incremental_update(pt, v_est, f_est)
+                    mesh_param = wavefront.polyhedron_parameters(v_est, f_est)
+                    v_est, f_est = wavefront.radius_mesh_incremental_update(pt, v_est, f_est,
+                                                                            mesh_param,
+                                                                            max_angle=np.deg2rad(45))
 
             # use HD5PY instead
             # save every so often and delete v_array,f_array to save memory
