@@ -1529,7 +1529,8 @@ def mesh_incremental_update(pt, v, f, method='all'):
 
     return nv, nf
 
-def radius_mesh_incremental_update(pt, v, f):
+def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
+                                   max_angle=np.deg2rad(-180)):
     r"""Update a mesh by radially moving vertices
 
     nv, nf = radius_mesh_incremental_update(pt, v, f)
@@ -1564,26 +1565,52 @@ def radius_mesh_incremental_update(pt, v, f):
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
     """
+    normal_face = mesh_parameters.normal_face
+    edge_vertex_map = mesh_parameters.edge_vertex_map
+    edge_face_map = mesh_parameters.edge_face_map
+    vf_map = mesh_parameters.vertex_face_map
     # find minimum angular seperatiaon 
     cos_angle = np.dot(v, pt)/np.linalg.norm(v, axis=1)/np.linalg.norm(pt)
-    
+    # find the index of the point which lies inside of a threshold
+    mask = np.ma.masked_less(cos_angle, np.cos(max_angle))
     # now find index of minimum angle (closest to 1)
-    ind_angle = np.nonzero(cos_angle == np.max(cos_angle))[0]
-    a = - pt
-    b = v[ind_angle, :]
-    vertex_param = - np.dot(b, a) / np.linalg.norm(b, axis=1)**2
+    ind_angle = np.nonzero(mask == np.max(mask))[0]
+    if ind_angle.any(): # some points satisfy the constraint
+        # TODO Think about changing all of these points by a given radius
+        a = - pt
+        b = v[ind_angle, :]
+        vertex_param = - np.dot(b, a) / np.linalg.norm(b, axis=1)**2
 
-    # this is the candidate new point
-    vertex_intersections = vertex_param[:, np.newaxis] * b
-    
-    # now find the index of the smallest change (minimum radius change)
-    radius_change = np.linalg.norm(b - vertex_intersections, axis=1)
-    min_radius = np.nonzero(radius_change == np.min(radius_change))[0]
-    min_ind = ind_angle[min_radius]
+        # this is the candidate new point
+        vertex_intersections = vertex_param[:, np.newaxis] * b
+        
+        # now find the index of the smallest change (minimum radius change)
+        radius_change = np.linalg.norm(b - vertex_intersections, axis=1)
+        min_radius = np.nonzero(radius_change == np.min(radius_change))[0]
+        min_ind = ind_angle[min_radius]
 
-    nv = v.copy()
-    nv[min_ind, :] = vertex_intersections[min_radius, :]
-    nf = f.copy()
+        nv = v.copy()
+        nv[min_ind, :] = vertex_intersections[min_radius, :]
+        nf = f.copy()
+    else: # no point lies within the angle constraint. Now we'll add a vertex
+
+        # find closest edge and face
+        De, Pe, Ve, Ee, Fe = distance_to_edges(pt, v, f, normal_face,
+                                               edge_vertex_map, edge_face_map,
+                                               vf_map)
+        De, Pe, Ve, Ee, Fe = distance_minimum(De, Pe, Ve, Ee, Fe)
+
+        Df, Pf, Vf, Ef, Ff = distance_to_faces(pt, v, f, normal_face,
+                                               edge_vertex_map, edge_face_map,
+                                               vf_map)
+        Df, Pf, Vf, Ef, Ff = distance_minimum(Df, Pf, Vf, Ef, Ff)
+
+        if De <= Df: # add vertex by replacing an edge
+            nv, nf = edge_insertion(pt, v, f, De, Pe, Ve, Ee, Fe)
+        else:
+            nv, nf = face_insertion(pt, v, f, Df, Pf, Vf, Ef, Ff)
+        # whichever is closest is used to add the vertex
+
 
     return nv, nf
 

@@ -263,14 +263,18 @@ def test_radius_mesh_update_cube(pt=np.array([1, 0, 0])):
     """
     # load the cube
     v, f = wavefront.read_obj('./integration/cube.obj')
+    mesh_parameters = wavefront.polyhedron_parameters(v, f)
     # pick a point
-    nv, nf = wavefront.radius_mesh_incremental_update(pt, v, f)
+    nv, nf = wavefront.radius_mesh_incremental_update(pt, v, f, mesh_parameters,
+                                                      max_angle=np.deg2rad(5))
 
     # plot the new mesh
     mfig = graphics.mayavi_figure()
     graphics.mayavi_addMesh(mfig, nv, nf)
     graphics.mayavi_addPoint(mfig, pt)
     graphics.mayavi_points3d(mfig, v, color=(0,  1, 0))
+    
+    return nv, nf
 
 def test_radius_cube_into_sphere():
     """Transform a cube into a sphere
