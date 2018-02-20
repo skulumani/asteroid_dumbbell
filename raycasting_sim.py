@@ -193,9 +193,12 @@ def reconstruct(time, state, ast, dum, point_cloud):
 
 def incremental_reconstruction(filename, asteroid_name='castalia'):
     """Incrementally update the mesh
+
+    Now we'll use the radial mesh reconstruction.
+
     """
     logger = logging.getLogger(__name__)
-    output_filename = './data/raycasting/20180215_castalia_highres_ellipse' + '_reconstruct_vertexonly_smaller.hdf5'
+    output_filename = './data/raycasting/2018020_castalia_reconstruct_radius_modification.hdf5'
     
     logger.info('Loading {}'.format(filename))
     data = np.load(filename)
@@ -207,11 +210,11 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
     
     logger.info('Creating ellipsoid mesh')
     # define a simple mesh to start
-    v_est, f_est = wavefront.ellipsoid_mesh(ast.axes[0]-0.1, ast.axes[1]-0.1, ast.axes[2]-0.1,
-                                    density=10, subdivisions=3)
+    v_est, f_est = wavefront.ellipsoid_mesh(ast.axes[0]*0.75, ast.axes[1]*0.75, ast.axes[2]*0.75,
+                                    density=10, subdivisions=0)
     # extract out all the points in the asteroid frame
-    time = point_cloud['time'][::5]
-    ast_ints = point_cloud['ast_ints'][::5]
+    time = point_cloud['time'][::10]
+    ast_ints = point_cloud['ast_ints'][::10]
     logger.info('Create HDF5 file {}'.format(output_filename))
     with h5py.File(output_filename, 'w') as fout:
         v_group = fout.create_group('vertex_array')
@@ -225,9 +228,10 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
                 # incremental update for each point in points
                 # check to make sure each pt is not nan
                 if not np.any(np.isnan(pt)):
-                    v_est, f_est = wavefront.mesh_incremental_update(pt, v_est, f_est, 'vertex')
+                    # v_est, f_est = wavefront.mesh_incremental_update(pt, v_est, f_est, 'vertex')
+                    v_est, f_est = wavefront.radius_mesh_incremental_update(pt, v_est, f_est)
 
-            # use HD5py instead
+            # use HD5PY instead
             # save every so often and delete v_array,f_array to save memory
             if (ii % 1) == 0:
                 logger.info('Saving data to HDF5. ii = {}, t = {}'.format(ii, t))
@@ -238,10 +242,14 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
 
     return 0
 
-def read_mesh_reconstruct(filename):
+def read_mesh_reconstruct(filename, output_path='/tmp/reconstruct_images'):
     """Use H5PY to read the data back and plot
     """
     
+    # check if location exists
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+
     with h5py.File(filename, 'r') as hf:
         face_array = hf['face_array']
         vertex_array = hf['vertex_array']
@@ -257,14 +265,12 @@ def read_mesh_reconstruct(filename):
         ms = mesh.mlab_source
         graphics.mlab.view(azimuth=-45)
         for ii, (vk, fk) in enumerate(zip(vertex_keys, face_keys)):
-            filename = os.path.join('/tmp/mayavi_figure', str.zfill(str(ii), 6) +'.jpg')
+            filename = os.path.join(output_path, str.zfill(str(ii), 6) +'.jpg')
             v, f = (vertex_array[vk][()], face_array[fk][()])
             # draw the mesh
             ms.reset(x=v[:,0], y=v[:,1], z=v[:,2], triangles=f)
             # save the figure
             graphics.mlab.savefig(filename, magnification=4)
-            # input('Press enter to continue...')
-            
     
     return mfig
 
