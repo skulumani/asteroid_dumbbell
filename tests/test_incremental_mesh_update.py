@@ -133,3 +133,19 @@ class TestFaceInsertion():
 
     def test_vertices_shape(self):
         np.testing.assert_allclose(self.nv.shape, (self.v.shape[0] + 1, 3))
+
+class TestRadiusMeshUpdate():
+    """Test out the incremental mesh update using the radius modification
+    """
+    v, f = wavefront.read_obj('./integration/cube.obj')
+
+    def test_vertex_radial_change(self):
+        pt = np.array([1, 1, 1])
+        mesh_parameters = wavefront.polyhedron_parameters(self.v, self.f)
+        nv, nf = wavefront.radius_mesh_incremental_update(pt, self.v, self.f,
+                                                          mesh_parameters,
+                                                          max_angle=np.deg2rad(5))
+        nv_exp = self.v.copy()
+        nv_exp[-1, :] = pt
+        np.testing.assert_allclose(nv, nv_exp)
+        np.testing.assert_allclose(nf, self.f)
