@@ -198,7 +198,7 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
 
     """
     logger = logging.getLogger(__name__)
-    output_filename = './data/raycasting/2018020_castalia_reconstruct_radius_modification.hdf5'
+    output_filename = './data/raycasting/20180220_castalia_reconstruct_radius_modification.hdf5'
     
     logger.info('Loading {}'.format(filename))
     data = np.load(filename)
