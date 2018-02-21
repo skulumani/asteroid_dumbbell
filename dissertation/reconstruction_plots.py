@@ -63,7 +63,7 @@ def sphere_into_ellipsoid(img_path):
             index +=1
             filename = os.path.join(img_path, 'sphere_ellipsoid_' + str(index).zfill(6) + '.jpg')
             graphics.mlab.savefig(filename, magnification=4)
-            mesh_param = polyhedron_parameters(vs, fs)
+            mesh_param = wavefront.polyhedron_parameters(vs, fs)
             vs, fs = wavefront.radius_mesh_incremental_update(pt, vs,fs,
                                                               mesh_param,
                                                               max_angle=np.deg2rad(45))
