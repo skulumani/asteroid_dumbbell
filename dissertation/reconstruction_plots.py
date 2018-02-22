@@ -30,10 +30,10 @@ def cube_into_sphere(img_path):
             index += 1
             filename = os.path.join(img_path, 'cube_sphere_' + str(index).zfill(6) + '.jpg')
             graphics.mlab.savefig(filename, magnification=4)
-            mesh_param = polyhedron_parameters(vc, fc)
+            mesh_param = wavefront.polyhedron_parameters(vc, fc)
             vc, fc = wavefront.radius_mesh_incremental_update(pt, vc, fc,
                                                               mesh_param,
-                                                              max_angle=np.deg2rad(45))
+                                                              max_angle=np.deg2rad(5))
             ms.reset(x=vc[:, 0], y=vc[:, 1], z=vc[:, 2], triangles=fc)
             graphics.mayavi_addPoint(mfig, pt)
         

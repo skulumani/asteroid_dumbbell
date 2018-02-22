@@ -266,7 +266,7 @@ def test_radius_mesh_update_cube(pt=np.array([1, 0, 0])):
     mesh_parameters = wavefront.polyhedron_parameters(v, f)
     # pick a point
     nv, nf = wavefront.radius_mesh_incremental_update(pt, v, f, mesh_parameters,
-                                                      max_angle=np.deg2rad(5))
+                                                      max_angle=np.deg2rad(10))
 
     # plot the new mesh
     mfig = graphics.mayavi_figure()
