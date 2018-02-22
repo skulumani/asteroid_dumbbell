@@ -1576,6 +1576,7 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
     # now find index of minimum angle (closest to 1)
     ind_angle = np.nonzero(mask == np.max(mask))[0]
     if ind_angle.size: # some points satisfy the constraint
+        logger.info("pt: {} is within {} deg of v:{}. Radially changing the vertex".format(pt, np.rad2deg(max_angle), v[ind_angle, :]))
         # TODO Think about changing all of these points by a given radius
         a = - pt
         b = v[ind_angle, :]
@@ -1593,7 +1594,7 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
         nv[min_ind, :] = vertex_intersections[min_radius, :]
         nf = f.copy()
     else: # no point lies within the angle constraint. Now we'll add a vertex
-
+        
         # find closest edge and face
         De, Pe, Ve, Ee, Fe = distance_to_edges(pt, v, f, normal_face,
                                                edge_vertex_map, edge_face_map,
@@ -1604,11 +1605,19 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
                                                edge_vertex_map, edge_face_map,
                                                vf_map)
         Df, Pf, Vf, Ef, Ff = distance_minimum(Df, Pf, Vf, Ef, Ff)
-
-        if De <= Df: # add vertex by replacing an edge
-            nv, nf = edge_insertion(pt, v, f, De, Pe, Ve, Ee, Fe)
+        
+        # if not near an edge or face (outside of edge or face)
+        if De or Df:
+            if Df < De: # add vertex by replacing a vertex
+                logger.info('Face is closest')
+                nv, nf = face_insertion(pt, v, f, Df, Pf, Vf, Ef, Ff)
+            else:
+                logger.info('Edge is closest')
+                nv, nf = edge_insertion(pt, v, f, De, Pe, Ve, Ee, Fe)
         else:
-            nv, nf = face_insertion(pt, v, f, Df, Pf, Vf, Ef, Ff)
+            logger.info('Pt:{} is not in view. Skipping')
+            nv = v.copy()
+            nf = f.copy()
         # whichever is closest is used to add the vertex
 
 
