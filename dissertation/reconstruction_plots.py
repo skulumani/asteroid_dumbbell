@@ -19,8 +19,9 @@ def cube_into_sphere(img_path):
     """
     vc, fc = wavefront.read_obj('./integration/cube.obj')
     vs, fs = wavefront.ellipsoid_mesh(2, 2, 2, density=10, subdivisions=0)
-
-    mfig = graphics.mayavi_figure()
+    
+    
+    mfig = graphics.mayavi_figure(offscreen=True)
     mesh = graphics.mayavi_addMesh(mfig, vc,fc)
     ms = mesh.mlab_source
     index = 0
@@ -53,7 +54,7 @@ def sphere_into_ellipsoid(img_path):
     vs, fs = wavefront.ellipsoid_mesh(1, 1, 1, density=10, subdivisions=0)
     ve, fe = wavefront.ellipsoid_mesh(2, 3, 4, density=10, subdivisions=2)
     
-    mfig = graphics.mayavi_figure()
+    mfig = graphics.mayavi_figure(offscreen=True)
     mesh = graphics.mayavi_addMesh(mfig, vs, fs)
     ms = mesh.mlab_source
     index = 0

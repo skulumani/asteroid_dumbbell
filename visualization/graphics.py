@@ -289,9 +289,10 @@ def vtk_renderer():
     """
     return vtk.vtkRenderer()
 
-def mayavi_figure(size=(800, 600), bg=(1, 1, 1), **kwargs):
+def mayavi_figure(size=(800, 600), bg=(1, 1, 1),offscreen=False, **kwargs):
     """Just define a figure for mayavi to plot into
     """
+    mlab.options.offscreen = offscreen
     return mlab.figure(bgcolor=bg, size=size, **kwargs)
 
 def mayavi_addPoly(fig, polydata, color=(0.5, 0.5, 0.5)):
