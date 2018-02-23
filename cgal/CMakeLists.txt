@@ -35,43 +35,24 @@ endif()
 
 # include for local package
 
-
-# Creating entries for target: points_and_segments
-# ############################
+# ALL THE EXECUTABLES
 
 add_executable( points_and_segments  points_and_segments.cpp )
-
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS points_and_segments )
-
-# Link the executable to CGAL and third-party libraries
 target_link_libraries(points_and_segments   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
-# Creating entries for target: surprising
-# ############################
-
 add_executable( surprising surprising.cpp )
-
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS surprising )
-
-# Link the executable to CGAL and third-party libraries
 target_link_libraries(surprising   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
-# Creating entries for target: exact
-# ############################
-
 add_executable( exact exact.cpp )
-
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS exact )
-
-# Link the executable to CGAL and third-party libraries
 target_link_libraries(exact   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
-# Creating entries for target: exact
-# ############################
-
 add_executable( points_and_vectors points_and_vectors.cpp )
-
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS points_and_vectors)
-
-# Link the executable to CGAL and third-party libraries
 target_link_libraries(points_and_vectors  ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+
+add_executable( hds_prog_default hds_prog_default.cpp )
+add_to_cached_list( CGAL_EXECUTABLE_TARGETS hds_prog_default )
+target_link_libraries(hds_prog_default   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
