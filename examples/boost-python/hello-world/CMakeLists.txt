@@ -1,0 +1,3 @@
+PYTHON_ADD_MODULE(hello hello.cpp)
+FILE(COPY hello.py DESTINATION .)
+ADD_TEST(NAME HelloWorld COMMAND ${PYTHON_EXECUTABLE} hello.py)
