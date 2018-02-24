@@ -10,13 +10,13 @@ if [[ ! "$TEMP_DIR" || ! -d "$TEMP_DIR" ]]; then
     exit 1
 fi
 
-# # delete the temp directory on cleanup
-# function cleanup {
-#     rm -rf "$TEMP_DIR"
-#     echo "Deleted temp working directory $TEMP_DIR"
-# }
+# delete the temp directory on cleanup
+function cleanup {
+    rm -rf "$TEMP_DIR"
+    echo "Deleted temp working directory $TEMP_DIR"
+}
 
-# trap cleanup EXIT
+trap cleanup EXIT
 
 echo "Installing some dependencies"
 sudo apt-get update
