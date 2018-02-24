@@ -45,6 +45,13 @@ echo "Now installing Boost and compiled libraries"
 cd boost
 ./bootstrap.sh --prefix=${INSTALL_DIR} --with-libraries=all --with-python=$HOME/anaconda3/bin/python3
 
+echo "Now you need to add the following line:"
+
+echo "using python : 3.6 : /home/shankar/anaconda3 : /home/shankar/anaconda3/include/python3.6m ;" 
+echo "Located inside project-config.jam"
+
+read -p "Press enter when done"
+
 sudo ./b2 -j 4 install
 
 echo "Boost and Boost-Python are installed to $INSTALL_DIR"
