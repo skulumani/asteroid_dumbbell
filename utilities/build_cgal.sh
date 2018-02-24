@@ -20,8 +20,8 @@ fi
 
 echo "Installing some dependencies"
 sudo apt-get update
-sudo apt-get install cmake build-essential libboost-dev libgmp-dev libmpfr-dev zlib1g-dev
-sudo apt-get install libgl1 libstdc++6 libgcc1 libc6 libntl-dev libeigen3-dev 
+sudo apt-get install cmake build-essential libgmp-dev libmpfr-dev zlib1g-dev
+sudo apt-get install libgl1 libstdc++6 libgcc1 libc6 libntl-dev 
 # install CGAL for Python and build it from source for C++
 echo "Verify you're using the correct conda environment"
 
