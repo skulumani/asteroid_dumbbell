@@ -17,5 +17,6 @@ LINK_LIBRARIES(${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 
 ADD_SUBDIRECTORY(01_hello_world)
 add_subdirectory(02_exposing_classes)
+add_subdirectory(03_constructors)
 
 
