@@ -56,3 +56,7 @@ target_link_libraries(points_and_vectors  ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIB
 add_executable( hds_prog_default hds_prog_default.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS hds_prog_default )
 target_link_libraries(hds_prog_default   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+
+add_executable( hds_prog_graph hds_prog_graph.cpp )
+add_to_cached_list( CGAL_EXECUTABLE_TARGETS hds_prog_graph )
+target_link_libraries(hds_prog_graph   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
