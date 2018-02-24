@@ -48,7 +48,7 @@ cd boost
 echo "Now you need to add the following line:"
 
 echo "using python : 3.6 : /home/shankar/anaconda3 : /home/shankar/anaconda3/include/python3.6m ;" 
-echo "Located inside project-config.jam"
+echo "Located inside ${TEMP_DIR}/boost/project-config.jam"
 
 read -p "Press enter when done"
 
