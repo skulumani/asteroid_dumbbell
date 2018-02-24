@@ -4,15 +4,7 @@ This will be using [Boost Python](http://www.boost.org/doc/libs/1_66_0/libs/pyth
 
 ## Setup
 
-1. You need Boost. Which is probably already installed. But can also be installed from source [here](http://www.boost.org/doc/libs/1_46_1/more/getting_started/unix-variants.html)
+1. You need Boost, but we need to build from source since the Ubuntu version is most likely old (16.04 only has 1.58).
+	* Instructions are [here](http://www.boost.org/doc/libs/1_46_1/more/getting_started/unix-variants.html)
 
-~~~
-sudo apt-get install libboost-dev
-~~~
-
-2. The Boost-Python library is not installed by default. Again can build from source [here](http://www.boost.org/doc/libs/1_46_1/libs/python/doc/building.html) or the package, usually outdated.
-
-~~~
-sudo apt-get install libboost-python
-~~~
-
+2. Also need the Boost python library
