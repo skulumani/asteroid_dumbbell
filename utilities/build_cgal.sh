@@ -36,7 +36,7 @@ tar xf ${CGAL_VER}.tar.*
 
 cd $CGAL_VER
 cmake -DWITH_examples=ON -DWITH_demos=ON -DWITH_CGAL_Qt5=OFF .
-make 
+make -j 4
 # make examples
 # make demos
 sudo make install
