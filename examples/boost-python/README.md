@@ -33,3 +33,9 @@ g++ -o hello.so -Wl,-h -Wl,hello.so -shared -Wl,--start-group hello.o  -Wl,-Bsta
 ~~
 
 There's an example `CMakeLists.txt` for a more general build, a standalone `Makefile` for simple projects.
+
+## Helpful Links
+
+* [Boost Python Tutorial](http://www.boost.org/doc/libs/1_66_0/libs/python/doc/html/tutorial/index.html)
+* [Boost Numpy]()
+
