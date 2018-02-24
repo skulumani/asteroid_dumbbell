@@ -10,3 +10,15 @@ This will be using [Boost Python](http://www.boost.org/doc/libs/1_66_0/libs/pyth
     * [Description](https://stackoverflow.com/a/45767023) of build process
 
 2. Compile the `boost_test.cpp` to test that boost is installed properly.
+
+## Commands
+
+* This builds the object file
+~~~
+g++ -ftemplate-depth-128 -O0 -fno-inline -Wall -g -fPIC -I/usr/include/python3.5m -c -o "hello.o" "hello.cpp"
+~~~
+
+* This links it into a library for python
+~~
+g++ -o hello.so -Wl,-h -Wl,hello.so -shared -Wl,--start-group hello.o  -Wl,-Bstatic  -Wl,-Bdynamic -L/usr/local/lib -lboost_python3 -ldl -lpthread -lutil -Wl,--end-group
+~~
