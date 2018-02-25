@@ -12,10 +12,10 @@ np::ndarray make_zeros(int rows, int cols)
     return np::zeros(bp::make_tuple(rows, cols), np::dtype::get_builtin<float>());
 }
 
-void make_ndarray()
+int make_ndarray(int rows, int cols)
 {
     Py_Initialize();
-    bp::tuple shape = bp::make_tuple(3, 3);
+    bp::tuple shape = bp::make_tuple(rows, cols);
     np::dtype dtype = np::dtype::get_builtin<float>();
     np::ndarray a = np::zeros(shape, dtype);
 
@@ -26,21 +26,23 @@ void make_ndarray()
     std::cout << "Original array:\n" << bp::extract<char const *>(bp::str(a)) << std::endl;
 
     // reshape teh array into a 1D array
-    a = a.reshape(bp::make_tuple(9));
+    a = a.reshape(bp::make_tuple(rows * cols));
     // print it out again
     std::cout << "Reshaped array:\n" << bp::extract<char const *>(bp::str(a)) << std::endl;
+
+    return 0;
 }
 
-void create_array()
+int create_array()
 {
     Py_Initialize();
     // create an numpy nd array from a tuple
-    bp::object tu = bp::make_tuple('a', 'b', 'c');
+    bp::object tu = bp::make_tuple(1, 2, 3, 5);
     np::ndarray example_tuple = np::array(tu);
 
     // now create an array from a list
     bp::list l;
-    l.append('a');
+    l.append(10);
     np::ndarray example_list = np::array(l);
 
     // specify a dtype for the array
@@ -84,10 +86,13 @@ void create_array()
     mul_data_ex = np::from_data(mul_data, dt1, shape, stride, bp::object());
     std::cout << "Selective multidimensional array :: " << std::endl
         << bp::extract<char const *>(bp::str(mul_data_ex)) << std::endl;
+    return 0;
 }
 
 BOOST_PYTHON_MODULE(test_numpy)
 {
     np::initialize();
     bp::def("make_zeros", make_zeros);
+    bp::def("make_ndarray", make_ndarray);
+    bp::def("create_array", create_array);
 }
