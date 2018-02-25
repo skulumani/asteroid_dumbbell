@@ -17,6 +17,7 @@ conda clean --all
 # build mayavi
 bash ${DIR}/build_mayavi.sh
 
+bash ${DIR}/build_cmake.sh
 bash ${DIR}/build_boost.sh
 bash ${DIR}/build_eigen.sh
 bash ${DIR}/build_cgal.sh
