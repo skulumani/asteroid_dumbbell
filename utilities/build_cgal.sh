@@ -39,4 +39,4 @@ cmake -DWITH_examples=ON -DWITH_demos=ON -DWITH_CGAL_Qt5=OFF .
 make -j 4
 # make examples
 # make demos
-sudo make install
+sudo checkinstall make install
