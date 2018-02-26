@@ -12,7 +12,7 @@ read -p "Press Enter to continue"
 sudo apt-get purge cmake
 sudo apt-get install checkinstall
 
-echo "Now going to download cmake v$VERSION$BUILD"
+echo "Now going to download cmake v$VERSION.$BUILD"
 
 read -p "Press Enter to continue"
 
