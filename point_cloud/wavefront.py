@@ -172,7 +172,24 @@ def ellipsoid_mesh(a, b, c, density=20, subdivisions=1):
     --------
     reconstruct_numpy : VTK surface reconstruction from vertices
     mesh_subdivide : use this to subdivide the mesh into more faces
+    
+    Notes
+    -----
+    The density and subdivision cause differences in the number of vertices
+    and faces.
+    here is some help
 
+    Density          Subdivisions           # vertices              # faces
+    10                  0                       110                 216
+    20                  0                       254                 504
+    30                  0                       434                 864
+    10                  1                       434                 864
+    20                  1                       1010                 2016
+    30                  1                       1730                 3456
+    10                  2                       1730                 3456
+    20                  2                       4034                 8064
+    30                  2                       6914                 13824
+    
     Author
     ------
     Shankar Kulumani		GWU		skulumani@gwu.edu
