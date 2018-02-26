@@ -198,25 +198,46 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
 
     """
     logger = logging.getLogger(__name__)
-    output_filename = './data/raycasting/20180220_castalia_reconstruct_radius_modification.hdf5'
+    output_filename = './data/raycasting/20180226_castalia_reconstruct_lowres_45deg_cone.hdf5'
     
     logger.info('Loading {}'.format(filename))
     data = np.load(filename)
     point_cloud = data['point_cloud'][()]
 
     # define the asteroid and dumbbell objects
-    ast = asteroid.Asteroid(asteroid_name, 4092, 'mat')
-    dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
+
+    asteroid_faces = 4092
+    asteroid_type = 'mat'
+    max_angle = 45
+    m1, m2, l = 500, 500, 0.003
+    density = 10
+    subdivisions = 0
+
+    ast = asteroid.Asteroid(asteroid_name, asteroid_faces, asteroid_type)
+    dum = dumbbell.Dumbbell(m1=m1, m2=m2, l=l)
     
     logger.info('Creating ellipsoid mesh')
     # define a simple mesh to start
     v_est, f_est = wavefront.ellipsoid_mesh(ast.axes[0]*0.75, ast.axes[1]*0.75, ast.axes[2]*0.75,
-                                    density=10, subdivisions=0)
+                                    density=density, subdivisions=subdivisions)
+
     # extract out all the points in the asteroid frame
     time = point_cloud['time'][::10]
     ast_ints = point_cloud['ast_ints'][::10]
     logger.info('Create HDF5 file {}'.format(output_filename))
     with h5py.File(output_filename, 'w') as fout:
+        # store some extra data about teh simulation
+        sim_data = fout.create_group('simulation_data')
+        sim_data.attrs['asteroid_name'] = np.string_(asteroid_name)
+        sim_data.attrs['asteroid_faces'] =asteroid_faces
+        sim_data.attrs['asteroid_type'] = np.string_(asteroid_type)
+        sim_data.attrs['m1'] = dum.m1
+        sim_data.attrs['m2'] = dum.m2
+        sim_data.attrs['l'] = dum.l
+        sim_data.attrs['density'] = density
+        sim_data.attrs['subdivisions'] = subdivisions
+        sim_data['max_angle'] = max_angle
+
         v_group = fout.create_group('vertex_array')
         f_group = fout.create_group('face_array')
 
@@ -232,7 +253,7 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
                     mesh_param = wavefront.polyhedron_parameters(v_est, f_est)
                     v_est, f_est = wavefront.radius_mesh_incremental_update(pt, v_est, f_est,
                                                                             mesh_param,
-                                                                            max_angle=np.deg2rad(45))
+                                                                            max_angle=np.deg2rad(max_angle))
 
             # use HD5PY instead
             # save every so often and delete v_array,f_array to save memory
@@ -240,6 +261,7 @@ def incremental_reconstruction(filename, asteroid_name='castalia'):
                 logger.info('Saving data to HDF5. ii = {}, t = {}'.format(ii, t))
                 v_group.create_dataset(str(ii), data=v_est)
                 f_group.create_dataset(str(ii), data=f_est)
+        
 
     logger.info('Completed the reconstruction')
 
