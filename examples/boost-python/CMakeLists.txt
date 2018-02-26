@@ -24,7 +24,7 @@ ADD_SUBDIRECTORY(01_hello_world)
 add_subdirectory(02_exposing_classes)
 add_subdirectory(03_constructors)
 add_subdirectory(04_numpy_example)
-
+add_subdirectory(05_class_members)
 # each subdiretory that you want to build into a python shared library should have the following
 # this will create a so file for import into python
 # PYTHON_ADD_MODULE(test_numpy test_numpy.cpp)
