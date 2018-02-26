@@ -60,3 +60,7 @@ target_link_libraries(hds_prog_default   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBR
 add_executable( hds_prog_graph hds_prog_graph.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS hds_prog_graph )
 target_link_libraries(hds_prog_graph   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+
+add_executable( polyhedron_prog_tetra polyhedron_prog_tetra.cpp )
+add_to_cached_list( CGAL_EXECUTABLE_TARGETS polyhedron_prog_tetra )
+target_link_libraries(polyhedron_prog_tetra   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
