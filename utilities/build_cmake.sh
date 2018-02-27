@@ -1,7 +1,8 @@
 #!/bin/bash
 
-VERSION=3.10
-BUILD=2
+# 3.10.2 has an issue with the Finding boost 1.66
+VERSION=3.11
+BUILD="0-rc2"
 TEMP_DIR="$(mktemp -d)"
 
 echo "This will download and install the latest stable version of CMAKE"
