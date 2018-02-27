@@ -1611,7 +1611,7 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
         nv[min_ind, :] = vertex_intersections[min_radius, :]
         nf = f.copy()
     else: # no point lies within the angle constraint. Now we'll add a vertex
-        
+        # TODO Need assertions that the mesh remains topologically valid 
         # find closest edge and face
         De, Pe, Ve, Ee, Fe = distance_to_edges(pt, v, f, normal_face,
                                                edge_vertex_map, edge_face_map,
@@ -1625,12 +1625,17 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
         
         # if not near an edge or face (outside of edge or face)
         if De or Df:
-            if Df < De: # add vertex by replacing a vertex
-                logger.info('Face is closest')
-                nv, nf = face_insertion(pt, v, f, Df, Pf, Vf, Ef, Ff)
-            else:
-                logger.info('Edge is closest')
-                nv, nf = edge_insertion(pt, v, f, De, Pe, Ve, Ee, Fe)
+            try:
+                if Df < De: # add vertex by replacing a vertex
+                    logger.info('Face is closest')
+                    nv, nf = face_insertion(pt, v, f, Df, Pf, Vf, Ef, Ff)
+                else:
+                    logger.info('Edge is closest')
+                    nv, nf = edge_insertion(pt, v, f, De, Pe, Ve, Ee, Fe)
+            except IndexError as err:
+                logger.error("Some kind of index error at pt = {}. Error = {}\nJust using the old v,f".format(pt, err))
+                nv = v.copy()
+                nf = f.copy()
         else:
             logger.info('Pt:{} is not in view. Skipping')
             nv = v.copy()
