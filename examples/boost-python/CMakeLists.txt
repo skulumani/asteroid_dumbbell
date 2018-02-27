@@ -28,6 +28,7 @@ add_subdirectory(05_class_members)
 add_subdirectory(06_inheritance)
 add_subdirectory(07_virtual_function)
 add_subdirectory(08_operators)
+add_subdirectory(09_policies)
 # each subdiretory that you want to build into a python shared library should have the following
 # this will create a so file for import into python
 # PYTHON_ADD_MODULE(test_numpy test_numpy.cpp)
