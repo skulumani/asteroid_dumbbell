@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.10.2)
 project(boost_python)
 
+# There is an bug with CMAKE finding the Boost Python headers
+# Look in /usr/local/share/cmake-VERSION/Modules/FindBoost.cmake
+# You can add the following lines in the _Boost_COMPONENT_HEADERS component _hdrs) function
+set(_Boost_NUMPY3_HEADERS               "boost/python/numpy.hpp")
+set(_Boost_PYTHON3_HEADERS               "boost/python.hpp")
+
 # Find and link all the python stuff
 FIND_PACKAGE(PythonInterp REQUIRED)
 FIND_PACKAGE(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
