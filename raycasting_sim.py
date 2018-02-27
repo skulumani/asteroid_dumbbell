@@ -9,6 +9,7 @@ from collections import defaultdict
 import os
 import tempfile
 import argparse
+import subprocess
 
 import warnings
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -348,4 +349,10 @@ if __name__ == "__main__":
         output_path = tempfile.mkdtemp()
         print("Images saved to {}".format(output_path))
         read_mesh_reconstruct(args.reconstruct_data, output_path=output_path)
+
+        # also automatically create the video by calling ffmpeg
+        print("Now going to create a video using FFMPEG")
+        # ffmpeg_command ='ffmpeg -framerate -i %06d.jpg' + " -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" video.mp4"
+        # subprocess.run(ffmpeg_command, shell=True, cwd=output_path)
+
 
