@@ -31,6 +31,7 @@ import utilities
 # TODO Save the ast, dum, objects to the numpy
 
 
+
 def initialize():
     """Initialize all the things for the simulation
     """
@@ -195,17 +196,17 @@ def reconstruct(time, state, ast, dum, point_cloud):
     return v, f
 
 
-def incremental_reconstruction(filename, asteroid_name='castalia'):
+def incremental_reconstruction(input_filename, output_filename, asteroid_name='castalia'):
     """Incrementally update the mesh
 
     Now we'll use the radial mesh reconstruction.
 
     """
     logger = logging.getLogger(__name__)
-    output_filename = './data/raycasting/20180226_castalia_reconstruct_highres_45deg_cone.hdf5'
+    # output_filename = './data/raycasting/20180226_castalia_reconstruct_highres_45deg_cone.hdf5'
     
-    logger.info('Loading {}'.format(filename))
-    data = np.load(filename)
+    logger.info('Loading {}'.format(input_filename))
+    data = np.load(input_filename)
     point_cloud = data['point_cloud'][()]
 
     # define the asteroid and dumbbell objects
@@ -312,29 +313,33 @@ if __name__ == "__main__":
                         datefmt='%Y-%m-%d %H:%M:%S')
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('fnames', nargs='*')
+    parser.add_argument('point_cloud_data', help="Filename for point cloud data.")
+    parser.add_argument('reconstruct_data', help="Filename for reconstruction data.")
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--simulate", help='Run the point cloud simulation',
                         action="store_true")
     group.add_argument("-r", "--reconstruct", help="Reconstruct from the point cloud",
                         action="store_true")
-    args = parser.parse_args()
+    group.add_argument("-p", "--plot", help="Read the reconstruction and generate images",
+                       action="store_true")
 
+    args = parser.parse_args()
+    
     if args.simulate:
-        pass
-        # time, state, point_cloud = simulate()
+        time, state, point_cloud = simulate()
 
         # save data to a file
-        # np.savez('20180131_itokawa_raycasting_sim', time=time, state=state,
-        #          point_cloud=point_cloud)
+        np.savez(args.point_cloud_data, time=time, state=state,
+                 point_cloud=point_cloud)
 
         # to access the data again
         # data = np.load(filename)
         # point_cloud = data['point_cloud'][()]
     elif args.reconstruct:
         # now reconstruct
-        filename = './data/raycasting/20180110_raycasting_castalia.npz'
+        # reconstruct_filename = os.path.join('./data/raycasting', args.fnames[1])
+        # filename = './data/raycasting/20180110_raycasting_castalia.npz'
         
-        incremental_reconstruction(filename, 'castalia')
+        incremental_reconstruction(args.point_cloud_data, args.reconstruct_data, 'castalia')
 
