@@ -277,11 +277,14 @@ def incremental_reconstruction(input_filename, output_filename, asteroid_name='c
 def read_mesh_reconstruct(filename, output_path='/tmp/reconstruct_images'):
     """Use H5PY to read the data back and plot
     """
-    
+    logger = logging.getLogger(__name__)
+    logger.info('Starting the image generation')
+
     # check if location exists
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-
+    
+    logger.info('Opening {}'.format(filename))
     with h5py.File(filename, 'r') as hf:
         face_array = hf['face_array']
         vertex_array = hf['vertex_array']
@@ -303,16 +306,21 @@ def read_mesh_reconstruct(filename, output_path='/tmp/reconstruct_images'):
             ms.reset(x=v[:,0], y=v[:,1], z=v[:,2], triangles=f)
             # save the figure
             graphics.mlab.savefig(filename, magnification=4)
+            logger.info('Saved image {}/{}'.format(ii, len(face_keys))) 
     
+    logger.info('Finished')
+
     return mfig
 
 if __name__ == "__main__":
     # TODO Measure time for run
     # TODO Add argument parsing
-    logging.basicConfig(filename='reconstruct.txt',
+    logging_file = tempfile.mkstemp(suffix='.txt')[1]
+    logging.basicConfig(filename=logging_file,
                         filemode='w', level=logging.INFO,
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
+    print("Logging to {}".format(logging_file))
 
     parser = argparse.ArgumentParser()
     parser.add_argument('point_cloud_data', help="Filename for point cloud data.")
