@@ -9,6 +9,9 @@ from collections import defaultdict
 import os
 import argparse
 
+import warnings
+warnings.simplefilter(action="ignore", category=FutureWarning)
+
 import numpy as np
 from scipy import integrate
 import h5py
