@@ -24,6 +24,19 @@ of the point cloud data
     * Uses only the vertices and modifies the closest vertex to a point
     * The size of the initial asteroid mesh is the semimajor axes of castalia
 
+### Castalia testing using the radius with edge/face modifications
+
+These simulations are using the point cloud data from
+
+20180110_raycasting_castalia.npz
+
+There are four related simulations with slightly different settings:
+
+1. `20180226_castalia_reconstruct_highres_45deg_cone.hdf5`
+2. `20180226_castalia_reconstruct_highres_5deg_cone.hdf5`
+3. `20180226_castalia_reconstruct_lowres_45deg_cone.hdf5`
+4. `20180226_castalia_reconstruct_lowres_5deg_cone.hdf5`
+
 ## Itokawa simulations
 
 20180131_itokawa_raycasting.npz - around itokawa
