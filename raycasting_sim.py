@@ -7,6 +7,7 @@ import pdb
 import logging
 from collections import defaultdict
 import os
+import tempfile
 import argparse
 
 import warnings
@@ -289,7 +290,7 @@ def read_mesh_reconstruct(filename, output_path='/tmp/reconstruct_images'):
         vertex_keys = utilities.sorted_nicely(list(vertex_array.keys()))
 
         # loop over keys in both and plot
-        mfig = graphics.mayavi_figure()
+        mfig = graphics.mayavi_figure(offscreen=True)
         mesh = graphics.mayavi_addMesh(mfig, vertex_array[vertex_keys[0]][()], 
                                        face_array[face_keys[0]][()])
         ms = mesh.mlab_source
@@ -342,4 +343,9 @@ if __name__ == "__main__":
         # filename = './data/raycasting/20180110_raycasting_castalia.npz'
         
         incremental_reconstruction(args.point_cloud_data, args.reconstruct_data, 'castalia')
+    elif args.plot:
+        # generate the images
+        output_path = tempfile.mkdtemp()
+        print("Images saved to {}".format(output_path))
+        read_mesh_reconstruct(args.reconstruct_data, output_path=output_path)
 
