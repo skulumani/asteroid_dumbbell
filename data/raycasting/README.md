@@ -37,6 +37,8 @@ There are four related simulations with slightly different settings:
 3. `20180226_castalia_reconstruct_lowres_45deg_cone.hdf5`
 4. `20180226_castalia_reconstruct_lowres_5deg_cone.hdf5`
 
+These are comparing the effect of the angle constraint on the vertex and the effect of resolution of the initial mesh.
+
 ## Itokawa simulations
 
 20180131_itokawa_raycasting.npz - around itokawa
