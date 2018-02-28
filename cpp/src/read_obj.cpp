@@ -7,41 +7,10 @@
 
 #include <iostream>
 #include <fstream>
-#include <string>
-#include <vector>
-#include <algorithm>
+#include "input_parser.hpp"
 
 // definition for the function
 bool loadOBJ (const std::string path, std::vector<double> &vertices, std::vector<double> &faces);
-
-
-class InputParser {
-
-    public:
-        InputParser (int &argc, char **argv) {
-            for (int ii = 1; ii < argc; ++ii) {
-                this->tokens.push_back(std::string(argv[ii]));
-            }
-        }
-        // only allows reading from object not WRITING
-        const std::string& get_command_option(const std::string &option) const {
-            std::vector<std::string>::const_iterator itr;
-            itr = std::find(this->tokens.begin(), this->tokens.end(), option);
-            if (itr != this->tokens.end() && ++itr != this->tokens.end()) {
-                return *itr;
-            }
-            static const std::string empty_string("");
-            return empty_string;
-        }
-
-        bool option_exists(const std::string &option) const {
-            return std::find(this->tokens.begin(), this->tokens.end(), option) != this->tokens.end();
-        }
-
-    private:
-        std::vector <std::string> tokens;
-
-};
 
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
