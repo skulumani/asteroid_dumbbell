@@ -6,6 +6,7 @@
 */
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 
 #include "input_parser.hpp"
@@ -13,22 +14,52 @@
 // Overload these functions eventually and save to a vector
 // Single word read/print
 // Read the fstream and save into an Eigen matrix (one for vertices and one for faces)
+
+void print_vector(std::vector<double> &vector) {
+    for (auto v = vector.begin(); v != vector.end(); ++v) {
+        std::cout << " " << *v;
+    }
+    std::cout << std::endl;
+}
+
+template<typename VectorType> 
+void read_row(std::istringstream &ss, std::vector<VectorType> &vector) {
+    VectorType v;
+    while (ss >> v) {
+        vector.push_back(v);
+    }
+}
+
 std::istream& read(std::istream& input, std::vector<std::vector<double>> &V, std::vector<std::vector<int>> &F) {
 
     // store some strings for parsing the obj file
     std::string v("v"); // vertices
     std::string f("f"); // faces
     std::string octothorp("#"); // comments
+    
+    std::string line;
 
-    if (input) {
-        std::string word;
-        while (input >> word) {
-            std::cout << "input is : " << word << std::endl;
+    double vertex;  
+    double vindex;
+
+    while (std::getline(input, line)) {
+        std::string row_type;
+        std::istringstream row(line);
+
+        row >> row_type;
+        if (row_type == v) {
+            std::vector<double> vertices;
+
+            while (row >> vertex) {
+                vertices.push_back(vertex);
+            }
+
+            V.push_back(vertices);
+            assert(vertices.size() == 3);
+        } else if (row_type == f) {
+            std::cout << "Found f" << std::endl;
         }
-    } else {
-        std::cout << "Error opening the file" << std::endl;
     }
-
     /* input.clear(); */
     return input;
 }
