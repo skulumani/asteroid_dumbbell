@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <assert.h>
 
 #include "input_parser.hpp"
 
@@ -49,21 +50,19 @@ std::istream& read(std::istream& input, std::vector<std::vector<double>> &V, std
         row >> row_type;
         if (row_type == v) {
             std::vector<double> vertices;
-
-            while (row >> vertex) {
-                vertices.push_back(vertex);
-            }
-
+            read_row(row, vertices);
             V.push_back(vertices);
             assert(vertices.size() == 3);
         } else if (row_type == f) {
-            std::cout << "Found f" << std::endl;
+            std::vector<int> indices;
+            read_row(row, indices);
+            F.push_back(indices);
+            assert(indices.size() == 3);
         }
     }
     /* input.clear(); */
     return input;
 }
-
 
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
@@ -80,7 +79,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Reading " << input_file << std::endl;
         std::ifstream input_stream(input_file);
         read(input_stream, V, F);
-    } // input file goes out of scope and is closed
-     
+    }  // input file is closed when leaving the scope
+        
     return 0;
 }
