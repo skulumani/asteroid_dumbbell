@@ -4,13 +4,18 @@
     @author Shankar Kulumani
     @version 0.1 2/28/2018
 */
-
 #include <iostream>
 #include <fstream>
 #include "input_parser.hpp"
 
-// definition for the function
-bool loadOBJ (const std::string path, std::vector<double> &vertices, std::vector<double> &faces);
+std::istream& read_cin(std::istream& input) {
+    std::string word;
+    while (input >> word) {
+        std::cout << "input is : " << word << std::endl;
+    }
+    /* input.clear(); */
+    return input;
+}
 
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
@@ -21,6 +26,22 @@ int main(int argc, char* argv[]) {
     const std::string &input_file = input.get_command_option("-i");
     if (!input_file.empty()) {
         std::cout << "Filename = " << input_file << std::endl;
+        std::istream &input_stream = read_cin(std::cin) ;
+
+        std::cout << input_stream.good() << std::endl;
+        /* std::string word; */
+        /* while (std::cin >> word) { */
+        /*     std::cout << "input is : " << word << std::endl; */
+        /* } */
+        /* std::cout << std::endl; */
+        // open the file and check that it is open
+        
+        // read a line from it and print to the screen
+
+        /* std::string line; */    
+        /* while (std::getline(ifile, line)) { */
+        /*     std::cout << line << std::endl; */
+        /* } */
     }
     /* std::cout << "path is " << ipath << std::endl; */
     /* std::cout << argv[0] << argv[1] << std::endl; */
@@ -34,10 +55,6 @@ int main(int argc, char* argv[]) {
     /*     return 1; */
     /* } */
 
-    /* std::string line; */    
-    /* while (std::getline(ifile, line)) { */
-    /*     std::cout << line << std::endl; */
-    /* } */
     
     return 0;
 }
