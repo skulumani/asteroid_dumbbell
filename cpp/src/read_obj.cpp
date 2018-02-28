@@ -13,7 +13,13 @@
 // Overload these functions eventually and save to a vector
 // Single word read/print
 // Read the fstream and save into an Eigen matrix (one for vertices and one for faces)
-std::istream& read(std::istream& input) {
+std::istream& read(std::istream& input, std::vector<std::vector<double>> &V, std::vector<std::vector<int>> &F) {
+
+    // store some strings for parsing the obj file
+    std::string v("v"); // vertices
+    std::string f("f"); // faces
+    std::string octothorp("#"); // comments
+
     if (input) {
         std::string word;
         while (input >> word) {
@@ -33,12 +39,16 @@ int main(int argc, char* argv[]) {
     if (input.option_exists("-h")) {
         std::cout << "Usage read_obj -i input_file.obj" << std::endl;
     }
+    
+    // vectors of vectors to store the data
+    std::vector<std::vector<double>> V;
+    std::vector<std::vector<int>> F;
 
     const std::string input_file = input.get_command_option("-i");
     if (!input_file.empty()) {
         std::cout << "Reading " << input_file << std::endl;
         std::ifstream input_stream(input_file);
-        read(input_stream);
+        read(input_stream, V, F);
     } // input file goes out of scope and is closed
      
     return 0;
