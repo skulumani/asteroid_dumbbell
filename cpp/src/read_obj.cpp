@@ -64,6 +64,7 @@ std::istream& read(std::istream& input, std::vector<std::vector<double>> &V, std
     return input;
 }
 
+// TODO Add some tests
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
@@ -80,6 +81,7 @@ int main(int argc, char* argv[]) {
         std::ifstream input_stream(input_file);
         read(input_stream, V, F);
     }  // input file is closed when leaving the scope
-        
+    
+     
     return 0;
 }
