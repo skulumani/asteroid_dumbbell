@@ -1,5 +1,6 @@
 #ifndef INPUT_PARSER_H
 #define INPUT_PARSER_H
+
 // InputParser definition
 #include <string>
 #include <algorithm>
