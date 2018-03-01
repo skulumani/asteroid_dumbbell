@@ -37,7 +37,11 @@ namespace obj {
 
 
     int read(std::istream& input, std::vector<std::vector<double>> &V, std::vector<std::vector<int>> &F) {
-
+        
+        if (input.fail()) {
+            std::cout << "Error opening the file stream" << std::endl;
+            return 1;
+        }
         // store some strings for parsing the obj file
         std::string v("v"); // vertices
         std::string f("f"); // faces
@@ -71,12 +75,12 @@ namespace obj {
         input_stream.open(input_filename);
 
         // check to make sure the file is opened properly
-        if (input_stream.is_open()) {
-            obj::read(input_stream, V, F);
+        if (!input_stream.fail()) {
+            int read_flag = obj::read(input_stream, V, F);
+            return 0;
         } else {
-            std::cout << "Error opening file" << std::endl;
+            std::cout << "Error opening file filename" << std::endl;
             return 1;
         }
-        return 0;
     }
 } // namespace read_obj
