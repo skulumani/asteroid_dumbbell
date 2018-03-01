@@ -31,38 +31,46 @@ void read_row(std::istringstream &ss, std::vector<VectorType> &vector) {
     }
 }
 
-std::istream& read(std::istream& input, std::vector<std::vector<double>> &V, std::vector<std::vector<int>> &F) {
+namespace obj {
 
-    // store some strings for parsing the obj file
-    std::string v("v"); // vertices
-    std::string f("f"); // faces
-    std::string octothorp("#"); // comments
-    
-    std::string line;
 
-    double vertex;  
-    double vindex;
+    int read(std::istream& input, std::vector<std::vector<double>> &V, std::vector<std::vector<int>> &F) {
 
-    while (std::getline(input, line)) {
-        std::string row_type;
-        std::istringstream row(line);
+        // store some strings for parsing the obj file
+        std::string v("v"); // vertices
+        std::string f("f"); // faces
+        std::string octothorp("#"); // comments
 
-        row >> row_type;
-        if (row_type == v) {
-            std::vector<double> vertices;
-            read_row(row, vertices);
-            V.push_back(vertices);
-            assert(vertices.size() == 3);
-        } else if (row_type == f) {
-            std::vector<int> indices;
-            read_row(row, indices);
-            F.push_back(indices);
-            assert(indices.size() == 3);
+        std::string line;
+
+        while (std::getline(input, line)) {
+            std::string row_type;
+            std::istringstream row(line);
+
+            row >> row_type;
+            if (row_type == v) {
+                std::vector<double> vertices;
+                read_row(row, vertices);
+                V.push_back(vertices);
+                assert(vertices.size() == 3);
+            } else if (row_type == f) {
+                std::vector<int> indices;
+                read_row(row, indices);
+                F.push_back(indices);
+                assert(indices.size() == 3);
+            }
         }
+        /* input.clear(); */
+        return 0;
     }
-    /* input.clear(); */
-    return input;
-}
+    // overloaded function for opening the file
+    int read(const std::string input_filename, std::vector<std::vector<double>> &V, std::vector<std::vector<int>> &F) {
+        std::ifstream input_stream;
+        input_stream.open(input_filename);
+        obj::read(input_stream, V, F);
+    }
+} // namespace read_obj
+
 
 // TODO Add some tests
 int main(int argc, char* argv[]) {
@@ -79,7 +87,8 @@ int main(int argc, char* argv[]) {
     if (!input_file.empty()) {
         std::cout << "Reading " << input_file << std::endl;
         std::ifstream input_stream(input_file);
-        read(input_stream, V, F);
+        obj::read(input_stream, V, F);
+        
     }  // input file is closed when leaving the scope
     
      
