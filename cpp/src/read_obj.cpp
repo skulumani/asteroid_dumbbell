@@ -69,6 +69,14 @@ namespace obj {
     int read(const std::string input_filename, std::vector<std::vector<double>> &V, std::vector<std::vector<int>> &F) {
         std::ifstream input_stream;
         input_stream.open(input_filename);
-        obj::read(input_stream, V, F);
+
+        // check to make sure the file is opened properly
+        if (input_stream.is_open()) {
+            obj::read(input_stream, V, F);
+        } else {
+            std::cout << "Error opening file" << std::endl;
+            return 1;
+        }
+        return 0;
     }
 } // namespace read_obj

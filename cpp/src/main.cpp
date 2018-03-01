@@ -19,10 +19,6 @@ int vector_array_to_eigen(std::vector<std::vector<VectorType>> &vector,
     for (int ii = 0; ii < rows; ii++) {
         Eigen::Matrix<typename Derived::Scalar, 1, 3> v(vector[ii].data());
         matrix.row(ii) = v;
-        /* std::cout << vector[ii] << std::endl; */
-        /* for (int jj = 0; jj < cols; jj++) { */
-        /*     matrix(ii, jj) = vector[ii][jj]; */
-        /* } */
     }
     return 0;
 }
@@ -37,18 +33,22 @@ int main(int argc, char* argv[]) {
     // vectors of vectors to store the data
     std::vector<std::vector<double>> vector_V;
     std::vector<std::vector<int>> vector_F;
+    int read_flag;
 
     const std::string input_file = input.get_command_option("-i");
     if (!input_file.empty()) {
         std::cout << "Reading " << input_file << std::endl;
-        std::ifstream input_stream(input_file);
-        obj::read(input_stream, vector_V, vector_F);
+        /* std::ifstream input_stream(input_file); */
+        read_flag = obj::read(input_file, vector_V, vector_F);
         
     }  // input file is closed when leaving the scope
+
+    if (read_flag == 0) {
     Eigen::MatrixXd V;
     Eigen::MatrixXi F;
     vector_array_to_eigen(vector_V, V);
     vector_array_to_eigen(vector_F, F);
     std::cout << V << std::endl;
+    }
     return 0;
 }
