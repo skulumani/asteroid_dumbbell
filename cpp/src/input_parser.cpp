@@ -1,6 +1,9 @@
 #include "input_parser.hpp"
 
-// definitions for input parser
+#include <string>
+#include <algorithm>
+#include <vector>
+
 
 // constructor definition
 InputParser::InputParser (int &argc, char **argv) {
