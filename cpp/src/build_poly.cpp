@@ -6,6 +6,7 @@
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <CGAL/Polyhedron_3.h>
+#include <CGAL/IO/Polyhedron_iostream.h>
 
 #include <iostream>
 #include <fstream>
@@ -13,16 +14,16 @@
 
 typedef CGAL::Simple_cartesian<double>     Kernel;
 typedef CGAL::Polyhedron_3<Kernel>         Polyhedron;
-typedef Polyhedron::HalfedgeDS             HalfedgeDS;<Paste>
+typedef Polyhedron::HalfedgeDS             HalfedgeDS;
 
 // declaration for the polyhedron builder
-template<typename HDS, typename VectorType, typename IndexType> 
+template<typename HDS> 
 class Polyhedron_builder : public CGAL::Modifier_base<HDS> {
     public:
-        Eigen::PlainObjectBase<VectorType> &V;
-        Eigen::PlainObjectBase<IndexType> &F;
+        Eigen::MatrixXd &V;
+        Eigen::MatrixXi &F;
 
-        Polyhedron_builder(Eigen::PlainObjectBase<VectorType> &V_input, Eigen::PlainObjectBase<IndexType> &F_input) : V(V_input), F(F_input) {};
+        Polyhedron_builder(Eigen::MatrixXd &V_input, Eigen::MatrixXi &F_input) : V(V_input), F(F_input) {};
 
         void operator() (HDS &hds) {
 
@@ -44,7 +45,7 @@ class Polyhedron_builder : public CGAL::Modifier_base<HDS> {
                 B.add_vertex_to_facet(F(ii, 0));
                 B.add_vertex_to_facet(F(ii, 1));
                 B.add_vertex_to_facet(F(ii, 2));
-                B.end_facet()
+                B.end_facet();
             }
             B.end_surface();
         }
@@ -75,7 +76,15 @@ int main(int argc, char* argv[]) {
             Eigen::MatrixXi F;
             vector_array_to_eigen(vector_V, V);
             vector_array_to_eigen(vector_F, F);
-
+			
+			Polyhedron P;
+			Polyhedron_builder<HalfedgeDS> builder(V, F);
+			P.delegate(builder);
+			
+			// Write to OBJ file
+			std::ofstream os("dump.off");
+			os << P;
+			os.close();
         }
          
     }  // input file is closed when leaving the scope
