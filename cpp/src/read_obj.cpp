@@ -61,7 +61,10 @@ namespace obj {
                 assert(vertices.size() == 3);
             } else if (row_type == f) {
                 std::vector<int> indices;
-                read_row(row, indices);
+				int v;
+				while (row >> v) {
+					indices.push_back(v - 1);
+				}
                 F.push_back(indices);
                 assert(indices.size() == 3);
             }
