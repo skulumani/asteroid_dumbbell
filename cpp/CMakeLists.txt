@@ -1,7 +1,30 @@
 cmake_minimum_required(VERSION 3.10)
 project( wavefront )
 
+################################################################################
+# GLOBAL SETUP
+################################################################################
 set(CMAKE_CXX_STANDARD 11)
+
+# CGAL Setup
+find_package(CGAL QUIET COMPONENTS)
+if (NOT CGAL_FOUND)
+   message(STATUS "This project requires the CGAL Library and will not compile")
+   return()
+endif()
+# include helper file
+include( ${CGAL_USE_FILE} )
+
+# # Boost and its components
+# find_package( Boost REQUIRED )
+# if ( NOT Boost_FOUND )
+#   message(STATUS "This project requires the Boost library, and will not be compiled.")
+#   return()  
+# endif()
+
+################################################################################
+# GOOGLE TESTING
+################################################################################
 # Download and unpack googletest at configure time
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
@@ -34,7 +57,11 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
+
 include_directories(${PROJECT_SOURCE_DIR}/include)
+################################################################################
+# BUILD TARGETS
+################################################################################
 # create a obj file reader executable
 set(read_obj_src src/main.cpp src/read_obj.cpp src/input_parser.cpp)
 add_executable(read_obj ${read_obj_src})
@@ -42,9 +69,10 @@ target_link_libraries(read_obj gtest_main)
 # add_test(NAME example_test COMMAND example)
 
 ## BUILD POLYHEDRON EXECUTABLE
-set(build_poly_src src/build_poly.cpp src/read_obj.cpp src/input_parser.cpp)
-add_executable(build_poly ${build_poly_src})
-target_link_libraries(build_poly gtest_main)
+# set(build_poly_src src/build_poly.cpp src/read_obj.cpp src/input_parser.cpp)
+# add_executable(build_poly ${build_poly_src})
+# add_to_cached_list(CGAL_EXECUTABLE_TARGETS build_poly)
+# target_link_libraries(build_poly gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
 
 # this will install to /usr/local by default
 # install(TARGETS read_obj DESTINATION bin)
