@@ -11,7 +11,7 @@
 #include <fstream>
 #include <vector>
 
-// definition for the polyhedron builder
+// declaration for the polyhedron builder
 template<typename HDS, typename Derived> 
 class Polyhedron_builder : public CGAL::Modifier_base<HDS> {
     public:
@@ -19,6 +19,8 @@ class Polyhedron_builder : public CGAL::Modifier_base<HDS> {
         void operator() (HDS &hds);
 };
 
+// definition for polyhedron builder
+//
 template<typename HDS> 
 class Build_triangle : public CGAL::Modifier_base<HDS> {
     public:
