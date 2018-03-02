@@ -3,9 +3,44 @@
 
 #include <Eigen/Dense>
 
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Polyhedron_incremental_builder_3.h>
+#include <CGAL/Polyhedron_3.h>
+
 #include <iostream>
 #include <fstream>
 #include <vector>
+
+// definition for the polyhedron builder
+template<typename HDS, typename Derived> 
+class Polyhedron_builder : public CGAL::Modifier_base<HDS> {
+    public:
+        Polyhedron_builder(Eigen::PlainObjectBase<Derived> &V, Eigen::PlainObjectBase<Derived> &F);
+        void operator() (HDS &hds);
+};
+
+template<typename HDS> 
+class Build_triangle : public CGAL::Modifier_base<HDS> {
+    public:
+        Build_triangle () {}
+
+        void operator() (HDS& hds) {
+            // postcondition hds is a valid polyhedral surface
+            CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, true);
+            B.begin_surface(3, 1, 6);
+            typedef typename HDS::Vertex Vertex;
+            typedef typename Vertex::Point Point;
+            B.add_vertex(Point(0, 0, 0));
+            B.add_vertex(Point(1, 0, 0));
+            B.add_vertex(Point(0, 1, 0));
+            B.begin_facet();
+            B.add_vertex_to_facet(0);
+            B.add_vertex_to_facet(1);
+            B.add_vertex_to_facet(2);
+            B.end_facet();
+            B.end_surface();
+        }
+};
 
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
