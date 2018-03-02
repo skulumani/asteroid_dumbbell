@@ -1,15 +1,21 @@
-
 #include "input_parser.hpp"
 #include "read_obj.hpp"
+#include "build_poly.hpp"
 
 #include <Eigen/Dense>
+
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Polyhedron_incremental_builder_3.h>
+#include <CGAL/Polyhedron_3.h>
 
 #include <iostream>
 #include <fstream>
 #include <vector>
 
+typedef CGAL::Simple_cartesian<double>     Kernel;
+typedef CGAL::Polyhedron_3<Kernel>         Polyhedron;
+typedef Polyhedron::HalfedgeDS             HalfedgeDS;
 
-// TODO Add some tests
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
@@ -32,6 +38,12 @@ int main(int argc, char* argv[]) {
             Eigen::MatrixXi F;
             vector_array_to_eigen(vector_V, V);
             vector_array_to_eigen(vector_F, F);
+			
+			Polyhedron P;
+			Polyhedron_builder<HalfedgeDS> builder(V, F);
+			P.delegate(builder);
+			
+			CGAL_assertion(P.is_triangle(P.halfedges_begin()));
         }
          
     }  // input file is closed when leaving the scope
