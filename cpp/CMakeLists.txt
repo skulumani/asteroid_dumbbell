@@ -39,6 +39,12 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 set(read_obj_src src/main.cpp src/read_obj.cpp src/input_parser.cpp)
 add_executable(read_obj ${read_obj_src})
 target_link_libraries(read_obj gtest_main)
+
+# Testing example
+set(test_src tests/test_gtest.cpp)
+add_executable(example_test ${test_src})
+target_link_libraries(example_test gtest)
+add_test(NAME example_test COMMAND example_test)
 # add_test(NAME example_test COMMAND example)
 
 # this will install to /usr/local by default
