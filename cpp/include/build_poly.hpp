@@ -1,8 +1,6 @@
 #ifndef BUILD_POLY_H
 #define BUILD_POLY_H
 
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <CGAL/Polyhedron_3.h>
 
 // declaration for the polyhedron builder
@@ -42,4 +40,5 @@ void Polyhedron_builder<HDS>::operator() (HDS &hds) {
     }
     B.end_surface();
 }
+
 #endif
