@@ -81,10 +81,7 @@ int main(int argc, char* argv[]) {
 			Polyhedron_builder<HalfedgeDS> builder(V, F);
 			P.delegate(builder);
 			
-			// Write to OBJ file
-			std::ofstream os("dump.off");
-			os << P;
-			os.close();
+			CGAL_assertion(P.is_triangle(P.halfedges_begin()));
         }
          
     }  // input file is closed when leaving the scope
