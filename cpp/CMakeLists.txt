@@ -41,6 +41,11 @@ add_executable(read_obj ${read_obj_src})
 target_link_libraries(read_obj gtest_main)
 # add_test(NAME example_test COMMAND example)
 
+## BUILD POLYHEDRON EXECUTABLE
+set(build_poly_src src/build_poly.cpp src/read_obj.cpp src/input_parser.cpp)
+add_executable(build_poly ${build_poly_src})
+target_link_libraries(build_poly gtest_main)
+
 # this will install to /usr/local by default
 # install(TARGETS read_obj DESTINATION bin)
 
