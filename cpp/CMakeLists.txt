@@ -69,7 +69,7 @@ target_link_libraries(read_obj gtest_main)
 # add_test(NAME example_test COMMAND example)
 
 # BUILD POLYHEDRON EXECUTABLE
-set(build_poly_src src/build_poly.cpp src/read_obj.cpp src/input_parser.cpp)
+set(build_poly_src src/build_poly_main.cpp src/read_obj.cpp src/input_parser.cpp)
 add_executable(build_poly ${build_poly_src})
 add_to_cached_list(CGAL_EXECUTABLE_TARGETS build_poly)
 target_link_libraries(build_poly gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
