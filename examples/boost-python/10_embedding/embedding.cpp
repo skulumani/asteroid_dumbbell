@@ -17,7 +17,7 @@ namespace bp = boost::python;
 int main(int argc, char** argv) {
     try {
         PyImport_AppendInittab((char*)"mymodule", INIT_MODULE);
-        bp::Py_Initialize();
+        Py_Initialize();
         bp::object main_module = bp::import("__main__");
         bp::dict main_namespace = bp::extract<bp::dict>(main_module.attr("__dict__"));
         bp::object mymodule = bp::import("mymodule");
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
         main_namespace["precreated_object"] = Base("created on C++ side");
         exec_file("embedding.py", main_namespace, main_namespace);
     } catch (bp::error_already_set& e) {
-        bp::PyErr_PrintEx(0);
+        PyErr_PrintEx(0);
         return 1;
     }
     return 0;

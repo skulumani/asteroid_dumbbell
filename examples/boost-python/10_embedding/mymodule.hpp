@@ -10,4 +10,4 @@ class Base {
         }
     private:
         std::string mName;
-}
+};

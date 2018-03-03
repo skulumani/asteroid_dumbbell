@@ -1,0 +1,5 @@
+PYTHON_ADD_MODULE(mymodule mymodule.cpp)
+add_executable(embedding mymodule.cpp embedding.cpp)
+target_link_libraries(embedding ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+file(COPY embedding.py DESTINATION .)
+add_test(NAME 10_embedding COMMAND embedding)
