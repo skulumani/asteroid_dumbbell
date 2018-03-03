@@ -1,0 +1,5 @@
+add_executable(auto_instance myextension.cpp auto_instance.cpp)
+target_link_libraries(auto_instance ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+FILE(COPY auto_instance.py DESTINATION .)
+set(ENV{PYTHONPATH} .)
+add_test(NAME 13_autoinstantiation COMMAND auto_instance)

@@ -38,6 +38,8 @@ add_subdirectory(09_policies)
 add_subdirectory(10_embedding)
 add_subdirectory(11_iterators)
 add_subdirectory(12_exceptions)
+add_subdirectory(13_autoinstantiation)
+add_subdirectory(14_overloading)
 # each subdiretory that you want to build into a python shared library should have the following
 # this will create a so file for import into python
 # PYTHON_ADD_MODULE(test_numpy test_numpy.cpp)
