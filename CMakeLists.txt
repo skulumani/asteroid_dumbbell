@@ -64,7 +64,7 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # create a obj file reader executable
-set(read_obj_src src/main.cpp src/read_obj.cpp src/input_parser.cpp)
+set(read_obj_src src/read_obj_main.cpp src/read_obj.cpp src/input_parser.cpp)
 add_executable(read_obj ${read_obj_src})
 target_link_libraries(read_obj gtest_main)
 set_target_properties( read_obj
@@ -74,17 +74,6 @@ LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
 RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
 
-# Testing example
-set(test_src tests/test_gtest.cpp)
-add_executable(example_test ${test_src})
-target_link_libraries(example_test gtest)
-add_test(NAME example_test COMMAND example_test)
-set_target_properties(example_test
-PROPERTIES
-ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
-)
 
 # BUILD POLYHEDRON EXECUTABLE
 set(build_poly_src src/build_poly_main.cpp src/read_obj.cpp src/input_parser.cpp)
@@ -98,6 +87,19 @@ LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
 RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
 
+################################################################################
+# Testing example
+################################################################################
+set(test_src tests/test_gtest.cpp)
+add_executable(example_test ${test_src})
+target_link_libraries(example_test gtest)
+add_test(NAME example_test COMMAND example_test)
+set_target_properties(example_test
+PROPERTIES
+ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
+LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
+RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
+)
 # this will install to /usr/local by default
 # install(TARGETS read_obj DESTINATION bin)
 
