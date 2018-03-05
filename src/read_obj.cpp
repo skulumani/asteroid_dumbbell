@@ -14,10 +14,6 @@
 #include <vector>
 #include <assert.h>
 
-// Overload these functions eventually and save to a vector
-// Single word read/print
-// Read the fstream and save into an Eigen matrix (one for vertices and one for faces)
-
 void print_vector(std::vector<double> &vector) {
     for (auto v = vector.begin(); v != vector.end(); ++v) {
         std::cout << " " << *v;
