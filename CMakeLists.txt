@@ -22,6 +22,7 @@ if ( NOT Boost_FOUND )
   return()  
 endif()
 
+
 ################################################################################
 # GOOGLE TESTING
 ################################################################################
@@ -90,20 +91,23 @@ RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 ################################################################################
 # Testing example
 ################################################################################
-add_executable(example_test tests/test_gtest.cpp)
-target_link_libraries(example_test gtest)
-add_test(NAME example_test COMMAND example_test)
-set_target_properties(example_test
+ENABLE_TESTING()
+
+add_executable(test_gtest tests/cpp/test_gtest.cpp)
+target_link_libraries(test_gtest gtest)
+add_test(NAME test_gtest COMMAND test_gtest)
+set_target_properties(test_gtest
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
 
-add_executable(test_read_obj tests/test_read_obj.cpp src/read_obj.cpp)
+add_executable(test_read_obj tests/cpp/test_read_obj.cpp src/read_obj.cpp )
 target_link_libraries(test_read_obj gtest)
-add_test(NAME test_read_obj COMMAND test_read_obj)
-set_target_properties(test_read_obj
+add_test(NAME test_read_obj COMMAND test_read_obj
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+set_target_properties(test_read_obj 
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"

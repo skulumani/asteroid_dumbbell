@@ -85,6 +85,7 @@ TEST(VectorToEigen, VectorToEigen) {
 
 }
 
+// Can include all the other tests here if desired
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
