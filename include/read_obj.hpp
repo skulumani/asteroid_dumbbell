@@ -45,6 +45,9 @@ namespace obj {
     */
     int read(const std::string input_filename, std::vector<std::vector<double> > &V, std::vector<std::vector<int> > &F);
     
+    template<typename VectorType, typename IndexType> 
+    int read(const std::string input_filename, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F);
+
     /**
         Print a row from a stl vectors
 

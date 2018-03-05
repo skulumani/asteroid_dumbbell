@@ -77,6 +77,23 @@ namespace obj {
             return 1;
         }
     }
+    
+    template<typename VectorType, typename IndexType>
+    void read(std::istream& input, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F) {
+        // just call the stl vector version
+    }
+
+    template<typename VectorType, typename IndexType> 
+    void read(const std::string input_filename, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F) {
+        std::ifstream input_stream;
+        input_stream.open(input_filename);
+
+        if (!input_stream.fail()) {
+            int read_flag = obj
+        } else {
+
+        }
+    }
 
     void print_vector(std::vector<double> &vector) {
         for (auto v = vector.begin(); v != vector.end(); ++v) {
@@ -84,8 +101,5 @@ namespace obj {
         }
         std::cout << std::endl;
     }
-    
-    void read_obj(const std::string input_filename, ) {
-
-    }
+        
 } // namespace read_obj
