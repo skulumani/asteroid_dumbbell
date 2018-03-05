@@ -5,8 +5,9 @@
     @version 0.1 2/28/2018
 */
 
-#include "input_parser.hpp"
 #include "read_obj.hpp"
+
+#include <Eigen/Dense>
 
 #include <iostream>
 #include <fstream>
@@ -14,12 +15,6 @@
 #include <vector>
 #include <assert.h>
 
-void print_vector(std::vector<double> &vector) {
-    for (auto v = vector.begin(); v != vector.end(); ++v) {
-        std::cout << " " << *v;
-    }
-    std::cout << std::endl;
-}
 
 template<typename VectorType> 
 void read_row(std::istringstream &ss, std::vector<VectorType> &vector) {
@@ -81,5 +76,16 @@ namespace obj {
             std::cout << "Error opening file filename" << std::endl;
             return 1;
         }
+    }
+
+    void print_vector(std::vector<double> &vector) {
+        for (auto v = vector.begin(); v != vector.end(); ++v) {
+            std::cout << " " << *v;
+        }
+        std::cout << std::endl;
+    }
+    
+    void read_obj(const std::string input_filename, ) {
+
     }
 } // namespace read_obj

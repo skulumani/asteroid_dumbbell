@@ -16,7 +16,6 @@
 // definition for the function
 bool loadOBJ (const std::string path, std::vector<double> &vertices, std::vector<double> &faces);
 
-void print_vector(std::vector<double> &vector);
 
 /**
     Read a single row of a OBJ file to a vector 
@@ -27,25 +26,6 @@ void print_vector(std::vector<double> &vector);
 template<typename VectorType>
 void read_row(std::istringstream &ss, std::vector<VectorType> &vector);
 
-/**
-    Convert vector of vectors to Eigen arrays
-
-    @param vector Vector of vectors 
-    @returns matrix Output eigen matrix 
-*/
-template<typename VectorType, typename Derived> 
-int vector_array_to_eigen(std::vector<std::vector<VectorType>> &vector,
-        Eigen::PlainObjectBase<Derived> &matrix) {
-    // initialize a matrix to hold everything (assumes all are the same size
-    int rows = vector.size();
-    int cols = vector[0].size();
-    matrix.resize(rows, cols);
-    for (int ii = 0; ii < rows; ii++) {
-        Eigen::Matrix<typename Derived::Scalar, 1, 3> v(vector[ii].data());
-        matrix.row(ii) = v;
-    }
-    return 0;
-}
 
 namespace obj {
     /**
@@ -64,5 +44,32 @@ namespace obj {
         @return F vector of vector ints for faces
     */
     int read(const std::string input_filename, std::vector<std::vector<double> > &V, std::vector<std::vector<int> > &F);
+    
+    /**
+        Print a row from a stl vectors
+
+        @param vector Vector input to print 
+    */
+    void print_vector(std::vector<double> &vector);
+
+    /**
+      Convert vector of vectors to Eigen arrays
+
+      @param vector Vector of vectors 
+      @returns matrix Output eigen matrix 
+      */
+    template<typename VectorType, typename Derived> 
+        int vector_array_to_eigen(std::vector<std::vector<VectorType>> &vector,
+                Eigen::PlainObjectBase<Derived> &matrix) {
+            // initialize a matrix to hold everything (assumes all are the same size
+            int rows = vector.size();
+            int cols = vector[0].size();
+            matrix.resize(rows, cols);
+            for (int ii = 0; ii < rows; ii++) {
+                Eigen::Matrix<typename Derived::Scalar, 1, 3> v(vector[ii].data());
+                matrix.row(ii) = v;
+            }
+            return 0;
+        }
 }
 #endif

@@ -36,8 +36,8 @@ int main(int argc, char* argv[]) {
             std::cout << "Converting to Eigen arrays" << std::endl;
             Eigen::MatrixXd V;
             Eigen::MatrixXi F;
-            vector_array_to_eigen(vector_V, V);
-            vector_array_to_eigen(vector_F, F);
+            obj::vector_array_to_eigen(vector_V, V);
+            obj::vector_array_to_eigen(vector_F, F);
 			
 			Polyhedron P;
 			Polyhedron_builder<HalfedgeDS> builder(V, F);

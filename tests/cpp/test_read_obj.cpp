@@ -79,7 +79,7 @@ TEST(VectorToEigen, VectorToEigen) {
 
     Eigen::MatrixXd V;
     
-    vector_array_to_eigen(V_vector, V);
+    obj::vector_array_to_eigen(V_vector, V);
 
     ASSERT_TRUE(V.isApprox(V_true));
 
