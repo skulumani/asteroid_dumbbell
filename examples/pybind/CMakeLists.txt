@@ -15,5 +15,8 @@ add_subdirectory(lib/pybind11)
 
 # Can build a module or a shared library 
 pybind11_add_module(example MODULE ${SOURCE_DIR}/example.cpp)
-pybind11_add_module(python_example MODULE ${SOURCE_DIR}/math.cpp ${SOURCE_DIR}/bindings.cpp)
+pybind11_add_module(python_example MODULE 
+    ${SOURCE_DIR}/math.cpp 
+    ${SOURCE_DIR}/bindings.cpp
+    ${SOURCE_DIR}/eigen.cpp)
 
