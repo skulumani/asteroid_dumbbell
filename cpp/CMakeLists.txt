@@ -58,27 +58,29 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
 endif()
 
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
 ################################################################################
 # BUILD TARGETS
 ################################################################################
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
 # create a obj file reader executable
 set(read_obj_src src/main.cpp src/read_obj.cpp src/input_parser.cpp)
 add_executable(read_obj ${read_obj_src})
-target_link_libraries(read_obj gtest_main)
+# target_link_libraries(read_obj gtest_main)
+target_link_libraries(read_obj)
 
 # Testing example
 set(test_src tests/test_gtest.cpp)
 add_executable(example_test ${test_src})
 target_link_libraries(example_test gtest)
 add_test(NAME example_test COMMAND example_test)
-# add_test(NAME example_test COMMAND example)
 
 # BUILD POLYHEDRON EXECUTABLE
 set(build_poly_src src/build_poly_main.cpp src/read_obj.cpp src/input_parser.cpp)
 add_executable(build_poly ${build_poly_src})
 add_to_cached_list(CGAL_EXECUTABLE_TARGETS build_poly)
-target_link_libraries(build_poly gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
+# target_link_libraries(build_poly gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
+target_link_libraries(build_poly ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
 
 # this will install to /usr/local by default
 # install(TARGETS read_obj DESTINATION bin)
@@ -87,11 +89,11 @@ target_link_libraries(build_poly gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_L
 # set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 # set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
- set_target_properties( read_obj
-   PROPERTIES
-   ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
- )
+ # set_target_properties( read_obj
+ #   PROPERTIES
+ #   ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+ #   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+ #   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+ # )
 
  # also can use ${CMAKE_CURRENT_SOURCE_DIR} for current cmake location or ${CMAKE_SOURCE_DIR} for top leavel cmake
