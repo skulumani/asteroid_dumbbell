@@ -56,6 +56,42 @@ TEST(ReadOBJ, VectorOfVectors) {
     }
 }
 
+TEST(ReadOBJ, EigenArray) {
+    Eigen::Matrix3d V_true;
+    Eigen::Matrix3i F_true;
+
+    V_true << -0.5,   -0.5, -0.5,
+           -0.5, -0.5, 0.5,
+           -0.5, 0.5,  -0.5,
+           -0.5, 0.5,  0.5,
+           0.5,  -0.5, -0.5,
+           0.5,  -0.5, 0.5,
+           0.5,  0.5,  -0.5,
+           0.5,  0.5,  0.5;
+    F_true << 1, 7, 5,
+           1, 3, 7,
+           1, 4, 3,
+           1, 2, 4,
+           3, 8, 7,
+           3, 4, 8,
+           5, 7, 8,
+           5, 8, 6,
+           1, 5, 6,
+           1, 6, 2,
+           2, 6, 8,
+           2, 8, 4;
+
+    Eigen::MatrixXd V;
+    Eigen::MatrixXi F;
+
+    const std::string input_file = "./integration/cube.obj";
+    // read using the function
+    int read_flag = 0;
+    /* read_flag = obj::read(input_file, V, F); */
+    /* ASSERT_TRUE(V.isApprox(V_true)); */
+    /* ASSERT_TRUE(F.isApprox(F_true)); */
+}
+
 TEST(VectorToEigen, VectorToEigen) {
     // initialize the truth vector of vectors
     Eigen::Matrix3d V_true;

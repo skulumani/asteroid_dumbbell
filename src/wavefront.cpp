@@ -78,28 +78,14 @@ namespace obj {
         }
     }
     
-    template<typename VectorType, typename IndexType>
-    void read(std::istream& input, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F) {
-        // just call the stl vector version
-        std::vector<std::vector<double> > V_vector;
-        std::vector<std::vector<int> > F_vector;
-        int read_flag = obj::read(input, V_vector, F_vector);
-        
-        if (read_flag == 0) {
-            obj::vector_array_to_eigen(V_vector,  V);
-            obj::vector_array_to_eigen(F_vector, F);
-        } else {
-            V = Eigen::MatrixX3d::Zero();
-            F = Eigen::MatrixX3i::Zero();
-        }
-    }
 
-    template<typename VectorType, typename IndexType> 
-    void read(const std::string input_filename, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F) {
+    void read_to_eigen(const std::string input_filename, Eigen::MatrixXd &V, Eigen::MatrixXi &F) {
         // just call the stl vector version
         std::vector<std::vector<double> > V_vector;
         std::vector<std::vector<int> > F_vector;
         int read_flag = obj::read(input_filename, V_vector, F_vector);
+        V.resize(V_vector.size(), 3);
+        F.resize(F_vector.size(), 3);
 
         if (read_flag == 0) {
             obj::vector_array_to_eigen(V_vector,  V);
