@@ -62,7 +62,8 @@ namespace obj {
         @returns V vector of vector doubles for vertices
         @return F vector of vector ints for faces
     */
-    int read(std::istream& input, std::vector<std::vector<double> > &V, std::vector<std::vector<int> > &F);
+    int read(std::istream& input, std::vector<std::vector<double> > &V,
+            std::vector<std::vector<int> > &F);
     /**
         Read OBJ file to vector of vectors
 
@@ -70,10 +71,12 @@ namespace obj {
         @returns V vector of vector doubles for vertices
         @return F vector of vector ints for faces
     */
-    int read(const std::string input_filename, std::vector<std::vector<double> > &V, std::vector<std::vector<int> > &F);
+    int read(const std::string input_filename, std::vector<std::vector<double>
+            > &V, std::vector<std::vector<int> > &F);
     
-    template <typename VectorType, typename IndexType>
-        int read_to_eigen(const std::string input_filename, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F) {
+    template <typename VectorType, typename IndexType> int read_to_eigen(const
+            std::string input_filename, Eigen::PlainObjectBase<VectorType> &V,
+            Eigen::PlainObjectBase<IndexType> &F) {
             // just call the stl vector version
             std::vector<std::vector<double> > V_vector;
             std::vector<std::vector<int> > F_vector;

@@ -5,7 +5,6 @@
 #include <Eigen/Dense>
 
 #include <CGAL/Simple_cartesian.h>
-#include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <CGAL/Polyhedron_3.h>
 
 #include <iostream>
@@ -27,6 +26,7 @@ int main(int argc, char* argv[]) {
     std::vector<std::vector<double>> vector_V;
     std::vector<std::vector<int>> vector_F;
     int read_flag = 1;
+    Polyhedron P;
 
     const std::string input_file = input.get_command_option("-i");
     if (!input_file.empty()) {
@@ -37,16 +37,20 @@ int main(int argc, char* argv[]) {
         Eigen::MatrixXi F_eigen;
         read_flag = obj::read_to_eigen(input_file, V_eigen, F_eigen);
         if (read_flag == 0) {
-            std::cout << "Converting to Eigen arrays" << std::endl;
-			Polyhedron P;
 			Polyhedron_builder<HalfedgeDS> builder(V_eigen, F_eigen);
 			P.delegate(builder);
 			
 			CGAL_assertion(P.is_triangle(P.halfedges_begin()));
-            std::cout << V_eigen << std::endl;
+
+            std::cout << "Polyhedron is built in CGAL" << std::endl;
+            std::cout << "Valid : " << P.is_valid() << std::endl;
+            std::cout << "Vertices : " << P.size_of_vertices() << std::endl;
+            std::cout << "Faces : " << P.size_of_facets() << std::endl;
+            std::cout << "HalfEdges : " << P.size_of_halfedges() << std::endl;
         }
          
     }  // input file is closed when leaving the scope
-
+    
+    polyhedron_to_eigen(P);
     return 0;
 }

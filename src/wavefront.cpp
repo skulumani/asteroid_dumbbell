@@ -77,8 +77,6 @@ namespace obj {
             return 1;
         }
     }
-    
-    
 
     void print_vector(std::vector<double> &vector) {
         for (auto v = vector.begin(); v != vector.end(); ++v) {
