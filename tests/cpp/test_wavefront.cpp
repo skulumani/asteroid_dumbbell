@@ -1,4 +1,4 @@
-#include "read_obj.hpp"
+#include "wavefront.hpp"
 
 #include "gtest/gtest.h"
 

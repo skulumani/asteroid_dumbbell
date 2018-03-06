@@ -5,7 +5,7 @@
     @version 0.1 2/28/2018
 */
 
-#include "read_obj.hpp"
+#include "wavefront.hpp"
 
 #include <Eigen/Dense>
 
@@ -88,11 +88,11 @@ namespace obj {
         std::ifstream input_stream;
         input_stream.open(input_filename);
 
-        if (!input_stream.fail()) {
-            int read_flag = obj
-        } else {
-
-        }
+        /* if (!input_stream.fail()) { */
+        /*     int read_flag = obj */
+        /* } else { */
+            
+        /* } */
     }
 
     void print_vector(std::vector<double> &vector) {

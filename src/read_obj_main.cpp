@@ -1,6 +1,6 @@
 
 #include "input_parser.hpp"
-#include "read_obj.hpp"
+#include "wavefront.hpp"
 
 #include <Eigen/Dense>
 

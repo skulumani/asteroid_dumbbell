@@ -1,6 +1,6 @@
 #include "input_parser.hpp"
-#include "read_obj.hpp"
-#include "build_poly.hpp"
+#include "wavefront.hpp"
+#include "polyhedron.hpp"
 
 #include <Eigen/Dense>
 

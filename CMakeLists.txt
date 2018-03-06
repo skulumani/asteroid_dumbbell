@@ -65,7 +65,7 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # create a obj file reader executable
-set(read_obj_src src/read_obj_main.cpp src/read_obj.cpp src/input_parser.cpp)
+set(read_obj_src src/read_obj_main.cpp src/wavefront.cpp src/input_parser.cpp)
 add_executable(read_obj ${read_obj_src})
 target_link_libraries(read_obj gtest_main)
 set_target_properties( read_obj
@@ -77,7 +77,7 @@ RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 
 
 # BUILD POLYHEDRON EXECUTABLE
-set(build_poly_src src/build_poly_main.cpp src/read_obj.cpp src/input_parser.cpp)
+set(build_poly_src src/build_poly_main.cpp src/wavefront.cpp src/input_parser.cpp)
 add_executable(build_poly ${build_poly_src})
 add_to_cached_list(CGAL_EXECUTABLE_TARGETS build_poly)
 target_link_libraries(build_poly gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
@@ -103,7 +103,7 @@ set_target_properties(test_gtest
     RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
 
-add_executable(test_read_obj tests/cpp/test_read_obj.cpp src/read_obj.cpp )
+add_executable(test_read_obj tests/cpp/test_wavefront.cpp src/wavefront.cpp )
 target_link_libraries(test_read_obj gtest)
 add_test(NAME test_read_obj COMMAND test_read_obj
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
