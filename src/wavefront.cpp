@@ -78,8 +78,9 @@ namespace obj {
         }
     }
     
-
-    void read_to_eigen(const std::string input_filename, Eigen::MatrixXd &V, Eigen::MatrixXi &F) {
+    
+    template<typename VectorType, typename IndexType> 
+    int read(const std::string input_filename, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F) {
         // just call the stl vector version
         std::vector<std::vector<double> > V_vector;
         std::vector<std::vector<int> > F_vector;
@@ -90,9 +91,11 @@ namespace obj {
         if (read_flag == 0) {
             obj::vector_array_to_eigen(V_vector,  V);
             obj::vector_array_to_eigen(F_vector, F);
+            return 0;
         } else {
             V = Eigen::MatrixX3d::Zero();
             F = Eigen::MatrixX3i::Zero();
+            return 1;
         }
 
     }
