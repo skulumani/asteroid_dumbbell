@@ -37,7 +37,6 @@ TEST(ReadOBJ, VectorOfVectors) {
     int read_flag = 0;
     read_flag = obj::read(input_file, V_actual, F_actual);
     
-
     // compare the two
     ASSERT_EQ(V_actual.size(), V_true.size());
     ASSERT_EQ(F_actual.size(), F_true.size());
@@ -56,9 +55,36 @@ TEST(ReadOBJ, VectorOfVectors) {
     }
 }
 
+
+TEST(VectorToEigen, VectorToEigen) {
+    // initialize the truth vector of vectors
+    std::vector<std::vector<double> > V_vector {  { -0.5, -0.5, -0.5},
+                                             { -0.5, -0.5, 0.5},
+                                             { -0.5, 0.5, -0.5},
+                                             { -0.5, 0.5, 0.5},
+                                             { 0.5, -0.5, -0.5},
+                                             { 0.5, -0.5, 0.5},
+                                             { 0.5, 0.5, -0.5},
+                                             { 0.5, 0.5, 0.5}};
+    Eigen::Matrix3d V_array;
+     V_array << -0.5,   -0.5, -0.5,
+           -0.5, -0.5, 0.5,
+           -0.5, 0.5,  -0.5,
+           -0.5, 0.5,  0.5,
+           0.5,  -0.5, -0.5,
+           0.5,  -0.5, 0.5,
+           0.5,  0.5,  -0.5,
+           0.5,  0.5,  0.5;
+
+    Eigen::MatrixXd V_actual;
+    obj::vector_array_to_eigen(V_vector, V_actual);
+    
+    ASSERT_TRUE(V_actual.isApprox(V_array));
+}
+
 TEST(ReadOBJ, EigenArray) {
-    Eigen::Matrix3d V_true;
-    Eigen::Matrix3i F_true;
+    Eigen::Matrix<double, 8, 3> V_true;
+    Eigen::Matrix<int, 12, 3> F_true;
 
     V_true << -0.5,   -0.5, -0.5,
            -0.5, -0.5, 0.5,
@@ -68,6 +94,7 @@ TEST(ReadOBJ, EigenArray) {
            0.5,  -0.5, 0.5,
            0.5,  0.5,  -0.5,
            0.5,  0.5,  0.5;
+
     F_true << 1, 7, 5,
            1, 3, 7,
            1, 4, 3,
@@ -80,47 +107,17 @@ TEST(ReadOBJ, EigenArray) {
            1, 6, 2,
            2, 6, 8,
            2, 8, 4;
-
-    Eigen::MatrixXd V;
-    Eigen::MatrixXi F;
+    F_true.array() -= 1;
 
     const std::string input_file = "./integration/cube.obj";
     // read using the function
     int read_flag = 0;
-    /* read_flag = obj::read(input_file, V, F); */
-    /* ASSERT_TRUE(V.isApprox(V_true)); */
-    /* ASSERT_TRUE(F.isApprox(F_true)); */
-}
-
-TEST(VectorToEigen, VectorToEigen) {
-    // initialize the truth vector of vectors
-    Eigen::Matrix3d V_true;
-    V_true << -0.5,   -0.5, -0.5,
-                                -0.5, -0.5, 0.5,
-                                -0.5, 0.5,  -0.5,
-                                -0.5, 0.5,  0.5,
-                                0.5,  -0.5, -0.5,
-                                0.5,  -0.5, 0.5,
-                                0.5,  0.5,  -0.5,
-                                0.5,  0.5,  0.5;
-
-    std::vector<std::vector<double> > V_vector {  { -0.5, -0.5, -0.5},
-                                             { -0.5, -0.5, 0.5},
-                                             { -0.5, 0.5, -0.5},
-                                             { -0.5, 0.5, 0.5},
-                                             { 0.5, -0.5, -0.5},
-                                             { 0.5, -0.5, 0.5},
-                                             { 0.5, 0.5, -0.5},
-                                             { 0.5, 0.5, 0.5}};
-
     Eigen::MatrixXd V;
-    
-    obj::vector_array_to_eigen(V_vector, V);
-
+    Eigen::MatrixXi F;
+    read_flag = obj::read_to_eigen(input_file, V, F);
     ASSERT_TRUE(V.isApprox(V_true));
-
+    ASSERT_TRUE(F.isApprox(F_true));
 }
-
 // Can include all the other tests here if desired
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);

@@ -16,6 +16,7 @@ typedef CGAL::Simple_cartesian<double>     Kernel;
 typedef CGAL::Polyhedron_3<Kernel>         Polyhedron;
 typedef Polyhedron::HalfedgeDS             HalfedgeDS;
 
+
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
@@ -31,19 +32,18 @@ int main(int argc, char* argv[]) {
     if (!input_file.empty()) {
         std::cout << "Reading " << input_file << std::endl;
         /* std::ifstream input_stream(input_file); */
-        read_flag = obj::read(input_file, vector_V, vector_F);
+        /* read_flag = obj::read(input_file, vector_V, vector_F); */
+        Eigen::MatrixXd V_eigen;
+        Eigen::MatrixXi F_eigen;
+        read_flag = obj::read_to_eigen(input_file, V_eigen, F_eigen);
         if (read_flag == 0) {
             std::cout << "Converting to Eigen arrays" << std::endl;
-            Eigen::MatrixXd V;
-            Eigen::MatrixXi F;
-            obj::vector_array_to_eigen(vector_V, V);
-            obj::vector_array_to_eigen(vector_F, F);
-			
 			Polyhedron P;
-			Polyhedron_builder<HalfedgeDS> builder(V, F);
+			Polyhedron_builder<HalfedgeDS> builder(V_eigen, F_eigen);
 			P.delegate(builder);
 			
 			CGAL_assertion(P.is_triangle(P.halfedges_begin()));
+            std::cout << V_eigen << std::endl;
         }
          
     }  // input file is closed when leaving the scope
