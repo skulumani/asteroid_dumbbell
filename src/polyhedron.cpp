@@ -3,11 +3,12 @@
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <CGAL/Polyhedron_3.h>
+#include <CGAL/Polyhedron_items_with_id_3.h>
 
 #include <iostream>
 
 typedef CGAL::Simple_cartesian<double>     Kernel;
-typedef CGAL::Polyhedron_3<Kernel>         Polyhedron;
+typedef CGAL::Polyhedron_3<Kernel, CGAL::Polyhedron_items_with_id_3>         Polyhedron;
 typedef Polyhedron::Facet_iterator          Facet_iterator;
 typedef Polyhedron::Vertex_iterator         Vertex_iterator;
 typedef Polyhedron::HalfedgeDS             HalfedgeDS;
