@@ -14,12 +14,28 @@ typedef Polyhedron::Vertex_iterator         Vertex_iterator;
 typedef Polyhedron::HalfedgeDS             HalfedgeDS;
 typedef Polyhedron::Halfedge_around_facet_circulator Halfedge_facet_circulator;
 
+// TODO Add the ID for each vertex to the faces
+// Extract the vertex indices and face array from a Polyhedron
 // convert a given eigen V and F to a polyhedron
 void polyhedron_to_eigen(Polyhedron &P) {
     // loop over all the faces first
     CGAL::set_ascii_mode(std::cout);
     std::cout << "OFF" << std::endl << P.size_of_vertices() << ' '
         << P.size_of_facets() << " 0" << std::endl;
+    
+    // create some eigen arrays to store all the vertices
+    std::size_t num_v = P.size_of_vertices();
+    std::size_t num_f = P.size_of_facets();
+    // loop and fill the eigen array
+    std::cout << "Looping over the vertices" << std::endl;
+    std::size_t ii = 0;
+    for (Vertex_iterator vert = P.vertices_begin(); vert != P.vertices_end(); ++vert) {
+        vert->id() = ii++; 
+    }
+    ii = 0; // reset the counter
+    for (Facet_iterator facet = P.facets_begin(); facet != P.facets_end(); ++facet) {
+        facet->id() = ii++;
+    }
 
     std::cout << "Printing all vertices" << std::endl;
     std::copy (P.points_begin(), P.points_end(), std::ostream_iterator<Kernel::Point_3>( std::cout, "\n"));
@@ -29,7 +45,7 @@ void polyhedron_to_eigen(Polyhedron &P) {
         Halfedge_facet_circulator v = f->facet_begin();
         std::cout << "Number of vertices around facet: " << CGAL::circulator_size(v) << std::endl;
         do {
-            std::cout << v->vertex()->point() << " ";
+            std::cout << "ID: " << v->vertex()->id() << " " << "Vertex: " << v->vertex()->point() << " ";
         } while( ++v != f->facet_begin());
 
         std::cout << std::endl;
@@ -38,7 +54,6 @@ void polyhedron_to_eigen(Polyhedron &P) {
     //
 }
 // given a Polyhedron convert to V, F
-// TODO Add the ID for each vertex to the faces
 template<typename HDS>
 void Polyhedron_builder<HDS>::operator() (HDS &hds) {
 
@@ -64,5 +79,7 @@ void Polyhedron_builder<HDS>::operator() (HDS &hds) {
     }
     B.end_surface();
 }
+
+
 // Explicit initialization of the template
 template void Polyhedron_builder<CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> > >::operator()(CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> >&);
