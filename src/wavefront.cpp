@@ -85,4 +85,24 @@ namespace obj {
         std::cout << std::endl;
     }
         
+template<typename VectorType, typename Derived> 
+int vector_array_to_eigen(std::vector<std::vector<VectorType> > &vector,
+        Eigen::PlainObjectBase<Derived> &matrix) {
+    // initialize a matrix to hold everything (assumes all are the same size
+    int rows = vector.size();
+    int cols = vector[0].size();
+    matrix.resize(rows, cols);
+    for (int ii = 0; ii < rows; ii++) {
+        Eigen::Matrix<typename Derived::Scalar, 1, 3> v(vector[ii].data());
+        matrix.row(ii) = v;
+    }
+    return 0;
+}
 } // namespace read_obj
+
+// Explicit initialization
+
+
+template int obj::vector_array_to_eigen<double, Eigen::Matrix<double, -1, -1, 0, -1, -1> >(std::vector<std::vector<double, std::allocator<double> >, std::allocator<std::vector<double, std::allocator<double> > > >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&);
+
+template int obj::vector_array_to_eigen<int, Eigen::Matrix<int, -1, -1, 0, -1, -1> >(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > >&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> >&);

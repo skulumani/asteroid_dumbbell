@@ -44,17 +44,7 @@ namespace obj {
       */
     template<typename VectorType, typename Derived> 
         int vector_array_to_eigen(std::vector<std::vector<VectorType> > &vector,
-                Eigen::PlainObjectBase<Derived> &matrix) {
-            // initialize a matrix to hold everything (assumes all are the same size
-            int rows = vector.size();
-            int cols = vector[0].size();
-            matrix.resize(rows, cols);
-            for (int ii = 0; ii < rows; ii++) {
-                Eigen::Matrix<typename Derived::Scalar, 1, 3> v(vector[ii].data());
-                matrix.row(ii) = v;
-            }
-            return 0;
-        }
+                Eigen::PlainObjectBase<Derived> &matrix);
     /**
         Read OBJ file to vector of vectors
 
@@ -97,4 +87,5 @@ namespace obj {
         }
 
 }
+
 #endif
