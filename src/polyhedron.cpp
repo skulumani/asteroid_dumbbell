@@ -39,7 +39,6 @@ void polyhedron_to_eigen(Polyhedron &P) {
 }
 // given a Polyhedron convert to V, F
 // TODO Add the ID for each vertex to the faces
-
 template<typename HDS>
 void Polyhedron_builder<HDS>::operator() (HDS &hds) {
 
