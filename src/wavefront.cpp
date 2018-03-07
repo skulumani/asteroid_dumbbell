@@ -98,11 +98,34 @@ int vector_array_to_eigen(std::vector<std::vector<VectorType> > &vector,
     }
     return 0;
 }
+
+template <typename VectorType, typename IndexType> 
+int read_to_eigen(const std::string input_filename, Eigen::PlainObjectBase<VectorType> &V,
+        Eigen::PlainObjectBase<IndexType> &F) {
+    // just call the stl vector version
+    std::vector<std::vector<double> > V_vector;
+    std::vector<std::vector<int> > F_vector;
+    int read_flag = obj::read(input_filename, V_vector, F_vector);
+    V.resize(V_vector.size(), 3);
+    F.resize(F_vector.size(), 3);
+
+    if (read_flag == 0) {
+        vector_array_to_eigen(V_vector,  V);
+        vector_array_to_eigen(F_vector, F);
+        return 0;
+    } else {
+        V = Eigen::MatrixXd::Zero(V_vector.size(), 3);
+        F = Eigen::MatrixXi::Zero(F_vector.size(), 3);
+        return 1;
+    }
+
+}
+
 } // namespace read_obj
 
 // Explicit initialization
-
-
 template int obj::vector_array_to_eigen<double, Eigen::Matrix<double, -1, -1, 0, -1, -1> >(std::vector<std::vector<double, std::allocator<double> >, std::allocator<std::vector<double, std::allocator<double> > > >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&);
 
 template int obj::vector_array_to_eigen<int, Eigen::Matrix<int, -1, -1, 0, -1, -1> >(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > >&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> >&);
+
+template int obj::read_to_eigen<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> >&);
