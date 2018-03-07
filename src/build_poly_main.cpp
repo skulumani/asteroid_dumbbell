@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
         if (read_flag == 0) {
 			Polyhedron_builder<HalfedgeDS> builder(V_eigen, F_eigen);
 			P.delegate(builder);
-			
+            			
 			CGAL_assertion(P.is_triangle(P.halfedges_begin()));
 
             std::cout << "Polyhedron is built in CGAL" << std::endl;
@@ -51,7 +51,9 @@ int main(int argc, char* argv[]) {
         }
          
     }  // input file is closed when leaving the scope
-    
-    polyhedron_to_eigen(P);
+    Eigen::MatrixXd V_poly;
+    Eigen::MatrixXi F_poly;
+
+    polyhedron_to_eigen(P, V_poly, F_poly);
     return 0;
 }

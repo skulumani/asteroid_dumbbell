@@ -50,20 +50,20 @@ void loop_over_facets(Polyhedron &P) {
     }
     
 }
-void polyhedron_to_eigen(Polyhedron &P) {
+
+template<typename VectorType, typename IndexType>
+void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F) {
     // loop over all the faces first
     
     // create some eigen arrays to store all the vertices
     const unsigned int num_v = P.size_of_vertices();
     const unsigned int num_f = P.size_of_facets();
     
-    std::cout << num_v << std::endl;
-    Eigen::Matrix<double, 8, 3> V;
-    Eigen::Matrix<int,12, 3> F;
+    V.resize(num_v, 3);
+    F.resize(num_f, 3);
 
     // loop and fill the eigen array
     build_polyhedron_index(P);
-    /* print_vertices(P); */
 
     std::size_t row, col;
     row = 0;
@@ -120,3 +120,8 @@ void Polyhedron_builder<HDS>::operator() (HDS &hds) {
 
 // Explicit initialization of the template
 template void Polyhedron_builder<CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> > >::operator()(CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> >&);
+
+template void polyhedron_to_eigen<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1> >
+(CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> >&, 
+ Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&, 
+ Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> >&);
