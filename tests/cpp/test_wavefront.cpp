@@ -6,8 +6,12 @@
 
 #include <vector>
 
-TEST(ReadOBJ, VectorOfVectors) {
-    // initialize the truth vector of vectors
+class ReadOBJ: public ::testing::Test {
+    protected:
+
+        ReadOBJ() {
+            input_stream.open(input_file);
+        }
     std::vector<std::vector<double> > V_true {  { -0.5, -0.5, -0.5},
                                              { -0.5, -0.5, 0.5},
                                              { -0.5, 0.5, -0.5},
@@ -29,18 +33,38 @@ TEST(ReadOBJ, VectorOfVectors) {
                                           { 1, 6, 2},
                                           { 2, 6, 8},
                                           { 2, 8, 4}};
+    const std::string input_file = "./integration/cube.obj";
+    std::ifstream input_stream;
+};
+
+// Using the input string 
+TEST_F(ReadOBJ, VectorOfVectorsString) {
+    std::vector<std::vector<double> > V_actual;
+    std::vector<std::vector<int> > F_actual;
+    // read using the function
+    int read_flag = obj::read(input_file, V_actual, F_actual);
+    
+    ASSERT_EQ(read_flag, 0);
+}
+
+TEST_F(ReadOBJ, VectorOfVectorsSizeString) {
 
     std::vector<std::vector<double> > V_actual;
     std::vector<std::vector<int> > F_actual;
-    const std::string input_file = "./integration/cube.obj";
     // read using the function
-    int read_flag = 0;
-    read_flag = obj::read(input_file, V_actual, F_actual);
+    int read_flag = obj::read(input_file, V_actual, F_actual);
     
     // compare the two
     ASSERT_EQ(V_actual.size(), V_true.size());
     ASSERT_EQ(F_actual.size(), F_true.size());
 
+}
+
+TEST_F(ReadOBJ, VectorOfVectorsElementsString) {
+    std::vector<std::vector<double> > V_actual;
+    std::vector<std::vector<int> > F_actual;
+    // read using the function
+    int read_flag = obj::read(input_file, V_actual, F_actual);
     // loop over the vector and compare V
     for (int ii = 0; ii < V_actual.size(); ++ii) {
         for (int jj = 0; jj < V_actual[0].size(); ++jj) {
@@ -53,8 +77,51 @@ TEST(ReadOBJ, VectorOfVectors) {
             EXPECT_EQ(F_actual[ii][jj], F_true[ii][jj]-1);
         }
     }
+
 }
 
+// Using the input stream
+TEST_F(ReadOBJ, VectorOfVectorsStream) {
+    std::vector<std::vector<double> > V_actual;
+    std::vector<std::vector<int> > F_actual;
+    // read using the function
+    int read_flag = obj::read(input_stream, V_actual, F_actual);
+    
+    ASSERT_EQ(read_flag, 0);
+}
+
+TEST_F(ReadOBJ, VectorOfVectorsSizeStream) {
+
+    std::vector<std::vector<double> > V_actual;
+    std::vector<std::vector<int> > F_actual;
+    // read using the function
+    int read_flag = obj::read(input_stream, V_actual, F_actual);
+    
+    // compare the two
+    ASSERT_EQ(V_actual.size(), V_true.size());
+    ASSERT_EQ(F_actual.size(), F_true.size());
+
+}
+
+TEST_F(ReadOBJ, VectorOfVectorsElementsStream) {
+    std::vector<std::vector<double> > V_actual;
+    std::vector<std::vector<int> > F_actual;
+    // read using the function
+    int read_flag = obj::read(input_stream, V_actual, F_actual);
+    // loop over the vector and compare V
+    for (int ii = 0; ii < V_actual.size(); ++ii) {
+        for (int jj = 0; jj < V_actual[0].size(); ++jj) {
+            EXPECT_EQ(V_actual[ii][jj], V_true[ii][jj]);
+        }
+    }
+
+    for (int ii = 0; ii < F_actual.size(); ++ii) {
+        for (int jj = 0; jj < F_actual[0].size(); ++jj) {
+            EXPECT_EQ(F_actual[ii][jj], F_true[ii][jj]-1);
+        }
+    }
+
+}
 
 TEST(VectorToEigen, VectorToEigen) {
     // initialize the truth vector of vectors
@@ -82,7 +149,7 @@ TEST(VectorToEigen, VectorToEigen) {
     ASSERT_TRUE(V_actual.isApprox(V_array));
 }
 
-TEST(ReadOBJ, EigenArray) {
+TEST(Testing, EigenArray) {
     Eigen::Matrix<double, 8, 3> V_true;
     Eigen::Matrix<int, 12, 3> F_true;
 
@@ -119,7 +186,3 @@ TEST(ReadOBJ, EigenArray) {
     ASSERT_TRUE(F.isApprox(F_true));
 }
 
-/* int main(int argc, char **argv) { */
-/*     ::testing::InitGoogleTest(&argc, argv); */
-/*     return RUN_ALL_TESTS(); */
-/* } */
