@@ -67,7 +67,3 @@ TEST_F(TestPolyhedron, PolyhedronFaces) {
 TEST(Polyhedron, PolyhedronToEigen) {
 // TODO test that we can go from a P to V, F
 }
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

@@ -93,32 +93,19 @@ RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 ################################################################################
 ENABLE_TESTING()
 
-add_executable(test_gtest tests/cpp/test_gtest.cpp)
-target_link_libraries(test_gtest gtest)
-add_test(NAME test_gtest COMMAND test_gtest)
-set_target_properties(test_gtest
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
-)
+set(test_all_src 
+    tests/cpp/test_all.cpp
+    tests/cpp/test_polyhedron.cpp
+    tests/cpp/test_gtest.cpp
+    tests/cpp/test_wavefront.cpp
+    src/wavefront.cpp
+    src/polyhedron.cpp)
 
-add_executable(test_read_obj tests/cpp/test_wavefront.cpp src/wavefront.cpp src/polyhedron.cpp)
-target_link_libraries(test_read_obj gtest)
-add_test(NAME test_read_obj COMMAND test_read_obj
+add_executable(test_all ${test_all_src})
+target_link_libraries(test_all gtest)
+add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-set_target_properties(test_read_obj 
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
-)
-
-add_executable(test_polyhedron tests/cpp/test_polyhedron.cpp src/wavefront.cpp src/polyhedron.cpp)
-target_link_libraries(test_polyhedron gtest)
-add_test(NAME test_polyhedron COMMAND test_polyhedron
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-set_target_properties(test_polyhedron 
+set_target_properties(test_all 
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
