@@ -77,22 +77,18 @@ void polyhedron_to_eigen(Polyhedron &P) {
         V(row, 2)  = vert->point().z();
         row += 1;
     }
-    std::cout << V << std::endl;
-    row = 0;
-    for ( Facet_iterator f = P.facets_begin(); f != P.facets_end(); ++f) {
-        Halfedge_facet_circulator v = f->facet_begin();
-        std::cout << "Number of vertices around facet: " << CGAL::circulator_size(v) << std::endl;
-        do {
-            std::cout << "ID: " << v->vertex()->id() << " " << "Vertex: " << v->vertex()->point() << " ";
-
-        } while( ++v != f->facet_begin());
-
-        std::cout << std::endl;
-    }
 
     // Build F
-    //
-    //
+    row = 0;
+    for ( Facet_iterator face = P.facets_begin(); face != P.facets_end(); ++face) {
+        Halfedge_facet_circulator vert = face->facet_begin();
+        col = 0;
+        do {
+            F(row, col) = vert->vertex()->id();
+            col += 1;
+        } while( ++vert != face->facet_begin());
+        row += 1;
+    }
 }
 // given a Polyhedron convert to V, F
 template<typename HDS>
