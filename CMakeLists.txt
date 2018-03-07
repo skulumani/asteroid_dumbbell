@@ -114,6 +114,16 @@ set_target_properties(test_read_obj
     RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
 
+add_executable(test_polyhedron tests/cpp/test_polyhedron.cpp src/wavefront.cpp src/polyhedron.cpp)
+target_link_libraries(test_polyhedron gtest)
+add_test(NAME test_polyhedron COMMAND test_polyhedron
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+set_target_properties(test_polyhedron 
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
+)
 
 # this will install to /usr/local by default
 # install(TARGETS read_obj DESTINATION bin)
