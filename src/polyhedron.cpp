@@ -37,27 +37,60 @@ void print_vertices(Polyhedron& P) {
     std::copy (P.points_begin(), P.points_end(), std::ostream_iterator<Kernel::Point_3>( std::cout, "\n"));
 }
 
-void polyhedron_to_eigen(Polyhedron &P) {
-    // loop over all the faces first
-    
-    // create some eigen arrays to store all the vertices
-    std::size_t num_v = P.size_of_vertices();
-    std::size_t num_f = P.size_of_facets();
-    // loop and fill the eigen array
-    build_polyhedron_index(P);
-    
-    print_vertices(P);
-
-    std::cout << std::endl << "Printing all facet indices" << std::endl;
+void loop_over_facets(Polyhedron &P) {
     for ( Facet_iterator f = P.facets_begin(); f != P.facets_end(); ++f) {
         Halfedge_facet_circulator v = f->facet_begin();
         std::cout << "Number of vertices around facet: " << CGAL::circulator_size(v) << std::endl;
         do {
             std::cout << "ID: " << v->vertex()->id() << " " << "Vertex: " << v->vertex()->point() << " ";
+
         } while( ++v != f->facet_begin());
 
         std::cout << std::endl;
     }
+    
+}
+void polyhedron_to_eigen(Polyhedron &P) {
+    // loop over all the faces first
+    
+    // create some eigen arrays to store all the vertices
+    const unsigned int num_v = P.size_of_vertices();
+    const unsigned int num_f = P.size_of_facets();
+    
+    std::cout << num_v << std::endl;
+    Eigen::Matrix<double, 8, 3> V;
+    Eigen::Matrix<int,12, 3> F;
+
+    // loop and fill the eigen array
+    build_polyhedron_index(P);
+    /* print_vertices(P); */
+
+    std::size_t row, col;
+    row = 0;
+    col = 0;
+    /* loop_over_facets(P); */
+
+    // Build V
+    for (Vertex_iterator vert = P.vertices_begin(); vert != P.vertices_end(); ++vert) {
+        V(row, 0)  = vert->point().x();
+        V(row, 1)  = vert->point().y();
+        V(row, 2)  = vert->point().z();
+        row += 1;
+    }
+    std::cout << V << std::endl;
+    row = 0;
+    for ( Facet_iterator f = P.facets_begin(); f != P.facets_end(); ++f) {
+        Halfedge_facet_circulator v = f->facet_begin();
+        std::cout << "Number of vertices around facet: " << CGAL::circulator_size(v) << std::endl;
+        do {
+            std::cout << "ID: " << v->vertex()->id() << " " << "Vertex: " << v->vertex()->point() << " ";
+
+        } while( ++v != f->facet_begin());
+
+        std::cout << std::endl;
+    }
+
+    // Build F
     //
     //
 }
