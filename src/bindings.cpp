@@ -28,6 +28,7 @@ void build_polyhedron(Eigen::Ref<Eigen::MatrixXd> V, Eigen::Ref<Eigen::MatrixXi>
     // Update the matrix V, F
 
     std::cout << "Created P" << std::endl;
+    print_polyhedron_stats(P);
 }
 
 PYBIND11_MODULE(cgal_cpp, m) {
