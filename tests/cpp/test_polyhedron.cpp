@@ -64,6 +64,11 @@ TEST_F(TestPolyhedron, PolyhedronFaces) {
     EXPECT_EQ(P.size_of_facets(), 12);
 }
 
-TEST(Polyhedron, PolyhedronToEigen) {
-// TODO test that we can go from a P to V, F
+TEST_F(TestPolyhedron, PolyhedronToEigen) {
+    Eigen::MatrixXd V_poly;
+    Eigen::MatrixXi F_poly;
+    
+    polyhedron_to_eigen(P, V_poly, F_poly);
+    EXPECT_EQ(V_poly.size(), V.size());
+    EXPECT_EQ(F_poly.size(), F.size());
 }
