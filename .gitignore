@@ -178,6 +178,7 @@ ENV/
 *.obj
 
 # Precompiled Headers
+*.gch-*
 *.gch
 *.pch
 
