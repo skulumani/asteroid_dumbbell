@@ -14,9 +14,7 @@ typedef Polyhedron::Vertex_iterator         Vertex_iterator;
 typedef Polyhedron::HalfedgeDS             HalfedgeDS;
 typedef Polyhedron::Halfedge_around_facet_circulator Halfedge_facet_circulator;
 
-// TODO Add the ID for each vertex to the faces
-// Extract the vertex indices and face array from a Polyhedron
-// convert a given eigen V and F to a polyhedron
+// //TODO Add documentationn V and F to a polyhedron
 void build_polyhedron_index(Polyhedron &P) {
     std::size_t ii = 0;
     for (Vertex_iterator vert = P.vertices_begin(); vert != P.vertices_end(); ++vert) {
@@ -29,6 +27,7 @@ void build_polyhedron_index(Polyhedron &P) {
 
 }
 
+//TODO Add documentation
 void print_vertices(Polyhedron& P) {
     CGAL::set_ascii_mode(std::cout);
     std::cout << "#V: " << P.size_of_vertices() << " #F: "
@@ -37,6 +36,7 @@ void print_vertices(Polyhedron& P) {
     std::copy (P.points_begin(), P.points_end(), std::ostream_iterator<Kernel::Point_3>( std::cout, "\n"));
 }
 
+//TODO Add documentation
 void loop_over_facets(Polyhedron &P) {
     for ( Facet_iterator f = P.facets_begin(); f != P.facets_end(); ++f) {
         Halfedge_facet_circulator v = f->facet_begin();
@@ -51,6 +51,7 @@ void loop_over_facets(Polyhedron &P) {
     
 }
 
+// TODO Add documentation
 template<typename VectorType, typename IndexType>
 void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F) {
     // loop over all the faces first
@@ -90,7 +91,15 @@ void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, E
         row += 1;
     }
 }
-// given a Polyhedron convert to V, F
+
+template<typename VectorType, typename IndexType>
+void eigen_to_polyhedron(Eigen::Ref<Eigen::PlainObjectBase<VectorType> > V, Eigen::Ref<Eigen::PlainObjectBase<IndexType> > F, Polyhedron &P) {
+    Polyhedron_builder<HalfedgeDS> builder(V, F);
+    P.delegate(builder);
+    CGAL_assertion(P.is_triangle(P.halfedges_begin()));
+}
+
+// TODO Add documentation}
 template<typename HDS>
 void Polyhedron_builder<HDS>::operator() (HDS &hds) {
 
@@ -125,3 +134,5 @@ template void polyhedron_to_eigen<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eige
 (CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> >&, 
  Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&, 
  Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> >&);
+
+/* template void eigen_to_polyhedron<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1> >(const Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >, const Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> >, CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> >&); */

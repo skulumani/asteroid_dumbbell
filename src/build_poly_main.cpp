@@ -38,10 +38,7 @@ int main(int argc, char* argv[]) {
         Eigen::MatrixXi F_eigen;
         read_flag = obj::read_to_eigen(input_file, V_eigen, F_eigen);
         if (read_flag == 0) {
-			Polyhedron_builder<HalfedgeDS> builder(V_eigen, F_eigen);
-			P.delegate(builder);
-            			
-			CGAL_assertion(P.is_triangle(P.halfedges_begin()));
+            eigen_to_polyhedron(V_eigen, F_eigen, P);	
 
             std::cout << "Polyhedron is built in CGAL" << std::endl;
             std::cout << "Valid : " << P.is_valid() << std::endl;
