@@ -7,6 +7,11 @@
 
 #include <Eigen/Dense>
 
+// Create a class that contains all the data of interest
+// Should hold P
+// Should hold Eigen V and F of P
+// Have access methods to take V/F and update P
+// Return V, F method
 // TODO This declaration should remain private. Move ot only CPP file
 // declaration for the polyhedron builder
 template<typename HDS> 
