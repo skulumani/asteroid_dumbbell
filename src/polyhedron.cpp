@@ -92,6 +92,11 @@ void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, E
     }
 }
 
+void eigen_to_polyhedron(Eigen::MatrixXd &V, Eigen::MatrixXi &F, Polyhedron &P) {
+    Polyhedron_builder<HalfedgeDS> builder(V, F);
+    P.delegate(builder);
+    CGAL_assertion(P.is_triangle(P.halfedges_begin()));
+}
 
 // TODO Add documentation}
 template<typename HDS>
@@ -129,4 +134,3 @@ template void polyhedron_to_eigen<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eige
  Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&, 
  Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> >&);
 
-/* template void eigen_to_polyhedron<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1> >(const Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >, const Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> >, CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> >&); */
