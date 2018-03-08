@@ -19,6 +19,7 @@ void scale_by_2(Eigen::Ref<Eigen::VectorXd> v) {
 }
 
 // This makes a copy of the array
+// TODO Use a py::array here to directly access the data instead of going to an Eigen array immediately
 void build_polyhedron(Eigen::MatrixXd V, Eigen::MatrixXi F) {
     typedef CGAL::Simple_cartesian<double>     Kernel;
     typedef CGAL::Polyhedron_3<Kernel, CGAL::Polyhedron_items_with_id_3>         Polyhedron;

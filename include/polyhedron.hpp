@@ -12,6 +12,16 @@
 // Should hold Eigen V and F of P
 // Have access methods to take V/F and update P
 // Return V, F method
+// Polyhedron potential method which takes a state and returns the gravity, accel etc
+class Poly {
+    public:
+
+    private:
+        CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3 > P;
+        Eigen::MatrixXd V;
+        Eigen::MatrixXi F;
+};
+
 // TODO This declaration should remain private. Move ot only CPP file
 // declaration for the polyhedron builder
 template<typename HDS> 
