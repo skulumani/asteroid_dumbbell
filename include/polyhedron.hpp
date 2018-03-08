@@ -15,6 +15,15 @@
 // Polyhedron potential method which takes a state and returns the gravity, accel etc
 class Poly {
     public:
+        Poly();
+        Poly(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input);
+        Poly(const std::string input_file);
+
+        Eigen::MatrixXd get_vertices();
+        Eigen::MatrixXi get_faces();
+        void build_poly();
+
+        CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3> get_polyhedron();
 
     private:
         CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3 > P;

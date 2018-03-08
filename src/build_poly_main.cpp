@@ -41,11 +41,17 @@ int main(int argc, char* argv[]) {
             eigen_to_polyhedron(V_eigen, F_eigen, P);
             print_polyhedron_stats(P);
         }
+        std::cout << "Now initializing a Poly object to store all of our data in a single structure/object" << std::endl;
+
+        Poly P_eigen(V_eigen,F_eigen);
+        Poly P_string(input_file);
          
     }  // input file is closed when leaving the scope
     Eigen::MatrixXd V_poly;
     Eigen::MatrixXi F_poly;
+    std::cout << "Can extract V, F from a polyhedron now" << std::endl;
 
     polyhedron_to_eigen(P, V_poly, F_poly);
+    
     return 0;
 }
