@@ -7,8 +7,6 @@
 
 #include <Eigen/Dense>
 
-#include <tuple>
-
 // Create a class that contains all the data of interest
 // Should hold P
 // Should hold Eigen V and F of P
