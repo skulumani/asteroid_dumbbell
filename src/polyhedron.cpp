@@ -7,6 +7,7 @@
 #include <CGAL/Polyhedron_items_with_id_3.h>
 
 #include <iostream>
+#include <tuple>
 
 typedef CGAL::Simple_cartesian<double>     Kernel;
 typedef CGAL::Polyhedron_3<Kernel, CGAL::Polyhedron_items_with_id_3>         Polyhedron;
@@ -137,8 +138,8 @@ void print_polyhedron_stats(Polyhedron &P) {
 /****************************POLYHEDRON CLASS**********************************/
 // Member methods for Poly class
 Poly::Poly(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input) {
-    this->V = V_input;
-    this->F = F_input;
+    this->vertices = V_input;
+    this->faces = F_input;
 
     // build the polyhedron and store to object
     this->build_poly();
@@ -146,15 +147,23 @@ Poly::Poly(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input) {
 
 Poly::Poly(const std::string input_file) {
     // read the file an store in member arrays
-    obj::read_to_eigen(input_file, this->V, this->F);
+    obj::read_to_eigen(input_file, this->vertices, this->faces);
 
     // build the polyhedron
     this->build_poly();
 }
 
 void Poly::build_poly() {
-    eigen_to_polyhedron(V, F, P);
+    eigen_to_polyhedron(vertices, faces, P);
 }
+
+PolyArrays Poly::get_arrays() {
+    PolyArrays out;
+    out.vertices = this->vertices;
+    out.faces = this->faces;
+    return out; 
+}
+
 // Explicit initialization of the template
 template void Polyhedron_builder<CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> > >::operator()(CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> >&);
 

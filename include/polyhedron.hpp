@@ -7,29 +7,37 @@
 
 #include <Eigen/Dense>
 
+#include <tuple>
+
 // Create a class that contains all the data of interest
 // Should hold P
 // Should hold Eigen V and F of P
 // Have access methods to take V/F and update P
 // Return V, F method
 // Polyhedron potential method which takes a state and returns the gravity, accel etc
+struct PolyArrays {
+    Eigen::MatrixXd vertices;
+    Eigen::MatrixXi faces;
+};
+
 class Poly {
     public:
         Poly();
         Poly(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input);
         Poly(const std::string input_file);
 
-        Eigen::MatrixXd get_vertices();
-        Eigen::MatrixXi get_faces();
-        void build_poly();
+        PolyArrays get_arrays();
 
         CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3> get_polyhedron();
 
     private:
         CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3 > P;
-        Eigen::MatrixXd V;
-        Eigen::MatrixXi F;
+        Eigen::MatrixXd vertices;
+        Eigen::MatrixXi faces;
+
+        void build_poly();
 };
+
 
 // TODO This declaration should remain private. Move ot only CPP file
 // declaration for the polyhedron builder

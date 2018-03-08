@@ -46,6 +46,11 @@ int main(int argc, char* argv[]) {
         Poly P_eigen(V_eigen,F_eigen);
         Poly P_string(input_file);
          
+        // Now we'll extract the vertices adn faces
+        auto eigen_arrays = P_eigen.get_arrays();
+        
+        std::cout << "Vertices from P: \n" << eigen_arrays.vertices << std::endl;
+
     }  // input file is closed when leaving the scope
     Eigen::MatrixXd V_poly;
     Eigen::MatrixXi F_poly;
