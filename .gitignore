@@ -2,7 +2,7 @@
 # Created by https://www.gitignore.io/api/python,matlab,linux,macos
 
 data/
-
+bin/
 ### Linux ###
 *~
 
