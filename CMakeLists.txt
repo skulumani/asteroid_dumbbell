@@ -6,6 +6,10 @@ project( wavefront )
 ################################################################################
 set(CMAKE_CXX_STANDARD 11)
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+
 # CGAL Setup
 find_package(CGAL QUIET COMPONENTS)
 if (NOT CGAL_FOUND)
@@ -22,7 +26,13 @@ if ( NOT Boost_FOUND )
   return()  
 endif()
 
+find_package(PythonInterp REQUIRED)
+find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
+link_libraries(${PYTHON_LIBRARIES})
+link_directories(${PYTHON_LIBRARY_DIRS})
 
+add_subdirectory(extern/pybind11)
 ################################################################################
 # GOOGLE TESTING
 ################################################################################
@@ -58,7 +68,6 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
-
 ################################################################################
 # BUILD TARGETS
 ################################################################################
@@ -68,12 +77,6 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 set(read_obj_src src/read_obj_main.cpp src/wavefront.cpp src/input_parser.cpp)
 add_executable(read_obj ${read_obj_src})
 target_link_libraries(read_obj gtest_main)
-set_target_properties( read_obj
-PROPERTIES
-ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
-)
 
 
 # BUILD POLYHEDRON EXECUTABLE
@@ -81,12 +84,13 @@ set(build_poly_src src/build_poly_main.cpp src/wavefront.cpp src/input_parser.cp
 add_executable(build_poly ${build_poly_src})
 add_to_cached_list(CGAL_EXECUTABLE_TARGETS build_poly)
 target_link_libraries(build_poly gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
-set_target_properties(build_poly
-PROPERTIES
-ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
-)
+
+################################################################################
+# PYTHON BINDING
+################################################################################
+pybind11_add_module(cgal_cpp MODULE 
+    src/bindings.cpp
+    src/polyhedron.cpp)
 
 ################################################################################
 # Testing example
@@ -105,12 +109,6 @@ add_executable(test_all ${test_all_src})
 target_link_libraries(test_all gtest)
 add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-set_target_properties(test_all 
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
-)
 
 # this will install to /usr/local by default
 # install(TARGETS read_obj DESTINATION bin)
@@ -118,6 +116,5 @@ set_target_properties(test_all
 # set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 # set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 # set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
 
  # also can use ${CMAKE_CURRENT_SOURCE_DIR} for current cmake location or ${CMAKE_SOURCE_DIR} for top leavel cmake

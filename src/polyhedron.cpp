@@ -14,7 +14,7 @@ typedef Polyhedron::Vertex_iterator         Vertex_iterator;
 typedef Polyhedron::HalfedgeDS             HalfedgeDS;
 typedef Polyhedron::Halfedge_around_facet_circulator Halfedge_facet_circulator;
 
-// //TODO Add documentationn V and F to a polyhedron
+//TODO Add documentationn V and F to a polyhedron
 void build_polyhedron_index(Polyhedron &P) {
     std::size_t ii = 0;
     for (Vertex_iterator vert = P.vertices_begin(); vert != P.vertices_end(); ++vert) {
