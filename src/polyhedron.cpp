@@ -125,6 +125,13 @@ void Polyhedron_builder<HDS>::operator() (HDS &hds) {
     B.end_surface();
 }
 
+void print_polyhedron_stats(Polyhedron &P) {
+    std::cout << "Polyhedron is built in CGAL" << std::endl;
+    std::cout << "Valid : " << P.is_valid() << std::endl;
+    std::cout << "Vertices : " << P.size_of_vertices() << std::endl;
+    std::cout << "Faces : " << P.size_of_facets() << std::endl;
+    std::cout << "HalfEdges : " << P.size_of_halfedges() << std::endl;
+}
 
 // Explicit initialization of the template
 template void Polyhedron_builder<CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> > >::operator()(CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> >&);

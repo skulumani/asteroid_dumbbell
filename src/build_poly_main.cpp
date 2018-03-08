@@ -38,16 +38,8 @@ int main(int argc, char* argv[]) {
         Eigen::MatrixXi F_eigen;
         read_flag = obj::read_to_eigen(input_file, V_eigen, F_eigen);
         if (read_flag == 0) {
-            /* Polyhedron_builder<HalfedgeDS> builder(V_eigen, F_eigen); */
-            /* P.delegate(builder); */
-            /* CGAL_assertion(P.is_triangle(P.halfedges_begin())); */
             eigen_to_polyhedron(V_eigen, F_eigen, P);
-
-            std::cout << "Polyhedron is built in CGAL" << std::endl;
-            std::cout << "Valid : " << P.is_valid() << std::endl;
-            std::cout << "Vertices : " << P.size_of_vertices() << std::endl;
-            std::cout << "Faces : " << P.size_of_facets() << std::endl;
-            std::cout << "HalfEdges : " << P.size_of_halfedges() << std::endl;
+            print_polyhedron_stats(P);
         }
          
     }  // input file is closed when leaving the scope
