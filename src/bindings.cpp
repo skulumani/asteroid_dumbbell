@@ -18,16 +18,20 @@ void scale_by_2(Eigen::Ref<Eigen::VectorXd> v) {
     v *= 2;
 }
 
-void build_polyhedron(Eigen::Ref<Eigen::MatrixXd> V, Eigen::Ref<Eigen::MatrixXi> F) {
+// This makes a copy of the array
+void build_polyhedron(Eigen::MatrixXd V, Eigen::MatrixXi F) {
     typedef CGAL::Simple_cartesian<double>     Kernel;
     typedef CGAL::Polyhedron_3<Kernel, CGAL::Polyhedron_items_with_id_3>         Polyhedron;
 
     // create a polyhedron
+    std::cout << "Creating initial P" << std::endl;
     Polyhedron P;
+
+    std::cout << "Building P using V, F" << std::endl;
+    eigen_to_polyhedron(V, F, P);
     // compute and print some stats about it
     // Update the matrix V, F
 
-    std::cout << "Created P" << std::endl;
     print_polyhedron_stats(P);
 }
 
