@@ -14,9 +14,6 @@
 #include <sstream>
 #include <vector>
 
-// definition for the function
-bool loadOBJ (const std::string path, std::vector<double> &vertices, std::vector<double> &faces);
-
 
 /**
     Read a single row of a OBJ file to a vector 
@@ -26,7 +23,6 @@ bool loadOBJ (const std::string path, std::vector<double> &vertices, std::vector
 */
 template<typename VectorType>
 void read_row(std::istringstream &ss, std::vector<VectorType> &vector);
-
 
 namespace obj {
     /**
