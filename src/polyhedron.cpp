@@ -92,12 +92,6 @@ void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, E
     }
 }
 
-template<typename VectorType, typename IndexType>
-void eigen_to_polyhedron(Eigen::Ref<Eigen::PlainObjectBase<VectorType> > V, Eigen::Ref<Eigen::PlainObjectBase<IndexType> > F, Polyhedron &P) {
-    Polyhedron_builder<HalfedgeDS> builder(V, F);
-    P.delegate(builder);
-    CGAL_assertion(P.is_triangle(P.halfedges_begin()));
-}
 
 // TODO Add documentation}
 template<typename HDS>

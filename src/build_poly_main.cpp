@@ -16,6 +16,11 @@ typedef CGAL::Simple_cartesian<double>     Kernel;
 typedef CGAL::Polyhedron_3<Kernel, CGAL::Polyhedron_items_with_id_3>         Polyhedron;
 typedef Polyhedron::HalfedgeDS             HalfedgeDS;
 
+void eigen_to_polyhedron(Eigen::MatrixXd &V, Eigen::MatrixXi &F, Polyhedron &P) {
+    Polyhedron_builder<HalfedgeDS> builder(V, F);
+    P.delegate(builder);
+    CGAL_assertion(P.is_triangle(P.halfedges_begin()));
+}
 
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
@@ -38,7 +43,10 @@ int main(int argc, char* argv[]) {
         Eigen::MatrixXi F_eigen;
         read_flag = obj::read_to_eigen(input_file, V_eigen, F_eigen);
         if (read_flag == 0) {
-            eigen_to_polyhedron(V_eigen, F_eigen, P);	
+            /* Polyhedron_builder<HalfedgeDS> builder(V_eigen, F_eigen); */
+            /* P.delegate(builder); */
+            /* CGAL_assertion(P.is_triangle(P.halfedges_begin())); */
+            eigen_to_polyhedron(V_eigen, F_eigen, P);
 
             std::cout << "Polyhedron is built in CGAL" << std::endl;
             std::cout << "Valid : " << P.is_valid() << std::endl;
