@@ -25,6 +25,12 @@ template<typename VectorType>
 void read_row(std::istringstream &ss, std::vector<VectorType> &vector);
 
 namespace obj {
+
+    struct OBJ {
+        Eigen::MatrixXd vertices;
+        Eigen::MatrixXi faces;
+    };
+
     /**
         Print a row from a stl vectors
 

@@ -1,6 +1,8 @@
 #ifndef BUILD_POLY_H
 #define BUILD_POLY_H
 
+#include "wavefront.hpp"
+
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Polyhedron_items_with_id_3.h>
@@ -13,23 +15,19 @@
 // Have access methods to take V/F and update P
 // Return V, F method
 // Polyhedron potential method which takes a state and returns the gravity, accel etc
-struct PolyArrays {
-    Eigen::MatrixXd vertices;
-    Eigen::MatrixXi faces;
-};
 
-class Poly {
+class Mesh {
     public:
-        Poly();
-        Poly(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input);
-        Poly(const std::string input_file);
+        Mesh();
+        Mesh(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input);
+        Mesh(const std::string input_file);
 
-        PolyArrays get_arrays();
+        obj::OBJ get_arrays();
 
         CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3> get_polyhedron();
 
     private:
-        CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3 > P;
+        CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3 > Poly;
         Eigen::MatrixXd vertices;
         Eigen::MatrixXi faces;
 

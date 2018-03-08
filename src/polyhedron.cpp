@@ -136,7 +136,7 @@ void print_polyhedron_stats(Polyhedron &P) {
 
 /****************************POLYHEDRON CLASS**********************************/
 // Member methods for Poly class
-Poly::Poly(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input) {
+Mesh::Mesh(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input) {
     this->vertices = V_input;
     this->faces = F_input;
 
@@ -144,7 +144,7 @@ Poly::Poly(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input) {
     this->build_poly();
 }
 
-Poly::Poly(const std::string input_file) {
+ Mesh::Mesh(const std::string input_file) {
     // read the file an store in member arrays
     obj::read_to_eigen(input_file, this->vertices, this->faces);
 
@@ -152,12 +152,13 @@ Poly::Poly(const std::string input_file) {
     this->build_poly();
 }
 
-void Poly::build_poly() {
-    eigen_to_polyhedron(vertices, faces, P);
+// TODO just make this a member function
+void Mesh::build_poly() {
+    eigen_to_polyhedron(this->vertices, this->faces, this->Poly);
 }
 
-PolyArrays Poly::get_arrays() {
-    PolyArrays out;
+obj::OBJ Mesh::get_arrays() {
+    obj::OBJ out;
     out.vertices = this->vertices;
     out.faces = this->faces;
     return out; 

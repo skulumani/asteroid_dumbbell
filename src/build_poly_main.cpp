@@ -43,8 +43,8 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "Now initializing a Poly object to store all of our data in a single structure/object" << std::endl;
 
-        Poly P_eigen(V_eigen,F_eigen);
-        Poly P_string(input_file);
+        Mesh P_eigen(V_eigen,F_eigen);
+        Mesh P_string(input_file);
          
         // Now we'll extract the vertices adn faces
         auto eigen_arrays = P_eigen.get_arrays();
