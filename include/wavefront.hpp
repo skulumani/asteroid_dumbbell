@@ -7,7 +7,6 @@
 #ifndef READ_OBJ_H
 #define READ_OBJ_H
 
-
 #include <Eigen/Dense>
 
 #include <fstream>
@@ -26,51 +25,21 @@ void read_row(std::istringstream &ss, std::vector<VectorType> &vector);
 
 namespace obj {
 
-    struct OBJ {
-        Eigen::MatrixXd vertices;
-        Eigen::MatrixXi faces;
+    class OBJ {
+        public:
+            // constructors
+            OBJ() = default;
+            OBJ(const std::string &input_filename);
+            OBJ(const std::istream &input_stream);
+            // TODO Check on copying/memory of eigen matrix initialization
+            OBJ(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) : vertices(V), faces(F) {}
+            
+            void update(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
+
+        private:
+            Eigen::MatrixXd vertices;
+            Eigen::MatrixXi faces;
     };
 
-    /**
-        Print a row from a stl vectors
-
-        @param vector Vector input to print 
-    */
-    void print_vector(std::vector<double> &vector);
-
-    /**
-      Convert vector of vectors to Eigen arrays
-
-      @param vector Vector of vectors 
-      @returns matrix Output eigen matrix 
-      */
-    template<typename VectorType, typename Derived> 
-        int vector_array_to_eigen(std::vector<std::vector<VectorType> > &vector,
-                Eigen::PlainObjectBase<Derived> &matrix);
-    /**
-        Read OBJ file to vector of vectors
-
-        @param input string stream for input OBJ file
-        @returns V vector of vector doubles for vertices
-        @return F vector of vector ints for faces
-    */
-    int read(std::istream& input, std::vector<std::vector<double> > &V,
-            std::vector<std::vector<int> > &F);
-    /**
-        Read OBJ file to vector of vectors
-
-        @param input_filename string of the file. This just opens the file
-        @returns V vector of vector doubles for vertices
-        @return F vector of vector ints for faces
-    */
-    int read(const std::string input_filename, std::vector<std::vector<double> > &V, 
-            std::vector<std::vector<int> > &F);
-    
-    template <typename VectorType, typename IndexType> 
-    int read_to_eigen(const std::string input_filename,
-                        Eigen::PlainObjectBase<VectorType> &V,
-                        Eigen::PlainObjectBase<IndexType> &F);
-
 }
-
 #endif
