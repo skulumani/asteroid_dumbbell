@@ -38,7 +38,7 @@ namespace obj {
             void update(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
             void update(const std::string &input_filename);
             void update(const std::istream &input_stream);
-
+            // TODO Think about making these protected or private
             Eigen::MatrixXd vertices;
             Eigen::MatrixXi faces;
     };
