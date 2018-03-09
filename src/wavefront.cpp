@@ -150,7 +150,7 @@ namespace obj {
         read_to_eigen(input_filename, this->vertices, this->faces);
     }
 
-    OBJ::OBJ(const std::istream &input_stream) {
+    OBJ::OBJ(std::istream &input_stream) {
         std::vector<std::vector<double>> V;
         std::vector<std::vector<int>> F;
         read(input_stream, V, F);

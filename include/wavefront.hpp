@@ -30,13 +30,15 @@ namespace obj {
             // constructors
             OBJ() = default;
             OBJ(const std::string &input_filename);
-            OBJ(const std::istream &input_stream);
+            OBJ(std::istream &input_stream);
             // TODO Check on copying/memory of eigen matrix initialization
             OBJ(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) : vertices(V), faces(F) {}
             
+            // member methods
             void update(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
+            void update(const std::string &input_filename);
+            void update(const std::istream &input_stream);
 
-        private:
             Eigen::MatrixXd vertices;
             Eigen::MatrixXi faces;
     };

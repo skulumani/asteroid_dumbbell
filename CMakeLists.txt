@@ -97,19 +97,23 @@ pybind11_add_module(cgal_cpp MODULE
 ################################################################################
 ENABLE_TESTING()
 
-set(test_all_src 
-    tests/cpp/test_all.cpp
-    tests/cpp/test_polyhedron.cpp
-    tests/cpp/test_gtest.cpp
-    tests/cpp/test_wavefront.cpp
-    src/wavefront.cpp
-    src/polyhedron.cpp)
+# set(test_all_src 
+#     tests/cpp/test_all.cpp
+#     tests/cpp/test_polyhedron.cpp
+#     tests/cpp/test_gtest.cpp
+#     tests/cpp/test_wavefront.cpp
+#     src/wavefront.cpp
+#     src/polyhedron.cpp)
 
-add_executable(test_all ${test_all_src})
-target_link_libraries(test_all gtest)
-add_test(NAME test_all COMMAND test_all
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+# add_executable(test_all ${test_all_src})
+# target_link_libraries(test_all gtest)
+# add_test(NAME test_all COMMAND test_all
+#         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
+add_executable(test_wavefront src/wavefront.cpp tests/cpp/test_wavefront.cpp tests/cpp/test_all.cpp)
+target_link_libraries(test_wavefront gtest)
+add_test(NAME test_wavefront COMMAND test_wavefront
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 # this will install to /usr/local by default
 # install(TARGETS read_obj DESTINATION bin)
 
