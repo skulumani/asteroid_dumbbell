@@ -144,25 +144,17 @@ Mesh::Mesh(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input) {
     this->build_poly();
 }
 
- Mesh::Mesh(const std::string input_file) {
-    // read the file an store in member arrays
-    obj::read_to_eigen(input_file, this->vertices, this->faces);
-
-    // build the polyhedron
-    this->build_poly();
-}
-
 // TODO just make this a member function
 void Mesh::build_poly() {
     eigen_to_polyhedron(this->vertices, this->faces, this->Poly);
 }
 
-obj::OBJ Mesh::get_arrays() {
-    obj::OBJ out;
-    out.vertices = this->vertices;
-    out.faces = this->faces;
-    return out; 
-}
+/* obj::OBJ Mesh::get_arrays() { */
+/*     obj::OBJ out; */
+/*     out.vertices = this->vertices; */
+/*     out.faces = this->faces; */
+/*     return out; */ 
+/* } */
 
 // Explicit initialization of the template
 template void Polyhedron_builder<CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> > >::operator()(CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> >&);
