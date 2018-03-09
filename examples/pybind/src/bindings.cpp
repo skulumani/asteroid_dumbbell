@@ -17,9 +17,16 @@ PYBIND11_MODULE(python_example, m) {
 
     // expose a class to Python
     py::class_<Pet>(m, "Pet") 
-        .def(py::init<const std::string &>())
+        .def(py::init<const std::string &, int>())
         .def("setName", &Pet::setName, py::arg("name"))
         .def("getName", &Pet::getName)
+        .def("set", (void (Pet::*)(int)) &Pet::set, "set the pet's age")
+        .def("set", (void (Pet::*)(const std::string &)) &Pet::set, "Set pet's name")
         .def("__repr__", [](const Pet &a) { return "<python_example.Pet named '" + a.name + "'>"; })
         .def_readwrite("name", &Pet::name);
+
+    // expose a derived class to python
+    py::class_<Dog, Pet>(m, "Dog")
+        .def(py::init<const std::string &>())
+        .def("bark", &Dog::bark);
 }
