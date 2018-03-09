@@ -24,16 +24,10 @@ int main(int argc, char* argv[]) {
     const std::string input_file = input.get_command_option("-i");
     if (!input_file.empty()) {
         std::cout << "Reading " << input_file << std::endl;
-        /* std::ifstream input_stream(input_file); */
-        read_flag = obj::read(input_file, vector_V, vector_F);
-        if (read_flag == 0) {
-            std::cout << "Converting to Eigen arrays" << std::endl;
-            Eigen::MatrixXd V;
-            Eigen::MatrixXi F;
-            obj::vector_array_to_eigen(vector_V, V);
-            obj::vector_array_to_eigen(vector_F, F);
-        }
-         
+        obj::OBJ wavefront_obj(input_file);
+        
+        std::cout << "Vertices: \n" << wavefront_obj.vertices << std::endl;
+        std::cout << "Faces: \n" << wavefront_obj.faces << std::endl;
     }  // input file is closed when leaving the scope
 
     return 0;
