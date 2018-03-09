@@ -85,6 +85,9 @@ add_executable(build_poly ${build_poly_src})
 add_to_cached_list(CGAL_EXECUTABLE_TARGETS build_poly)
 target_link_libraries(build_poly gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
 
+# mesh loading
+set(mesh_src src/mesh.cpp src/mesh_main.cpp src/loader.cpp)
+add_executable(mesh ${mesh_src})
 ################################################################################
 # PYTHON BINDING
 ################################################################################
