@@ -16,21 +16,20 @@
 // Return V, F method
 // Polyhedron potential method which takes a state and returns the gravity, accel etc
 
-class Mesh : obj::OBJ {
+class Mesh : public obj::OBJ {
     public:
         //constructor
         Mesh() = default;
         Mesh(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input);
-        Mesh(const std::string &input_file) : obj::OBJ(input_file) {
+        Mesh(const std::string &input_file) : OBJ(input_file) {
             this->build_poly();
         }
-        Mesh(std::istream &input_stream) : obj::OBJ(input_stream) {
+        Mesh(std::istream &input_stream) : OBJ(input_stream) {
             this->build_poly();
         }
 
         CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3> get_polyhedron();
 
-    private:
         CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3 > Poly;
         void build_poly();
 };
