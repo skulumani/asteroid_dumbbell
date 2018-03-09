@@ -1,4 +1,3 @@
-#include "wavefront.hpp"
 #include "polyhedron.hpp"
 
 #include <Eigen/Dense>
@@ -72,21 +71,22 @@ class TestPolyhedron: public ::testing::Test {
 TEST_F(TestPolyhedron, PolyhedronIsValid) {
     Mesh mesh(input_file);
     ASSERT_EQ(mesh.Poly.is_valid(), 1);
+    ASSERT_EQ(1, 1);
 }
 
-/* // Test number of vertices and faces */
-/* TEST_F(TestPolyhedron, PolyhedronVertices) { */
-/*     Mesh mesh(input_file); */
-/*     EXPECT_EQ(mesh.Poly.size_of_vertices(), 8); */
-/* } */
+// Test number of vertices and faces
+TEST_F(TestPolyhedron, PolyhedronVertices) {
+    Mesh mesh(input_file);
+    EXPECT_EQ(mesh.Poly.size_of_vertices(), 8);
+}
 
-/* TEST_F(TestPolyhedron, PolyhedronFaces) { */
-/*     Mesh mesh(input_file); */
-/*     EXPECT_EQ(mesh.Poly.size_of_facets(), 12); */
-/* } */
+TEST_F(TestPolyhedron, PolyhedronFaces) {
+    Mesh mesh(input_file);
+    EXPECT_EQ(mesh.Poly.size_of_facets(), 12);
+}
 
-/* TEST_F(TestPolyhedron, PolyhedronToEigen) { */
-/*     Mesh mesh(input_file); */
-/*     EXPECT_EQ(mesh.vertices.size(), Ve_true.size()); */
-/*     EXPECT_EQ(mesh.faces.size(), Fe_true.size()); */
-/* } */
+TEST_F(TestPolyhedron, PolyhedronToEigen) {
+    Mesh mesh(input_file);
+    EXPECT_EQ(mesh.vertices.size(), Ve_true.size());
+    EXPECT_EQ(mesh.faces.size(), Fe_true.size());
+}

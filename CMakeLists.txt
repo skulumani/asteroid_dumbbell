@@ -115,7 +115,7 @@ target_link_libraries(test_wavefront gtest)
 add_test(NAME test_wavefront COMMAND test_wavefront
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
-add_executable(test_polyhedron src/polyhedron.cpp tests/cpp/test_polyhedron.cpp tests/cpp/test_all.cpp)
+add_executable(test_polyhedron src/wavefront.cpp src/polyhedron.cpp tests/cpp/test_polyhedron.cpp tests/cpp/test_all.cpp)
 target_link_libraries(test_polyhedron gtest)
 add_test(NAME test_polyhedron COMMAND test_polyhedron
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
