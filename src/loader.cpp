@@ -27,7 +27,7 @@ template<typename VectorType, typename Derived>
 int vector_array_to_eigen(std::vector<std::vector<VectorType> > &vector,
         Eigen::PlainObjectBase<Derived> &matrix);
 
-std::shared_ptr<MeshData> load(const std::string &input_filename) {
+std::shared_ptr<MeshData> Loader::load(const std::string &input_filename) {
     Eigen::MatrixXd vertices;
     Eigen::MatrixXi faces;
      
