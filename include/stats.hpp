@@ -1,3 +1,9 @@
+/**
+    A bunch of useful functions for operating on the MeshData class
+
+    @author Shankar Kulumani
+    @version Date
+*/
 #ifndef STATS_H
 #define STATS_H
 

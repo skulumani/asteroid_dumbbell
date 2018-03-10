@@ -1,3 +1,9 @@
+/**
+    Load the data into the MeshData class
+
+    @author Shankar Kulumani
+    @version Date
+*/
 #ifndef LOADER_H
 #define LOADER_H
 
