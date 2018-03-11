@@ -95,6 +95,9 @@ pybind11_add_module(cgal_cpp MODULE
     src/bindings.cpp
     src/polyhedron.cpp)
 
+pybind11_add_module(polyhedron_potential MODULE
+    src/potential.cpp)
+
 ################################################################################
 # Testing example
 ################################################################################
