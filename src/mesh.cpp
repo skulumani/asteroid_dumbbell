@@ -65,6 +65,10 @@ void Polyhedron_builder<HDS>::operator() (HDS &hds) {
     B.end_surface();
 }
 
+void SurfaceMesh_builder::SurfaceMesh_builder(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input) {
+
+}
+
 //TODO Add documentationn V and F to a polyhedron
 void build_polyhedron_index(Polyhedron &P) {
     std::size_t ii = 0;

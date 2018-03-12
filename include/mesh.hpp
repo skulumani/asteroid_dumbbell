@@ -7,6 +7,7 @@
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Polyhedron_items_with_id_3.h>
+#include <CGAL/Surface_mesh.h>
 
 // This data holds the polyhedorn and mesh
 class MeshData {
@@ -41,5 +42,17 @@ class Polyhedron_builder : public CGAL::Modifier_base<HDS> {
         Polyhedron_builder(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input) : V(V_input), F(F_input) {}
     
         void operator() (HDS &hds);		
+};
+
+class SurfaceMesh_builder {
+
+    public:
+
+        SurfaceMesh_builder(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input);
+
+        Eigen::MatrixXd V;
+        Eigen::MatrixXi F;
+
+        CGAL::Surface_mesh<CGAL::Simple_cartesian<double>::Point_3> mesh;    
 };
 #endif
