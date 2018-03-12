@@ -7,6 +7,7 @@
 
 #include <memory>
 
+
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
@@ -31,5 +32,25 @@ int main(int argc, char* argv[]) {
     
     std::cout << "#Vertices : " << mesh->surface_mesh.number_of_vertices() << std::endl;
     std::cout << "#Faces: " << mesh->surface_mesh.number_of_faces() << std::endl;
+    
+    // add vertex to to surface mesh
+    /* typedef CGAL::Surface_mesh<CGAL::Simple_cartesian<double>::Point_3> Mesh; */
+    /* typedef Mesh::Vertex_index vertex_descriptor; */
+    /* typedef Mesh::Face_index face_descriptor; */
+
+    /* const unsigned int num_v = mesh->surface_mesh.number_of_vertices(); */
+    /* const unsigned int num_f = mesh->surface_mesh.number_of_faces(); */
+
+    /* // vertex iterators over the mesh */
+    /* Mesh::Vertex_range::iterator vb, ve; */
+    /* Mesh::Vertex_range r = mesh->surface_mesh.vertices(); */
+
+    /* vb = r.begin(); */
+    /* ve = r.end(); */
+    
+    /* // iterate over vertices and print to stdout */
+    /* for (vertex_descriptor vd : mesh->surface_mesh.vertices()) { */
+    /*     std::cout << vd << std::endl; */ 
+    /* } */
     return 0;
 }
