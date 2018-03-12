@@ -1,15 +1,12 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include "cgal_types.hpp"
+
 #include <Eigen/Dense>
 
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/Polyhedron_incremental_builder_3.h>
-#include <CGAL/Polyhedron_3.h>
-#include <CGAL/Polyhedron_items_with_id_3.h>
-#include <CGAL/Surface_mesh.h>
-
 #include <vector>
+
 // This data holds the polyhedorn and mesh
 class MeshData {
     public:
@@ -25,13 +22,13 @@ class MeshData {
         Eigen::MatrixXd vertices;
         Eigen::MatrixXi faces;
 
-        CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3 > polyhedron;
+        Polyhedron polyhedron;
        
         // Surface mesh shit
-        CGAL::Surface_mesh<CGAL::Simple_cartesian<double>::Point_3> surface_mesh;
+        Mesh surface_mesh;
         
-        std::vector<CGAL::Surface_mesh<CGAL::Simple_cartesian<double>::Point_3>::Vertex_index> vertex_descriptor;
-        std::vector<std::vector<CGAL::Surface_mesh<CGAL::Simple_cartesian<double>::Point_3>::Vertex_index> > face_descriptor;
+        std::vector<Vertex_index> vertex_descriptor;
+        std::vector<std::vector<Vertex_index> > face_descriptor;
 
     private:
         // build the polyhedron

@@ -1,19 +1,5 @@
 #include "mesh.hpp"
 
-#include <Eigen/Dense>
-
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/Surface_mesh.h>
-
-#include <vector>
-
-typedef CGAL::Simple_cartesian<double>     Kernel;
-typedef CGAL::Polyhedron_3<Kernel, CGAL::Polyhedron_items_with_id_3>         Polyhedron;
-typedef Polyhedron::Facet_iterator          Facet_iterator;
-typedef Polyhedron::Vertex_iterator         Vertex_iterator;
-typedef Polyhedron::HalfedgeDS             HalfedgeDS;
-typedef Polyhedron::Halfedge_around_facet_circulator Halfedge_facet_circulator;
-
 // forward declare functions
 void eigen_to_polyhedron(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F, Polyhedron &P);
 
@@ -21,7 +7,6 @@ void build_polyhedron_index(Polyhedron &P);
 
 template<typename VectorType, typename IndexType>
 void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F);
-
 
 // Member methods
 MeshData::MeshData(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
@@ -171,10 +156,6 @@ void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, E
 template<typename VectorType, typename IndexType>
 void surface_mesh_to_eigen(MeshData mesh) {
     // TODO add inputs for eigen v and f
-    typedef CGAL::Simple_cartesian<double>     Kernel;
-    typedef CGAL::Surface_mesh<Kernel::Point_3> Mesh;
-    typedef Mesh::Vertex_index vertex_descriptor;
-    typedef Mesh::Face_index face_descriptor;
 
     const unsigned int num_v = mesh.surface_mesh.number_of_vertices();
     const unsigned int num_f = mesh.surface_mesh.number_of_faces();
@@ -190,7 +171,7 @@ void surface_mesh_to_eigen(MeshData mesh) {
     ve = r.end();
     
     // iterate over vertices and print to stdout
-    for (vertex_descriptor vd : mesh.vertices()) {
+    for (Vertex_index vd : mesh.vertices()) {
         std::cout << vd << std::endl; 
     }
 }
