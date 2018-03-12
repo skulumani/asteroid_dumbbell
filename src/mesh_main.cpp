@@ -30,6 +30,8 @@ int main(int argc, char* argv[]) {
     
     // lets try and build a surface mesh now
     SurfaceMesh_builder smesh(mesh->vertices, mesh->faces);
-
+    
+    std::cout << "#Vertices : " << smesh.mesh.number_of_vertices() << std::endl;
+    std::cout << "#Faces: " << smesh.mesh.number_of_faces() << std::endl;
     return 0;
 }
