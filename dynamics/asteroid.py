@@ -78,7 +78,7 @@ class Asteroid(object):
             elif name == 'cube':
                 verts, faces = wavefront.read_obj('./integration/cube.obj')
                 # translate so center of object is at origin
-                verts = verts - np.array([0.5, 0.5, 0.5])
+                # verts = verts - np.array([0.5, 0.5, 0.5])
             else:
                 self.logger.warning('Unknown asteroid name : {}'.format(name))
 
