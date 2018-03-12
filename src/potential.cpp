@@ -5,7 +5,6 @@
 
 #include <iostream>
 
-
 // Start of polyhedron potential function code 
 void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::MatrixXi F, 
         Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> F_face, Eigen::Matrix<double, Eigen::Dynamic, 1> w_face) {
@@ -13,24 +12,20 @@ void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::Matr
     std::cout << r_v << std::endl;
 }
 
-void laplacian_factor(Eigen::Matrix<double, Eigen::Dynamic, 3> r_v,
-                     Eigen::Matrix<int, Eigen::Dynamic, 1> Fa,
-                     Eigen::Matrix<int, Eigen::Dynamic, 1> Fb,
-                     Eigen::Matrix<int, Eigen::Dynamic, 1> Fc) {
+int laplacian_factor(const Eigen::Array<double, Eigen::Dynamic, 3> r_v,
+                     const Eigen::Array<int, Eigen::Dynamic, 1> Fa,
+                     const Eigen::Array<int, Eigen::Dynamic, 1> Fb,
+                     const Eigen::Array<int, Eigen::Dynamic, 1> Fc,
+                     Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > w_face) {
     // form the ri, rj, rk arrays
-    Eigen::Matrix<double, Eigen::Dynamic, 3> ri, rj, rk, rjrk_cross;
-    Eigen::Matrix<double, Eigen::Dynamic, 1> ri_norm, rj_norm, rk_norm;
+    Eigen::Array<double, Eigen::Dynamic, 3> ri, rj, rk, rjrk_cross;
 
     ri.resize(Fa.rows(), 3);
     rj.resize(Fb.rows(), 3);
     rk.resize(Fc.rows(), 3);
     rjrk_cross.resize(Fa.rows(), 3);
     
-    ri_norm.resize(Fa.rows(), 1);
-    rj_norm.resize(Fb.rows(), 1);
-    rk_norm.resize(Fc.rows(), 1);
-
-    Eigen::Matrix<double, 1, 3> ra, rb, rc;
+    Eigen::Array<double, 1, 3> ra, rb, rc;
 
     for (int ii = 0; ii < Fa.rows(); ++ii) {
         ra = r_v.row(Fa(ii));
@@ -41,21 +36,31 @@ void laplacian_factor(Eigen::Matrix<double, Eigen::Dynamic, 3> r_v,
         rj.row(ii) = rb;
         rk.row(ii) = rc;
 
-        rjrk_cross.row(ii) = rj.row(ii).cross(rk.row(ii));
+        rjrk_cross.row(ii) = rj.row(ii).matrix().cross(rk.row(ii).matrix());
 
     }
 
-   
-    ri_norm = ri.array().pow(2).rowwise().sum().sqrt();
-    rj_norm = rj.array().pow(2).rowwise().sum().sqrt();
-    rk_norm = rk.array().pow(2).rowwise().sum().sqrt();
+    Eigen::Array<double, Eigen::Dynamic, 1> ri_norm, rj_norm, rk_norm;
+    ri_norm = ri.pow(2).rowwise().sum().sqrt();
+    rj_norm = rj.pow(2).rowwise().sum().sqrt();
+    rk_norm = rk.pow(2).rowwise().sum().sqrt();
+
     // dot product terms
+    Eigen::Array<double, Eigen::Dynamic, 1> rjrk_dot, rkri_dot, rirj_dot;
+    rjrk_dot = (rj * rk).rowwise().sum();
+    rkri_dot = (rk * ri).rowwise().sum();
+    rirj_dot = (ri * rj).rowwise().sum();
 
     // numerator and denonminator of atan2
-    Eigen::Matrix<double, Eigen::Dynamic, 1> num, den;
-    num = (ri.array() * rjrk_cross.array()).rowwise().sum();
+    Eigen::Array<double, Eigen::Dynamic, 1> num, den;
+    num = (ri * rjrk_cross).rowwise().sum();
+    den = ri_norm * rj_norm * rk_norm + ri_norm * rjrk_dot + rj_norm * rkri_dot + rk_norm * rirj_dot;
     
-    std::cout << num << std::endl;
+    // return by reference
+    w_face = 2.0 * num.binaryExpr(den, [] (double a, double b) { return std::atan2(a,b);} );
+
+    return 0;
+    
 }
 
 PYBIND11_MODULE(polyhedron_potential, m) {
