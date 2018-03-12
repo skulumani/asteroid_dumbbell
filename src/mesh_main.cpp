@@ -27,6 +27,9 @@ int main(int argc, char* argv[]) {
     /* std::cout << "Faces: \n" << mesh->faces << std::endl; */
 
     print_polyhedron_vertices(mesh);
+    
+    // lets try and build a surface mesh now
+    SurfaceMesh_builder smesh(mesh->vertices, mesh->faces);
 
     return 0;
 }

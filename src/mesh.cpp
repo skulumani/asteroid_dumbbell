@@ -68,7 +68,7 @@ void Polyhedron_builder<HDS>::operator() (HDS &hds) {
     B.end_surface();
 }
 
-void SurfaceMesh_builder::SurfaceMesh_builder(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input) {
+SurfaceMesh_builder::SurfaceMesh_builder(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input) {
     
     typedef CGAL::Surface_mesh<Kernel::Point_3> Mesh;
     typedef Mesh::Vertex_index vertex_descriptor;
