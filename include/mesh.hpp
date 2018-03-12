@@ -25,11 +25,13 @@ class MeshData {
         Eigen::MatrixXi faces;
 
         CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3 > polyhedron;
-
+        
         // TODO Add a surface mesh data type in addition to the polyhedron
+        CGAL::Surface_mesh<CGAL::Simple_cartesian<double>::Point_3> surface_mesh;
     private:
         // build the polyhedron
         void build_polyhedron();
+        void build_surface_mesh();
 };
 
 // declaration for the polyhedron builder
@@ -44,15 +46,4 @@ class Polyhedron_builder : public CGAL::Modifier_base<HDS> {
         void operator() (HDS &hds);		
 };
 
-class SurfaceMesh_builder {
-
-    public:
-
-        SurfaceMesh_builder(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input);
-
-        Eigen::MatrixXd V;
-        Eigen::MatrixXi F;
-
-        CGAL::Surface_mesh<CGAL::Simple_cartesian<double>::Point_3> mesh;    
-};
 #endif

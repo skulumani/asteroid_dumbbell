@@ -20,7 +20,6 @@ int main(int argc, char* argv[]) {
     if (!input_file.empty()) {
         mesh = Loader::load(input_file);
 
-
     }
 
     /* std::cout << "Vertices: \n" << mesh->vertices << std::endl; */
@@ -29,9 +28,8 @@ int main(int argc, char* argv[]) {
     print_polyhedron_vertices(mesh);
     
     // lets try and build a surface mesh now
-    SurfaceMesh_builder smesh(mesh->vertices, mesh->faces);
     
-    std::cout << "#Vertices : " << smesh.mesh.number_of_vertices() << std::endl;
-    std::cout << "#Faces: " << smesh.mesh.number_of_faces() << std::endl;
+    std::cout << "#Vertices : " << mesh->surface_mesh.number_of_vertices() << std::endl;
+    std::cout << "#Faces: " << mesh->surface_mesh.number_of_faces() << std::endl;
     return 0;
 }
