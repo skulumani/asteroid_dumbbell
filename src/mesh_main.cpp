@@ -30,10 +30,8 @@ int main(int argc, char* argv[]) {
     
     // lets try and build a surface mesh now
     
-    std::cout << "#Vertices : " << mesh->surface_mesh.number_of_vertices() << std::endl;
-    std::cout << "#Faces: " << mesh->surface_mesh.number_of_faces() << std::endl;
+    surface_mesh_stats(mesh);
+    print_surface_mesh_vertices(mesh);
     
-    std::cout << "#V0: " << mesh->surface_mesh.point(mesh->vertex_descriptor[0]) << std::endl;
-
     return 0;
 }
