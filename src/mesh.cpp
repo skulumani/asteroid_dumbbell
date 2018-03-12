@@ -51,27 +51,30 @@ void MeshData::build_surface_mesh() {
 
     // build the mesh
     // build vector of vertex descriptors
-    std::vector<vertex_descriptor> vd_vector;
 
     for (int ii = 0; ii < V.rows(); ++ii) {
         p = Kernel::Point_3(V(ii, 0), V(ii, 1), V(ii, 2));
         v = this->surface_mesh.add_vertex(p);
 
-        vd_vector.push_back(v);
+        this->vertex_descriptor.push_back(v);
     }
-    /* int ii = 0; */
-    /* std::cout << "V0: " << this->surface_mesh.vertices[static_cast<vertex_descriptor>(ii)] << std::endl; */
-    /* for (int ii = 0; ii < F.rows(); ++ii) { */
-    /*     p1 = Kernel::Point_3(V(F(ii, 0), 0), V(F(ii, 0), 1), V(F(ii, 0), 2)); */
-    /*     p2 = Kernel::Point_3(V(F(ii, 1), 0), V(F(ii, 1), 1), V(F(ii, 2), 2)); */
-    /*     p3 = Kernel::Point_3(V(F(ii, 2), 0), V(F(ii, 2), 1), V(F(ii, 2), 2)); */
+    
 
-    /*     v1 = this->surface_mesh.add_vertex(p1); */
-    /*     v2 = this->surface_mesh.add_vertex(p2); */
-    /*     v3 = this->surface_mesh.add_vertex(p3); */
+    std::vector<vertex_descriptor> face_indices;
 
-    /*     this->surface_mesh.add_face(v1, v2, v3); */
-    /* } */
+    for (int ii = 0; ii < F.rows(); ++ii) {
+        p1 = Kernel::Point_3(V(F(ii, 0), 0), V(F(ii, 0), 1), V(F(ii, 0), 2));
+        p2 = Kernel::Point_3(V(F(ii, 1), 0), V(F(ii, 1), 1), V(F(ii, 2), 2));
+        p3 = Kernel::Point_3(V(F(ii, 2), 0), V(F(ii, 2), 1), V(F(ii, 2), 2));
+
+        v1 = this->vertex_descriptor[F(ii, 0)];
+        v2 = this->vertex_descriptor[F(ii, 1)];
+        v3 = this->vertex_descriptor[F(ii, 2)];
+
+        this->surface_mesh.add_face(v1, v2, v3);
+        face_indices = {v1, v2, v3};
+        this->face_descriptor.push_back(face_indices);
+    }
 
 }
 

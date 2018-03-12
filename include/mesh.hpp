@@ -9,6 +9,7 @@
 #include <CGAL/Polyhedron_items_with_id_3.h>
 #include <CGAL/Surface_mesh.h>
 
+#include <vector>
 // This data holds the polyhedorn and mesh
 class MeshData {
     public:
@@ -25,9 +26,13 @@ class MeshData {
         Eigen::MatrixXi faces;
 
         CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3 > polyhedron;
-        
-        // TODO Add a surface mesh data type in addition to the polyhedron
+       
+        // Surface mesh shit
         CGAL::Surface_mesh<CGAL::Simple_cartesian<double>::Point_3> surface_mesh;
+        
+        std::vector<CGAL::Surface_mesh<CGAL::Simple_cartesian<double>::Point_3>::Vertex_index> vertex_descriptor;
+        std::vector<std::vector<CGAL::Surface_mesh<CGAL::Simple_cartesian<double>::Point_3>::Vertex_index> > face_descriptor;
+
     private:
         // build the polyhedron
         void build_polyhedron();
