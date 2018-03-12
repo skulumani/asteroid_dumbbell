@@ -2,6 +2,9 @@
 
 #include <Eigen/Dense>
 
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Surface_mesh.h>
+
 typedef CGAL::Simple_cartesian<double>     Kernel;
 typedef CGAL::Polyhedron_3<Kernel, CGAL::Polyhedron_items_with_id_3>         Polyhedron;
 typedef Polyhedron::Facet_iterator          Facet_iterator;
@@ -66,6 +69,30 @@ void Polyhedron_builder<HDS>::operator() (HDS &hds) {
 }
 
 void SurfaceMesh_builder::SurfaceMesh_builder(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input) {
+    
+    typedef CGAL::Surface_mesh<Kernel::Point_3> Mesh;
+    typedef Mesh::Vertex_index vertex_descriptor;
+
+    // create some vertices
+    Kernel::Point_3 p1, p2, p3;
+    Mesh::Vertex_index v1, v2, v3;
+
+    // save the data to the class
+    this->V = V_input;
+    this->F = F_input;
+
+    // build the mesh
+    for (int ii = 0; ii < F.rows(); ++ii) {
+        p1 = Kernel::Point_3(V_input(F_input(ii, 0), 0), V_input(F_input(ii, 0), 1), V_input(F_input(ii, 0), 2));
+        p2 = Kernel::Point_3(V_input(F_input(ii, 1), 0), V_input(F_input(ii, 1), 1), V_input(F_input(ii, 2), 2));
+        p3 = Kernel::Point_3(V_input(F_input(ii, 2), 0), V_input(F_input(ii, 2), 1), V_input(F_input(ii, 2), 2));
+
+        v1 = this->mesh.add_vertex(p1);
+        v2 = this->mesh.add_vertex(p2);
+        v3 = this->mesh.add_vertex(p3);
+
+        this->mesh.add_face(v1, v2, v3);
+    }
 
 }
 
