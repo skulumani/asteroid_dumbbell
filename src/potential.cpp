@@ -1,7 +1,7 @@
+#include "potential.hpp"
+
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
-
-#include <Eigen/Dense>
 
 #include <iostream>
 
@@ -75,13 +75,24 @@ int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >
                 Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > L3_edge) {
 
         Eigen::Array<double, Eigen::Dynamic, 3> r1i, r1j;
-        
+        r1i.resize(e1_vertex_map.rows(), 3);
+        r1j.resize(e1_vertex_map.rows(), 3);
         for (int ii = 0; ii < e1_vertex_map.rows(); ++ii) {
             r1i.row(ii) = r_v.row(e1_vertex_map(ii, 0));
             r1j.row(ii) = r_v.row(e1_vertex_map(ii, 1));
         }
+        Eigen::Array<double, Eigen::Dynamic, 1> r1i_norm, r1j_norm, e1_norm;
+        r1i_norm.resize(r1i.rows(), 1);
+        r1j_norm.resize(r1j.rows(), 1);
+        e1_norm.resize(e1.rows(), 1);
+        L1_edge.resize(e1.rows(), 1);
 
-        std::cout << r1i << std::endl;
+        r1i_norm = r1i.matrix().rowwise().norm();
+        r1j_norm = r1j.matrix().rowwise().norm();
+        e1_norm  = e1.matrix().rowwise().norm();
+        L1_edge = (r1i_norm + r1j_norm + e1_norm) / (r1i_norm + r1j_norm - e1_norm);
+        std::cout << e1_norm << std::endl;
+
 }
 
 PYBIND11_MODULE(polyhedron_potential, m) {
