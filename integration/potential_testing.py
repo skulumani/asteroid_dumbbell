@@ -23,5 +23,7 @@ flag = polyhedron_potential.laplacian_factor(r_v, Fa, Fb, Fc, w_face)
 
 w_face_python = polyhedron.laplacian_factor(r_v, Fa, Fb, Fc)
 
+# edge factor testing
+
 # now try the compiled library
 # polyhedron_potential.face_contribution_loop(state, V, F, F_face, w_face)
