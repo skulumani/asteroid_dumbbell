@@ -12,10 +12,10 @@ void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::Matr
     std::cout << r_v << std::endl;
 }
 
-int laplacian_factor(const Eigen::Array<double, Eigen::Dynamic, 3> r_v,
-                     const Eigen::Array<int, Eigen::Dynamic, 1> Fa,
-                     const Eigen::Array<int, Eigen::Dynamic, 1> Fb,
-                     const Eigen::Array<int, Eigen::Dynamic, 1> Fc,
+int laplacian_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& r_v,
+                     const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 1> >& Fa,
+                     const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 1> >& Fb,
+                     const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 1> >& Fc,
                      Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > w_face) {
     // form the ri, rj, rk arrays
     Eigen::Array<double, Eigen::Dynamic, 3> ri, rj, rk, rjrk_cross;
@@ -63,9 +63,31 @@ int laplacian_factor(const Eigen::Array<double, Eigen::Dynamic, 3> r_v,
     
 }
 
+int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& r_v, 
+                const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& e1,
+                const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& e2,
+                const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& e3,
+                const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 2> >& e1_vertex_map,
+                const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 2> >& e2_vertex_map,
+                const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 2> >& e3_vertex_map,
+                Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > L1_edge,
+                Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > L2_edge,
+                Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > L3_edge) {
+
+        Eigen::Array<double, Eigen::Dynamic, 3> r1i, r1j;
+        
+        for (int ii = 0; ii < e1_vertex_map.rows(); ++ii) {
+            r1i.row(ii) = r_v.row(e1_vertex_map(ii, 0));
+            r1j.row(ii) = r_v.row(e1_vertex_map(ii, 1));
+        }
+
+        std::cout << r1i << std::endl;
+}
+
 PYBIND11_MODULE(polyhedron_potential, m) {
     m.def("face_contribution_loop", &face_contribution_loop);
     m.def("laplacian_factor", &laplacian_factor);
+    m.def("edge_factor", &edge_factor);
 }
 
 
