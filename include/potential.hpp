@@ -1,5 +1,6 @@
 #ifndef POTENTIAL_H
 #define POTENTIAL_H
+
 #include <Eigen/Dense>
 
 // declare some shit

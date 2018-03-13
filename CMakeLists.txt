@@ -96,7 +96,7 @@ pybind11_add_module(cgal_cpp MODULE
     src/polyhedron.cpp)
 
 pybind11_add_module(polyhedron_potential MODULE
-    src/potential.cpp)
+    src/potential.cpp src/potential_bindings.cpp)
 
 ################################################################################
 # Testing example
@@ -125,6 +125,12 @@ add_executable(test_polyhedron src/wavefront.cpp src/polyhedron.cpp tests/cpp/te
 target_link_libraries(test_polyhedron gtest)
 add_test(NAME test_polyhedron COMMAND test_polyhedron
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+add_executable(test_potential src/potential.cpp tests/cpp/test_potential.cpp tests/cpp/test_all.cpp)
+target_link_libraries(test_potential gtest)
+add_test(NAME test_potential COMMAND test_potential
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
 # this will install to /usr/local by default
 # install(TARGETS read_obj DESTINATION bin)
 

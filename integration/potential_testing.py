@@ -26,7 +26,7 @@ num_v = V.shape[0]
 state = np.array([2, 0, 0])
 r_v = V - np.tile(state, (num_v, 1))
 
-w_face = np.zeros((1, 1))
+w_face = np.zeros((12, 1))
 flag = polyhedron_potential.laplacian_factor(r_v, Fa, Fb, Fc, w_face)
 w_face_python = polyhedron.laplacian_factor(r_v, Fa, Fb, Fc)
 

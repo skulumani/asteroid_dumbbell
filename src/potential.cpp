@@ -1,8 +1,5 @@
 #include "potential.hpp"
 
-#include <pybind11/eigen.h>
-#include <pybind11/pybind11.h>
-
 #include <iostream>
 
 // Start of polyhedron potential function code 
@@ -57,7 +54,9 @@ int laplacian_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic,
     den = ri_norm * rj_norm * rk_norm + ri_norm * rjrk_dot + rj_norm * rkri_dot + rk_norm * rirj_dot;
     
     // return by reference
-    w_face = 2.0 * num.binaryExpr(den, [] (double a, double b) { return std::atan2(a,b);} );
+    /* w_face = 2.0 * num.binaryExpr(den, [] (double a, double b) { return std::atan2(a,b);} ); */
+    w_face.resize(num.rows(), 1);
+    w_face = 2.0 * num.binaryExpr(den, std::ptr_fun(::atan2));
 
     return 0;
     
@@ -95,10 +94,5 @@ int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >
 
 }
 
-PYBIND11_MODULE(polyhedron_potential, m) {
-    m.def("face_contribution_loop", &face_contribution_loop);
-    m.def("laplacian_factor", &laplacian_factor);
-    m.def("edge_factor", &edge_factor);
-}
 
 
