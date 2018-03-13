@@ -55,7 +55,7 @@ int laplacian_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic,
     
     // return by reference
     /* w_face = 2.0 * num.binaryExpr(den, [] (double a, double b) { return std::atan2(a,b);} ); */
-    w_face.resize(num.rows(), 1);
+    /* w_face.resize(num.rows(), 1); */
     w_face = 2.0 * num.binaryExpr(den, std::ptr_fun(::atan2));
 
     return 0;

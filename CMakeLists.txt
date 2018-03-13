@@ -88,6 +88,10 @@ target_link_libraries(build_poly gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_L
 # mesh loading
 set(mesh_src src/mesh.cpp src/mesh_main.cpp src/loader.cpp src/input_parser.cpp src/stats.cpp)
 add_executable(mesh ${mesh_src})
+
+# potential function
+set(potential_src src/potential.cpp src/potential_main.cpp)
+add_executable(potential ${potential_src})
 ################################################################################
 # PYTHON BINDING
 ################################################################################

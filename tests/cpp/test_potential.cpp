@@ -73,5 +73,4 @@ TEST_F(TestPotential, LaplacianFactor) {
     r_v = Ve_true.rowwise() - state;
     Eigen::Array<double, Eigen::Dynamic, 1> w_face;
     int flag = laplacian_factor(r_v, Fa, Fb, Fc, w_face);
-    std::cout << flag<< std::endl;
 }
