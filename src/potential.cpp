@@ -17,10 +17,10 @@ int laplacian_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic,
     // form the ri, rj, rk arrays
     Eigen::Array<double, Eigen::Dynamic, 3> ri, rj, rk, rjrk_cross;
 
-    /* ri.resize(Fa.rows(), 3); */
-    /* rj.resize(Fb.rows(), 3); */
-    /* rk.resize(Fc.rows(), 3); */
-    /* rjrk_cross.resize(Fa.rows(), 3); */
+    ri.resize(Fa.rows(), 3);
+    rj.resize(Fb.rows(), 3);
+    rk.resize(Fc.rows(), 3);
+    rjrk_cross.resize(Fa.rows(), 3);
     
     Eigen::Array<double, 1, 3> ra, rb, rc;
 
@@ -53,6 +53,7 @@ int laplacian_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic,
     num = (ri * rjrk_cross).rowwise().sum();
     den = ri_norm * rj_norm * rk_norm + ri_norm * rjrk_dot + rj_norm * rkri_dot + rk_norm * rirj_dot;
     
+    w_face = num;
     // return by reference
     /* w_face = 2.0 * num.binaryExpr(den, [] (double a, double b) { return std::atan2(a,b);} ); */
     /* w_face.resize(num.rows(), 1); */

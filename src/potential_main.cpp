@@ -2,11 +2,6 @@
 
 #include <iostream>
 
-void eigen_test_func(const Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 3> >& a,
-        Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 3> > b) {
-    b = a;
-}
-
 int main() {
     Eigen::Array<double, 8, 3> Ve_true;
     Eigen::Array<int, 12, 3> Fe_true;
@@ -47,9 +42,9 @@ int main() {
     state << 2, 0, 0;
     Eigen::Array<double, Eigen::Dynamic, 3> r_v;
     r_v = Ve_true.rowwise() - state;
-    Eigen::Array<double, Eigen::Dynamic, 1> w_face;
+    Eigen::Array<double, 12, 1> w_face;
     int flag = laplacian_factor(r_v, Fa, Fb, Fc, w_face);
     
-    std::cout << "Here is b outside: \n" << w_face<< std::endl;
+    std::cout << "Here is w_face outside: \n" << w_face<< std::endl;
     return 0;
 }
