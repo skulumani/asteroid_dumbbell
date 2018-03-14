@@ -71,6 +71,7 @@ TEST_F(TestPotential, LaplacianFactor) {
     state << 2, 0, 0;
     Eigen::Array<double, Eigen::Dynamic, 3> r_v;
     r_v = Ve_true.rowwise() - state;
-    Eigen::Array<double, Eigen::Dynamic, 1> w_face;
+    Eigen::Array<double, 12, 1> w_face;
     int flag = laplacian_factor(r_v, Fa, Fb, Fc, w_face);
+    EXPECT_TRUE(w_face.isApprox(w_face_true, 1e-7));
 }
