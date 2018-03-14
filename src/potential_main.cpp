@@ -3,11 +3,9 @@
 #include <iostream>
 
 void eigen_test_func(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& a,
-        Eigen::Array<double, Eigen::Dynamic, 1>& b) {
-    std::cout << "Here is a: \n" << a << std::endl;
-    std::cout << "Here is b before: \n" << b << std::endl;
-    b = a.matrix().rowwise().norm();
-    std::cout << "Here is b after: \n" << b << std::endl;
+        Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 3> > b) {
+    b.resize(1, 3);
+    b = a.row(2) * 2;
 }
 
 int main() {
@@ -50,7 +48,7 @@ int main() {
     state << 2, 0, 0;
     Eigen::Array<double, Eigen::Dynamic, 3> r_v;
     r_v = Ve_true.rowwise() - state;
-    Eigen::Array<double, Eigen::Dynamic, 1> w_face;
+    Eigen::Array<double, Eigen::Dynamic, 3> w_face;
     /* int flag = laplacian_factor(r_v, Fa, Fb, Fc, w_face); */
     
     eigen_test_func(Ve_true,w_face);
