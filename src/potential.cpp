@@ -17,10 +17,10 @@ int laplacian_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic,
     // form the ri, rj, rk arrays
     Eigen::Array<double, Eigen::Dynamic, 3> ri, rj, rk, rjrk_cross;
 
-    ri.resize(Fa.rows(), 3);
-    rj.resize(Fb.rows(), 3);
-    rk.resize(Fc.rows(), 3);
-    rjrk_cross.resize(Fa.rows(), 3);
+    /* ri.resize(Fa.rows(), 3); */
+    /* rj.resize(Fb.rows(), 3); */
+    /* rk.resize(Fc.rows(), 3); */
+    /* rjrk_cross.resize(Fa.rows(), 3); */
     
     Eigen::Array<double, 1, 3> ra, rb, rc;
 
