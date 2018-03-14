@@ -4,7 +4,7 @@ from lib import polyhedron_potential, binding
 from point_cloud import polyhedron
 
 # create the asteroid
-ast = asteroid.Asteroid('cube', 0, 'obj')
+ast = asteroid.Asteroid('itokawa', 0, 'obj')
 
 # extract out some things
 V = ast.asteroid_grav['V']
@@ -22,18 +22,22 @@ e2_vertex_map = ast.asteroid_grav['e2_vertex_map']
 e3_vertex_map = ast.asteroid_grav['e3_vertex_map']
 
 num_v = V.shape[0]
+num_f = F.shape[0]
 
 state = np.array([2, 0, 0])
 r_v = V - np.tile(state, (num_v, 1))
 
-w_face = np.zeros((12, 1))
+w_face = np.zeros((num_f, 1))
 flag = polyhedron_potential.laplacian_factor(r_v, Fa, Fb, Fc, w_face)
 w_face_python = polyhedron.laplacian_factor(r_v, Fa, Fb, Fc)
 
 # edge factor testing
-L1_edge = np.zeros((1, 1))
-L2_edge = np.zeros((1,1))
-L3_edge = np.zeros((1,1))
+L1_edge_python, L2_edge_python, L3_edge_python = polyhedron.edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map)
+
+# this is slower than numpy
+L1_edge = np.zeros((num_f, 1))
+L2_edge = np.zeros((num_f, 1))
+L3_edge = np.zeros((num_f, 1))
 flag = polyhedron_potential.edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map, L1_edge, L2_edge, L3_edge)
 
 # now try the compiled library

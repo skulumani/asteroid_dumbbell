@@ -112,6 +112,7 @@ int laplacian_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic,
     
 }
 
+// This is slower than numpy
 int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& r_v, 
                 const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& e1,
                 const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& e2,
@@ -161,6 +162,7 @@ int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >
         e3_norm  = e3.matrix().rowwise().norm();
         L3_edge = Eigen::log((r3i_norm + r3j_norm + e3_norm) / (r3i_norm + r3j_norm - e3_norm));
 
+        return 0;
 }
 
 
