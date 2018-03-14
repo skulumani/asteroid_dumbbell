@@ -34,7 +34,7 @@ w_face_python = polyhedron.laplacian_factor(r_v, Fa, Fb, Fc)
 L1_edge = np.zeros((1, 1))
 L2_edge = np.zeros((1,1))
 L3_edge = np.zeros((1,1))
-# flag = polyhedron_potential.edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map, L1_edge, L2_edge, L3_edge)
+flag = polyhedron_potential.edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map, L1_edge, L2_edge, L3_edge)
 
 # now try the compiled library
 # polyhedron_potential.face_contribution_loop(state, V, F, F_face, w_face)

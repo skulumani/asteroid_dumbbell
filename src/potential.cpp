@@ -2,6 +2,24 @@
 
 #include <iostream>
 
+void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> > & V,
+        const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F) {
+    
+    std::size_t num_v = V.rows();
+    std::size_t num_f = F.rows();
+    std::size_t num_e = 3 * (num_v -2);
+
+    // calculate all the edges zero based. This assumes it's already subtracted from the original OBJ for example
+    Eigen::Array<int, Eigen::Dynamic, 1> Fa, Fb, Fc;
+    Fa = F.col(0);
+    Fb = F.col(1);
+    Fc = F.col(2);
+
+    Eigen::Array<double, Eigen::Dynamic, 3> V1, V2, V3;
+
+    std::cout << Fa << std::endl;
+}
+
 // Start of polyhedron potential function code 
 void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::MatrixXi F, 
         Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> F_face, Eigen::Matrix<double, Eigen::Dynamic, 1> w_face) {

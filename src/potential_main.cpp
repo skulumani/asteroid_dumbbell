@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+
 int main() {
     Eigen::Array<double, 8, 3> Ve_true;
     Eigen::Array<int, 12, 3> Fe_true;
@@ -38,13 +39,14 @@ int main() {
                 0.03808065, 0.02361574, -0.20033484, -0.20033484,
                 0.03808065, 0.02361574, 0.03808065,0.02361574;
 
+    polyhedron_parameters(Ve_true, Fe_true);
+
     Eigen::Array<double, 1, 3> state;
     state << 2, 0, 0;
     Eigen::Array<double, Eigen::Dynamic, 3> r_v;
     r_v = Ve_true.rowwise() - state;
     Eigen::Array<double, 12, 1> w_face;
     int flag = laplacian_factor(r_v, Fa, Fb, Fc, w_face);
-    
-    std::cout << "Here is w_face outside: \n" << w_face<< std::endl;
+
     return 0;
 }
