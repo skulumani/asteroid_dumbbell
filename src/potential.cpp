@@ -16,8 +16,39 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     Fc = F.col(2);
 
     Eigen::Array<double, Eigen::Dynamic, 3> V1, V2, V3;
+    V1.resize(Fa.rows(),3 );
+    V2.resize(Fb.rows(),3 );
+    V3.resize(Fc.rows(),3 );
+    for (int ii = 0; ii < num_f; ++ii) {
+        V1.row(ii) << V(Fa(ii), 0), V(Fa(ii), 1), V(Fa(ii), 2);
+        V2.row(ii) << V(Fb(ii), 0), V(Fb(ii), 1), V(Fb(ii), 2);
+        V3.row(ii) << V(Fc(ii), 0), V(Fb(ii), 1), V(Fc(ii), 2);
+    }
 
-    std::cout << Fa << std::endl;
+    // compute the edge vectors
+    Eigen::Array<double, Eigen::Dynamic, 3> e1, e2, e3;
+    e1 = V2 - V1;
+    e2 = V3 - V2;
+    e3 = V1 - V3;
+    
+    // vertex map
+    Eigen::Array<int, Eigen::Dynamic, 2> e1_vertex_map, e2_vertex_map, e3_vertex_map, e_vertex_map;
+    e1_vertex_map.resize(Fa.rows(), 2);
+    e2_vertex_map.resize(Fb.rows(), 2);
+    e3_vertex_map.resize(Fc.rows(), 2);
+    e_vertex_map.resize(3*Fc.rows(), 2); 
+
+    e1_vertex_map.col(0) = Fb;
+    e1_vertex_map.col(1) = Fa;
+
+    e2_vertex_map.col(0) = Fc;
+    e2_vertex_map.col(1) = Fb;
+
+    e3_vertex_map.col(0) = Fa;
+    e3_vertex_map.col(1) = Fc;
+    
+    e_vertex_map << e1_vertex_map, e2_vertex_map, e3_vertex_map;
+    std::cout << std::sort(e_vertex_map << std::endl;
 }
 
 // Start of polyhedron potential function code 
