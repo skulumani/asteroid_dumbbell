@@ -53,11 +53,10 @@ int laplacian_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic,
     num = (ri * rjrk_cross).rowwise().sum();
     den = ri_norm * rj_norm * rk_norm + ri_norm * rjrk_dot + rj_norm * rkri_dot + rk_norm * rirj_dot;
     
-    w_face = num;
-    // return by reference
-    /* w_face = 2.0 * num.binaryExpr(den, [] (double a, double b) { return std::atan2(a,b);} ); */
     /* w_face.resize(num.rows(), 1); */
-    w_face = 2.0 * num.binaryExpr(den, std::ptr_fun(::atan2));
+    // return by reference
+    w_face = 2.0 * num.binaryExpr(den, [] (double a, double b) { return std::atan2(a,b);} );
+    /* w_face = 2.0 * num.binaryExpr(den, std::ptr_fun(::atan2)); */
 
     return 0;
     
