@@ -34,6 +34,45 @@ int main() {
                   4, 1, 5, 7, 5, 3, 7;
     e3_vertex_map << 0, 4, 0, 6, 0, 2, 0, 3, 2, 6, 2, 7, 4, 7, 4, 5, 0,
                   5, 0, 1, 1, 7, 1, 3;
+    
+    e1 << 1., 1., 0.,
+       0.,    1., 0.,
+       0.,    1., 1.,
+       0.,    0., 1.,
+       1.,    0., 1.,
+       0.,    0., 1.,
+       0.,    1., 0.,
+       0.,    1., 1.,
+       1.,    0., 0.,
+       1.,    0., 1.,
+       1.,    0., 0.,
+       1.,    1., 0.;
+    
+    e2 << 0.,  -1., 0.,
+       1.,     0.,  0.,
+       0.,     0.,  -1.,
+       0.,     1.,  0.,
+       0.,     0.,  -1.,
+       1.,     0.,  0.,
+       0.,     0.,  1.,
+       0.,     -1., 0.,
+       0.,     0.,  1.,
+       -1.,    0.,  0.,
+       0.,     1.,  0.,
+       -1.,    0.,  0.;
+
+    e3 << -1., 0.,  0.,
+       -1.,    -1., 0.,
+       0.,     -1., 0.,
+       0.,     -1., -1.,
+       -1.,    0.,  0.,
+       -1.,    0.,  -1.,
+       0.,     -1., -1.,
+       0.,     0.,  -1.,
+       -1.,    0.,  -1.,
+       0.,     0.,  -1.,
+       -1.,    -1., 0.,
+       0.,     -1., 0.;
 
     w_face_true << 0.03808065, 0.02361574, 0.07694205, 0.07694205,
                 0.03808065, 0.02361574, -0.20033484, -0.20033484,
@@ -46,7 +85,13 @@ int main() {
     Eigen::Array<double, Eigen::Dynamic, 3> r_v;
     r_v = Ve_true.rowwise() - state;
     Eigen::Array<double, 12, 1> w_face;
-    int flag = laplacian_factor(r_v, Fa, Fb, Fc, w_face);
-
+    int lflag = laplacian_factor(r_v, Fa, Fb, Fc, w_face);
+    
+    // now try out the edge factor code
+    Eigen::Array<double, 12, 1> L1_edge, L2_edge, L3_edge;
+    int eflag = edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map,
+            L1_edge, L2_edge, L3_edge);
+    
+    std::cout << L1_edge << std::endl;
     return 0;
 }

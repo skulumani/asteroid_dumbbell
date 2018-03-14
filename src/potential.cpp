@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
+// TODO Need to make this function
 void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> > & V,
         const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F) {
     
@@ -121,28 +122,44 @@ int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >
                 Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > L1_edge,
                 Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > L2_edge,
                 Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > L3_edge) {
-
+    
         Eigen::Array<double, Eigen::Dynamic, 3> r1i, r1j, r2i, r2j, r3i, r3j;
         r1i.resize(e1_vertex_map.rows(), 3);
         r1j.resize(e1_vertex_map.rows(), 3);
+
+        r2i.resize(e2_vertex_map.rows(), 3);
+        r2j.resize(e2_vertex_map.rows(), 3);
+
+        r3i.resize(e3_vertex_map.rows(), 3);
+        r3j.resize(e3_vertex_map.rows(), 3);
         for (int ii = 0; ii < e1_vertex_map.rows(); ++ii) {
             r1i.row(ii) = r_v.row(e1_vertex_map(ii, 0));
             r1j.row(ii) = r_v.row(e1_vertex_map(ii, 1));
+
+            r2i.row(ii) = r_v.row(e2_vertex_map(ii, 0));
+            r2j.row(ii) = r_v.row(e2_vertex_map(ii, 1));
+
+            r3i.row(ii) = r_v.row(e3_vertex_map(ii, 0));
+            r3j.row(ii) = r_v.row(e3_vertex_map(ii, 1));
         }
 
         Eigen::Array<double, Eigen::Dynamic, 1> r1i_norm, r1j_norm, e1_norm;
-        r1i_norm.resize(r1i.rows(), 1);
-        r1j_norm.resize(r1j.rows(), 1);
-        e1_norm.resize(e1.rows(), 1);
-        L1_edge.resize(e1.rows(), 1);
-
         r1i_norm = r1i.matrix().rowwise().norm();
         r1j_norm = r1j.matrix().rowwise().norm();
         e1_norm  = e1.matrix().rowwise().norm();
-        L1_edge = (r1i_norm + r1j_norm + e1_norm) / (r1i_norm + r1j_norm - e1_norm);
+        L1_edge = Eigen::log((r1i_norm + r1j_norm + e1_norm) / (r1i_norm + r1j_norm - e1_norm));
 
-        
-        std::cout << e1_norm << std::endl;
+        Eigen::Array<double, Eigen::Dynamic, 1> r2i_norm, r2j_norm, e2_norm;
+        r2i_norm = r2i.matrix().rowwise().norm();
+        r2j_norm = r2j.matrix().rowwise().norm();
+        e2_norm  = e2.matrix().rowwise().norm();
+        L2_edge = Eigen::log((r2i_norm + r2j_norm + e2_norm) / (r2i_norm + r2j_norm - e2_norm));
+
+        Eigen::Array<double, Eigen::Dynamic, 1> r3i_norm, r3j_norm, e3_norm;
+        r3i_norm = r3i.matrix().rowwise().norm();
+        r3j_norm = r3j.matrix().rowwise().norm();
+        e3_norm  = e3.matrix().rowwise().norm();
+        L3_edge = Eigen::log((r3i_norm + r3j_norm + e3_norm) / (r3i_norm + r3j_norm - e3_norm));
 
 }
 
