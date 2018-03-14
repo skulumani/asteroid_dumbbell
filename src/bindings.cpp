@@ -14,7 +14,7 @@
 /* typedef Polyhedron::HalfedgeDS             HalfedgeDS; */
 /* namespace py = pybind11; */
 
-void scale_by_2(Eigen::Ref<Eigen::VectorXd> v) {
+void scale_by_2(Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > v) {
     v *= 2;
 }
 
