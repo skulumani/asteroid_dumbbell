@@ -3,7 +3,7 @@
 #include <Eigen/Dense>
 
 // a - nonwriteable, b - writeable
-void eigen_reference_class(const Eigen::Ref<const Eigen::Array<double, 1, 3> >& a, Eigen::Ref<Eigen::Array<double, 1, 3> > b) {
+void eigen_reference_class(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& a, Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 3> > b) {
     b = 2 * a;
 }
 
