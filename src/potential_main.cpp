@@ -3,12 +3,13 @@
 #include <iostream>
 
 void eigen_test_func(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& a,
-        Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > b) {
+        Eigen::Array<double, Eigen::Dynamic, 1>& b) {
     std::cout << "Here is a: \n" << a << std::endl;
     std::cout << "Here is b before: \n" << b << std::endl;
     b = a.matrix().rowwise().norm();
     std::cout << "Here is b after: \n" << b << std::endl;
 }
+
 int main() {
     Eigen::Array<double, 8, 3> Ve_true;
     Eigen::Array<int, 12, 3> Fe_true;
