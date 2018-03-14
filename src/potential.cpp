@@ -1,5 +1,6 @@
 #include "potential.hpp"
 
+#include <algorithm>
 #include <iostream>
 
 void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> > & V,
@@ -48,7 +49,6 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     e3_vertex_map.col(1) = Fc;
     
     e_vertex_map << e1_vertex_map, e2_vertex_map, e3_vertex_map;
-    std::cout << std::sort(e_vertex_map << std::endl;
 }
 
 // Start of polyhedron potential function code 
