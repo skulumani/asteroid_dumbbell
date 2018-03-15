@@ -14,5 +14,16 @@ void distance_to_polyhedron(Eigen::Vector3d& pt, std::shared_ptr<MeshData> mesh)
     } else {
         std::cout << "no intersection" << std::endl;
     }
+    
+    std::cout << tree.number_of_intersected_primitives(segment_query) << " intersection(s)" << std::endl;
 
+
+    Segment_intersection intersection = tree.any_intersection(segment_query);
+    if(intersection) {
+        // get intersection object
+        const Point* p = boost::get<Point>(&(intersection->first));
+        if(p) {
+            std::cout << "intersection object is a point " << *p << std::endl;
+        }
+    }
 }

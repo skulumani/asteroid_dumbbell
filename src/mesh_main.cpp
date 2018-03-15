@@ -24,15 +24,15 @@ int main(int argc, char* argv[]) {
         mesh = Loader::load(input_file);
     }
 
-    std::cout << "Vertices: \n" << mesh->vertices << std::endl;
-    std::cout << "Faces: \n" << mesh->faces << std::endl;
+    /* std::cout << "Vertices: \n" << mesh->vertices << std::endl; */
+    /* std::cout << "Faces: \n" << mesh->faces << std::endl; */
 
-    print_polyhedron_vertices(mesh);
+    /* print_polyhedron_vertices(mesh); */
     
     // lets try and build a surface mesh now
     
     surface_mesh_stats(mesh);
-    print_surface_mesh_vertices(mesh);
+    /* print_surface_mesh_vertices(mesh); */
     
     Eigen::Vector3d pt;
     pt << 2, 0, 0;
