@@ -68,3 +68,7 @@ target_link_libraries(polyhedron_prog_tetra   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY
 add_executable( polyhedron_prog_incr_builder polyhedron_prog_incr_builder.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS polyhedron_prog_incr_builder )
 target_link_libraries(polyhedron_prog_incr_builder   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+
+add_executable( AABB_polyhedron_facet_intersection_example AABB_polyhedron_facet_intersection_example.cpp )
+add_to_cached_list( CGAL_EXECUTABLE_TARGETS AABB_polyhedron_facet_intersection_example )
+target_link_libraries(AABB_polyhedron_facet_intersection_example ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})

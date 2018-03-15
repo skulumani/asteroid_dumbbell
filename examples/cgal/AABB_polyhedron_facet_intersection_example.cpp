@@ -21,5 +21,41 @@ typedef boost::optional< Tree::Intersection_and_primitive_id<Segment>::Type > Se
 typedef boost::optional< Tree::Intersection_and_primitive_id<Plane>::Type > Plane_intersection;
 
 int main() {
+    Point p(1.0, 0.0, 0.0);
+    Point q(0.0, 1.0, 0.0);
+    Point r(0.0, 0.0, 1.0);
+    Point s(0.0, 0.0, 0.0);
+    Polyhedron polyhedron;
+    polyhedron.make_tetrahedron(p, q, r, s);
+
+    // construct the AABB tree
+    Tree tree(faces(polyhedron).first, faces(polyhedron).second, polyhedron);
+
+    // constructs segment query
+    Point a(-0.2, 0.2, -0.2);
+    Point b(1.3, 0.2, 1.3);
+    Segment segment_query(a, b);
+
+    // tests intersections with segment query
+    if(tree.do_intersect(segment_query)) {
+        std::cout << "intersection(s)" << std::endl;
+    } else {
+        std::cout << "no intersection" << std::endl;
+    }
+
+    // computes #intersection with segment query
+    std::cout << tree.number_of_intersected_primitives(segment_query) << " intersection(s)" << std::endl;
+
+    // computes first encountered intersection with segment query (generally a point)
+    Segment_intersection intersection = tree.any_intersection(segment_query);
+    if(intersection) {
+        // get intersection object
+        const Point* p = boost::get<Point>(&(intersection->first));
+        if(p) {
+            std::cout << "intersection object is a point " << *p << std::endl;
+        }
+    }
+
+    // computes all intersections with the segment query (as pairs object - primitive_id)
 
 }
