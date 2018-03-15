@@ -19,6 +19,7 @@ typedef CGAL::AABB_traits<K, Primitive> Traits;
 typedef CGAL::AABB_tree<Traits> Tree;
 typedef boost::optional< Tree::Intersection_and_primitive_id<Segment>::Type > Segment_intersection;
 typedef boost::optional< Tree::Intersection_and_primitive_id<Plane>::Type > Plane_intersection;
+typedef Tree::Primitive_id Primitive_id;
 
 int main() {
     Point p(1.0, 0.0, 0.0);
@@ -57,5 +58,25 @@ int main() {
     }
 
     // computes all intersections with the segment query (as pairs object - primitive_id)
+    std::list<Segment_intersection> intersections;
+    tree.all_intersections(segment_query, std::back_inserter(intersections));
+
+    // computes all intersected primitives with segment query as primitive ids
+    std::list<Primitive_id> primitives;
+    tree.all_intersected_primitives(segment_query, std::back_inserter(primitives));
+
+    // constructs plane query
+    Vector vec(0, 0, 1.0);
+    Plane plane_query(a, vec);
+
+    // computes first encountered intersection with plane query
+    Plane_intersection plane_intersection = tree.any_intersection(plane_query);
+    if(plane_intersection) {
+        if(boost::get<Segment>(&(plane_intersection->first))) {
+            std::cout << "intersection object is a segment" << std::endl;
+        }
+    }
+
+    return EXIT_SUCCESS;
 
 }
