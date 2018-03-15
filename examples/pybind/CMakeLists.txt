@@ -20,3 +20,5 @@ pybind11_add_module(python_example MODULE
     ${SOURCE_DIR}/bindings.cpp
     ${SOURCE_DIR}/eigen.cpp)
 
+# add_executable(template src/template.cpp)
+pybind11_add_module(template MODULE ${SOURCE_DIR}/template.cpp)

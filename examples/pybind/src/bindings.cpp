@@ -14,6 +14,9 @@ PYBIND11_MODULE(python_example, m) {
     m.def("subtract", &subtract);
     m.def("scale_vector_inplace", &scale_vector_inplace);
     m.def("scale_vector_return", &scale_vector_return);
+    m.def("square", &square<int>);
+    m.def("square", &square<double>);
+    m.def("square", &square<float>);
 
     // expose a class to Python
     py::class_<Pet>(m, "Pet") 
