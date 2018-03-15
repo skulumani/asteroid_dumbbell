@@ -21,7 +21,7 @@ typedef boost::optional< Tree::Intersection_and_primitive_id<Segment>::Type > Se
 typedef boost::optional< Tree::Intersection_and_primitive_id<Plane>::Type > Plane_intersection;
 typedef Tree::Primitive_id Primitive_id;
 
-int main() {
+int main(int argc, char* argv[]) {
     Point p(1.0, 0.0, 0.0);
     Point q(0.0, 1.0, 0.0);
     Point r(0.0, 0.0, 1.0);
@@ -33,8 +33,13 @@ int main() {
     Tree tree(faces(polyhedron).first, faces(polyhedron).second, polyhedron);
 
     // constructs segment query
-    Point a(-0.2, 0.2, -0.2);
-    Point b(1.3, 0.2, 1.3);
+    double x, y, z;
+    std::cout << "Enter the start of segment: ";
+    std::cin >> x >> y >> z;
+    Point a(x, y, z);
+    std::cout << "Enter the end of segment: " ;
+    std::cin >> x >> y >> z;
+    Point b(x, y, z);
     Segment segment_query(a, b);
 
     // tests intersections with segment query
