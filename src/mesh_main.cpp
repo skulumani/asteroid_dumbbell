@@ -7,7 +7,8 @@
 
 #include <memory>
 
-
+// try to write a function to  find distance from mesh to point using AABB
+//
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
