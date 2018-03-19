@@ -27,12 +27,15 @@ int main(int argc, char* argv[]) {
         surface_mesh_stats(mesh);
         /* print_surface_mesh_vertices(mesh); */
 
-        Eigen::Vector3d pt;
-        pt << 2, 0, 0;
-        distance_to_polyhedron(pt, mesh);
+        Eigen::Vector3d psource, ptarget;
+        psource << 2, 0, 0;
+        ptarget << 0, 0, 0;
+
+        distance_to_polyhedron(psource, mesh);
 
         // instantiate the raycaster object
         RayCaster caster(mesh);
+        caster.castray(psource, ptarget);
     }
 
     /* std::cout << "Vertices: \n" << mesh->vertices << std::endl; */

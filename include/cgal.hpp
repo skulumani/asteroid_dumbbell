@@ -19,6 +19,7 @@ class RayCaster {
     private:
         // needs the mesh to operate on
         std::shared_ptr<MeshData> mesh;
+        Tree tree; // holds the AABB tree for CGAL distance computations
 };
 
 #endif

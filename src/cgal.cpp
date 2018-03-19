@@ -1,5 +1,5 @@
 #include "cgal.hpp"
-
+// TODO Modify this to compute distance instead of doing raycasting
 void distance_to_polyhedron(Eigen::Vector3d& pt, std::shared_ptr<MeshData> mesh) {
     Tree tree(faces(mesh->polyhedron).first, faces(mesh->polyhedron).second, mesh->polyhedron);
     
@@ -32,6 +32,9 @@ void distance_to_polyhedron(Eigen::Vector3d& pt, std::shared_ptr<MeshData> mesh)
 RayCaster::RayCaster(std::shared_ptr<MeshData> mesh) {
     // assign copy of pointer to object instance
     this->mesh = mesh;
+    /* this->tree = Tree tree(faces(this->mesh->polyhedron).first, */
+    /*                        faces(this->mesh->polyhedron).second, */
+    /*                        this->mesh->polyhedron); */
 }
 
 void RayCaster::update_mesh(std::shared_ptr<MeshData> mesh) {
