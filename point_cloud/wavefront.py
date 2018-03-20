@@ -1547,7 +1547,8 @@ def mesh_incremental_update(pt, v, f, method='all'):
     return nv, nf
 
 def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
-                                   max_angle=np.deg2rad(-180)):
+                                   max_angle=np.deg2rad(45),
+                                   angle_std=np.deg2rad(5)):
     r"""Update a mesh by radially moving vertices
 
     nv, nf = radius_mesh_incremental_update(pt, v, f)
@@ -1589,7 +1590,10 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
     # find minimum angular seperatiaon 
     cos_angle = np.dot(v, pt)/np.linalg.norm(v, axis=1)/np.linalg.norm(pt)
     # find the index of the point which lies inside of a threshold
+    # 1 sigma mask (extra points)
+    
     mask = np.ma.masked_less(cos_angle, np.cos(max_angle))
+    pdb.set_trace()
     # now find index of minimum angle (closest to 1)
     ind_angle = np.nonzero(mask == np.max(mask))[0]
     if ind_angle.size: # some points satisfy the constraint
