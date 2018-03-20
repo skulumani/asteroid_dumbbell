@@ -326,13 +326,13 @@ def incremental_reconstruction_subdivide(input_filename, output_filename, astero
         f_group = fout.create_group('face_array')
 
         logger.info('Starting loop over point cloud')
-        add_points(time, ast_ints, v_est, f_est, v_group, f_group)    
+        add_points(time, ast_ints, v_est, f_est, logger, max_angle, v_group, f_group)    
 
     logger.info('Completed the reconstruction')
 
     return 0
 
-def add_points(time, ast_ints, v_est, f_est, v_group, f_group):
+def add_points(time, ast_ints, v_est, f_est, logger, max_angle, v_group, f_group):
     """
     Loop over the point cloud and include each one into the mesh and update
 
@@ -435,7 +435,7 @@ if __name__ == "__main__":
         # reconstruct_filename = os.path.join('./data/raycasting', args.fnames[1])
         # filename = './data/raycasting/20180110_raycasting_castalia.npz'
         
-        incremental_reconstruction(args.point_cloud_data, args.reconstruct_data, 'castalia')
+        incremental_reconstruction_subdivide(args.point_cloud_data, args.reconstruct_data, 'castalia')
     elif args.plot:
         # generate the images
         output_path = tempfile.mkdtemp()
