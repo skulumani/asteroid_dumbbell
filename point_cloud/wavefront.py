@@ -1548,7 +1548,7 @@ def mesh_incremental_update(pt, v, f, method='all'):
 
 def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
                                    max_angle=np.deg2rad(45),
-                                   angle_std=np.deg2rad(5)):
+                                   angle_std=2):
     r"""Update a mesh by radially moving vertices
 
     nv, nf = radius_mesh_incremental_update(pt, v, f)
@@ -1591,29 +1591,40 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
     cos_angle = np.dot(v, pt)/np.linalg.norm(v, axis=1)/np.linalg.norm(pt)
     # find the index of the point which lies inside of a threshold
     # 1 sigma mask (extra points)
-    
+    # mask_sigma = np.ma.masked_less(cos_angle, np.cos(np.deg2rad(np.rad2deg(max_angle) * angle_std)))
     mask = np.ma.masked_less(cos_angle, np.cos(max_angle))
-    pdb.set_trace()
+    
     # now find index of minimum angle (closest to 1)
     ind_angle = np.nonzero(mask == np.max(mask))[0]
+    # ind_angle_sigma = np.nonzero(mask_sigma == np.max(mask_sigma))[0]
+    ind_angle_region = np.nonzero(mask)[0]
+    
     if ind_angle.size: # some points satisfy the constraint
         logger.info("pt: {} is within {} deg of v:{}. Radially changing the vertex".format(pt, np.rad2deg(max_angle), v[ind_angle, :]))
         # TODO Think about changing all of these points by a given radius
-        a = - pt
-        b = v[ind_angle, :]
-        vertex_param = - np.dot(b, a) / np.linalg.norm(b, axis=1)**2
+        # a = - pt
+        # b = v[ind_angle, :]
+        # vertex_param = - np.dot(b, a) / np.linalg.norm(b, axis=1)**2
 
-        # this is the candidate new point
-        vertex_intersections = vertex_param[:, np.newaxis] * b
+        # # this is the candidate new point
+        # vertex_intersections = vertex_param[:, np.newaxis] * b
         
-        # now find the index of the smallest change (minimum radius change)
-        radius_change = np.linalg.norm(b - vertex_intersections, axis=1)
-        min_radius = np.nonzero(radius_change == np.min(radius_change))[0]
-        min_ind = ind_angle[min_radius]
+        # # now find the index of the smallest change (minimum radius change)
+        # radius_change = np.linalg.norm(b - vertex_intersections, axis=1)
+        # min_radius = np.nonzero(radius_change == np.min(radius_change))[0]
+        # min_ind = ind_angle[min_radius]
 
+        # nv = v.copy()
+        # nv[min_ind, :] = vertex_intersections[min_radius, :]
+        # nf = f.copy()
+
+        # modify everything within the region of interest
+        vertex_param_region = -np.dot(v[ind_angle_region, :], - pt) / np.linalg.norm(v[ind_angle_region, :], axis=1)**2
+        vertex_intersections_region = vertex_param_region[:, np.newaxis] * v[ind_angle_region, :]
         nv = v.copy()
-        nv[min_ind, :] = vertex_intersections[min_radius, :]
-        nf = f.copy()
+        nv[ind_angle_region, :] = vertex_intersections_region
+        nf=f.copy()
+
     else: # no point lies within the angle constraint. Now we'll add a vertex
         # TODO Need assertions that the mesh remains topologically valid 
         # find closest edge and face
