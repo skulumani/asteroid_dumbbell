@@ -30,16 +30,16 @@ void distance_to_polyhedron(Eigen::Vector3d& pt, std::shared_ptr<MeshData> mesh)
 }
 
 // Raycaster class
-RayCaster::RayCaster(std::shared_ptr<MeshData> mesh) {
+RayCaster::RayCaster(std::shared_ptr<MeshData> mesh_in) {
     // assign copy of pointer to object instance
-    this->mesh = mesh;
+    this->mesh = mesh_in;
     this->tree.insert(faces(this->mesh->polyhedron).first,
             faces(this->mesh->polyhedron).second,
             this->mesh->polyhedron);
 }
 
-void RayCaster::update_mesh(std::shared_ptr<MeshData> mesh) {
-    this->mesh = mesh;
+void RayCaster::update_mesh(std::shared_ptr<MeshData> mesh_in) {
+    this->mesh = mesh_in;
     this->tree.clear();
     this->tree.insert(faces(this->mesh->polyhedron).first,
             faces(this->mesh->polyhedron).second,
