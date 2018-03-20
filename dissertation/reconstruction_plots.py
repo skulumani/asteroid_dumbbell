@@ -51,8 +51,8 @@ def sphere_into_ellipsoid(img_path):
     """
 
     # define the sphere
-    vs, fs = wavefront.ellipsoid_mesh(1, 1, 1, density=10, subdivisions=0)
-    ve, fe = wavefront.ellipsoid_mesh(2, 3, 4, density=10, subdivisions=2)
+    vs, fs = wavefront.ellipsoid_mesh(1, 1, 1, density=20, subdivisions=1)
+    ve, fe = wavefront.ellipsoid_mesh(2, 3, 4, density=20, subdivisions=1)
     
     mfig = graphics.mayavi_figure(offscreen=True)
     mesh = graphics.mayavi_addMesh(mfig, vs, fs)
@@ -67,7 +67,7 @@ def sphere_into_ellipsoid(img_path):
             mesh_param = wavefront.polyhedron_parameters(vs, fs)
             vs, fs = wavefront.radius_mesh_incremental_update(pt, vs,fs,
                                                               mesh_param,
-                                                              max_angle=np.deg2rad(5))
+                                                              max_angle=np.deg2rad(10))
             ms.reset(x=vs[:,0], y=vs[:,1], z=vs[:,2], triangles=fs)
             graphics.mayavi_addPoint(mfig, pt)
     

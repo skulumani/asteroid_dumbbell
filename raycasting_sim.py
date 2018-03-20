@@ -215,7 +215,7 @@ def incremental_reconstruction(input_filename, output_filename, asteroid_name='c
 
     asteroid_faces = 4092
     asteroid_type = 'mat'
-    max_angle = 5
+    max_angle = 10
     m1, m2, l = 500, 500, 0.003
     density = 30
     subdivisions = 2
@@ -273,6 +273,90 @@ def incremental_reconstruction(input_filename, output_filename, asteroid_name='c
     logger.info('Completed the reconstruction')
 
     return 0
+
+def incremental_reconstruction_subdivide(input_filename, output_filename, asteroid_name='castalia'):
+    """Incrementally update the mesh
+
+    Now we'll use the radial mesh reconstruction.
+
+    After running through all the points we'll do a smoothing again go over teh points
+    """
+    logger = logging.getLogger(__name__)
+    # output_filename = './data/raycasting/20180226_castalia_reconstruct_highres_45deg_cone.hdf5'
+    
+    logger.info('Loading {}'.format(input_filename))
+    data = np.load(input_filename)
+    point_cloud = data['point_cloud'][()]
+
+    # define the asteroid and dumbbell objects
+
+    asteroid_faces = 4092
+    asteroid_type = 'mat'
+    max_angle = 10
+    m1, m2, l = 500, 500, 0.003
+    density = 30
+    subdivisions = 2
+
+    ast = asteroid.Asteroid(asteroid_name, asteroid_faces, asteroid_type)
+    dum = dumbbell.Dumbbell(m1=m1, m2=m2, l=l)
+    
+    logger.info('Creating ellipsoid mesh')
+    # define a simple mesh to start
+    v_est, f_est = wavefront.ellipsoid_mesh(ast.axes[0]*0.75, ast.axes[1]*0.75, ast.axes[2]*0.75,
+                                    density=density, subdivisions=subdivisions)
+
+    # extract out all the points in the asteroid frame
+    time = point_cloud['time'][::100]
+    ast_ints = point_cloud['ast_ints'][::100]
+    logger.info('Create HDF5 file {}'.format(output_filename))
+    with h5py.File(output_filename, 'w') as fout:
+        # store some extra data about teh simulation
+        sim_data = fout.create_group('simulation_data')
+        sim_data.attrs['asteroid_name'] = np.string_(asteroid_name)
+        sim_data.attrs['asteroid_faces'] =asteroid_faces
+        sim_data.attrs['asteroid_type'] = np.string_(asteroid_type)
+        sim_data.attrs['m1'] = dum.m1
+        sim_data.attrs['m2'] = dum.m2
+        sim_data.attrs['l'] = dum.l
+        sim_data.attrs['density'] = density
+        sim_data.attrs['subdivisions'] = subdivisions
+        sim_data['max_angle'] = max_angle
+
+        v_group = fout.create_group('vertex_array')
+        f_group = fout.create_group('face_array')
+
+        logger.info('Starting loop over point cloud')
+        add_points(time, ast_ints, v_est, f_est, v_group, f_group)    
+
+    logger.info('Completed the reconstruction')
+
+    return 0
+
+def add_points(time, ast_ints, v_est, f_est, v_group, f_group):
+    """
+    Loop over the point cloud and include each one into the mesh and update
+
+    This will also add the new meshes to the HDF5 datasets v_group, f_group
+    """
+    for ii, (t, points) in enumerate(zip(time, ast_ints)):
+        # check if points is empty
+        logger.info('Current : t = {} with {} points'.format(t, len(points)))
+        for pt in points:
+            # incremental update for each point in points
+            # check to make sure each pt is not nan
+            if not np.any(np.isnan(pt)):
+                # v_est, f_est = wavefront.mesh_incremental_update(pt, v_est, f_est, 'vertex')
+                mesh_param = wavefront.polyhedron_parameters(v_est, f_est)
+                v_est, f_est = wavefront.radius_mesh_incremental_update(pt, v_est, f_est,
+                                                                        mesh_param,
+                                                                        max_angle=np.deg2rad(max_angle))
+
+        # use HD5PY instead
+        # save every so often and delete v_array,f_array to save memory
+        if (ii % 1) == 0:
+            logger.info('Saving data to HDF5. ii = {}, t = {}'.format(ii, t))
+            v_group.create_dataset(str(ii), data=v_est)
+            f_group.create_dataset(str(ii), data=f_est)
 
 def read_mesh_reconstruct(filename, output_path='/tmp/reconstruct_images'):
     """Use H5PY to read the data back and plot
