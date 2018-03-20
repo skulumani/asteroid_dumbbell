@@ -229,8 +229,8 @@ def incremental_reconstruction(input_filename, output_filename, asteroid_name='c
                                     density=density, subdivisions=subdivisions)
 
     # extract out all the points in the asteroid frame
-    time = point_cloud['time'][::10]
-    ast_ints = point_cloud['ast_ints'][::10]
+    time = point_cloud['time'][::100]
+    ast_ints = point_cloud['ast_ints'][::100]
     logger.info('Create HDF5 file {}'.format(output_filename))
     with h5py.File(output_filename, 'w') as fout:
         # store some extra data about teh simulation
