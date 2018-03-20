@@ -47,6 +47,8 @@ void RayCaster::update_mesh(std::shared_ptr<MeshData> mesh) {
 }
 
 void RayCaster::castray(Eigen::Vector3d& psource, Eigen::Vector3d& ptarget) {
+    // TODO Look at the raycasting example and use a ray here and tree.first_intersection(ray, skip)
+    // TODO Also look at closest_point_and_primitive
     // create a Point object
     Point a(psource(0),psource(1),psource(2));
     Point b(ptarget(0), ptarget(1), ptarget(2));
