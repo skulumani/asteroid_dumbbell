@@ -7,6 +7,10 @@
 #include <memory>
 
 void distance_to_polyhedron(Eigen::Vector3d& pt, std::shared_ptr<MeshData> mesh);
+class MeshDistance {
+    public:
+
+};
 
 class RayCaster {
     public:
