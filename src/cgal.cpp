@@ -91,10 +91,10 @@ void MeshDistance::update_mesh(std::shared_ptr<MeshData> mesh_in) {
 }
 
 int MeshDistance::k_nearest_neighbor(const Eigen::Ref<const Eigen::Vector3d>& pt, const int &K) {
-    
+    // TODO Move this property map into the mesh data class itself 
     Vertex_point_pmap vppmap = get(CGAL::vertex_point, this->mesh->surface_mesh);
 
-    // insert number of data points in the tree
+    // TODO Figure out how to build this only once insert number of data points in the tree
     KD_Tree tree(vertices(this->mesh->surface_mesh).begin(),
             vertices(this->mesh->surface_mesh).end(),
             Splitter(),
@@ -102,6 +102,7 @@ int MeshDistance::k_nearest_neighbor(const Eigen::Ref<const Eigen::Vector3d>& pt
     Point query(pt(0),  pt(1), pt(2));
     Distance tr_dist(vppmap);
 
+    // Save the nearest neighbors into an Eigen array
     K_neighbor_search search(tree, query, K, 0, true, tr_dist);
     for (K_neighbor_search::iterator it = search.begin(); it != search.end(); it++) {
         std::cout << "Vertex " << it->first << " : " << vppmap[it->first] << " at distance " 
