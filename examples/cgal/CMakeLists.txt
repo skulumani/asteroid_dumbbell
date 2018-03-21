@@ -76,3 +76,7 @@ target_link_libraries(AABB_polyhedron_facet_intersection_example ${CGAL_LIBRARIE
 add_executable( AABB_triangle_3_example AABB_triangle_3_example.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS AABB_triangle_3_example )
 target_link_libraries(AABB_triangle_3_example ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
+
+add_executable( searching_surface_mesh_vertices searching_surface_mesh_vertices.cpp )
+add_to_cached_list( CGAL_EXECUTABLE_TARGETS searching_surface_mesh_vertices )
+target_link_libraries(searching_surface_mesh_vertices ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
