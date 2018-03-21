@@ -39,6 +39,7 @@ typedef CGAL::AABB_traits<Kernel, Primitive> Traits;
 typedef CGAL::AABB_tree<Traits> Tree;
 typedef boost::optional< Tree::Intersection_and_primitive_id<Segment>::Type > Segment_intersection;
 typedef boost::optional< Tree::Intersection_and_primitive_id<Plane>::Type > Plane_intersection;
+typedef boost::optional< Tree::Intersection_and_primitive_id<Ray>::Type > Ray_intersection;
 typedef Tree::Primitive_id Primitive_id;
 
 #endif

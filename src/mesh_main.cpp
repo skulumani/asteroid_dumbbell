@@ -31,11 +31,13 @@ int main(int argc, char* argv[]) {
         psource << 2, 0, 0;
         ptarget << 0, 0, 0;
 
-        distance_to_polyhedron(psource, mesh);
-
         // instantiate the raycaster object
         RayCaster caster(mesh);
-        caster.castray(psource, ptarget);
+        Eigen::Vector3d intersection;
+        int int_flag = caster.castray(psource, ptarget, intersection);
+        if (int_flag == 0) {
+            std::cout << "Intersection point: " << intersection << std::endl;
+        }
     }
 
     /* std::cout << "Vertices: \n" << mesh->vertices << std::endl; */

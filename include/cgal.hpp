@@ -9,7 +9,11 @@
 void distance_to_polyhedron(Eigen::Vector3d& pt, std::shared_ptr<MeshData> mesh);
 class MeshDistance {
     public:
-
+        MeshDistance(std::shared_ptr<MeshData> mesh_in);
+        
+        // funciton to compute distance from pt to mesh and return minimum distance, and primitive
+    private:
+        std::shared_ptr<MeshData> mesh;
 };
 
 class RayCaster {
@@ -17,7 +21,8 @@ class RayCaster {
         RayCaster(std::shared_ptr<MeshData> mesh_in);
 
         // cast ray function
-        void castray(Eigen::Vector3d& psource, Eigen::Vector3d& ptarget);
+        int castray(const Eigen::Ref<const Eigen::Vector3d>& psource, const Eigen::Ref<const Eigen::Vector3d>& ptarget, Eigen::Ref<Eigen::Vector3d> intersection);
+
         // cast many rays function
         void update_mesh(std::shared_ptr<MeshData> mesh_in);
     private:
