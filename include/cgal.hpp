@@ -13,11 +13,12 @@ class MeshDistance {
     public:
         MeshDistance(std::shared_ptr<MeshData> mesh_in);
         
+        void update_mesh(std::shared_ptr<MeshData> mesh_in);
         // funciton to compute distance from pt to mesh and return minimum distance, and primitive
+        int k_nearest_neighbor(const Eigen::Ref<const Eigen::Vector3d>& pt, const int &K);
     private:
         std::shared_ptr<MeshData> mesh;
         Vertex_point_pmap vppmap;
-
 };
 
 class RayCaster {

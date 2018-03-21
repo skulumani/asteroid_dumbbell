@@ -38,6 +38,11 @@ int main(int argc, char* argv[]) {
         if (int_flag == 0) {
             std::cout << "Intersection point: " << intersection << std::endl;
         }
+
+        // Distance to mesh object
+        MeshDistance mesh_dist(mesh);
+
+        mesh_dist.k_nearest_neighbor(psource, 5);
     }
 
     /* std::cout << "Vertices: \n" << mesh->vertices << std::endl; */
