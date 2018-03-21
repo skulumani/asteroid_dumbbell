@@ -40,13 +40,23 @@ typedef Mesh::Face_index Face_index;
 
 // AABB typedefs
 typedef CGAL::AABB_face_graph_triangle_primitive<Polyhedron> Primitive;
-typedef CGAL::AABB_traits<Kernel, Primitive> Traits;
-typedef CGAL::AABB_tree<Traits> Tree;
-typedef boost::optional< Tree::Intersection_and_primitive_id<Segment>::Type > Segment_intersection;
-typedef boost::optional< Tree::Intersection_and_primitive_id<Plane>::Type > Plane_intersection;
-typedef boost::optional< Tree::Intersection_and_primitive_id<Ray>::Type > Ray_intersection;
-typedef Tree::Primitive_id Primitive_id;
+typedef CGAL::AABB_traits<Kernel, Primitive> AABB_Traits;
+typedef CGAL::AABB_tree<AABB_Traits> AABB_Tree;
+typedef boost::optional< AABB_Tree::Intersection_and_primitive_id<Segment>::Type > Segment_intersection;
+typedef boost::optional< AABB_Tree::Intersection_and_primitive_id<Plane>::Type > Plane_intersection;
+typedef boost::optional< AABB_Tree::Intersection_and_primitive_id<Ray>::Type > Ray_intersection;
+typedef AABB_Tree::Primitive_id Primitive_id;
 
 // dD spatial searching
+typedef boost::graph_traits<Mesh>::vertex_descriptor Mesh_Point;
+typedef boost::graph_traits<Mesh>::vertices_size_type size_type;
+
+typedef boost::property_map<Mesh,CGAL::vertex_point_t>::type Vertex_point_pmap;
+typedef CGAL::Search_traits_3<Kernel>                                    Traits_base;
+typedef CGAL::Search_traits_adapter<Mesh_Point,Vertex_point_pmap,Traits_base> KD_Traits;
+typedef CGAL::Orthogonal_k_neighbor_search<KD_Traits>                      K_neighbor_search;
+typedef K_neighbor_search::Tree                                         KD_Tree;
+typedef KD_Tree::Splitter                                                  Splitter;
+typedef K_neighbor_search::Distance                                     Distance;
 
 #endif

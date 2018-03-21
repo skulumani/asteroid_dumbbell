@@ -16,6 +16,8 @@ class MeshDistance {
         // funciton to compute distance from pt to mesh and return minimum distance, and primitive
     private:
         std::shared_ptr<MeshData> mesh;
+        Vertex_point_pmap vppmap;
+
 };
 
 class RayCaster {
@@ -30,7 +32,7 @@ class RayCaster {
     private:
         // needs the mesh to operate on
         std::shared_ptr<MeshData> mesh;
-        Tree tree; // holds the AABB tree for CGAL distance computations
+        AABB_Tree tree; // holds the AABB tree for CGAL distance computations
 };
 
 #endif
