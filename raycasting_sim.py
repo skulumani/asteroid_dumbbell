@@ -322,11 +322,13 @@ def incremental_reconstruction_subdivide(input_filename, output_filename, astero
         sim_data.attrs['subdivisions'] = subdivisions
         sim_data['max_angle'] = max_angle
 
-        v_group = fout.create_group('vertex_array')
-        f_group = fout.create_group('face_array')
 
         logger.info('Starting loop over point cloud')
-        add_points(time, ast_ints, v_est, f_est, logger, max_angle, v_group, f_group)    
+        for ii in range(5):
+            v_group = fout.create_group('vertex_array' + '_' + str(ii))
+            f_group = fout.create_group('face_array' + '_' + str(ii))
+            v_est, f_est = add_points(time, ast_ints, v_est, f_est, logger, max_angle, v_group, f_group)    
+            v_est, f_est = wavefront.mesh_subdivide(vs, fs, 1)
 
     logger.info('Completed the reconstruction')
 
