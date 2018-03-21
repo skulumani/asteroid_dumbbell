@@ -7,6 +7,8 @@
 #include <memory>
 
 void distance_to_polyhedron(Eigen::Vector3d& pt, std::shared_ptr<MeshData> mesh);
+
+// Use the dD spatial searching package for finding nearest vertices/primitives
 class MeshDistance {
     public:
         MeshDistance(std::shared_ptr<MeshData> mesh_in);

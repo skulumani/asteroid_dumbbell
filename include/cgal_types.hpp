@@ -12,6 +12,11 @@
 #include <CGAL/AABB_traits.h>
 #include <CGAL/AABB_face_graph_triangle_primitive.h>
 
+// dD Spatial searching
+#include <CGAL/Search_traits_3.h>
+#include <CGAL/Search_traits_adapter.h>
+#include <CGAL/Orthogonal_k_neighbor_search.h>
+
 typedef CGAL::Simple_cartesian<double>     Kernel;
 
 // Basic primitive objects in CGAL
@@ -41,5 +46,7 @@ typedef boost::optional< Tree::Intersection_and_primitive_id<Segment>::Type > Se
 typedef boost::optional< Tree::Intersection_and_primitive_id<Plane>::Type > Plane_intersection;
 typedef boost::optional< Tree::Intersection_and_primitive_id<Ray>::Type > Ray_intersection;
 typedef Tree::Primitive_id Primitive_id;
+
+// dD spatial searching
 
 #endif
