@@ -405,6 +405,43 @@ def read_mesh_reconstruct(filename, output_path='/tmp/reconstruct_images'):
 
     return mfig
 
+def read_mesh_reconstruct_subdivide(filename, output_path='/tmp/reconstruct_images'):
+    """Use H5PY to read the data back and plot
+    """
+    logger = logging.getLogger(__name__)
+    logger.info('Starting the image generation')
+
+    # check if location exists
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    logger.info('Opening {}'.format(filename))
+    with h5py.File(filename, 'r') as hf:
+        face_array = hf['face_array_1']
+        vertex_array = hf['vertex_array_1']
+        
+        # get all the keys for both groups
+        face_keys = utilities.sorted_nicely(list(face_array.keys()))
+        vertex_keys = utilities.sorted_nicely(list(vertex_array.keys()))
+
+        # loop over keys in both and plot
+        mfig = graphics.mayavi_figure(offscreen=True)
+        mesh = graphics.mayavi_addMesh(mfig, vertex_array[vertex_keys[0]][()], 
+                                       face_array[face_keys[0]][()])
+        ms = mesh.mlab_source
+        graphics.mlab.view(azimuth=-45)
+        for ii, (vk, fk) in enumerate(zip(vertex_keys, face_keys)):
+            filename = os.path.join(output_path, str.zfill(str(ii), 6) +'.jpg')
+            v, f = (vertex_array[vk][()], face_array[fk][()])
+            # draw the mesh
+            ms.reset(x=v[:,0], y=v[:,1], z=v[:,2], triangles=f)
+            # save the figure
+            graphics.mlab.savefig(filename, magnification=4)
+            logger.info('Saved image {}/{}'.format(ii, len(face_keys))) 
+    
+    logger.info('Finished')
+
+    return mfig
 if __name__ == "__main__":
     # TODO Measure time for run
     # TODO Add argument parsing
@@ -463,7 +500,7 @@ if __name__ == "__main__":
         # ffmpeg_command ='ffmpeg -framerate -i %06d.jpg' + " -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" video.mp4"
         # subprocess.run(ffmpeg_command, shell=True, cwd=output_path)
 
-    elif args.plot_subdive:
+    elif args.plot_subdivide:
         output_path = tempfile.mkdtemp()
         print("Images saved to {}".format(output_path))
         read_mesh_reconstruct_subdivide(args.reconstruct_data, output_path=output_path)
