@@ -8,7 +8,7 @@ import os
 from point_cloud import wavefront
 from visualization import graphics
 from kinematics import sphere
-
+from dynamics import asteroid
 
 view = {'azimuth': 16.944197132093564, 'elevation': 66.34177792039738,
         'distance': 2.9356815748114435, 
@@ -76,21 +76,53 @@ def sphere_into_ellipsoid(img_path):
 
     return 0
 
-def itokawa_reconstruction(img_path):
-    """Incrementally modify an ellipse into a low resolution verision of itokawa
+def castalia_reconstruction(img_path):
+    """Incrementally modify an ellipse into a low resolution verision of castalia
     by adding vertices and modifying the mesh
     """
+    density = 20
+    subdivisions = 1
     # load a low resolution ellipse to start
-
+    ast = asteroid.Asteroid('castalia', 0, 'obj')
+    v_est, f_est = wavefront.ellipsoid_mesh(ast.axes[0]*0.75, 
+                                            ast.axes[1]*0.75,
+                                            ast.axes[2]*0.75,
+                                            density=density,
+                                            subdivisions=subdivisions)
     # truth model from itokawa shape model
+    v_truth, f_truth = ast.V, ast.F
+    # sort the vertices in in order (x component)
+    v_truth = v_truth[v_truth[:, 0].argsort()]
 
     # loop and create many figures
-    pass
-
+    mfig = graphics.mayavi_figure(offscreen=True)
+    mesh = graphics.mayavi_addMesh(mfig, v_est, f_est)
+    ms = mesh.mlab_source
+    index = 0
+    # pdb.set_trace()
+    for jj in range(2):
+        for ii, pt in enumerate(v_truth):
+            index +=1
+            filename = os.path.join(img_path, 'castalia_reconstruct_' + str(index).zfill(7) + '.jpg')
+            graphics.mlab.savefig(filename, magnification=4)
+            mesh_param = wavefront.polyhedron_parameters(v_est, f_est)
+            v_est, f_est = wavefront.radius_mesh_incremental_update(pt, v_est, f_est,
+                                                                    mesh_param,
+                                                                    max_angle=np.deg2rad(10))
+            ms.reset(x=v_est[:, 0], y=v_est[:, 1], z=v_est[:, 2], triangles=f_est)
+            graphics.mayavi_addPoint(mfig, pt, radius=0.01 )
+            
+        v_est, f_est = wavefront.mesh_subdivide(v_est, f_est, 1)
+        ms.reset(x=v_est[:, 0], y=v_est[:, 1], z=v_est[:, 2], triangles=f_est)
+    
+        pdb.set_trace()
+    return 0
+        
 if __name__ == "__main__":
     img_path = '/tmp/mayavi_figure'
     if not os.path.exists(img_path):
         os.makedirs(img_path)
 
     # cube_into_sphere(img_path)
-    sphere_into_ellipsoid(img_path)
+    # sphere_into_ellipsoid(img_path)
+    castalia_reconstruction(img_path)
