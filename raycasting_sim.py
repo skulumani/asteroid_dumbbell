@@ -306,8 +306,8 @@ def incremental_reconstruction_subdivide(input_filename, output_filename, astero
                                     density=density, subdivisions=subdivisions)
 
     # extract out all the points in the asteroid frame
-    time = point_cloud['time'][::100]
-    ast_ints = point_cloud['ast_ints'][::100]
+    time = point_cloud['time'][::200]
+    ast_ints = point_cloud['ast_ints'][::200]
     logger.info('Create HDF5 file {}'.format(output_filename))
     with h5py.File(output_filename, 'w') as fout:
         # store some extra data about teh simulation
@@ -328,7 +328,12 @@ def incremental_reconstruction_subdivide(input_filename, output_filename, astero
             v_group = fout.create_group('vertex_array' + '_' + str(ii))
             f_group = fout.create_group('face_array' + '_' + str(ii))
             v_est, f_est = add_points(time, ast_ints, v_est, f_est, logger, max_angle, v_group, f_group)    
+            logger.info('Finished all the points. Now subdividing')
+            logger.info('vertices: {}  faces: {}'.format(v_est.shape[0], f_est.shape[0]))
             v_est, f_est = wavefront.mesh_subdivide(v_est, f_est, 1)
+            logger.info('Finished subdivisions')
+            logger.info('vertices: {}  faces: {}'.format(v_est.shape[0], f_est.shape[0]))
+
 
     logger.info('Completed the reconstruction')
 
@@ -413,13 +418,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('point_cloud_data', help="Filename for point cloud data.")
     parser.add_argument('reconstruct_data', help="Filename for reconstruction data.")
-
+    
+    # TODO Look up argument parsing and passing flags
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--simulate", help='Run the point cloud simulation',
                         action="store_true")
     group.add_argument("-r", "--reconstruct", help="Reconstruct from the point cloud",
                         action="store_true")
-    group.add_argument("-p", "--plot", help="Read the reconstruction and generate images",
+    group.add_argument("-t", "--subdivide", help="Reconstruction with subdivision",
+                       action="store_true")
+    group.add_argument("-p", "--plot", help="Read the reconstruction  from r mode and generate images",
+                       action="store_true")
+    group.add_argument("-q", "--plot_subdivide", help="Read the reconstruction  from t mode and generate images",
                        action="store_true")
 
     args = parser.parse_args()
@@ -439,6 +449,8 @@ if __name__ == "__main__":
         # reconstruct_filename = os.path.join('./data/raycasting', args.fnames[1])
         # filename = './data/raycasting/20180110_raycasting_castalia.npz'
         
+        incremental_reconstruction(args.point_cloud_data, args.reconstruct_data, 'castalia')
+    elif args.subdivide:
         incremental_reconstruction_subdivide(args.point_cloud_data, args.reconstruct_data, 'castalia')
     elif args.plot:
         # generate the images
@@ -451,4 +463,7 @@ if __name__ == "__main__":
         # ffmpeg_command ='ffmpeg -framerate -i %06d.jpg' + " -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" video.mp4"
         # subprocess.run(ffmpeg_command, shell=True, cwd=output_path)
 
-
+    elif args.plot_subdive:
+        output_path = tempfile.mkdtemp()
+        print("Images saved to {}".format(output_path))
+        read_mesh_reconstruct_subdivide(args.reconstruct_data, output_path=output_path)
