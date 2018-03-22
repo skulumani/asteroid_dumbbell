@@ -76,6 +76,17 @@ def sphere_into_ellipsoid(img_path):
 
     return 0
 
+def itokawa_reconstruction(img_path):
+    """Incrementally modify an ellipse into a low resolution verision of itokawa
+    by adding vertices and modifying the mesh
+    """
+    # load a low resolution ellipse to start
+
+    # truth model from itokawa shape model
+
+    # loop and create many figures
+    pass
+
 if __name__ == "__main__":
     img_path = '/tmp/mayavi_figure'
     if not os.path.exists(img_path):
