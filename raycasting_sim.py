@@ -360,6 +360,8 @@ def add_points(time, ast_ints, v_est, f_est, logger, max_angle, v_group, f_group
             v_group.create_dataset(str(ii), data=v_est)
             f_group.create_dataset(str(ii), data=f_est)
 
+    return v_est, f_est
+
 def read_mesh_reconstruct(filename, output_path='/tmp/reconstruct_images'):
     """Use H5PY to read the data back and plot
     """
