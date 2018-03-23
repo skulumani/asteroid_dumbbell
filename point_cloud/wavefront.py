@@ -1676,20 +1676,18 @@ def spherical_incremental_mesh_update(pt_spherical, vs_spherical, f,
     # indices that are within the range
     region_index = np.intersect1d(np.nonzero(valid_lat), np.nonzero(valid_lon))
     mesh_region = vs_spherical[region_index,:]
-    dist = spherical_distance(pt_spherical, mesh_region)
-    pdb.set_trace()
-    # find the index of the point which lies inside of a threshold
-    # 1 sigma mask (extra points)
-    # mask_sigma = np.ma.masked_less(cos_angle, np.cos(np.deg2rad(np.rad2deg(max_angle) * angle_std)))
-    # mask = np.ma.masked_less(cos_angle, np.cos(max_angle))
-    
-    # # now find index of minimum angle (closest to 1)
-    # ind_angle = np.nonzero(mask == np.max(mask))[0]
-    # # ind_angle_sigma = np.nonzero(mask_sigma == np.max(mask_sigma))[0]
-    # ind_angle_region = np.nonzero(mask)[0]
+    delta_sigma = spherical_distance(pt_spherical, mesh_region)
 
-    # for each element we adjust its radius by a funciton
-    return vs_spherical, f
+    # now compute new radii for those in mesh region
+    radius_scale = radius_scale_factor(delta_sigma, 1)
+    
+    mesh_region[:, 0] = radius_scale * pt_spherical[0]
+    
+    nv_spherical = vs_spherical.copy()
+    
+    nv_spherical[region_index, :] = mesh_region
+
+    return nv_spherical, f
 
 def distance_to_mesh(pt, v, f, mesh_parameters):
     r"""Minimum distance to a mesh
@@ -2421,4 +2419,11 @@ def spherical_distance(s1, s2):
 
     dist = 1 * delta_sigma
     return delta_sigma
-    
+   
+def radius_scale_factor(dist_sigma, std=1):
+    """Scale factor based on half normal distribution
+
+    scale - higher numbers makes more spiky area
+    """
+    scale = np.sqrt(2)/std/np.sqrt(np.pi) * np.exp(- dist_sigma**2 / 2 / std**2)
+    return scale

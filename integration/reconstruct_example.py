@@ -13,7 +13,7 @@ ve_spherical = wavefront.cartesian2spherical(ve);
 
 # mesh_param = wavefront.polyhedron_parameters(v, f)
 
-pt = np.array([1, 1, 1])
+pt = ve[0, :]
 
 pt_spherical = wavefront.cartesian2spherical(pt)
 
