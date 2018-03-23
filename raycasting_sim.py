@@ -324,7 +324,7 @@ def incremental_reconstruction_subdivide(input_filename, output_filename, astero
 
 
         logger.info('Starting loop over point cloud')
-        for ii in range(5):
+        for ii in range(2):
             v_group = fout.create_group('vertex_array' + '_' + str(ii))
             f_group = fout.create_group('face_array' + '_' + str(ii))
             v_est, f_est = add_points(time, ast_ints, v_est, f_est, logger, max_angle, v_group, f_group)    
