@@ -115,7 +115,6 @@ def castalia_reconstruction(img_path):
         v_est, f_est = wavefront.mesh_subdivide(v_est, f_est, 1)
         ms.reset(x=v_est[:, 0], y=v_est[:, 1], z=v_est[:, 2], triangles=f_est)
     
-        pdb.set_trace()
     return 0
         
 if __name__ == "__main__":
