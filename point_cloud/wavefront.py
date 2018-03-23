@@ -1661,20 +1661,19 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
     return nv, nf
 
 def spherical_incremental_mesh_update(pt_spherical, vs_spherical, f,
-                                      surf_area, factor=1):
+                                      surf_area, factor=1, radius_factor=1):
 
     # surface area on a spherical area gives us a range of long and lat
     delta_lat, delta_lon = spherical_surface_area(pt_spherical, surf_area, factor=1)
 
     # find elements that lie close to the measurement (lat/lon searching col 1 and 2)
 
-    diff_lat = vs_spherical[:, 1:2] - pt_spherical[1:2]
-
-    valid_lat = np.absolute(vs_spherical[:, 1]) < delta_lat
-    valid_lon = np.absolute(vs_spherical[:, 2]) < delta_lon
+    diff_angle = vs_spherical[:, [1, 2]] - pt_spherical[np.newaxis, 1:2]
+    valid_lat = np.absolute(diff_angle[:, 0]) < delta_lat
+    valid_lon = np.absolute(diff_angle[:, 1]) < delta_lon
     
     # indices that are within the range
-    region_index = np.intersect1d(np.nonzero(valid_lat), np.nonzero(valid_lon))
+    region_index = np.intersect1d(np.nonzero(valid_lat)[0], np.nonzero(valid_lon)[0])
     mesh_region = vs_spherical[region_index,:]
     delta_sigma = spherical_distance(pt_spherical, mesh_region)
 
