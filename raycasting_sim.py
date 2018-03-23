@@ -460,12 +460,14 @@ if __name__ == "__main__":
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--simulate", help='Run the point cloud simulation',
                         action="store_true")
-    group.add_argument("-r", "--reconstruct", help="Reconstruct from the point cloud",
-                        action="store_true")
-    group.add_argument("-t", "--subdivide", help="Reconstruction with subdivision",
-                       action="store_true")
-    group.add_argument("-p", "--plot", help="Read the reconstruction  from r mode and generate images",
-                       action="store_true")
+    # reconstruct has several different options based on the selection
+    # 1 - reconstruct wihtout any subdivision
+    # 2 - reconstruct with subdivisions
+    group.add_argument("-r", "--reconstruct", help="Reconstruct from the point cloud data.\n 1 reconstructs without subdivisions\n2 reconstructs with subdivisions",
+                       action="store")
+    # plot the output - 1 matches r 1 and 2 matches with r 2
+    group.add_argument("-p", "--plot", help="Read the reconstruction from r mode and generate images",
+                       action="store")
     group.add_argument("-q", "--plot_subdivide", help="Read the reconstruction  from t mode and generate images",
                        action="store_true")
 
@@ -481,26 +483,27 @@ if __name__ == "__main__":
         # to access the data again
         # data = np.load(filename)
         # point_cloud = data['point_cloud'][()]
-    elif args.reconstruct:
+    elif args.reconstruct == 1:
         # now reconstruct
         # reconstruct_filename = os.path.join('./data/raycasting', args.fnames[1])
         # filename = './data/raycasting/20180110_raycasting_castalia.npz'
         
         incremental_reconstruction(args.point_cloud_data, args.reconstruct_data, 'castalia')
-    elif args.subdivide:
+    elif args.reconstruct == 2:
         incremental_reconstruction_subdivide(args.point_cloud_data, args.reconstruct_data, 'castalia')
-    elif args.plot:
+    elif args.plot == 1:
         # generate the images
         output_path = tempfile.mkdtemp()
         print("Images saved to {}".format(output_path))
         read_mesh_reconstruct(args.reconstruct_data, output_path=output_path)
 
-        # also automatically create the video by calling ffmpeg
-        print("Now going to create a video using FFMPEG")
-        # ffmpeg_command ='ffmpeg -framerate -i %06d.jpg' + " -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" video.mp4"
-        # subprocess.run(ffmpeg_command, shell=True, cwd=output_path)
-
-    elif args.plot_subdivide:
+    elif args.plt == 2:
         output_path = tempfile.mkdtemp()
         print("Images saved to {}".format(output_path))
         read_mesh_reconstruct_subdivide(args.reconstruct_data, output_path=output_path)
+
+    # also automatically create the video by calling ffmpeg
+    # print("Now going to create a video using FFMPEG")
+    # ffmpeg_command ='ffmpeg -framerate -i %06d.jpg' + " -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" video.mp4"
+    # subprocess.run(ffmpeg_command, shell=True, cwd=output_path)
+
