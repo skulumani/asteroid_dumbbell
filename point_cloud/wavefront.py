@@ -1664,8 +1664,8 @@ def spherical_incremental_mesh_update(pt_spherical, vs_spherical, f,
                                       surf_area, factor=1, radius_factor=1):
 
     # surface area on a spherical area gives us a range of long and lat
-    delta_lat, delta_lon = spherical_surface_area(pt_spherical, surf_area, factor=1)
-
+    delta_lat, delta_lon = spherical_surface_area(pt_spherical, surf_area, factor=factor)
+    
     # find elements that lie close to the measurement (lat/lon searching col 1 and 2)
 
     diff_angle = vs_spherical[:, [1, 2]] - pt_spherical[np.newaxis, 1:2]
@@ -1678,9 +1678,9 @@ def spherical_incremental_mesh_update(pt_spherical, vs_spherical, f,
     delta_sigma = spherical_distance(pt_spherical, mesh_region)
 
     # now compute new radii for those in mesh region
-    radius_scale = radius_scale_factor(delta_sigma, 1)
+    radius_scale = radius_scale_factor(delta_sigma, std=radius_factor)
     
-    mesh_region[:, 0] = radius_scale * pt_spherical[0]
+    mesh_region[:, 0] = radius_scale * (pt_spherical[np.newaxis, 0] - mesh_region[:, 0]) + mesh_region[:, 0]
     
     nv_spherical = vs_spherical.copy()
     
@@ -2424,5 +2424,6 @@ def radius_scale_factor(dist_sigma, std=1):
 
     scale - higher numbers makes more spiky area
     """
-    scale = np.sqrt(2)/std/np.sqrt(np.pi) * np.exp(- dist_sigma**2 / 2 / std**2)
+    max_value = np.sqrt(2) / std / np.sqrt(np.pi)
+    scale = np.sqrt(2)/std/np.sqrt(np.pi) * np.exp(- dist_sigma**2 / 2 / std**2) / max_value
     return scale

@@ -4,7 +4,7 @@ from visualization import graphics
 from point_cloud import wavefront
 import numpy as np
 
-vs, f = wavefront.ellipsoid_mesh(0.5, 0.5, 0.5, density=20, subdivisions=0)
+vs, f = wavefront.ellipsoid_mesh(0.5, 0.5, 0.5, density=20, subdivisions=1)
 # ve, fe = wavefront.ellipsoid_mesh(1, 1, 1, density=10, subdivisions=1)
 # convert all vertices to spherical coordinates
 v_spherical = wavefront.cartesian2spherical(vs);
@@ -18,7 +18,10 @@ v_spherical = wavefront.cartesian2spherical(vs);
 pt = np.array([1, 0, 0])
 pt_spherical = wavefront.cartesian2spherical(pt)
 
-nv_spherical, nf = wavefront.spherical_incremental_mesh_update(pt_spherical, v_spherical, f, surf_area=0.1, factor=1, radius_factor=1)
+nv_spherical, nf = wavefront.spherical_incremental_mesh_update(pt_spherical, v_spherical, f,
+                                                               surf_area=0.4, 
+                                                               factor=1, 
+                                                               radius_factor=0.4)
 
 # convert back to cartesian
 nv = wavefront.spherical2cartesian(nv_spherical)
