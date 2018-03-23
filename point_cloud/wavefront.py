@@ -1660,16 +1660,36 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
 
     return nv, nf
 
-def spherical_incremental_mesh_update(pt, v, f, mesh_parameters,
-                                      max_angle=np.deg2rad(45),
-                                      angle_std=2):
-    # convert to spherical coordinates
+def spherical_incremental_mesh_update(pt_spherical, vs_spherical, f,
+                                      surf_area, factor=1):
 
     # surface area on a spherical area gives us a range of long and lat
+    delta_lat, delta_lon = spherical_surface_area(pt_spherical, surf_area, factor=1)
 
-    # find elements that lie close to the measurement
+    # find elements that lie close to the measurement (lat/lon searching col 1 and 2)
+
+    diff_lat = vs_spherical[:, 1:2] - pt_spherical[1:2]
+
+    valid_lat = np.absolute(vs_spherical[:, 1]) < delta_lat
+    valid_lon = np.absolute(vs_spherical[:, 2]) < delta_lon
+    
+    # indices that are within the range
+    region_index = np.intersect1d(np.nonzero(valid_lat), np.nonzero(valid_lon))
+    mesh_region = vs_spherical[region_index,:]
+    dist = spherical_distance(pt_spherical, mesh_region)
+    pdb.set_trace()
+    # find the index of the point which lies inside of a threshold
+    # 1 sigma mask (extra points)
+    # mask_sigma = np.ma.masked_less(cos_angle, np.cos(np.deg2rad(np.rad2deg(max_angle) * angle_std)))
+    # mask = np.ma.masked_less(cos_angle, np.cos(max_angle))
+    
+    # # now find index of minimum angle (closest to 1)
+    # ind_angle = np.nonzero(mask == np.max(mask))[0]
+    # # ind_angle_sigma = np.nonzero(mask_sigma == np.max(mask_sigma))[0]
+    # ind_angle_region = np.nonzero(mask)[0]
 
     # for each element we adjust its radius by a funciton
+    return vs_spherical, f
 
 def distance_to_mesh(pt, v, f, mesh_parameters):
     r"""Minimum distance to a mesh
@@ -2366,3 +2386,39 @@ def spherical2cartesian(spherical):
         vertices = np.stack((x, y, z), axis=1)
 
     return vertices
+
+def spherical_surface_area(meas, surf_area, factor=1):
+    """Find the range of latitutde and longitude given a desired surface area
+    """
+    r, lat, lon = meas
+    del_angle = np.sqrt(surf_area/r**2 / np.cos(lat))
+
+    delta_lat = del_angle;
+    delta_lon = factor*delta_lat;
+
+    return delta_lat, delta_lon
+
+def spherical_distance(s1, s2):
+    """Find distance between between s1 and s2 on geodesic of sphere
+
+    Assume s1 is a scalar spherical coordinate (r, lat, lon)
+    and s2 can be a vector array n*3
+
+
+    Dist will be the same size as s2
+    """
+    r1, lat1, lon1 = s1[np.newaxis, 0], s1[np.newaxis, 1], s1[np.newaxis, 2]
+    r2, lat2, lon2 = s2[:, 0], s2[:, 1], s2[:, 2]
+    
+    delta_lon = np.absolute(lon1 - lon2)
+
+    num = np.sqrt((np.cos(lat2)*np.sin(delta_lon))**2 + (np.cos(lat1)*np.sin(lat2) - np.sin(lat1)*np.cos(lat2)*np.cos(delta_lon))**2)
+    den = np.sin(lat1)*np.sin(lat2) + np.cos(lat1)*np.cos(lat2)*np.cos(delta_lon)
+
+    delta_sigma = np.arctan2(num, den)
+
+    # delta_sigma_cos = np.arccos(np.sin(lat1)*np.sin(lat2) + np.cos(lat1)*np.cos(lat2)*np.cos(delta_lon))
+
+    dist = 1 * delta_sigma
+    return delta_sigma
+    
