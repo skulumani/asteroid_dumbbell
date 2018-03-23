@@ -444,7 +444,6 @@ def read_mesh_reconstruct_subdivide(filename, output_path='/tmp/reconstruct_imag
     return mfig
 if __name__ == "__main__":
     # TODO Measure time for run
-    # TODO Add argument parsing
     logging_file = tempfile.mkstemp(suffix='.txt')[1]
     logging.basicConfig(filename=logging_file,
                         filemode='w', level=logging.INFO,
@@ -452,24 +451,26 @@ if __name__ == "__main__":
                         datefmt='%Y-%m-%d %H:%M:%S')
     print("Logging to {}".format(logging_file))
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Raycasting and Reconstruction simulation",
+                                     formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('point_cloud_data', help="Filename for point cloud data.")
     parser.add_argument('reconstruct_data', help="Filename for reconstruction data.")
     
-    # TODO Look up argument parsing and passing flags
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--simulate", help='Run the point cloud simulation',
                         action="store_true")
     # reconstruct has several different options based on the selection
-    # 1 - reconstruct wihtout any subdivision
-    # 2 - reconstruct with subdivisions
-    group.add_argument("-r", "--reconstruct", help="Reconstruct from the point cloud data.\n 1 reconstructs without subdivisions\n2 reconstructs with subdivisions",
+    group.add_argument("-r", "--reconstruct", choices=['i', 's'], 
+                       help="Run the reconstruction algorithm.\n"
+                       "i = incremental reconstruction\n"
+                       "s = incremental reconstruction with subdivisions",
                        action="store")
     # plot the output - 1 matches r 1 and 2 matches with r 2
-    group.add_argument("-p", "--plot", help="Read the reconstruction from r mode and generate images",
+    group.add_argument("-p", "--plot", choices=['i', 's'],
+                       help="Read the reconstruction data and images\n"
+                       "i = incremental reconstruction\n"
+                       "s = incremental reconstruction with subdivision",
                        action="store")
-    group.add_argument("-q", "--plot_subdivide", help="Read the reconstruction  from t mode and generate images",
-                       action="store_true")
 
     args = parser.parse_args()
     
@@ -483,21 +484,21 @@ if __name__ == "__main__":
         # to access the data again
         # data = np.load(filename)
         # point_cloud = data['point_cloud'][()]
-    elif args.reconstruct == 1:
+    elif args.reconstruct == "i":
         # now reconstruct
         # reconstruct_filename = os.path.join('./data/raycasting', args.fnames[1])
         # filename = './data/raycasting/20180110_raycasting_castalia.npz'
         
         incremental_reconstruction(args.point_cloud_data, args.reconstruct_data, 'castalia')
-    elif args.reconstruct == 2:
+    elif args.reconstruct == "s":
         incremental_reconstruction_subdivide(args.point_cloud_data, args.reconstruct_data, 'castalia')
-    elif args.plot == 1:
+    elif args.plot == "i":
         # generate the images
         output_path = tempfile.mkdtemp()
         print("Images saved to {}".format(output_path))
         read_mesh_reconstruct(args.reconstruct_data, output_path=output_path)
 
-    elif args.plt == 2:
+    elif args.plt == "s":
         output_path = tempfile.mkdtemp()
         print("Images saved to {}".format(output_path))
         read_mesh_reconstruct_subdivide(args.reconstruct_data, output_path=output_path)
