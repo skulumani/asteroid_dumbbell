@@ -1660,6 +1660,17 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
 
     return nv, nf
 
+def spherical_incremental_mesh_update(pt, v, f, mesh_parameters,
+                                      max_angle=np.deg2rad(45),
+                                      angle_std=2):
+    # convert to spherical coordinates
+
+    # surface area on a spherical area gives us a range of long and lat
+
+    # find elements that lie close to the measurement
+
+    # for each element we adjust its radius by a funciton
+
 def distance_to_mesh(pt, v, f, mesh_parameters):
     r"""Minimum distance to a mesh
 
