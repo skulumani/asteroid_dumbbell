@@ -696,3 +696,14 @@ class TestCartesianAndSphericalTransformation():
     def test_single_vector_spherical2cartesian(self):
         cartesian = wavefront.spherical2cartesian(np.array([1, 0, 0]))
         np.testing.assert_allclose(cartesian, (1, 0, 0))
+
+class TestSphericalTrigonometry():
+    s1 = np.array([1, 0, 0])
+    def test_spherical_distance_zero(self):
+        delta_sigma = wavefront.spherical_distance(s1, np.array([[1, 0, 0]]))
+        np.testing.assert_allclose(delta_sigma, 0)
+
+    def test_spherical_distance_ninety(self):
+        delta_sigma = wavefront.spherical_distance(21, np.array([[1, np.pi/2, 0]]))
+        np.testing.assert_allclose(delta_sigma, np.pi/2)
+
