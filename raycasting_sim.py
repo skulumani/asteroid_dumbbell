@@ -445,6 +445,8 @@ def read_mesh_reconstruct_subdivide(filename, output_path='/tmp/reconstruct_imag
 if __name__ == "__main__":
     # TODO Measure time for run
     logging_file = tempfile.mkstemp(suffix='.txt')[1]
+    output_path = tempfile.mkdtemp()
+
     logging.basicConfig(filename=logging_file,
                         filemode='w', level=logging.INFO,
                         format='%(asctime)s %(levelname)-8s %(message)s',
@@ -453,8 +455,12 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Raycasting and Reconstruction simulation",
                                      formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('point_cloud_data', help="Filename for point cloud data.")
-    parser.add_argument('reconstruct_data', help="Filename for reconstruction data.")
+    parser.add_argument("-i", '--point_cloud_data', 
+                        help="Filename for point cloud data.\n"
+                        "This holds the simulation data as an npz")
+    parser.add_argument("-o", '--reconstruct_data', 
+                        help="Filename for reconstruction data.\n"
+                        "This holds the reconstructed data")
     
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--simulate", help='Run the point cloud simulation',
@@ -471,6 +477,11 @@ if __name__ == "__main__":
                        "i = incremental reconstruction\n"
                        "s = incremental reconstruction with subdivision",
                        action="store")
+    group.add_argument("-m", "--movie", nargs=2,
+                       help="Create movie from all images in temp folder\n"
+                       "Path to images folder\n"
+                       "Filename to parse by ffmpeg, i.e picture_<percent>06d.jpg",
+                       action="append")
 
     args = parser.parse_args()
     
@@ -494,15 +505,15 @@ if __name__ == "__main__":
         incremental_reconstruction_subdivide(args.point_cloud_data, args.reconstruct_data, 'castalia')
     elif args.plot == "i":
         # generate the images
-        output_path = tempfile.mkdtemp()
         print("Images saved to {}".format(output_path))
         read_mesh_reconstruct(args.reconstruct_data, output_path=output_path)
-
-    elif args.plt == "s":
-        output_path = tempfile.mkdtemp()
+    elif args.plot == "s":
         print("Images saved to {}".format(output_path))
         read_mesh_reconstruct_subdivide(args.reconstruct_data, output_path=output_path)
-
+    elif args.movie[0]:
+        os.chdir(args.movie[0][0])
+        subprocess.call(['ffmpeg', '-i', args.movie[0][1], 'output.mp4'])
+        print("Movie is created in {}/output.mp4".format(args.movie[0][0]))
     # also automatically create the video by calling ffmpeg
     # print("Now going to create a video using FFMPEG")
     # ffmpeg_command ='ffmpeg -framerate -i %06d.jpg' + " -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" video.mp4"
