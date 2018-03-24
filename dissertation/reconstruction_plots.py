@@ -116,7 +116,45 @@ def castalia_reconstruction(img_path):
         ms.reset(x=v_est[:, 0], y=v_est[:, 1], z=v_est[:, 2], triangles=f_est)
     
     return 0
-        
+def sphere_into_ellipsoid_spherical_coordinates(img_path):
+    """See if we can turn a sphere into an ellipse by changing the radius of
+    vertices in spherical coordinates
+    
+    The point cloud (ellipse) should have the same number of points than the initial mesh.
+    """
+    surf_area = 5
+    factor = 1
+    radius_factor = 0.1
+
+    # define the sphere
+    vs, fs = wavefront.ellipsoid_mesh(1, 1, 1, density=20, subdivisions=1)
+    ve, fe = wavefront.ellipsoid_mesh(2, 3, 4, density=20, subdivisions=1)
+    
+    # convert to spherical coordinates
+    vs_spherical = wavefront.cartesian2spherical(vs)
+    ve_spherical = wavefront.cartesian2spherical(ve)
+
+    mfig = graphics.mayavi_figure(offscreen=False)
+    mesh = graphics.mayavi_addMesh(mfig, vs, fs)
+    ms = mesh.mlab_source
+    index = 0
+    # in a loop add each vertex of the ellipse into the sphere mesh
+    pdb.set_trace()
+    for ii, pt in enumerate(ve_spherical):
+        index +=1
+        filename = os.path.join(img_path, 'sphere_ellipsoid_' + str(index).zfill(6) + '.jpg')
+        # graphics.mlab.savefig(filename, magnification=4)
+        vs_spherical, fs = wavefront.spherical_incremental_mesh_update(pt, vs_spherical,fs,
+                                                                surf_area=surf_area,
+                                                                factor=factor,
+                                                                radius_factor=radius_factor)
+        # convert back to cartesian for plotting
+
+    vs = wavefront.spherical2cartesian(vs_spherical)
+    ms.reset(x=vs[:,0], y=vs[:,1], z=vs[:,2], triangles=fs)
+    graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt))
+    return 0
+
 if __name__ == "__main__":
     img_path = '/tmp/mayavi_figure'
     if not os.path.exists(img_path):
@@ -124,4 +162,5 @@ if __name__ == "__main__":
 
     # cube_into_sphere(img_path)
     # sphere_into_ellipsoid(img_path)
-    castalia_reconstruction(img_path)
+    # castalia_reconstruction(img_path)
+    sphere_into_ellipsoid_spherical_coordinates(img_path)

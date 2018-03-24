@@ -39,6 +39,7 @@ import vtk
 from vtk.util import numpy_support
 
 import utilities
+from kinematics import attitude
 
 warnings.filterwarnings(action="ignore", category=RuntimeWarning,
                         message=r"All-NaN")
@@ -1665,7 +1666,6 @@ def spherical_incremental_mesh_update(pt_spherical, vs_spherical, f,
 
     # surface area on a spherical area gives us a range of long and lat
     delta_lat, delta_lon = spherical_surface_area(pt_spherical, surf_area, factor=factor)
-    
     # find elements that lie close to the measurement (lat/lon searching col 1 and 2)
 
     diff_angle = vs_spherical[:, [1, 2]] - pt_spherical[np.newaxis, 1:2]
@@ -2407,14 +2407,14 @@ def spherical_distance(s1, s2):
     r1, lat1, lon1 = s1[np.newaxis, 0], s1[np.newaxis, 1], s1[np.newaxis, 2]
     r2, lat2, lon2 = s2[:, 0], s2[:, 1], s2[:, 2]
     
-    delta_lon = np.absolute(lon1 - lon2)
-
+    delta_lon =attitude.normalize( (lon2 - lon1), -np.pi, np.pi)
+    
     num = np.sqrt((np.cos(lat2)*np.sin(delta_lon))**2 + (np.cos(lat1)*np.sin(lat2) - np.sin(lat1)*np.cos(lat2)*np.cos(delta_lon))**2)
     den = np.sin(lat1)*np.sin(lat2) + np.cos(lat1)*np.cos(lat2)*np.cos(delta_lon)
 
     delta_sigma = np.arctan2(num, den)
 
-    # delta_sigma_cos = np.arccos(np.sin(lat1)*np.sin(lat2) + np.cos(lat1)*np.cos(lat2)*np.cos(delta_lon))
+    delta_sigma_cos = np.arccos(np.sin(lat1)*np.sin(lat2) + np.cos(lat1)*np.cos(lat2)*np.cos(delta_lon))
 
     dist = 1 * delta_sigma
     return delta_sigma

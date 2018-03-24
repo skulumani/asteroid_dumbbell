@@ -10,18 +10,18 @@ vs, f = wavefront.ellipsoid_mesh(0.5, 0.5, 0.5, density=20, subdivisions=1)
 v_spherical = wavefront.cartesian2spherical(vs);
 # ve_spherical = wavefront.cartesian2spherical(ve);
 
-# vc, fc = wavefront.read_obj('./integration/cube.obj')
-# vc_spherical = wavefront.cartesian2spherical(vc)
+# vc, f = wavefront.read_obj('./integration/cube.obj')
+# v_spherical = wavefront.cartesian2spherical(vc)
 
 # mesh_param = wavefront.polyhedron_parameters(v, f)
 
-pt = np.array([1, 0, 0])
+pt = np.array([1, 1, 0])
 pt_spherical = wavefront.cartesian2spherical(pt)
 
 nv_spherical, nf = wavefront.spherical_incremental_mesh_update(pt_spherical, v_spherical, f,
-                                                               surf_area=0.4, 
+                                                               surf_area=5, 
                                                                factor=1, 
-                                                               radius_factor=0.4)
+                                                               radius_factor=0.1)
 
 # convert back to cartesian
 nv = wavefront.spherical2cartesian(nv_spherical)
