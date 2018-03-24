@@ -1666,11 +1666,16 @@ def spherical_incremental_mesh_update(pt_spherical, vs_spherical, f,
 
     # surface area on a spherical area gives us a range of long and lat
     delta_lat, delta_lon = spherical_surface_area(pt_spherical, surf_area, factor=factor)
+    # delta_lat = np.deg2rad(45)
+    # delta_lon = delta_lat
     # find elements that lie close to the measurement (lat/lon searching col 1 and 2)
+    diff_lat = attitude.normalize(vs_spherical[:, 1] - pt_spherical[np.newaxis, 1],
+                                  -np.pi/2, np.pi/2)
+    diff_lon = attitude.normalize(vs_spherical[:, 2] - pt_spherical[np.newaxis,  2],
+                                  -np.pi, np.pi)
 
-    diff_angle = vs_spherical[:, [1, 2]] - pt_spherical[np.newaxis, 1:2]
-    valid_lat = np.absolute(diff_angle[:, 0]) < delta_lat
-    valid_lon = np.absolute(diff_angle[:, 1]) < delta_lon
+    valid_lat = np.absolute(diff_lat) < delta_lat
+    valid_lon = np.absolute(diff_lon) < delta_lon
     
     # indices that are within the range
     region_index = np.intersect1d(np.nonzero(valid_lat)[0], np.nonzero(valid_lon)[0])
