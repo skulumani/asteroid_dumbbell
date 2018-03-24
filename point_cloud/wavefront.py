@@ -1681,7 +1681,7 @@ def spherical_incremental_mesh_update(pt_spherical, vs_spherical, f,
     region_index = np.intersect1d(np.nonzero(valid_lat)[0], np.nonzero(valid_lon)[0])
     mesh_region = vs_spherical[region_index,:]
     delta_sigma = spherical_distance(pt_spherical, mesh_region)
-
+    
     # now compute new radii for those in mesh region
     radius_scale = radius_scale_factor(delta_sigma, std=radius_factor)
     
