@@ -2419,7 +2419,7 @@ def spherical_distance(s1, s2):
 
     delta_sigma = np.arctan2(num, den)
 
-    delta_sigma_cos = np.arccos(np.sin(lat1)*np.sin(lat2) + np.cos(lat1)*np.cos(lat2)*np.cos(delta_lon))
+    # delta_sigma_cos = np.arccos(np.sin(lat1)*np.sin(lat2) + np.cos(lat1)*np.cos(lat2)*np.cos(delta_lon))
 
     dist = 1 * delta_sigma
     return delta_sigma

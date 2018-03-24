@@ -122,13 +122,13 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     
     The point cloud (ellipse) should have the same number of points than the initial mesh.
     """
-    surf_area = 5
+    surf_area = 0.1
     factor = 1
-    radius_factor = 0.1
+    radius_factor = 0.3
 
     # define the sphere
-    vs, fs = wavefront.ellipsoid_mesh(1, 1, 1, density=20, subdivisions=1)
-    ve, fe = wavefront.ellipsoid_mesh(2, 3, 4, density=20, subdivisions=1)
+    vs, fs = wavefront.ellipsoid_mesh(0.5, 0.5, 0.5, density=20, subdivisions=1)
+    ve, fe = wavefront.ellipsoid_mesh(1,2, 3, density=20, subdivisions=1)
     
     # convert to spherical coordinates
     vs_spherical = wavefront.cartesian2spherical(vs)
@@ -139,10 +139,10 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     ms = mesh.mlab_source
     index = 0
     # in a loop add each vertex of the ellipse into the sphere mesh
-    for ii, pt in enumerate(ve_spherical[::10]):
+    for ii, pt in enumerate(ve_spherical):
         index +=1
         filename = os.path.join(img_path, 'sphere_ellipsoid_' + str(index).zfill(6) + '.jpg')
-        graphics.mlab.savefig(filename, magnification=4)
+        # graphics.mlab.savefig(filename, magnification=4)
         vs_spherical, fs = wavefront.spherical_incremental_mesh_update(pt, vs_spherical,fs,
                                                                 surf_area=surf_area,
                                                                 factor=factor,

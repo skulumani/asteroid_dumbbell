@@ -16,11 +16,11 @@ v_spherical = wavefront.cartesian2spherical(vs);
 # v_spherical = wavefront.cartesian2spherical(vc)
 
 # mesh_param = wavefront.polyhedron_parameters(v, f)
-pt = np.array([-1, 0.1, 0])
+pt = np.array([-0.01, 0, 0])
 pt_spherical = wavefront.cartesian2spherical(pt)
 
 nv_spherical, nf = wavefront.spherical_incremental_mesh_update(pt_spherical, v_spherical, f,
-                                                            surf_area=0.5, 
+                                                            surf_area=0.1, 
                                                             factor=1, 
                                                             radius_factor=0.5)
 
