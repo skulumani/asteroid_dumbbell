@@ -139,20 +139,19 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     ms = mesh.mlab_source
     index = 0
     # in a loop add each vertex of the ellipse into the sphere mesh
-    pdb.set_trace()
-    for ii, pt in enumerate(ve_spherical):
+    for ii, pt in enumerate(ve_spherical[::10]):
         index +=1
         filename = os.path.join(img_path, 'sphere_ellipsoid_' + str(index).zfill(6) + '.jpg')
-        # graphics.mlab.savefig(filename, magnification=4)
+        graphics.mlab.savefig(filename, magnification=4)
         vs_spherical, fs = wavefront.spherical_incremental_mesh_update(pt, vs_spherical,fs,
                                                                 surf_area=surf_area,
                                                                 factor=factor,
                                                                 radius_factor=radius_factor)
         # convert back to cartesian for plotting
 
-    vs = wavefront.spherical2cartesian(vs_spherical)
-    ms.reset(x=vs[:,0], y=vs[:,1], z=vs[:,2], triangles=fs)
-    graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt))
+        vs_cartesian = wavefront.spherical2cartesian(vs_spherical)
+        ms.reset(x=vs_cartesian[:,0], y=vs_cartesian[:,1], z=vs_cartesian[:,2], triangles=fs)
+        graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt))
     return 0
 
 if __name__ == "__main__":
