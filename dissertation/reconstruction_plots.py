@@ -82,40 +82,50 @@ def castalia_reconstruction(img_path):
     """
     density = 20
     subdivisions = 1
+
+    surf_area = 0.15
+    factor = 1
+    radius_factor  =0.15
+
     # load a low resolution ellipse to start
     ast = asteroid.Asteroid('castalia', 0, 'obj')
-    v_est, f_est = wavefront.ellipsoid_mesh(ast.axes[0]*0.75, 
+    ve, fe = wavefront.ellipsoid_mesh(ast.axes[0]*0.75, 
                                             ast.axes[1]*0.75,
                                             ast.axes[2]*0.75,
                                             density=density,
                                             subdivisions=subdivisions)
     # truth model from itokawa shape model
-    v_truth, f_truth = ast.V, ast.F
+    vc, fc = ast.V, ast.F
     # sort the vertices in in order (x component)
-    v_truth = v_truth[v_truth[:, 0].argsort()]
+    # vc = vc[vc[:, 0].argsort()]
+
+    # both now into spherical coordinates
+    ve_spherical = wavefront.cartesian2spherical(ve)
+    vc_spherical = wavefront.cartesian2spherical(vc)
 
     # loop and create many figures
     mfig = graphics.mayavi_figure(offscreen=True)
-    mesh = graphics.mayavi_addMesh(mfig, v_est, f_est)
+    mesh = graphics.mayavi_addMesh(mfig, ve, fe)
     ms = mesh.mlab_source
     index = 0
     # pdb.set_trace()
-    for jj in range(2):
-        for ii, pt in enumerate(v_truth):
-            index +=1
-            filename = os.path.join(img_path, 'castalia_reconstruct_' + str(index).zfill(7) + '.jpg')
-            graphics.mlab.savefig(filename, magnification=4)
-            mesh_param = wavefront.polyhedron_parameters(v_est, f_est)
-            v_est, f_est = wavefront.radius_mesh_incremental_update(pt, v_est, f_est,
-                                                                    mesh_param,
-                                                                    max_angle=np.deg2rad(10))
-            ms.reset(x=v_est[:, 0], y=v_est[:, 1], z=v_est[:, 2], triangles=f_est)
-            graphics.mayavi_addPoint(mfig, pt, radius=0.01 )
+    for ii, pt in enumerate(vc_spherical):
+        index +=1
+        filename = os.path.join(img_path, 'castalia_reconstruct_' + str(index).zfill(7) + '.jpg')
+        graphics.mlab.savefig(filename, magnification=4)
+        ve_spherical, fc = wavefront.spherical_incremental_mesh_update(pt,ve_spherical,fe,
+                                                                       surf_area=surf_area,
+                                                                       factor=factor,
+                                                                       radius_factor=radius_factor)
+        
+        # back to cartesian
+        ve_cartesian = wavefront.spherical2cartesian(ve_spherical)
+        ms.reset(x=ve_cartesian[:, 0], y=ve_cartesian[:, 1], z=ve_cartesian[:, 2], triangles=fc)
+        graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt), radius=0.01 )
             
-        v_est, f_est = wavefront.mesh_subdivide(v_est, f_est, 1)
-        ms.reset(x=v_est[:, 0], y=v_est[:, 1], z=v_est[:, 2], triangles=f_est)
     
     return 0
+
 def sphere_into_ellipsoid_spherical_coordinates(img_path):
     """See if we can turn a sphere into an ellipse by changing the radius of
     vertices in spherical coordinates
@@ -161,5 +171,5 @@ if __name__ == "__main__":
 
     # cube_into_sphere(img_path)
     # sphere_into_ellipsoid(img_path)
-    # castalia_reconstruction(img_path)
-    sphere_into_ellipsoid_spherical_coordinates(img_path)
+    castalia_reconstruction(img_path)
+    # sphere_into_ellipsoid_spherical_coordinates(img_path)
