@@ -4,6 +4,7 @@ import pdb
 import numpy as np
 import warnings
 import os
+import itertools
 
 from point_cloud import wavefront
 from visualization import graphics
@@ -132,9 +133,9 @@ def castalia_reconstruction_factor_tuning(img_path):
     density = 20
     subdivisions = 1
 
-    surf_area = 0.01
+    surf_area = np.array([0.01, 0.05, 0.1, 0.5, 1.0])
     factor = 1
-    radius_factor = 0.5
+    radius_factor = np.array([0.01, 0.05, 0.1, 0.5, 1.0, 5, 10])
 
     # load a low resolution ellipse to start
     ast = asteroid.Asteroid('castalia', 0, 'obj')
@@ -156,21 +157,25 @@ def castalia_reconstruction_factor_tuning(img_path):
     mfig = graphics.mayavi_figure(offscreen=False)
     mesh = graphics.mayavi_addMesh(mfig, ve, fe)
     ms = mesh.mlab_source
-    index = 0
-    # pdb.set_trace()
-    for ii, pt in enumerate(vc_spherical):
-        index +=1
-        filename = os.path.join(img_path, 'castalia_reconstruct_' + str(index).zfill(7) + '.jpg')
-        # graphics.mlab.savefig(filename, magnification=4)
-        ve_spherical, fc = wavefront.spherical_incremental_mesh_update(pt,ve_spherical,fe,
-                                                                       surf_area=surf_area,
-                                                                       factor=factor,
-                                                                       radius_factor=radius_factor)
-        
-        # back to cartesian
-        ve_cartesian = wavefront.spherical2cartesian(ve_spherical)
-        ms.reset(x=ve_cartesian[:, 0], y=ve_cartesian[:, 1], z=ve_cartesian[:, 2], triangles=fc)
-        graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt), radius=0.01 )
+    
+    graphics.mayavi_points3d(mfig, vc, scale_factor=0.01)
+    ve_s = ve_spherical.copy()
+
+    for sa, rf in itertools.product(surf_area, radius_factor):
+        index = 0
+        filename = os.path.join(img_path, 'castalia_reconstruct_' + 'sa=' + str(sa) + '_rf=' + str(rf) + '.jpg')
+        for ii, pt in enumerate(vc_spherical):
+            ve_s, fc = wavefront.spherical_incremental_mesh_update(pt,ve_s,fe,
+                                                                   surf_area=sa,
+                                                                   factor=factor,
+                                                                   radius_factor=rf)
+            
+            # back to cartesian
+            ve_c = wavefront.spherical2cartesian(ve_s)
+
+        ms.reset(x=ve_c[:, 0], y=ve_c[:, 1], z=ve_c[:, 2], triangles=fc)
+        graphics.mayavi_addTitle(mfig, 'SA={} RF={}'.format(sa, rf), color=(0, 0, 0))
+        graphics.mlab.savefig(filename, magnification=4)
 
 def sphere_into_ellipsoid_spherical_coordinates(img_path):
     """See if we can turn a sphere into an ellipse by changing the radius of
@@ -217,5 +222,6 @@ if __name__ == "__main__":
 
     # cube_into_sphere(img_path)
     # sphere_into_ellipsoid(img_path)
-    castalia_reconstruction(img_path)
+    # castalia_reconstruction(img_path)
     # sphere_into_ellipsoid_spherical_coordinates(img_path)
+    castalia_reconstruction_factor_tuning(img_path)
