@@ -23,7 +23,7 @@ dependencies:
     - traitsui
     - pyface
     - envisage
-    - pydistmesh
+    # - pydistmesh # only makes solid meshes and not surface mesh
     # - mayavi
 prefix: /home/shankar/anaconda3/envs/asteroid
 
