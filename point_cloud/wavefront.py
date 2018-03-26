@@ -41,6 +41,7 @@ from vtk.util import numpy_support
 import utilities
 from kinematics import attitude
 
+from visualization import graphics
 warnings.filterwarnings(action="ignore", category=RuntimeWarning,
                         message=r"All-NaN")
 logger = logging.getLogger(__name__)
@@ -210,7 +211,7 @@ def ellipsoid_mesh(a, b, c, density=20, subdivisions=1):
     
     # now need to do surface reconstruction to get the faces
     verts, faces = reconstruct_numpy(v)
-    verts, faces = mesh_subdivide(verts, faces, subdivisions, 'loop')
+    # verts, faces = mesh_subdivide(verts, faces, subdivisions, 'loop')
 
     return verts, faces
 
@@ -1661,7 +1662,7 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
 
     return nv, nf
 
-def spherical_incremental_mesh_update(pt_spherical, vs_spherical, f,
+def spherical_incremental_mesh_update(mfig, pt_spherical, vs_spherical, f,
                                       surf_area, factor=1, radius_factor=1):
 
     # surface area on a spherical area gives us a range of long and lat
@@ -1680,6 +1681,7 @@ def spherical_incremental_mesh_update(pt_spherical, vs_spherical, f,
     # indices that are within the range
     region_index = np.intersect1d(np.nonzero(valid_lat)[0], np.nonzero(valid_lon)[0])
     mesh_region = vs_spherical[region_index,:]
+    # graphics.mayavi_addPoint(mfig, spherical2cartesian(mesh_region), color=(0, 0, 1))
     delta_sigma = spherical_distance(pt_spherical, mesh_region)
     
     # now compute new radii for those in mesh region
@@ -1690,6 +1692,9 @@ def spherical_incremental_mesh_update(pt_spherical, vs_spherical, f,
     nv_spherical = vs_spherical.copy()
     
     nv_spherical[region_index, :] = mesh_region
+
+    # graphics.mayavi_addPoint(mfig, spherical2cartesian(mesh_region), color=(1, 1, 0))
+    # graphics.mayavi_addPoint(mfig, spherical2cartesian(pt_spherical), color=(0, 1,1))
 
     return nv_spherical, f
 

@@ -195,16 +195,20 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     vs_spherical = wavefront.cartesian2spherical(vs)
     ve_spherical = wavefront.cartesian2spherical(ve)
 
-    mfig = graphics.mayavi_figure(offscreen=True)
+    mfig = graphics.mayavi_figure(offscreen=False)
     mesh = graphics.mayavi_addMesh(mfig, vs, fs)
     ms = mesh.mlab_source
     index = 0
+
+    graphics.mayavi_points3d(mfig, vs, color=(1, 0, 0))
+    graphics.mayavi_points3d(mfig, ve, color=(0, 1, 0))
     # in a loop add each vertex of the ellipse into the sphere mesh
     for ii, pt in enumerate(ve_spherical):
         index +=1
         filename = os.path.join(img_path, 'sphere_ellipsoid_' + str(index).zfill(6) + '.jpg')
         graphics.mlab.savefig(filename, magnification=4)
-        vs_spherical, fs = wavefront.spherical_incremental_mesh_update(pt, vs_spherical,fs,
+        pdb.set_trace()
+        vs_spherical, fs = wavefront.spherical_incremental_mesh_update(mfig, pt, vs_spherical,fs,
                                                                 surf_area=surf_area,
                                                                 factor=factor,
                                                                 radius_factor=radius_factor)
@@ -213,6 +217,7 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
         vs_cartesian = wavefront.spherical2cartesian(vs_spherical)
         ms.reset(x=vs_cartesian[:,0], y=vs_cartesian[:,1], z=vs_cartesian[:,2], triangles=fs)
         graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt))
+
     return 0
 
 if __name__ == "__main__":
@@ -223,5 +228,5 @@ if __name__ == "__main__":
     # cube_into_sphere(img_path)
     # sphere_into_ellipsoid(img_path)
     # castalia_reconstruction(img_path)
-    # sphere_into_ellipsoid_spherical_coordinates(img_path)
-    castalia_reconstruction_factor_tuning(img_path)
+    sphere_into_ellipsoid_spherical_coordinates(img_path)
+    # castalia_reconstruction_factor_tuning(img_path)
