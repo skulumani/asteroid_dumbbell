@@ -48,12 +48,15 @@ int main() {
     // meshing surface
     CGAL::make_surface_mesh(c2t3, surface, criteria, CGAL::Manifold_tag());
 
-    std::cout << "Final number of points: " << tr.number_of_vertices() << std::endl;
 
     for (Tr::Finite_vertices_iterator vit = tr.finite_vertices_begin(); vit != tr.finite_vertices_end(); ++vit) {
         std::cout << vit->point() << std::endl;
     }
     Polyhedron poly;    
     CGAL::output_surface_facets_to_polyhedron(c2t3, poly); 
+
+    std::cout << "Final number of points: " << tr.number_of_vertices() << std::endl;
+    std::cout << "Polyhedron vertices: " << poly.size_of_vertices() << std::endl;
+
     return 0;
 }
