@@ -84,9 +84,9 @@ def castalia_reconstruction(img_path):
     density = 20
     subdivisions = 1
 
-    surf_area = 0.01
+    surf_area = 0.05
     factor = 1
-    radius_factor = 0.5
+    radius_factor = 0.05
 
     # load a low resolution ellipse to start
     ast = asteroid.Asteroid('castalia', 0, 'obj')
@@ -105,7 +105,7 @@ def castalia_reconstruction(img_path):
     vc_spherical = wavefront.cartesian2spherical(vc)
 
     # loop and create many figures
-    mfig = graphics.mayavi_figure(offscreen=False)
+    mfig = graphics.mayavi_figure(offscreen=True)
     mesh = graphics.mayavi_addMesh(mfig, ve, fe)
     ms = mesh.mlab_source
     index = 0
@@ -113,7 +113,7 @@ def castalia_reconstruction(img_path):
     for ii, pt in enumerate(vc_spherical):
         index +=1
         filename = os.path.join(img_path, 'castalia_reconstruct_' + str(index).zfill(7) + '.jpg')
-        # graphics.mlab.savefig(filename, magnification=4)
+        graphics.mlab.savefig(filename, magnification=4)
         ve_spherical, fc = wavefront.spherical_incremental_mesh_update(pt,ve_spherical,fe,
                                                                        surf_area=surf_area,
                                                                        factor=factor,
@@ -154,7 +154,7 @@ def castalia_reconstruction_factor_tuning(img_path):
     vc_spherical = wavefront.cartesian2spherical(vc)
 
     # loop and create many figures
-    mfig = graphics.mayavi_figure(offscreen=False)
+    mfig = graphics.mayavi_figure(offscreen=True)
     mesh = graphics.mayavi_addMesh(mfig, ve, fe)
     ms = mesh.mlab_source
     
@@ -163,7 +163,7 @@ def castalia_reconstruction_factor_tuning(img_path):
 
     for sa, rf in itertools.product(surf_area, radius_factor):
         index = 0
-        filename = os.path.join(img_path, 'castalia_reconstruct_' + 'sa=' + str(sa) + '_rf=' + str(rf) + '.jpg')
+        filename = os.path.join(img_path, 'castalia_reconstruct_' + 'sa=' + str(sa).replace('.','') + '_rf=' + str(rf).replace('.','') + '.jpg')
         for ii, pt in enumerate(vc_spherical):
             ve_s, fc = wavefront.spherical_incremental_mesh_update(pt,ve_s,fe,
                                                                    surf_area=sa,
