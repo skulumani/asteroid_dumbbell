@@ -80,3 +80,7 @@ target_link_libraries(AABB_triangle_3_example ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY
 add_executable( searching_surface_mesh_vertices searching_surface_mesh_vertices.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS searching_surface_mesh_vertices )
 target_link_libraries(searching_surface_mesh_vertices ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
+
+add_executable( mesh_implicit_function mesh_implicit_function.cpp )
+add_to_cached_list( CGAL_EXECUTABLE_TARGETS mesh_implicit_function )
+target_link_libraries(mesh_implicit_function ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
