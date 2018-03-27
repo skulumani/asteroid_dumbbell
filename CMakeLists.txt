@@ -94,7 +94,7 @@ set(potential_src src/potential.cpp src/potential_main.cpp)
 add_executable(potential ${potential_src})
 
 # surface mesher
-set( surface_mesher_src src/surface_mesher.cpp src/input_parser.cpp)
+set( surface_mesher_src src/surface_mesher_main.cpp src/surface_mesher.cpp src/input_parser.cpp)
 add_executable(surface_mesher ${surface_mesher_src})
 ################################################################################
 # PYTHON BINDING
