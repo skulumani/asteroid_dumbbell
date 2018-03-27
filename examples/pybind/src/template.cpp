@@ -5,14 +5,14 @@
 
 namespace py = pybind11;
 
-template<typename Derived> 
-void scale_vector_template(Eigen::PlainObjectBase<Derived>& v, const int scale) {
-    v  = v * scale;
+template<typename T>
+void scale_vector_ref(Eigen::Ref<T> v, const int& scale) {
+    v *= scale;
 }
 
-PYBIND11_MODULE(py_template, m) {
+PYBIND11_MODULE(template, m) {
     m.doc() = "Python example bindings with eigen templates";
-    m.def("scale_vector_template", &scale_vector_template<Eigen::Matrix<double, -1, 3> >);
+    m.def("scale_vector_ref", &scale_vector_ref<Eigen::Matrix<double, -1, -1> >);
 }
 
 /* int main() { */
