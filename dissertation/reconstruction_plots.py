@@ -5,6 +5,7 @@ import numpy as np
 import warnings
 import os
 import itertools
+import scipy.io
 
 from point_cloud import wavefront
 from visualization import graphics
@@ -188,9 +189,16 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     radius_factor = 0.15
 
     # define the sphere
-    vs, fs = wavefront.ellipsoid_mesh(0.5, 0.5, 0.5, density=10, subdivisions=1)
-    ve, fe = wavefront.ellipsoid_mesh(1,2, 3, density=10, subdivisions=1)
+    # vs, fs = wavefront.ellipsoid_mesh(0.5, 0.5, 0.5, density=10, subdivisions=1)
+    # ve, fe = wavefront.ellipsoid_mesh(1,2, 3, density=10, subdivisions=1)
     
+    # import the sphere and ellipsoid from matlab files
+    sphere_data = scipy.io.loadmat('./data/sphere_distmesh.mat')
+    ellipsoid_data = scipy.io.loadmat('./data/ellipsoid_distmesh.mat')
+
+    vs, fs = sphere_data['v'], sphere_data['f']-1
+    ve, fe = ellipsoid_data['v'], ellipsoid_data['f']-1
+
     # convert to spherical coordinates
     vs_spherical = wavefront.cartesian2spherical(vs)
     ve_spherical = wavefront.cartesian2spherical(ve)
@@ -207,7 +215,6 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
         index +=1
         filename = os.path.join(img_path, 'sphere_ellipsoid_' + str(index).zfill(6) + '.jpg')
         graphics.mlab.savefig(filename, magnification=4)
-        pdb.set_trace()
         vs_spherical, fs = wavefront.spherical_incremental_mesh_update(mfig, pt, vs_spherical,fs,
                                                                 surf_area=surf_area,
                                                                 factor=factor,
@@ -217,6 +224,8 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
         vs_cartesian = wavefront.spherical2cartesian(vs_spherical)
         ms.reset(x=vs_cartesian[:,0], y=vs_cartesian[:,1], z=vs_cartesian[:,2], triangles=fs)
         graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt))
+        
+        pdb.set_trace()
 
     return 0
 

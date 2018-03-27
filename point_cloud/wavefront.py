@@ -1664,28 +1664,19 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
 
 def spherical_incremental_mesh_update(mfig, pt_spherical, vs_spherical, f,
                                       surf_area, factor=1, radius_factor=1):
-
+    
     # surface area on a spherical area gives us a range of long and lat
     delta_lat, delta_lon = spherical_surface_area(pt_spherical, surf_area, factor=factor)
-    # delta_lat = np.deg2rad(45)
-    # delta_lon = delta_lat
-    # find elements that lie close to the measurement (lat/lon searching col 1 and 2)
-    diff_lat = attitude.normalize(vs_spherical[:, 1] - pt_spherical[np.newaxis, 1],
-                                  -np.pi/2, np.pi/2)
-    diff_lon = attitude.normalize(vs_spherical[:, 2] - pt_spherical[np.newaxis,  2],
-                                  -np.pi, np.pi)
-
-    valid_lat = np.absolute(diff_lat) < delta_lat
-    valid_lon = np.absolute(diff_lon) < delta_lon
-    
-    # indices that are within the range
-    region_index = np.intersect1d(np.nonzero(valid_lat)[0], np.nonzero(valid_lon)[0])
+    delta_sigma = spherical_distance(pt_spherical, vs_spherical)
+    region_index = delta_sigma < delta_lat
     mesh_region = vs_spherical[region_index,:]
-    # graphics.mayavi_addPoint(mfig, spherical2cartesian(mesh_region), color=(0, 0, 1))
-    delta_sigma = spherical_distance(pt_spherical, mesh_region)
     
+    graphics.mayavi_points3d(mfig, spherical2cartesian(mesh_region), scale_factor=0.1, color=(1, 0, 0))
+    graphics.mayavi_addPoint(mfig, spherical2cartesian(pt_spherical), color=(0, 1,1))
+    pdb.set_trace()
+
     # now compute new radii for those in mesh region
-    radius_scale = radius_scale_factor(delta_sigma, std=radius_factor)
+    radius_scale = radius_scale_factor(delta_sigma[region_index], std=radius_factor)
     
     mesh_region[:, 0] = radius_scale * (pt_spherical[np.newaxis, 0] - mesh_region[:, 0]) + mesh_region[:, 0]
     
@@ -1694,7 +1685,6 @@ def spherical_incremental_mesh_update(mfig, pt_spherical, vs_spherical, f,
     nv_spherical[region_index, :] = mesh_region
 
     # graphics.mayavi_addPoint(mfig, spherical2cartesian(mesh_region), color=(1, 1, 0))
-    # graphics.mayavi_addPoint(mfig, spherical2cartesian(pt_spherical), color=(0, 1,1))
 
     return nv_spherical, f
 
