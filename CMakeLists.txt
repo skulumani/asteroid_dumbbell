@@ -106,6 +106,8 @@ pybind11_add_module(cgal_cpp MODULE
 pybind11_add_module(polyhedron_potential MODULE
     src/potential.cpp src/potential_bindings.cpp)
 
+pybind11_add_module(surface_mesh MODULE
+    src/surface_mesher.cpp src/surface_mesh_bindings.cpp)
 ################################################################################
 # Testing example
 ################################################################################
