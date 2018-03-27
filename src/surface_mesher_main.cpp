@@ -2,6 +2,7 @@
 #include "input_parser.hpp"
 #include "surface_mesher.hpp"
 
+
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
@@ -20,17 +21,16 @@ int main(int argc, char* argv[]) {
     max_radius = atof(argv[5]);
     max_distance = atof(argv[6]);
     Polyhedron poly;    
+    Eigen::MatrixXd V;
+    Eigen::MatrixXi F;
     
     ellipsoid_surface_mesher(atof(argv[1]), atof(argv[2]), atof(argv[3]),
             min_angle, max_radius, max_distance, poly);
+    
+    ellipsoid_surface_mesher(atof(argv[1]), atof(argv[2]), atof(argv[3]),
+            min_angle, max_radius, max_distance, V, F);
 
     std::cout << "Polyhedron vertices: " << poly.size_of_vertices() << std::endl;
-     
-    // convert to Eigen matrices
-    Eigen::MatrixXd V;
-    Eigen::MatrixXi F;
-    polyhedron_to_eigen(poly, V, F);
-    
     std::cout << V << std::endl;
     return 0;
 }

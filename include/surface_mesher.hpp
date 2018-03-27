@@ -47,5 +47,10 @@ int ellipsoid_surface_mesher(const double& a_in, const double& b_in, const doubl
         const double& min_angle, const double& max_radius, const double& max_distance,
         PolyType& poly);
 
+template<typename VectorType, typename IndexType>
+int ellipsoid_surface_mesher(const double& a_in, const double& b_in, const double& c_in,
+        const double& min_angle, const double& max_radius, const double& max_distance,
+        Eigen::PlainObjectBase<VectorType>&V, Eigen::PlainObjectBase<IndexType> &F);
+
 #endif
 
