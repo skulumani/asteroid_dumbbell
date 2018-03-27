@@ -42,5 +42,10 @@ void build_polyhedron_index(PolyType &P);
 template<typename PolyType, typename VectorType, typename IndexType>
 void polyhedron_to_eigen(PolyType &P, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F);
 
+template<typename PolyType>
+int ellipsoid_surface_mesher(const double& a_in, const double& b_in, const double& c_in,
+        const double& min_angle, const double& max_radius, const double& max_distance,
+        PolyType& poly);
+
 #endif
 
