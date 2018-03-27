@@ -3,58 +3,7 @@
 
 #include "surface_mesher.hpp"
 
-template<typename PolyType>
-void build_polyhedron_index(PolyType &P) {
-    std::size_t ii = 0;
-    for (Vertex_iterator vert = P.vertices_begin(); vert != P.vertices_end(); ++vert) {
-        vert->id() = ii++; 
-    }
-    ii = 0; // reset the counter
-    for (Facet_iterator facet = P.facets_begin(); facet != P.facets_end(); ++facet) {
-        facet->id() = ii++;
-    }
 
-}
-
-template<typename PolyType, typename VectorType, typename IndexType>
-void polyhedron_to_eigen(PolyType &P, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F) {
-    // loop over all the faces first
-    
-    // create some eigen arrays to store all the vertices
-    const unsigned int num_v = P.size_of_vertices();
-    const unsigned int num_f = P.size_of_facets();
-    
-    V.resize(num_v, 3);
-    F.resize(num_f, 3);
-
-    // loop and fill the eigen array
-    build_polyhedron_index(P);
-
-    std::size_t row, col;
-    row = 0;
-    col = 0;
-    /* loop_over_facets(P); */
-
-    // Build V
-    for (Vertex_iterator vert = P.vertices_begin(); vert != P.vertices_end(); ++vert) {
-        V(row, 0)  = vert->point().x();
-        V(row, 1)  = vert->point().y();
-        V(row, 2)  = vert->point().z();
-        row += 1;
-    }
-
-    // Build F
-    row = 0;
-    for ( Facet_iterator face = P.facets_begin(); face != P.facets_end(); ++face) {
-        Halfedge_facet_circulator vert = face->facet_begin();
-        col = 0;
-        do {
-            F(row, col) = vert->vertex()->id();
-            col += 1;
-        } while( ++vert != face->facet_begin());
-        row += 1;
-    }
-}
 // these need to be used in the ellispoid function
 double a, b, c;
 
@@ -65,26 +14,13 @@ FT ellipsoid_function (Point_3 p) {
     return x2 + y2 + z2 - 1;
 }
 
-int main(int argc, char* argv[]) {
-    InputParser input(argc, argv);
-    if (input.option_exists("-h")) {
-        std::cout << "Usage surface_mesher a b c min_angle max_radius max_distance\n  Where a, b, c are the semi-major axes of the ellipsoid" << std::endl;
-        return 0;
-    }
-    
-    if (argc != 7) {
-        std::cout << "Insufficient number of inputs: surface_mesher a b c" << std::endl;
-        return 1;
-    }
-    // initialize axes
-    a = atof(argv[1]);
-    b = atof(argv[2]);
-    c = atof(argv[3]);
-    
-    double min_angle, max_radius, max_distance;
-    min_angle = atof(argv[4]);
-    max_radius = atof(argv[5]);
-    max_distance = atof(argv[6]);
+template<typename PolyType>
+int ellipsoid_surface_mesher(const double& a_in, const double& b_in, const double& c_in,
+        const double& min_angle, const double& max_radius, const double& max_distance,
+        PolyType& poly) {
+    a = a_in;
+    b = b_in;
+    c = c_in;
 
     Tr tr; // 3D delaunay triangulation
     C2t3 c2t3 (tr); // 2D-complex in 3D-delaunay triangulation
@@ -100,16 +36,40 @@ int main(int argc, char* argv[]) {
                                                        max_radius, // raidus bound
                                                        max_distance); // distance bound
     
-    std::cout << std::max({a, b, c}) << std::endl;
     // meshing surface
     CGAL::make_surface_mesh(c2t3, surface, criteria, CGAL::Manifold_tag());
 
-    Polyhedron poly;    
     CGAL::output_surface_facets_to_polyhedron(c2t3, poly); 
 
     std::cout << "Final number of points: " << tr.number_of_vertices() << std::endl;
-    std::cout << "Polyhedron vertices: " << poly.size_of_vertices() << std::endl;
+
+    return 0;
+}
+
+int main(int argc, char* argv[]) {
+    InputParser input(argc, argv);
+    if (input.option_exists("-h")) {
+        std::cout << "Usage surface_mesher a b c min_angle max_radius max_distance\n  Where a, b, c are the semi-major axes of the ellipsoid" << std::endl;
+        return 0;
+    }
     
+    if (argc != 7) {
+        std::cout << "Insufficient number of inputs: surface_mesher a b c" << std::endl;
+        return 1;
+    }
+    // initialize axes
+    
+    double min_angle, max_radius, max_distance;
+    min_angle = atof(argv[4]);
+    max_radius = atof(argv[5]);
+    max_distance = atof(argv[6]);
+    Polyhedron poly;    
+    
+    ellipsoid_surface_mesher(atof(argv[1]), atof(argv[2]), atof(argv[3]),
+            min_angle, max_radius, max_distance, poly);
+
+    std::cout << "Polyhedron vertices: " << poly.size_of_vertices() << std::endl;
+     
     // convert to Eigen matrices
     Eigen::MatrixXd V;
     Eigen::MatrixXi F;

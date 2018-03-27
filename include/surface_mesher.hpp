@@ -36,6 +36,11 @@ typedef FT (*Function)(Point_3); // Function is a pointer with takes Point_3 as 
 
 typedef CGAL::Implicit_surface_3<GT, Function> Surface_3;
 
+template<typename PolyType>
+void build_polyhedron_index(PolyType &P);
+
+template<typename PolyType, typename VectorType, typename IndexType>
+void polyhedron_to_eigen(PolyType &P, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F);
 
 #endif
 
