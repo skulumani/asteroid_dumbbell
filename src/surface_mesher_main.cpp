@@ -3,8 +3,8 @@
 
 #include "surface_mesher.hpp"
 
-//TODO Add documentationn V and F to a polyhedron
-void build_polyhedron_index(Polyhedron &P) {
+template<typename PolyType>
+void build_polyhedron_index(PolyType &P) {
     std::size_t ii = 0;
     for (Vertex_iterator vert = P.vertices_begin(); vert != P.vertices_end(); ++vert) {
         vert->id() = ii++; 
@@ -16,8 +16,8 @@ void build_polyhedron_index(Polyhedron &P) {
 
 }
 
-template<typename VectorType, typename IndexType>
-void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F) {
+template<typename PolyType, typename VectorType, typename IndexType>
+void polyhedron_to_eigen(PolyType &P, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F) {
     // loop over all the faces first
     
     // create some eigen arrays to store all the vertices
