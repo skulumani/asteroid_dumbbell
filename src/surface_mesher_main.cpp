@@ -2,6 +2,15 @@
 #include "input_parser.hpp"
 #include "surface_mesher.hpp"
 
+template<typename D>
+void sub_func(Eigen::Ref<D> v) {
+    v = v * 2;
+}
+
+template<typename D>
+void ref_func(Eigen::Ref<D> v) {
+    sub_func(v);
+}
 
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
@@ -31,9 +40,12 @@ int main(int argc, char* argv[]) {
             min_angle, max_radius, max_distance, V, F);
     
     Eigen::Matrix<double, Eigen::Dynamic, 3> Va;
-    Eigen::Matrix<int, Eigen::Dynamic, 3> Fa;
+    Va.resize(1, 3);
+    Va << 1, 2, 3;
 
-
+    ref_func<Eigen::Matrix<double, Eigen::Dynamic, 3>>(Va);
+    
+    std::cout << Va << std::endl;
     std::cout << "Polyhedron vertices: " << poly.size_of_vertices() << std::endl;
     std::cout << "Eigen V vertices: " << V.rows() << std::endl;
     return 0;
