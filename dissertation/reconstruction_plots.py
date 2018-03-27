@@ -203,7 +203,7 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     vs_spherical = wavefront.cartesian2spherical(vs)
     ve_spherical = wavefront.cartesian2spherical(ve)
 
-    mfig = graphics.mayavi_figure(offscreen=False)
+    mfig = graphics.mayavi_figure(offscreen=True)
     mesh = graphics.mayavi_addMesh(mfig, vs, fs)
     ms = mesh.mlab_source
     index = 0
@@ -225,7 +225,6 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
         ms.reset(x=vs_cartesian[:,0], y=vs_cartesian[:,1], z=vs_cartesian[:,2], triangles=fs)
         graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt))
         
-        pdb.set_trace()
     return 0
 
 if __name__ == "__main__":
