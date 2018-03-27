@@ -197,6 +197,7 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     ellipsoid_data = scipy.io.loadmat('./data/ellipsoid_distmesh.mat')
 
     vs, fs = sphere_data['v'], sphere_data['f']
+
     ve, fe = ellipsoid_data['v'], ellipsoid_data['f']
 
     # convert to spherical coordinates
@@ -211,6 +212,7 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     # graphics.mayavi_points3d(mfig, vs, color=(1, 0, 0))
     # graphics.mayavi_points3d(mfig, ve, color=(0, 1, 0))
     # in a loop add each vertex of the ellipse into the sphere mesh
+    np.random.shuffle(ve_spherical)
     for ii, pt in enumerate(ve_spherical):
         index +=1
         filename = os.path.join(img_path, 'sphere_ellipsoid_' + str(index).zfill(6) + '.jpg')
