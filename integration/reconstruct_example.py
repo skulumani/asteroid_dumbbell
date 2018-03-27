@@ -30,9 +30,9 @@ pt = ve[0, :]
 pt_spherical = wavefront.cartesian2spherical(pt)
 
 nv_spherical, nf = wavefront.spherical_incremental_mesh_update(mfig, pt_spherical, v_spherical, fs,
-                                                               surf_area=2, 
+                                                               surf_area=0.5, 
                                                                factor=1, 
-                                                               radius_factor=10)
+                                                               radius_factor=0.3)
 
 # convert back to cartesian
 nv = wavefront.spherical2cartesian(nv_spherical)

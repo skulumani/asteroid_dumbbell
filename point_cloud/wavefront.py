@@ -1673,7 +1673,6 @@ def spherical_incremental_mesh_update(mfig, pt_spherical, vs_spherical, f,
     
     graphics.mayavi_points3d(mfig, spherical2cartesian(mesh_region), scale_factor=0.1, color=(1, 0, 0))
     graphics.mayavi_addPoint(mfig, spherical2cartesian(pt_spherical), color=(0, 1,1))
-    pdb.set_trace()
 
     # now compute new radii for those in mesh region
     radius_scale = radius_scale_factor(delta_sigma[region_index], std=radius_factor)
