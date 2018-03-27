@@ -11,6 +11,7 @@
 
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Polyhedron_3.h>
+#include <CGAL/Polyhedron_items_with_id_3.h>
 
 #include <stdlib.h>
 #include <cmath>
@@ -26,12 +27,68 @@ typedef Tr::Geom_traits GT;
 typedef GT::Sphere_3 Sphere_3;
 typedef GT::Point_3 Point_3;
 typedef GT::FT FT;
-typedef CGAL::Polyhedron_3<GT> Polyhedron;
+typedef CGAL::Polyhedron_3<GT,CGAL::Polyhedron_items_with_id_3> Polyhedron;
+typedef Polyhedron::Facet_iterator          Facet_iterator;
+typedef Polyhedron::Vertex_iterator         Vertex_iterator;
+typedef Polyhedron::HalfedgeDS             HalfedgeDS;
+typedef Polyhedron::Halfedge_around_facet_circulator Halfedge_facet_circulator;
 
 typedef FT (*Function)(Point_3); // Function is a pointer with takes Point_3 as input and returns type FT
 
 typedef CGAL::Implicit_surface_3<GT, Function> Surface_3;
 
+//TODO Add documentationn V and F to a polyhedron
+void build_polyhedron_index(Polyhedron &P) {
+    std::size_t ii = 0;
+    for (Vertex_iterator vert = P.vertices_begin(); vert != P.vertices_end(); ++vert) {
+        vert->id() = ii++; 
+    }
+    ii = 0; // reset the counter
+    for (Facet_iterator facet = P.facets_begin(); facet != P.facets_end(); ++facet) {
+        facet->id() = ii++;
+    }
+
+}
+
+template<typename VectorType, typename IndexType>
+void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F) {
+    // loop over all the faces first
+    
+    // create some eigen arrays to store all the vertices
+    const unsigned int num_v = P.size_of_vertices();
+    const unsigned int num_f = P.size_of_facets();
+    
+    V.resize(num_v, 3);
+    F.resize(num_f, 3);
+
+    // loop and fill the eigen array
+    build_polyhedron_index(P);
+
+    std::size_t row, col;
+    row = 0;
+    col = 0;
+    /* loop_over_facets(P); */
+
+    // Build V
+    for (Vertex_iterator vert = P.vertices_begin(); vert != P.vertices_end(); ++vert) {
+        V(row, 0)  = vert->point().x();
+        V(row, 1)  = vert->point().y();
+        V(row, 2)  = vert->point().z();
+        row += 1;
+    }
+
+    // Build F
+    row = 0;
+    for ( Facet_iterator face = P.facets_begin(); face != P.facets_end(); ++face) {
+        Halfedge_facet_circulator vert = face->facet_begin();
+        col = 0;
+        do {
+            F(row, col) = vert->vertex()->id();
+            col += 1;
+        } while( ++vert != face->facet_begin());
+        row += 1;
+    }
+}
 // these need to be used in the ellispoid function
 double a, b, c;
 
@@ -68,7 +125,7 @@ int main(int argc, char* argv[]) {
 
     // define a surface
     Surface_3 surface(ellipsoid_function, // pointer to function
-                      Sphere_3(CGAL::ORIGIN, pow(std::max({a, b, c}), 2.0) )); // bounding sphere
+                      Sphere_3(CGAL::ORIGIN, pow(std::max({a, b, c}) + 0.01, 2.0) )); // bounding sphere
     // Make sure you input a squared radius of the bound sphere
     // define the meshing criteria
     CGAL::Surface_mesh_default_criteria_3<Tr> criteria(min_angle, // angular bound
@@ -84,6 +141,12 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Final number of points: " << tr.number_of_vertices() << std::endl;
     std::cout << "Polyhedron vertices: " << poly.size_of_vertices() << std::endl;
-
+    
+    // convert to Eigen matrices
+    Eigen::MatrixXd V;
+    Eigen::MatrixXi F;
+    polyhedron_to_eigen(poly, V, F);
+    
+    std::cout << V << std::endl;
     return 0;
 }
