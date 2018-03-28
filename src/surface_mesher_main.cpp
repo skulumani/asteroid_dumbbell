@@ -27,7 +27,6 @@ int main(int argc, char* argv[]) {
 
 	std::cout << "Smesh poly vertices: " << smesh.poly.size_of_vertices() << std::endl;
 	std::cout << "Smesh v vertices: " << smesh.v.rows() << std::endl;
-
-	std::cout << smesh.verts() << std::endl;
+	std::cout << "Surface mesh faces: " << smesh.faces().rows() << std::endl;
     return 0;
 }
