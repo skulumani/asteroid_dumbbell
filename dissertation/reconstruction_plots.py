@@ -184,9 +184,9 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     
     The point cloud (ellipse) should have the same number of points than the initial mesh.
     """
-    surf_area = 0.1
-    a = 0.3
-    delta=0.05
+    surf_area = 0.06
+    a = 0.25 # at a*100 % of maximum angle the scale will be 50% of measurement
+    delta=0.01
     # define the sphere
     # vs, fs = wavefront.ellipsoid_mesh(0.5, 0.5, 0.5, density=10, subdivisions=1)
     # ve, fe = wavefront.ellipsoid_mesh(1,2, 3, density=10, subdivisions=1)
@@ -203,7 +203,7 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     vs_spherical = wavefront.cartesian2spherical(vs)
     ve_spherical = wavefront.cartesian2spherical(ve)
 
-    mfig = graphics.mayavi_figure(offscreen=True)
+    mfig = graphics.mayavi_figure(offscreen=False)
     mesh = graphics.mayavi_addMesh(mfig, vs, fs)
     ms = mesh.mlab_source
     index = 0
@@ -211,10 +211,10 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     # graphics.mayavi_points3d(mfig, vs, color=(1, 0, 0))
     # graphics.mayavi_points3d(mfig, ve, color=(0, 1, 0))
     # in a loop add each vertex of the ellipse into the sphere mesh
-    for ii, pt in enumerate(ve_spherical[0:200, :]):
+    for ii, pt in enumerate(ve_spherical[0:100, :]):
         index +=1
         filename = os.path.join(img_path, 'sphere_ellipsoid_' + str(index).zfill(6) + '.jpg')
-        graphics.mlab.savefig(filename, magnification=4)
+        # graphics.mlab.savefig(filename, magnification=4)
         vs_spherical, fs = wavefront.spherical_incremental_mesh_update(mfig, pt, vs_spherical,fs,
                                                                        surf_area=surf_area,
                                                                        a=a, delta=delta)
@@ -223,7 +223,8 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
         vs_cartesian = wavefront.spherical2cartesian(vs_spherical)
         ms.reset(x=vs_cartesian[:,0], y=vs_cartesian[:,1], z=vs_cartesian[:,2], triangles=fs)
         graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt))
-    
+
+    graphics.mayavi_points3d(mfig, vs_cartesian, scale_factor=0.1, color=(1, 0, 0))
     return 0
 
 if __name__ == "__main__":
