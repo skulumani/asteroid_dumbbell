@@ -2,15 +2,6 @@
 #include "input_parser.hpp"
 #include "surface_mesher.hpp"
 
-template<typename D>
-void sub_func(Eigen::Ref<D> v) {
-    v = v * 2;
-}
-
-template<typename D>
-void ref_func(Eigen::Ref<D> v) {
-    sub_func(v);
-}
 
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
@@ -29,24 +20,13 @@ int main(int argc, char* argv[]) {
     min_angle = atof(argv[4]);
     max_radius = atof(argv[5]);
     max_distance = atof(argv[6]);
-    Polyhedron poly;    
-    Eigen::MatrixXd V;
-    Eigen::MatrixXi F;
-    
-    ellipsoid_surface_mesher(atof(argv[1]), atof(argv[2]), atof(argv[3]),
-            min_angle, max_radius, max_distance, poly);
-    
-    ellipsoid_surface_mesher(atof(argv[1]), atof(argv[2]), atof(argv[3]),
-            min_angle, max_radius, max_distance, V, F);
-    
-    Eigen::Matrix<double, Eigen::Dynamic, 3> Va;
-    Va.resize(1, 3);
-    Va << 1, 2, 3;
 
-    ref_func<Eigen::Matrix<double, Eigen::Dynamic, 3>>(Va);
-    
-    std::cout << Va << std::endl;
-    std::cout << "Polyhedron vertices: " << poly.size_of_vertices() << std::endl;
-    std::cout << "Eigen V vertices: " << V.rows() << std::endl;
+	// Create surface mesh object
+	SurfMesh smesh(atof(argv[1]), atof(argv[2]), atof(argv[3]),
+            min_angle, max_radius, max_distance);
+
+	std::cout << "Smesh poly vertices: " << smesh.poly.size_of_vertices() << std::endl;
+	std::cout << "Smesh v vertices: " << smesh.v.rows() << std::endl;
+	std::cout << "Surface mesh faces: " << smesh.faces().rows() << std::endl;
     return 0;
 }
