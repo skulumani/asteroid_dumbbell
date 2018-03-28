@@ -1,5 +1,42 @@
 #include "surface_mesher.hpp"
 
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Polyhedron_3.h>
+#include <CGAL/Polyhedron_items_with_id_3.h>
+#include <CGAL/Surface_mesh_default_triangulation_3.h>
+#include <CGAL/IO/output_surface_facets_to_polyhedron.h>
+#include <CGAL/Complex_2_in_triangulation_3.h>
+#include <CGAL/make_surface_mesh.h>
+#include <CGAL/Implicit_surface_3.h>
+
+#include <Eigen/Dense>
+
+
+#include <stdlib.h>
+#include <cmath>
+
+
+typedef CGAL::Simple_cartesian<double> Kernel;
+// default triangulation for surface_mesher
+typedef CGAL::Surface_mesh_default_triangulation_3 Tr;
+
+// c2t3
+typedef CGAL::Complex_2_in_triangulation_3<Tr> C2t3;
+
+typedef Tr::Geom_traits GT;
+typedef GT::Sphere_3 Sphere_3;
+typedef GT::Point_3 Point_3;
+typedef GT::FT FT;
+typedef CGAL::Polyhedron_3<GT,CGAL::Polyhedron_items_with_id_3> Polyhedron;
+typedef Polyhedron::Facet_iterator          Facet_iterator;
+typedef Polyhedron::Vertex_iterator         Vertex_iterator;
+typedef Polyhedron::HalfedgeDS             HalfedgeDS;
+typedef Polyhedron::Halfedge_around_facet_circulator Halfedge_facet_circulator;
+
+typedef FT (*Function)(Point_3); // Function is a pointer with takes Point_3 as input and returns type FT
+
+typedef CGAL::Implicit_surface_3<GT, Function> Surface_3;
+
 template<typename PolyType>
 void build_polyhedron_index(PolyType &P) {
     std::size_t ii = 0;
@@ -100,6 +137,7 @@ SurfMesh::SurfMesh (const double& a_in, const double& b_in, const double& c_in,
 	polyhedron_to_eigen<Polyhedron, Eigen::MatrixXd, Eigen::MatrixXi>(this->poly, this->v, this->f);
 
 }
+
 // Explicit specialization
 template void polyhedron_to_eigen<CGAL::Polyhedron_3<CGAL::Robust_circumcenter_traits_3<CGAL::Epick>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> >, Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1> >(CGAL::Polyhedron_3<CGAL::Robust_circumcenter_traits_3<CGAL::Epick>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> >&, Eigen::Ref<Eigen::Matrix<double, -1, -1, 0, -1, -1>, 0, Eigen::internal::conditional<Eigen::Matrix<double, -1, -1, 0, -1, -1>::IsVectorAtCompileTime, Eigen::InnerStride<1>, Eigen::OuterStride<-1> >::type>, Eigen::Ref<Eigen::Matrix<int, -1, -1, 0, -1, -1>, 0, Eigen::internal::conditional<Eigen::Matrix<int, -1, -1, 0, -1, -1>::IsVectorAtCompileTime, Eigen::InnerStride<1>, Eigen::OuterStride<-1> >::type>);
 
