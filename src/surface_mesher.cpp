@@ -11,23 +11,21 @@
 
 #include <Eigen/Dense>
 
-
 #include <stdlib.h>
 #include <cmath>
 
-
 typedef CGAL::Simple_cartesian<double> Kernel;
-// default triangulation for surface_mesher
-typedef CGAL::Surface_mesh_default_triangulation_3 Tr;
 
-// c2t3
+typedef CGAL::Surface_mesh_default_triangulation_3 Tr;
 typedef CGAL::Complex_2_in_triangulation_3<Tr> C2t3;
 
 typedef Tr::Geom_traits GT;
 typedef GT::Sphere_3 Sphere_3;
 typedef GT::Point_3 Point_3;
 typedef GT::FT FT;
+
 typedef CGAL::Polyhedron_3<GT,CGAL::Polyhedron_items_with_id_3> Polyhedron;
+
 typedef Polyhedron::Facet_iterator          Facet_iterator;
 typedef Polyhedron::Vertex_iterator         Vertex_iterator;
 typedef Polyhedron::HalfedgeDS             HalfedgeDS;
@@ -37,6 +35,11 @@ typedef FT (*Function)(Point_3); // Function is a pointer with takes Point_3 as 
 
 typedef CGAL::Implicit_surface_3<GT, Function> Surface_3;
 
+/**
+	Store the indices for the vertices in the polyhedron
+
+	@param Polyhedron object instance. It should have items
+*/
 template<typename PolyType>
 void build_polyhedron_index(PolyType &P) {
     std::size_t ii = 0;
@@ -50,6 +53,13 @@ void build_polyhedron_index(PolyType &P) {
 
 }
 
+/**
+	Extract the vertices and faces from polyhedron
+
+	@param Polyhedron object instance. It should have items
+	@returns V eigen array of vertices (n x 3)
+	@returns F eigen array of faces (f x 3)
+*/
 template<typename PolyType, typename VectorType, typename IndexType>
 void polyhedron_to_eigen(PolyType &P, 
         Eigen::Ref<VectorType> V, Eigen::Ref<IndexType> F) {
@@ -85,6 +95,14 @@ void polyhedron_to_eigen(PolyType &P,
 // these need to be used in the ellispoid function
 double a, b, c;
 
+/**
+	Implicit signed distance function for an ellipsoid
+	
+	There some global variables which define the axes of the ellipse
+
+	@param Point_3 p is a CGAL::Point
+	@returns signed distance zero level set of the function is the surface
+*/
 FT ellipsoid_function (Point_3 p) {
     const FT x2 = (p.x()*p.x()) / (a * a);
     const FT y2 = (p.y()*p.y()) / (b * b);
@@ -92,6 +110,21 @@ FT ellipsoid_function (Point_3 p) {
     return x2 + y2 + z2 - 1;
 }
 
+/**
+	Generate a polyhedron defining the ellipsoid surface	
+
+	@param a_in semimajor axis in x axis
+	@param b_in semimajor axis in y axis
+	@param c_in semimajor axis in z axis
+	@param min_angle lower bound in degree for the angles of the mesh facets
+	@param radius_bound upper bound on the radii of the surface delaunay balls.
+		A surface delaunay ball is the ball circumscribining a mesh facet and 
+		centered on the surface	
+	@param max_distance Upper bound for the distance bewtween the circumcenter 
+		of a mesh facet and the center of a surface delaunay ball of this
+		facet
+	@returns Polyhedron_3 The polyhedron mesh defining the surface mesh
+*/
 template<typename PolyType>
 int ellipsoid_surface_mesher(const double& a_in, const double& b_in, const double& c_in,
         const double& min_angle, const double& max_radius, const double& max_distance,
@@ -123,6 +156,24 @@ int ellipsoid_surface_mesher(const double& a_in, const double& b_in, const doubl
 }
 
 // SurMesh class
+/**
+	SurfMesh constructor
+	
+	Simply builds the surface mesh and stores data with the object
+
+	@param a_in semimajor axis in x axis
+	@param b_in semimajor axis in y axis
+	@param c_in semimajor axis in z axis
+	@param min_angle lower bound in degree for the angles of the mesh facets
+	@param radius_bound upper bound on the radii of the surface delaunay balls.
+		A surface delaunay ball is the ball circumscribining a mesh facet and 
+		centered on the surface	
+	@param max_distance Upper bound for the distance bewtween the circumcenter 
+		of a mesh facet and the center of a surface delaunay ball of this
+		facet
+	@returns None Object instance is updated with polyhedron, vertices, and
+		faces
+*/
 SurfMesh::SurfMesh (const double& a_in, const double& b_in, const double& c_in,
 					const double& min_angle, const double& max_radius, const double& max_distance) {
 	ellipsoid_surface_mesher(a_in, b_in, c_in, min_angle, max_radius, max_distance,
