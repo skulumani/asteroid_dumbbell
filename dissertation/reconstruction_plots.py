@@ -96,7 +96,7 @@ def castalia_reconstruction(img_path):
     vc, fc = ast.V, ast.F
 
     # sort the vertices in in order (x component)
-    vc = vc[vc[:, 0].argsort()]
+    # vc = vc[vc[:, 0].argsort()]
 
     # both now into spherical coordinates
     ve_spherical = wavefront.cartesian2spherical(ve)
@@ -180,8 +180,8 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     
     The point cloud (ellipse) should have the same number of points than the initial mesh.
     """
-    surf_area = 0.06
-    a = 0.25 # at a*100 % of maximum angle the scale will be 50% of measurement
+    surf_area = 0.1
+    a = 1.2 # at a*100 % of maximum angle the scale will be 50% of measurement
     delta=0.01
     # define the sphere
     # vs, fs = wavefront.ellipsoid_mesh(0.5, 0.5, 0.5, density=10, subdivisions=1)
@@ -207,7 +207,7 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     # graphics.mayavi_points3d(mfig, vs, color=(1, 0, 0))
     # graphics.mayavi_points3d(mfig, ve, color=(0, 1, 0))
     # in a loop add each vertex of the ellipse into the sphere mesh
-    for ii, pt in enumerate(ve_spherical[0:100, :]):
+    for ii, pt in enumerate(ve_spherical):
         index +=1
         filename = os.path.join(img_path, 'sphere_ellipsoid_' + str(index).zfill(6) + '.jpg')
         # graphics.mlab.savefig(filename, magnification=4)
@@ -218,9 +218,9 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
 
         vs_cartesian = wavefront.spherical2cartesian(vs_spherical)
         ms.reset(x=vs_cartesian[:,0], y=vs_cartesian[:,1], z=vs_cartesian[:,2], triangles=fs)
-        graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt))
+        graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt), radius=0.02)
 
-    graphics.mayavi_points3d(mfig, vs_cartesian, scale_factor=0.1, color=(1, 0, 0))
+    graphics.mayavi_points3d(mfig, vs_cartesian, scale_factor=0.02, color=(1, 0, 0))
     return 0
 
 if __name__ == "__main__":
@@ -230,6 +230,6 @@ if __name__ == "__main__":
 
     # cube_into_sphere(img_path)
     # sphere_into_ellipsoid(img_path)
-    castalia_reconstruction(img_path)
-    # sphere_into_ellipsoid_spherical_coordinates(img_path)
+    # castalia_reconstruction(img_path)
+    sphere_into_ellipsoid_spherical_coordinates(img_path)
     # castalia_reconstruction_factor_tuning(img_path)
