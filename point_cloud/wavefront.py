@@ -1663,19 +1663,18 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
     return nv, nf
 
 def spherical_incremental_mesh_update(mfig, pt_spherical, vs_spherical, f,
-                                      surf_area, factor=1, radius_factor=1):
+                                      surf_area, a=0.3, delta=0.5):
     
     # surface area on a spherical area gives us a range of long and lat
-    delta_lat, delta_lon = spherical_surface_area(pt_spherical, surf_area, factor=factor)
+    delta_lat, delta_lon = spherical_surface_area(pt_spherical, surf_area)
     delta_sigma = spherical_distance(pt_spherical, vs_spherical)
     region_index = delta_sigma < delta_lat
     mesh_region = vs_spherical[region_index,:]
     
     # graphics.mayavi_points3d(mfig, spherical2cartesian(mesh_region), scale_factor=0.1, color=(1, 0, 0))
     # graphics.mayavi_addPoint(mfig, spherical2cartesian(pt_spherical), color=(0, 1,1))
-
     # now compute new radii for those in mesh region
-    radius_scale = radius_scale_factor(delta_sigma[region_index], std=radius_factor)
+    radius_scale = radius_scale_factor(delta_sigma[region_index], a=a, delta=delta)
     
     mesh_region[:, 0] = radius_scale * (pt_spherical[np.newaxis, 0] - mesh_region[:, 0]) + mesh_region[:, 0]
     
@@ -2400,7 +2399,6 @@ def spherical_distance(s1, s2):
     Assume s1 is a scalar spherical coordinate (r, lat, lon)
     and s2 can be a vector array n*3
 
-
     Dist will be the same size as s2
     """
     r1, lat1, lon1 = s1[np.newaxis, 0], s1[np.newaxis, 1], s1[np.newaxis, 2]
@@ -2418,11 +2416,12 @@ def spherical_distance(s1, s2):
     dist = 1 * delta_sigma
     return delta_sigma
    
-def radius_scale_factor(dist_sigma, std=1):
-    """Scale factor based on half normal distribution
-
-    scale - higher numbers makes more spiky area
+def radius_scale_factor(angle, a=0.5, delta=0.1):
+    """Scale factor based on hyperbolic tangent
+        x is a percent of maximum value (normalized)
+        a is left right postioin
+        delta is for steepness
     """
-    max_value = np.sqrt(2) / std / np.sqrt(np.pi)
-    scale = np.sqrt(2)/std/np.sqrt(np.pi) * np.exp(- dist_sigma**2 / 2 / std**2) / max_value
+    x = angle/np.max(angle) 
+    scale = 1/2 * ( 1- np.tanh((x-a)/delta))
     return scale
