@@ -180,8 +180,8 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     
     The point cloud (ellipse) should have the same number of points than the initial mesh.
     """
-    surf_area = 0.1
-    a = 1.2 # at a*100 % of maximum angle the scale will be 50% of measurement
+    surf_area = 0.06
+    a = 0.25 # at a*100 % of maximum angle the scale will be 50% of measurement
     delta=0.01
     # define the sphere
     # vs, fs = wavefront.ellipsoid_mesh(0.5, 0.5, 0.5, density=10, subdivisions=1)
@@ -190,10 +190,16 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
     # import the sphere and ellipsoid from matlab files
     sphere_data = scipy.io.loadmat('./data/sphere_distmesh.mat')
     ellipsoid_data = scipy.io.loadmat('./data/ellipsoid_distmesh.mat')
-
     vs, fs = sphere_data['v'], sphere_data['f']
-
     ve, fe = ellipsoid_data['v'], ellipsoid_data['f']
+
+    # sphere = surface_mesh.SurfMesh(0.5, 0.5, 0.5, 10, 0.05, 0.5)
+    # ellipsoid = surface_mesh.SurfMesh(1, 2, 3, 10, 0.2, 0.5)
+    # vs, fs = sphere.verts(), sphere.faces()
+    # ve, fe = ellipsoid.verts(), sphere.faces()
+    
+    print("Sphere V: {} F: {}".format(vs.shape[0], fs.shape[0]))
+    print("Ellipsoid V: {} F: {}".format(ve.shape[0], fe.shape[0]))
 
     # convert to spherical coordinates
     vs_spherical = wavefront.cartesian2spherical(vs)
