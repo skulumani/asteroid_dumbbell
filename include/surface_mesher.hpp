@@ -36,21 +36,42 @@ typedef FT (*Function)(Point_3); // Function is a pointer with takes Point_3 as 
 
 typedef CGAL::Implicit_surface_3<GT, Function> Surface_3;
 
+struct SurfMesh {
+	// constructors
+	SurfMesh( void ) {}
+	SurfMesh(const double& a_in, const double& b_in, const double& c_in,
+			const double& min_angle, const double& max_radius, const double& max_distance);
+
+	// deconstructor
+	virtual ~SurfMesh( void ) {}
+
+	Polyhedron poly;
+	Eigen::MatrixXd v;
+	Eigen::MatrixXi f;	
+};
+
 template<typename PolyType>
 void build_polyhedron_index(PolyType &P);
 
 template<typename PolyType, typename VectorType, typename IndexType>
-void polyhedron_to_eigen(PolyType &P, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F);
+void polyhedron_to_eigen(PolyType &P,
+        Eigen::Ref<VectorType> V, Eigen::Ref<IndexType> F);
 
 template<typename PolyType>
 int ellipsoid_surface_mesher(const double& a_in, const double& b_in, const double& c_in,
         const double& min_angle, const double& max_radius, const double& max_distance,
         PolyType& poly);
 
-template<typename VectorType, typename IndexType>
-int ellipsoid_surface_mesher(const double& a_in, const double& b_in, const double& c_in,
-        const double& min_angle, const double& max_radius, const double& max_distance,
-        Eigen::PlainObjectBase<VectorType>&V, Eigen::PlainObjectBase<IndexType> &F);
+template<typename D>
+void sub_func(Eigen::Ref<D> v) {
+    v = v * 2;
+}
+
+template<typename D>
+void ref_func(Eigen::Ref<D> v) {
+    sub_func(v);
+}
+
 
 #endif
 

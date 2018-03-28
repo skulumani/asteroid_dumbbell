@@ -14,16 +14,8 @@ void build_polyhedron_index(PolyType &P) {
 }
 
 template<typename PolyType, typename VectorType, typename IndexType>
-void polyhedron_to_eigen(PolyType &P, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F) {
-    // loop over all the faces first
-    
-    // create some eigen arrays to store all the vertices
-    const unsigned int num_v = P.size_of_vertices();
-    const unsigned int num_f = P.size_of_facets();
-    
-    V.resize(num_v, 3);
-    F.resize(num_f, 3);
-
+void polyhedron_to_eigen(PolyType &P, 
+        Eigen::Ref<VectorType> V, Eigen::Ref<IndexType> F) {
     // loop and fill the eigen array
     build_polyhedron_index(P);
 
@@ -93,41 +85,23 @@ int ellipsoid_surface_mesher(const double& a_in, const double& b_in, const doubl
     return 0;
 }
 
-template<typename VectorType, typename IndexType>
-int ellipsoid_surface_mesher(const double& a_in, const double& b_in, const double& c_in,
-        const double& min_angle, const double& max_radius, const double& max_distance,
-        Eigen::PlainObjectBase<VectorType>& V, Eigen::PlainObjectBase<IndexType> &F) {
-    a = a_in;
-    b = b_in;
-    c = c_in;
-
-    Tr tr; // 3D delaunay triangulation
-    C2t3 c2t3 (tr); // 2D-complex in 3D-delaunay triangulation
-
-    // define a surface
-    Function surf_func;
-    surf_func = &ellipsoid_function;
-    Surface_3 surface(surf_func, // pointer to function
-                      Sphere_3(CGAL::ORIGIN, pow(std::max({a, b, c}) + 0.01, 2.0) )); // bounding sphere
-    // Make sure you input a squared radius of the bound sphere
-    // define the meshing criteria
-    CGAL::Surface_mesh_default_criteria_3<Tr> criteria(min_angle, // angular bound
-                                                       max_radius, // raidus bound
-                                                       max_distance); // distance bound
+// SurMesh class
+SurfMesh::SurfMesh (const double& a_in, const double& b_in, const double& c_in,
+					const double& min_angle, const double& max_radius, const double& max_distance) {
+	ellipsoid_surface_mesher(a_in, b_in, c_in, min_angle, max_radius, max_distance,
+							this->poly);
+		
+    const unsigned int num_v = poly.size_of_vertices();
+    const unsigned int num_f = poly.size_of_facets();
     
-    // meshing surface
-    CGAL::make_surface_mesh(c2t3, surface, criteria, CGAL::Manifold_tag());
+    this->v.resize(num_v, 3);
+    this->f.resize(num_f, 3);
 
-    Polyhedron poly;
-    CGAL::output_surface_facets_to_polyhedron(c2t3, poly); 
+	polyhedron_to_eigen<Polyhedron, Eigen::MatrixXd, Eigen::MatrixXi>(this->poly, this->v, this->f);
 
-    polyhedron_to_eigen(poly, V, F);
-    
-    return 0;
 }
 // Explicit specialization
-/* template void polyhedron_to_eigen<CGAL::Polyhedron_3<CGAL::Robust_circumcenter_traits_3<CGAL::Epick>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> >, Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1> >(CGAL::Polyhedron_3<CGAL::Robust_circumcenter_traits_3<CGAL::Epick>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> >&); */
+template void polyhedron_to_eigen<CGAL::Polyhedron_3<CGAL::Robust_circumcenter_traits_3<CGAL::Epick>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> >, Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1> >(CGAL::Polyhedron_3<CGAL::Robust_circumcenter_traits_3<CGAL::Epick>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> >&, Eigen::Ref<Eigen::Matrix<double, -1, -1, 0, -1, -1>, 0, Eigen::internal::conditional<Eigen::Matrix<double, -1, -1, 0, -1, -1>::IsVectorAtCompileTime, Eigen::InnerStride<1>, Eigen::OuterStride<-1> >::type>, Eigen::Ref<Eigen::Matrix<int, -1, -1, 0, -1, -1>, 0, Eigen::internal::conditional<Eigen::Matrix<int, -1, -1, 0, -1, -1>::IsVectorAtCompileTime, Eigen::InnerStride<1>, Eigen::OuterStride<-1> >::type>);
 
 template int ellipsoid_surface_mesher<CGAL::Polyhedron_3<CGAL::Robust_circumcenter_traits_3<CGAL::Epick>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> > >(double const&, double const&, double const&, double const&, double const&, double const&, CGAL::Polyhedron_3<CGAL::Robust_circumcenter_traits_3<CGAL::Epick>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> >&);
 
-template int ellipsoid_surface_mesher<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1> >(double const&, double const&, double const&, double const&, double const&, double const&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> >&);
