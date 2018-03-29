@@ -36,7 +36,7 @@ struct SurfMesh {
 			facet
 		@returns None Object instance is updated with polyhedron, vertices, and
 			faces
-	*/${0}
+	*/
 	SurfMesh(const double& a_in, const double& b_in, const double& c_in,
 			const double& min_angle, const double& max_radius, const double& max_distance);
 
