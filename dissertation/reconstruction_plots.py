@@ -83,8 +83,9 @@ def castalia_reconstruction(img_path):
     """Incrementally modify an ellipse into a low resolution verision of castalia
     by adding vertices and modifying the mesh
     """
+    radius = 1
     surf_area = 0.05
-    a = 0.25
+    a = 0.4
     delta = 0.01
 
     # load a low resolution ellipse to start
@@ -103,24 +104,27 @@ def castalia_reconstruction(img_path):
     vc_spherical = wavefront.cartesian2spherical(vc)
     
     # array of closest normalized measurement distance
-    vert_sigma = np.ones(ve_spherical.shape[0])
+    vert_weight = np.full(ve_spherical.shape[0], 0.01)
+    # calculate maximum angle as function of surface area
+    max_angle = wavefront.spherical_surface_area(radius, surf_area)
     # loop and create many figures
     mfig = graphics.mayavi_figure(offscreen=False)
     mesh = graphics.mayavi_addMesh(mfig, ve, fe)
     ms = mesh.mlab_source
     index = 0
-    for ii, pt in enumerate(vc_spherical[700:1000, :]):
+
+    for ii, pt in enumerate(vc_spherical):
         index +=1
         filename = os.path.join(img_path, 'castalia_reconstruct_' + str(index).zfill(7) + '.jpg')
         # graphics.mlab.savefig(filename, magnification=4)
-        ve_spherical, fc = wavefront.spherical_incremental_mesh_update(mfig, pt,ve_spherical,fe,
-                                                                       vert_sigma=vert_sigma,
-                                                                       surf_area=surf_area,
+        ve_spherical, vert_weight = wavefront.spherical_incremental_mesh_update(mfig, pt,ve_spherical,fe,
+                                                                       vertex_weight=vert_weight,
+                                                                       max_angle=max_angle,
                                                                        a=a, delta=delta)
         
         # back to cartesian
         ve_cartesian = wavefront.spherical2cartesian(ve_spherical)
-        ms.reset(x=ve_cartesian[:, 0], y=ve_cartesian[:, 1], z=ve_cartesian[:, 2], triangles=fc)
+        ms.reset(x=ve_cartesian[:, 0], y=ve_cartesian[:, 1], z=ve_cartesian[:, 2], triangles=fe)
         graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt), radius=0.01 )
 
     graphics.mayavi_points3d(mfig, ve_cartesian, scale_factor=0.01, color=(1, 0, 0))

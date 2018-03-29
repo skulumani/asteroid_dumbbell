@@ -1663,45 +1663,34 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
     return nv, nf
 
 def spherical_incremental_mesh_update(mfig, pt_spherical, vs_spherical, f,
-                                      vert_sigma, surf_area, a=0.3, delta=0.5, 
-                                      sigma_cutoff=0.25):
-    
-    # surface area on a spherical area gives us a range of long and lat
-    delta_lat, delta_lon = spherical_surface_area(pt_spherical, surf_area)
+                                      vertex_weight, max_angle, a=0.25, delta=0.01):
+    # angular distance from measurement to each vertex
     delta_sigma = spherical_distance(pt_spherical, vs_spherical)
     # normalize the sigma angle by the maximum
-    normalized_sigma = delta_sigma / delta_lat
+    normalized_sigma = delta_sigma / max_angle
     
     # find vertices that satisfy the area/angle constraint
-    region_index = delta_sigma < delta_lat
-
-    # update the past history of vert_sigma if smaller
-    memory_index = normalized_sigma < vert_sigma
-
-    vert_sigma[np.logical_and(memory_index, region_index)] = normalized_sigma[np.logical_and(memory_index, region_index)].copy()
+    region_index = normalized_sigma < 1
     
-    # maximum distance constraint normalized sigma distance
-    maxsigma_index = vert_sigma < sigma_cutoff
-    # now find vertices to update
-    # modify_index = np.logical_and(region_index, memory_index, maxsigma_index)
-    modify_index = region_index
-    mesh_region = vs_spherical[modify_index,:]
-    radius_scale = radius_scale_factor(normalized_sigma[modify_index], a=a, delta=delta)
+    # compute new weight for those in the region of interest
+    weight =radius_scale_factor(normalized_sigma[region_index], a=a, delta=delta)
 
-    # graphics.mayavi_points3d(mfig, spherical2cartesian(mesh_region), scale_factor=0.1, color=(1, 0, 0))
-    # graphics.mayavi_addPoint(mfig, spherical2cartesian(pt_spherical), color=(0, 1,1))
-    # now compute new radii for those in mesh region
+
+    mesh_region = vs_spherical[region_index,:]
+    weight_old = vertex_weight[region_index]
+    radius_old = mesh_region[:, 0]
+    radius_meas = pt_spherical[0]
+
+    radius_new = (radius_old * weight_old + radius_meas * weight) / (weight_old + weight)
+    weight_new = weight_old + weight 
+
+    new_vertex_spherical = vs_spherical.copy()
+    new_vertex_weight = vertex_weight.copy()
     
-    # compare
-    mesh_region[:, 0] = radius_scale * (pt_spherical[np.newaxis, 0] - mesh_region[:, 0]) + mesh_region[:, 0]
-     
-    nv_spherical = vs_spherical.copy()
-    
-    nv_spherical[modify_index, :] = mesh_region
+    new_vertex_spherical[region_index, 0] = radius_new
+    new_vertex_weight[region_index] = weight_new
 
-    # graphics.mayavi_addPoint(mfig, spherical2cartesian(mesh_region), color=(1, 1, 0))
-
-    return nv_spherical, f
+    return new_vertex_spherical, new_vertex_weight
 
 def distance_to_mesh(pt, v, f, mesh_parameters):
     r"""Minimum distance to a mesh
@@ -2399,16 +2388,15 @@ def spherical2cartesian(spherical):
 
     return vertices
 
-def spherical_surface_area(meas, surf_area, factor=1):
+def spherical_surface_area(radius, surf_area):
     """Find the range of latitutde and longitude given a desired surface area
     """
-    r, lat, lon = meas
-    del_angle = np.sqrt(surf_area/r**2 / np.cos(lat))
+    # del_angle = np.sqrt(surf_area/r**2 / np.cos(lat))
+    # delta_lat = del_angle;
+    # delta_lon = factor*delta_lat;
+    delta_angle = np.sqrt(surf_area / radius**2)
 
-    delta_lat = del_angle;
-    delta_lon = factor*delta_lat;
-
-    return delta_lat, delta_lon
+    return delta_angle
 
 def spherical_distance(s1, s2):
     """Find distance between between s1 and s2 on geodesic of sphere
