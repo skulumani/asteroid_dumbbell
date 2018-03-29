@@ -661,23 +661,23 @@ class TestSubdivision():
     def test_polydata_subdivision_loop(self):
         poly_out = wavefront.polydata_subdivide(self.poly_ellip, 1, 'loop')
         v, f = wavefront.polydatatomesh(poly_out)
-        np.testing.assert_allclose(v.shape[0],4578)
+        np.testing.assert_allclose(v.shape[0],1146)
         np.testing.assert_allclose(f.shape[0], self.f.shape[0]*4)
 
     def test_polydata_subdivision_butterfly(self):
         poly_out = wavefront.polydata_subdivide(self.poly_ellip, 1, 'butterfly')
         v, f = wavefront.polydatatomesh(poly_out)
-        np.testing.assert_allclose(v.shape[0],4578)
+        np.testing.assert_allclose(v.shape[0],1146)
         np.testing.assert_allclose(f.shape[0], self.f.shape[0]*4)
 
     def test_mesh_subdivision_loop(self):
         v, f = wavefront.mesh_subdivide(self.v, self.f, 1, 'loop')
-        np.testing.assert_allclose(v.shape[0],4578)
+        np.testing.assert_allclose(v.shape[0],1146)
         np.testing.assert_allclose(f.shape[0], self.f.shape[0]*4)
 
     def test_mesh_subdivision_butterfly(self):
         v, f = wavefront.mesh_subdivide(self.v, self.f, 1, 'butterfly')
-        np.testing.assert_allclose(v.shape[0],4578)
+        np.testing.assert_allclose(v.shape[0],1146)
         np.testing.assert_allclose(f.shape[0], self.f.shape[0]*4)
 
 class TestCartesianAndSphericalTransformation():
@@ -700,10 +700,10 @@ class TestCartesianAndSphericalTransformation():
 class TestSphericalTrigonometry():
     s1 = np.array([1, 0, 0])
     def test_spherical_distance_zero(self):
-        delta_sigma = wavefront.spherical_distance(s1, np.array([[1, 0, 0]]))
+        delta_sigma = wavefront.spherical_distance(self.s1, np.array([[1, 0, 0]]))
         np.testing.assert_allclose(delta_sigma, 0)
 
     def test_spherical_distance_ninety(self):
-        delta_sigma = wavefront.spherical_distance(21, np.array([[1, np.pi/2, 0]]))
+        delta_sigma = wavefront.spherical_distance(self.s1, np.array([[1, np.pi/2, 0]]))
         np.testing.assert_allclose(delta_sigma, np.pi/2)
 
