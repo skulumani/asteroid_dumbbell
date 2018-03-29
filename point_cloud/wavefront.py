@@ -1682,9 +1682,9 @@ def spherical_incremental_mesh_update(mfig, pt_spherical, vs_spherical, f,
     
     # maximum distance constraint normalized sigma distance
     maxsigma_index = vert_sigma < sigma_cutoff
-
     # now find vertices to update
-    modify_index = np.logical_and(region_index, memory_index, maxsigma_index)
+    # modify_index = np.logical_and(region_index, memory_index, maxsigma_index)
+    modify_index = region_index
     mesh_region = vs_spherical[modify_index,:]
     radius_scale = radius_scale_factor(normalized_sigma[modify_index], a=a, delta=delta)
 
