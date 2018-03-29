@@ -15,7 +15,7 @@
 /* typedef Polyhedron::Halfedge_around_facet_circulator Halfedge_facet_circulator; */
 
 template<typename PolyType>
-void build_polyhedron_index(Polyhedron &P) {
+void build_polyhedron_index(PolyType &P) {
     std::size_t ii = 0;
     for (Vertex_iterator vert = P.vertices_begin(); vert != P.vertices_end(); ++vert) {
         vert->id() = ii++; 
