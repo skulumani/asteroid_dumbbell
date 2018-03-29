@@ -1663,24 +1663,41 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
     return nv, nf
 
 def spherical_incremental_mesh_update(mfig, pt_spherical, vs_spherical, f,
-                                      surf_area, a=0.3, delta=0.5):
+                                      vert_sigma, surf_area, a=0.3, delta=0.5, 
+                                      sigma_cutoff=0.25):
     
     # surface area on a spherical area gives us a range of long and lat
     delta_lat, delta_lon = spherical_surface_area(pt_spherical, surf_area)
     delta_sigma = spherical_distance(pt_spherical, vs_spherical)
-    region_index = delta_sigma < delta_lat
-    mesh_region = vs_spherical[region_index,:]
+    # normalize the sigma angle by the maximum
+    normalized_sigma = delta_sigma / delta_lat
     
+    # find vertices that satisfy the area/angle constraint
+    region_index = delta_sigma < delta_lat
+
+    # update the past history of vert_sigma if smaller
+    memory_index = normalized_sigma < vert_sigma
+
+    vert_sigma[np.logical_and(memory_index, region_index)] = normalized_sigma[np.logical_and(memory_index, region_index)].copy()
+    
+    # maximum distance constraint normalized sigma distance
+    maxsigma_index = vert_sigma < sigma_cutoff
+
+    # now find vertices to update
+    modify_index = np.logical_and(region_index, memory_index, maxsigma_index)
+    mesh_region = vs_spherical[modify_index,:]
+    radius_scale = radius_scale_factor(normalized_sigma[modify_index], a=a, delta=delta)
+
     # graphics.mayavi_points3d(mfig, spherical2cartesian(mesh_region), scale_factor=0.1, color=(1, 0, 0))
     # graphics.mayavi_addPoint(mfig, spherical2cartesian(pt_spherical), color=(0, 1,1))
     # now compute new radii for those in mesh region
-    radius_scale = radius_scale_factor(delta_sigma[region_index], a=a, delta=delta)
     
+    # compare
     mesh_region[:, 0] = radius_scale * (pt_spherical[np.newaxis, 0] - mesh_region[:, 0]) + mesh_region[:, 0]
-    
+     
     nv_spherical = vs_spherical.copy()
     
-    nv_spherical[region_index, :] = mesh_region
+    nv_spherical[modify_index, :] = mesh_region
 
     # graphics.mayavi_addPoint(mfig, spherical2cartesian(mesh_region), color=(1, 1, 0))
 
@@ -2418,10 +2435,11 @@ def spherical_distance(s1, s2):
    
 def radius_scale_factor(angle, a=0.5, delta=0.1):
     """Scale factor based on hyperbolic tangent
-        x is a percent of maximum value (normalized)
+    angle is a normalized distance (0 to 1)
         a is left right postioin
         delta is for steepness
     """
-    x = angle/np.max(angle) 
-    scale = 1/2 * ( 1- np.tanh((x-a)/delta))
+    scale = 1/2 * ( 1- np.tanh((angle-a)/delta))
+
+
     return scale
