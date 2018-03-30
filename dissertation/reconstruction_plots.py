@@ -98,7 +98,6 @@ def castalia_reconstruction(img_path):
     # sort the vertices in in order (x component)
     vc = vc[vc[:, 0].argsort()]
 
-    pdb.set_trace()
     # uncertainty for each vertex in meters (1/variance)
     vert_weight = np.full(ve.shape[0], (np.pi*np.max(ast.axes))**2)
     # calculate maximum angle as function of surface area
@@ -119,9 +118,8 @@ def castalia_reconstruction(img_path):
                                                                        max_angle=max_angle,
                                                                        a=a, delta=delta)
         
-        # back to cartesian
         ms.reset(x=ve[:, 0], y=ve[:, 1], z=ve[:, 2], triangles=fe)
-        graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt), radius=0.01 )
+        graphics.mayavi_addPoint(mfig, pt, radius=0.01 )
         
     graphics.mayavi_points3d(mfig,ve, scale_factor=0.01, color=(1, 0, 0))
 

@@ -1662,35 +1662,39 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
 
     return nv, nf
 
-def spherical_incremental_mesh_update(mfig, pt_spherical, vs_spherical, f,
+def spherical_incremental_mesh_update(mfig, pt, vs, f,
                                       vertex_weight, max_angle, a=0.25, delta=0.01):
+    # normalize the vectors
+    pt_radius = np.linalg.norm(pt)
+    vs_radius = np.linalg.norm(vs, axis=1)
+
+    pt_uvec = pt / pt_radius
+    vs_uvec = vs / vs_radius[:, np.newaxis]
     # angular distance from measurement to each vertex
-    delta_sigma = spherical_distance(pt_spherical, vs_spherical)
-    # normalize the sigma angle by the maximum
-    normalized_sigma = delta_sigma / max_angle
+    delta_sigma = spherical_distance(pt_uvec, vs_uvec)
     
     # find vertices that satisfy the area/angle constraint
-    region_index = normalized_sigma < 1
+    region_index = delta_sigma < max_angle 
     
     # compute new weight for those in the region of interest
     # weight = radius_scale_factor(normalized_sigma[region_index], a=a, delta=delta)
-    weight = (delta_sigma[region_index] * pt_spherical[0])**2
+    weight = (delta_sigma[region_index] * pt_radius)**2
 
-    mesh_region = vs_spherical[region_index,:]
+    mesh_region = vs[region_index,:]
     weight_old = vertex_weight[region_index]
-    radius_old = mesh_region[:, 0]
-    radius_meas = pt_spherical[0]
+    radius_old = vs_radius[region_index]
+    radius_meas = pt_radius
 
     radius_new = (radius_old * weight + radius_meas * weight_old) / (weight_old + weight)
     weight_new = weight_old*weight/(weight_old+weight)
 
-    new_vertex_spherical = vs_spherical.copy()
+    new_vertex = vs.copy()
     new_vertex_weight = vertex_weight.copy()
     
-    new_vertex_spherical[region_index, 0] = radius_new
+    new_vertex[region_index, :] = radius_new[:, np.newaxis] * vs_uvec[region_index, :]
     new_vertex_weight[region_index] = weight_new
 
-    return new_vertex_spherical, new_vertex_weight
+    return new_vertex, new_vertex_weight
 
 def distance_to_mesh(pt, v, f, mesh_parameters):
     r"""Minimum distance to a mesh
@@ -2400,25 +2404,18 @@ def spherical_surface_area(radius, surf_area):
 
 def spherical_distance(s1, s2):
     """Find distance between between s1 and s2 on geodesic of sphere
-
-    Assume s1 is a scalar spherical coordinate (r, lat, lon)
-    and s2 can be a vector array n*3
+    
+    s1 is a 3 element vecotr
+    s2 is an nx3 of vectors
 
     Dist will be the same size as s2
     """
-    r1, lat1, lon1 = s1[np.newaxis, 0], s1[np.newaxis, 1], s1[np.newaxis, 2]
-    r2, lat2, lon2 = s2[:, 0], s2[:, 1], s2[:, 2]
-    
-    delta_lon =attitude.normalize( (lon2 - lon1), -np.pi, np.pi)
-    
-    num = np.sqrt((np.cos(lat2)*np.sin(delta_lon))**2 + (np.cos(lat1)*np.sin(lat2) - np.sin(lat1)*np.cos(lat2)*np.cos(delta_lon))**2)
-    den = np.sin(lat1)*np.sin(lat2) + np.cos(lat1)*np.cos(lat2)*np.cos(delta_lon)
+     
+    cross_product = np.cross(s1, s2) 
+    dot_product = np.inner(s1, s2)
 
-    delta_sigma = np.arctan2(num, den)
+    delta_sigma = np.arctan2(np.linalg.norm(cross_product, axis=1), dot_product)
 
-    # delta_sigma_cos = np.arccos(np.sin(lat1)*np.sin(lat2) + np.cos(lat1)*np.cos(lat2)*np.cos(delta_lon))
-
-    dist = 1 * delta_sigma
     return delta_sigma
    
 def radius_scale_factor(angle, a=0.5, delta=0.1):
