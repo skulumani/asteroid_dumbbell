@@ -83,8 +83,7 @@ def castalia_reconstruction(img_path):
     """Incrementally modify an ellipse into a low resolution verision of castalia
     by adding vertices and modifying the mesh
     """
-    radius = 1
-    surf_area = 0.1
+    surf_area = 0.01
     a = 0.22
     delta = 0.01
 
@@ -103,17 +102,19 @@ def castalia_reconstruction(img_path):
     ve_spherical = wavefront.cartesian2spherical(ve)
     vc_spherical = wavefront.cartesian2spherical(vc)
     
+    pdb.set_trace()
     # uncertainty for each vertex in meters (1/variance)
-    vert_weight = np.full(ve_spherical.shape[0], 0.01)
+    vert_weight = np.full(ve_spherical.shape[0], (np.pi*np.max(ast.axes))**2)
     # calculate maximum angle as function of surface area
-    max_angle = wavefront.spherical_surface_area(radius, surf_area)
+    max_angle = wavefront.spherical_surface_area(np.max(ast.axes), surf_area)
+
     # loop and create many figures
     mfig = graphics.mayavi_figure(offscreen=False)
     mesh = graphics.mayavi_addMesh(mfig, ve, fe)
     ms = mesh.mlab_source
     index = 0
 
-    for ii, pt in enumerate(vc_spherical[600:1200, :]):
+    for ii, pt in enumerate(vc_spherical):
         index +=1
         filename = os.path.join(img_path, 'castalia_reconstruct_' + str(index).zfill(7) + '.jpg')
         # graphics.mlab.savefig(filename, magnification=4)
@@ -126,8 +127,8 @@ def castalia_reconstruction(img_path):
         ve_cartesian = wavefront.spherical2cartesian(ve_spherical)
         ms.reset(x=ve_cartesian[:, 0], y=ve_cartesian[:, 1], z=ve_cartesian[:, 2], triangles=fe)
         graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt), radius=0.01 )
-
-    # graphics.mayavi_points3d(mfig, ve_cartesian, scale_factor=0.01, color=(1, 0, 0))
+        
+    graphics.mayavi_points3d(mfig, ve_cartesian, scale_factor=0.01, color=(1, 0, 0))
 
     return 0
 
