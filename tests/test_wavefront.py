@@ -704,6 +704,6 @@ class TestSphericalTrigonometry():
         np.testing.assert_allclose(delta_sigma, 0)
 
     def test_spherical_distance_ninety(self):
-        delta_sigma = wavefront.spherical_distance(self.s1, np.array([[1, np.pi/2, 0]]))
+        delta_sigma = wavefront.spherical_distance(self.s1, np.array([[0, 0, 1]]))
         np.testing.assert_allclose(delta_sigma, np.pi/2)
 
