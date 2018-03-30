@@ -210,10 +210,12 @@ def castalia_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
         v_initial = hf['initial_vertex'][()]
         f_initial = hf['initial_faces'][()]
     
-        # create images at 0%, 25%, 50%, 75% of reconstruction
+        """Partial images during the reconstruction"""
         mfig = graphics.mayavi_figure(offscreen=True)
         mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial)
         ms = mesh.mlab_source
+        graphics.mayavi_axes(mfig, [-1, 1, -1, 1, -1, 1], line_width=5, color=(1, 0, 0))
+        graphics.mayavi_view(fig=mfig)
         graphics.mlab.savefig(os.path.join(img_path, 'partial_0.jpg'), magnification=4)
 
         partial_index = np.array([0, v_keys.shape[0]*1/4, v_keys.shape[0]*1/2,
@@ -226,9 +228,30 @@ def castalia_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
             ms.reset(x=v[:, 0], y=v[:, 1], z=v[:,2], triangles=f_initial)
             graphics.mlab.savefig(filename, magnification=4)
 
-    # images at a variety of different angles
+        """Generate the completed shape at a variety of different angles"""
+        # change the mesh to the finished mesh
+        ms.reset(x=rv[v_keys[-1]][()][:, 0],y=rv[v_keys[-1]][()][:, 1],z=rv[v_keys[-1]][()][:, 2],
+                 triangles=f_initial)
+        elevation = np.array([30, -30])
+        azimuth = np.array([0, 45, 135, 215, 315])
+    
+        for az, el in itertools.product(azimuth, elevation):
+            filename = os.path.join(img_path,'final_az=' + str(az) + '_el=' + str(el) + '.jpg')
+            graphics.mayavi_view(fig=mfig, azimuth=az, elevation=el)
+            graphics.mlab.savefig(filename, magnification=4)
 
-    # all the images for use in creating an animation
+        """Create a bunch of images for animation"""
+        animation_path = os.path.join(img_path, 'animation')
+        if not os.path.exists(animation_path):
+            os.makedirs(animation_path)
+        
+        ms.reset(x=v_initial[:, 0], y=v_initial[:, 1], z=v_initial[:, 2], triangles=f_initial)
+
+        for ii, vk in enumerate(v_keys):
+            filename = os.path.join(animation_path, str(ii).zfill(7) + '.jpg')
+            v = rv[vk][()]
+            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:, 2], triangles=f_initial)
+            graphics.mayavi_savefig(mfig, filename, magnification=4)
     
     return 0
 
