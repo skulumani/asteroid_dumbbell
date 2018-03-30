@@ -135,7 +135,7 @@ def castalia_reconstruct_generate_data(output_filename):
     asteroid_faces = 0
     
     ellipsoid_min_angle = 10
-    ellipsoid_max_radius = 0.025
+    ellipsoid_max_radius = 0.03
     ellipsoid_max_distance = 0.5
 
     surf_area = 0.01
@@ -157,7 +157,7 @@ def castalia_reconstruct_generate_data(output_filename):
     max_angle = wavefront.spherical_surface_area(np.max(ast.axes), surf_area)
 
     # loop over all the points and save the data
-    output_path = os.path.join('./data', output_filename)
+    output_path = os.path.join(output_filename)
 
     with h5py.File(output_path, 'w') as fout:
         reconstructed_vertex = fout.create_group('reconstructed_vertex')
@@ -192,9 +192,13 @@ def castalia_reconstruct_generate_data(output_filename):
     
     return 0
 
-def castalia_generate_plots(data_path img_path='/tmp/diss_reconstruct'):
+def castalia_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
     """Given a HDF5 file this will read the data and create a bunch of plots/images
     """
+    # check and create output directory if not existed
+    if not os.path.exists(img_path):
+        os.makedirs(img_path)
+
     with h5py.File(data_path, 'r') as hf:
         rv = hf['reconstructed_vertex']
         rw = hf['reconstructed_weight']
@@ -210,15 +214,17 @@ def castalia_generate_plots(data_path img_path='/tmp/diss_reconstruct'):
         mfig = graphics.mayavi_figure(offscreen=True)
         mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial)
         ms = mesh.mlab_source
+        graphics.mlab.savefig(os.path.join(img_path, 'partial_0.jpg'), magnification=4)
 
         partial_index = np.array([0, v_keys.shape[0]*1/4, v_keys.shape[0]*1/2,
-                                  v_keys.shape[0]*3/4, v_keys.shape[0]*4/4],
+                                  v_keys.shape[0]*3/4, v_keys.shape[0]*4/4-1],
                                  dtype=np.int)
         for img_index, vk in enumerate(partial_index):
-            print(vk)
-            v = rv[vk][()]
+            filename = os.path.join(img_path, 'partial_' + str(img_index+1) + '.jpg')
+            v = rv[str(vk)][()]
             # generate an image and save it 
-            pdb.set_trace()
+            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:,2], triangles=f_initial)
+            graphics.mlab.savefig(filename, magnification=4)
 
     # images at a variety of different angles
 
