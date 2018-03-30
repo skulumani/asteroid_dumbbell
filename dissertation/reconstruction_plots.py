@@ -98,13 +98,9 @@ def castalia_reconstruction(img_path):
     # sort the vertices in in order (x component)
     vc = vc[vc[:, 0].argsort()]
 
-    # both now into spherical coordinates
-    ve_spherical = wavefront.cartesian2spherical(ve)
-    vc_spherical = wavefront.cartesian2spherical(vc)
-    
     pdb.set_trace()
     # uncertainty for each vertex in meters (1/variance)
-    vert_weight = np.full(ve_spherical.shape[0], (np.pi*np.max(ast.axes))**2)
+    vert_weight = np.full(ve.shape[0], (np.pi*np.max(ast.axes))**2)
     # calculate maximum angle as function of surface area
     max_angle = wavefront.spherical_surface_area(np.max(ast.axes), surf_area)
 
@@ -114,21 +110,20 @@ def castalia_reconstruction(img_path):
     ms = mesh.mlab_source
     index = 0
 
-    for ii, pt in enumerate(vc_spherical):
+    for ii, pt in enumerate(vc):
         index +=1
         filename = os.path.join(img_path, 'castalia_reconstruct_' + str(index).zfill(7) + '.jpg')
         # graphics.mlab.savefig(filename, magnification=4)
-        ve_spherical, vert_weight = wavefront.spherical_incremental_mesh_update(mfig, pt,ve_spherical,fe,
+        ve, vert_weight = wavefront.spherical_incremental_mesh_update(mfig, pt,ve,fe,
                                                                        vertex_weight=vert_weight,
                                                                        max_angle=max_angle,
                                                                        a=a, delta=delta)
         
         # back to cartesian
-        ve_cartesian = wavefront.spherical2cartesian(ve_spherical)
-        ms.reset(x=ve_cartesian[:, 0], y=ve_cartesian[:, 1], z=ve_cartesian[:, 2], triangles=fe)
+        ms.reset(x=ve[:, 0], y=ve[:, 1], z=ve[:, 2], triangles=fe)
         graphics.mayavi_addPoint(mfig, wavefront.spherical2cartesian(pt), radius=0.01 )
         
-    graphics.mayavi_points3d(mfig, ve_cartesian, scale_factor=0.01, color=(1, 0, 0))
+    graphics.mayavi_points3d(mfig,ve, scale_factor=0.01, color=(1, 0, 0))
 
     return 0
 
