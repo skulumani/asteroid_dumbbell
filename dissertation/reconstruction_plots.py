@@ -83,7 +83,6 @@ def castalia_reconstruction(img_path):
     """Incrementally modify an ellipse into a low resolution verision of castalia
     by adding vertices and modifying the mesh
     """
-    radius = 1
     surf_area = 0.1
     a = 0.22
     delta = 0.01
@@ -104,9 +103,10 @@ def castalia_reconstruction(img_path):
     vc_spherical = wavefront.cartesian2spherical(vc)
     
     # uncertainty for each vertex in meters (1/variance)
-    vert_weight = np.full(ve_spherical.shape[0], 0.01)
+    vert_weight = np.full(ve_spherical.shape[0], 1 / (np.pi*np.max(ast.axes))**2)
     # calculate maximum angle as function of surface area
-    max_angle = wavefront.spherical_surface_area(radius, surf_area)
+    max_angle = wavefront.spherical_surface_area(np.max(ast.axes), surf_area)
+
     # loop and create many figures
     mfig = graphics.mayavi_figure(offscreen=False)
     mesh = graphics.mayavi_addMesh(mfig, ve, fe)
