@@ -1662,8 +1662,7 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
 
     return nv, nf
 
-def spherical_incremental_mesh_update(mfig, pt, vs, f,
-                                      vertex_weight, max_angle, a=0.25, delta=0.01):
+def spherical_incremental_mesh_update(pt, vs, f, vertex_weight, max_angle):
     # normalize the vectors
     pt_radius = np.linalg.norm(pt)
     vs_radius = np.linalg.norm(vs, axis=1)

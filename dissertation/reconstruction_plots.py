@@ -6,6 +6,7 @@ import warnings
 import os
 import itertools
 import scipy.io
+import h5py
 
 from point_cloud import wavefront
 from visualization import graphics
@@ -90,7 +91,7 @@ def castalia_reconstruction(img_path):
     # load a low resolution ellipse to start
     ast = asteroid.Asteroid('castalia', 0, 'obj')
     ellipsoid = surface_mesh.SurfMesh(ast.axes[0]*0.75, ast.axes[1]*0.75, ast.axes[2]*0.75,
-                                     10, 0.02, 0.5)
+                                     10, 0.025, 0.5)
     
     ve, fe = ellipsoid.verts(), ellipsoid.faces()
     vc, fc = ast.V, ast.F
@@ -113,16 +114,82 @@ def castalia_reconstruction(img_path):
         index +=1
         filename = os.path.join(img_path, 'castalia_reconstruct_' + str(index).zfill(7) + '.jpg')
         # graphics.mlab.savefig(filename, magnification=4)
-        ve, vert_weight = wavefront.spherical_incremental_mesh_update(mfig, pt,ve,fe,
+        ve, vert_weight = wavefront.spherical_incremental_mesh_update(pt,ve,fe,
                                                                        vertex_weight=vert_weight,
-                                                                       max_angle=max_angle,
-                                                                       a=a, delta=delta)
+                                                                       max_angle=max_angle)
         
         ms.reset(x=ve[:, 0], y=ve[:, 1], z=ve[:, 2], triangles=fe)
         graphics.mayavi_addPoint(mfig, pt, radius=0.01 )
         
     graphics.mayavi_points3d(mfig,ve, scale_factor=0.01, color=(1, 0, 0))
 
+    return 0
+
+def castalia_reconstruct_generate_data(output_filename):
+    """Generate all the data for an example for reconstructing asteroid 
+    castalia
+    """
+    asteroid_name = 'castalia'
+    asteroid_type = 'obj'
+    asteroid_faces = 0
+    
+    ellipsoid_min_angle = 10
+    ellipsoid_max_radius = 0.02
+    ellipsoid_max_distance = 0.5
+
+    surf_area = 0.01
+    
+    # load asteroid castalia
+    ast = asteroid.Asteroid(asteroid_name, asteroid_faces, asteroid_type)
+    ellipsoid = surface_mesh.SurfMesh(ast.axes[0], ast.axes[1], ast.axes[2],
+                                      ellipsoid_min_angle, ellipsoid_max_radius, ellipsoid_max_distance)
+    ve, fe = ellipsoid.verts(), ellipsoid.faces()
+    vc, fc = ast.V, ast.F
+    
+    # cort the truth vertices in increasing order of x component
+    vc = vc[vc[:, 0].argsort()]
+
+    # define initial uncertainty for our estimate
+    vert_weight = np.full(ve.shape[0], (np.pi * np.max(ast.axes))**2)
+
+    # calculate the maximum angle as a function of desired surface area
+    max_angle = wavefront.spherical_surface_area(np.max(ast.axes), surf_area)
+
+    # loop over all the points and save the data
+    output_path = os.path.join('./data', output_filename)
+
+    with h5py.File(output_path, 'w') as fout:
+        reconstructed_vertex = fout.create_group('reconstructed_vertex')
+        reconstructed_weight = fout.create_group('reconstructed_weight')
+        reconstructed_vertex.attrs['asteroid_name'] = np.string_(asteroid_name)
+        reconstructed_vertex.attrs['asteroid_faces'] = asteroid_faces
+        reconstructed_vertex.attrs['asteroid_type'] = np.string_(asteroid_type)
+        reconstructed_vertex.attrs['ellipsoid_axes'] = ast.axes
+        reconstructed_vertex.attrs['ellipsoid_min_angle'] = ellipsoid_min_angle
+        reconstructed_vertex.attrs['ellipsoid_max_radius'] = ellipsoid_max_radius
+        reconstructed_vertex.attrs['ellipsoid_max_distance'] = ellipsoid_max_distance
+        reconstructed_vertex.attrs['surf_area'] = surf_area
+
+        fout.create_dataset('truth_vertex', data=vc)
+        fout.create_dataset('truth_faces', data=fc)
+        fout.create_dataset('estimate_faces', data=fe)
+
+        
+        reconstructed_vertex.create_dataset('initial_vertex', data=ve)
+        reconstructed_vertex.create_dataset('initial_faces', data=fe)
+        reconstructed_weight.create_dataset('initial_weight', data=vert_weight)
+
+        for ii, pt in enumerate(vc):
+            ve, vert_weight = wavefront.spherical_incremental_mesh_update(pt, ve, fe,
+                                                                          vertex_weight=vertex_weight,
+                                                                          max_angle=max_angle)
+            # save the current array and weight to htpy
+            reconstructed_vertex.create_dataset(str(ii), data=ve)
+            reconstructed_weight.create_dataset(str(ii), data=vert_weight)
+            
+    
+    print('Finished generating data. Saved to {}'.format(output_path))
+    
     return 0
 
 def castalia_reconstruction_factor_tuning(img_path):
