@@ -520,6 +520,34 @@ def mayavi_addTitle(fig, string, **kwargs):
     t = mlab.title(string, figure=fig, **kwargs)
     return t
 
+def mayavi_view(fig, azimuth=None, elevation=None, distance='auto', 
+                focalpoint='auto', **kwargs):
+    r"""Change the view of the mayavi figure
+
+    mayavi_view(fig, azimuth, elevation, **kwargs)
+
+    Parameters
+    ----------
+    fig : mayavi figure
+        Figure to add the title
+    azimuth : float
+        Angle (0-360) angle from the x axis (longitude)
+    elevation : float
+        Angle (0-180) from the vertical z axis (latitude)
+    distance : float or 'auto'
+        Distance to the focal point. Auto will best fit all objects
+    focalpoint : array_lik (3) or 'float'
+        Focal point of the camera. Auto will be the center of all objects
+    **kwargs : keyword list 
+        
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
+    mlab.view(fig, azimuth=azimuth, elevation=elevation,
+              distance=distance, focalpoint=focalpoint, **kwargs)
+    return 0
+
 def point_cloud_asteroid_frame(point_cloud, bg=(0,0,0)):
     """Input the point cloud data and plot all in the asteroid fixed frame
     """
