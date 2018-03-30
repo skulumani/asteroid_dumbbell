@@ -6,12 +6,14 @@ import warnings
 import os
 import itertools
 import scipy.io
+import h5py
 
 from point_cloud import wavefront
 from visualization import graphics
 from kinematics import sphere
 from dynamics import asteroid
 from lib import surface_mesh
+import utilities
 
 view = {'azimuth': 16.944197132093564, 'elevation': 66.34177792039738,
         'distance': 2.9356815748114435, 
@@ -89,8 +91,8 @@ def castalia_reconstruction(img_path):
 
     # load a low resolution ellipse to start
     ast = asteroid.Asteroid('castalia', 0, 'obj')
-    ellipsoid = surface_mesh.SurfMesh(ast.axes[0]*0.75, ast.axes[1]*0.75, ast.axes[2]*0.75,
-                                     10, 0.02, 0.5)
+    ellipsoid = surface_mesh.SurfMesh(ast.axes[0], ast.axes[1], ast.axes[2],
+                                     10, 0.025, 0.5)
     
     ve, fe = ellipsoid.verts(), ellipsoid.faces()
     vc, fc = ast.V, ast.F
@@ -113,10 +115,9 @@ def castalia_reconstruction(img_path):
         index +=1
         filename = os.path.join(img_path, 'castalia_reconstruct_' + str(index).zfill(7) + '.jpg')
         # graphics.mlab.savefig(filename, magnification=4)
-        ve, vert_weight = wavefront.spherical_incremental_mesh_update(mfig, pt,ve,fe,
+        ve, vert_weight = wavefront.spherical_incremental_mesh_update(pt,ve,fe,
                                                                        vertex_weight=vert_weight,
-                                                                       max_angle=max_angle,
-                                                                       a=a, delta=delta)
+                                                                       max_angle=max_angle)
         
         ms.reset(x=ve[:, 0], y=ve[:, 1], z=ve[:, 2], triangles=fe)
         graphics.mayavi_addPoint(mfig, pt, radius=0.01 )
@@ -125,102 +126,134 @@ def castalia_reconstruction(img_path):
 
     return 0
 
-def castalia_reconstruction_factor_tuning(img_path):
-    """ Vary both the surface area and radius factor to see the effect
+def castalia_reconstruct_generate_data(output_filename):
+    """Generate all the data for an example for reconstructing asteroid 
+    castalia
     """
-    surf_area = np.array([0.005, 0.01])
-    radius_cutoff = np.arange(0.25, 0.8, 0.05)
-    delta = 0.01
-
-    # load a low resolution ellipse to start
-    ast = asteroid.Asteroid('castalia', 0, 'obj')
-    ellipsoid = surface_mesh.SurfMesh(ast.axes[0]*0.75, ast.axes[1]*0.75, ast.axes[2]*0.75,
-                                     10, 0.02, 0.5)
+    asteroid_name = 'castalia'
+    asteroid_type = 'obj'
+    asteroid_faces = 0
     
+    ellipsoid_min_angle = 10
+    ellipsoid_max_radius = 0.03
+    ellipsoid_max_distance = 0.5
+
+    surf_area = 0.01
+    
+    # load asteroid castalia
+    ast = asteroid.Asteroid(asteroid_name, asteroid_faces, asteroid_type)
+    ellipsoid = surface_mesh.SurfMesh(ast.axes[0], ast.axes[1], ast.axes[2],
+                                      ellipsoid_min_angle, ellipsoid_max_radius, ellipsoid_max_distance)
     ve, fe = ellipsoid.verts(), ellipsoid.faces()
     vc, fc = ast.V, ast.F
-
-    # sort the vertices in in order (x component)
-    # vc = vc[vc[:, 0].argsort()]
-
-    # both now into spherical coordinates
-    ve_spherical = wavefront.cartesian2spherical(ve)
-    vc_spherical = wavefront.cartesian2spherical(vc)
-
-    # loop and create many figures
-    mfig = graphics.mayavi_figure(offscreen=True)
-    mesh = graphics.mayavi_addMesh(mfig, ve, fe)
-    ms = mesh.mlab_source
     
-    graphics.mayavi_points3d(mfig, vc, scale_factor=0.01)
+    # cort the truth vertices in increasing order of x component
+    vc = vc[vc[:, 0].argsort()]
 
-    for sa, a in itertools.product(surf_area, radius_cutoff):
-        index = 0
-        filename = os.path.join(img_path, 'castalia_reconstruct_nosort_' + 'sa=' + str(sa).replace('.','') + '_rf=' + str(a).replace('.','') + '.jpg')
-        
-        # reset
-        ve_s = ve_spherical.copy()
-        for ii, pt in enumerate(vc_spherical):
-            ve_s, fc = wavefront.spherical_incremental_mesh_update(mfig, pt,
-                                                                   ve_s, fe,
-                                                                   surf_area=sa,
-                                                                   a=a, delta=delta)
+    # define initial uncertainty for our estimate
+    vert_weight = np.full(ve.shape[0], (np.pi * np.max(ast.axes))**2)
+
+    # calculate the maximum angle as a function of desired surface area
+    max_angle = wavefront.spherical_surface_area(np.max(ast.axes), surf_area)
+
+    # loop over all the points and save the data
+    output_path = os.path.join(output_filename)
+
+    with h5py.File(output_path, 'w') as fout:
+        reconstructed_vertex = fout.create_group('reconstructed_vertex')
+        reconstructed_weight = fout.create_group('reconstructed_weight')
+        reconstructed_vertex.attrs['asteroid_name'] = np.string_(asteroid_name)
+        reconstructed_vertex.attrs['asteroid_faces'] = asteroid_faces
+        reconstructed_vertex.attrs['asteroid_type'] = np.string_(asteroid_type)
+        reconstructed_vertex.attrs['ellipsoid_axes'] = ast.axes
+        reconstructed_vertex.attrs['ellipsoid_min_angle'] = ellipsoid_min_angle
+        reconstructed_vertex.attrs['ellipsoid_max_radius'] = ellipsoid_max_radius
+        reconstructed_vertex.attrs['ellipsoid_max_distance'] = ellipsoid_max_distance
+        reconstructed_vertex.attrs['surf_area'] = surf_area
+
+        fout.create_dataset('truth_vertex', data=vc)
+        fout.create_dataset('truth_faces', data=fc)
+        fout.create_dataset('estimate_faces', data=fe)
+
+        fout.create_dataset('initial_vertex', data=ve)
+        fout.create_dataset('initial_faces', data=fe)
+        fout.create_dataset('initial_weight', data=vert_weight)
+
+        for ii, pt in enumerate(vc):
+            ve, vert_weight = wavefront.spherical_incremental_mesh_update(pt, ve, fe,
+                                                                          vertex_weight=vert_weight,
+                                                                          max_angle=max_angle)
+            # save the current array and weight to htpy
+            reconstructed_vertex.create_dataset(str(ii), data=ve)
+            reconstructed_weight.create_dataset(str(ii), data=vert_weight)
             
-        # back to cartesian
-        ve_c = wavefront.spherical2cartesian(ve_s)
+    
+    print('Finished generating data. Saved to {}'.format(output_path))
+    
+    return 0
 
-        ms.reset(x=ve_c[:, 0], y=ve_c[:, 1], z=ve_c[:, 2], triangles=fc)
-        graphics.mayavi_addTitle(mfig, 'Surface Area={} Cutoff={}'.format(sa, a), color=(0, 0, 0))
-        graphics.mlab.savefig(filename, magnification=4)
-
-def sphere_factor_tuning(img_path):
-    """ Vary both the surface area and radius factor to see the effect
+def castalia_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
+    """Given a HDF5 file this will read the data and create a bunch of plots/images
     """
-    surf_area = np.array([0.06])
-    radius_cutoff = np.array([0.25])
-    delta = 0.01
+    # check and create output directory if not existed
+    if not os.path.exists(img_path):
+        os.makedirs(img_path)
 
-    # load a low resolution ellipse to start
-    sphere_small = surface_mesh.SurfMesh(0.5, 0.5, 0.5, 10, 0.05, 0.5)
-    sphere_large = surface_mesh.SurfMesh(1, 1, 1, 10, 0.2, 0.5)
-    vi, fi = sphere_small.verts(), sphere_small.faces()
-    vf, ff = sphere_large.verts(), sphere_large.faces()
-    
-    print('Initial #V: {}'.format(vi.shape[0]))
-    print('Final #V: {}'.format(vf.shape[0]))
-    pdb.set_trace()
-    # sort the vertices in in order (x component)
-    # vc = vc[vc[:, 0].argsort()]
+    with h5py.File(data_path, 'r') as hf:
+        rv = hf['reconstructed_vertex']
+        rw = hf['reconstructed_weight']
 
-    # both now into spherical coordinates
-    vi_spherical = wavefront.cartesian2spherical(vi)
-    vf_spherical = wavefront.cartesian2spherical(vf)
-
-    # loop and create many figures
-    mfig = graphics.mayavi_figure(offscreen=True)
-    mesh = graphics.mayavi_addMesh(mfig, vi, fi)
-    ms = mesh.mlab_source
-    
-    # graphics.mayavi_points3d(mfig, vc, scale_factor=0.01)
-
-    for sa, a in itertools.product(surf_area, radius_cutoff):
-        index = 0
-        filename = os.path.join(img_path, 'sphere_reconstruct_nosort' + 'sa=' + str(sa).replace('.','') + '_rf=' + str(a).replace('.','') + '.jpg')
+        # get all the keys for the groups
+        v_keys = np.array(utilities.sorted_nicely(list(rv.keys())))
+        w_keys = np.array(utilities.sorted_nicely(list(rw.keys())))
         
-        # reset
-        vi_s = vi_spherical.copy()
-        for ii, pt in enumerate(vf_spherical):
-            vi_s, fc = wavefront.spherical_incremental_mesh_update(mfig, pt,
-                                                                   vi_s, fi,
-                                                                   surf_area=sa,
-                                                                   a=a, delta=delta)
-            
-        # back to cartesian
-        vi_c = wavefront.spherical2cartesian(vi_s)
+        v_initial = hf['initial_vertex'][()]
+        f_initial = hf['initial_faces'][()]
+    
+        """Partial images during the reconstruction"""
+        mfig = graphics.mayavi_figure(offscreen=True)
+        mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial)
+        ms = mesh.mlab_source
+        graphics.mayavi_axes(mfig, [-1, 1, -1, 1, -1, 1], line_width=5, color=(1, 0, 0))
+        graphics.mayavi_view(fig=mfig)
+        graphics.mlab.savefig(os.path.join(img_path, 'partial_0.jpg'), magnification=4)
 
-        ms.reset(x=vi_c[:, 0], y=vi_c[:, 1], z=vi_c[:, 2], triangles=fc)
-        graphics.mayavi_addTitle(mfig, 'Surface Area={} Cutoff={}'.format(sa, a), color=(0, 0, 0))
-        graphics.mlab.savefig(filename, magnification=4)
+        partial_index = np.array([0, v_keys.shape[0]*1/4, v_keys.shape[0]*1/2,
+                                  v_keys.shape[0]*3/4, v_keys.shape[0]*4/4-1],
+                                 dtype=np.int)
+        for img_index, vk in enumerate(partial_index):
+            filename = os.path.join(img_path, 'partial_' + str(img_index+1) + '.jpg')
+            v = rv[str(vk)][()]
+            # generate an image and save it 
+            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:,2], triangles=f_initial)
+            graphics.mlab.savefig(filename, magnification=4)
+
+        """Generate the completed shape at a variety of different angles"""
+        # change the mesh to the finished mesh
+        ms.reset(x=rv[v_keys[-1]][()][:, 0],y=rv[v_keys[-1]][()][:, 1],z=rv[v_keys[-1]][()][:, 2],
+                 triangles=f_initial)
+        elevation = np.array([30, -30])
+        azimuth = np.array([0, 45, 135, 215, 315])
+    
+        for az, el in itertools.product(azimuth, elevation):
+            filename = os.path.join(img_path,'final_az=' + str(az) + '_el=' + str(el) + '.jpg')
+            graphics.mayavi_view(fig=mfig, azimuth=az, elevation=el)
+            graphics.mlab.savefig(filename, magnification=4)
+
+        """Create a bunch of images for animation"""
+        animation_path = os.path.join(img_path, 'animation')
+        if not os.path.exists(animation_path):
+            os.makedirs(animation_path)
+        
+        ms.reset(x=v_initial[:, 0], y=v_initial[:, 1], z=v_initial[:, 2], triangles=f_initial)
+
+        for ii, vk in enumerate(v_keys):
+            filename = os.path.join(animation_path, str(ii).zfill(7) + '.jpg')
+            v = rv[vk][()]
+            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:, 2], triangles=f_initial)
+            graphics.mayavi_savefig(mfig, filename, magnification=4)
+    
+    return 0
 
 def sphere_into_ellipsoid_spherical_coordinates(img_path):
     """See if we can turn a sphere into an ellipse by changing the radius of
