@@ -1674,15 +1674,14 @@ def spherical_incremental_mesh_update(mfig, pt_spherical, vs_spherical, f,
     
     # compute new weight for those in the region of interest
     # weight = radius_scale_factor(normalized_sigma[region_index], a=a, delta=delta)
-    weight = 1 / (delta_sigma[region_index] * pt_spherical[0])**2
+    weight = (delta_sigma[region_index] * pt_spherical[0])**2
 
-    pdb.set_trace()
     mesh_region = vs_spherical[region_index,:]
     weight_old = vertex_weight[region_index]
     radius_old = mesh_region[:, 0]
     radius_meas = pt_spherical[0]
 
-    radius_new = (radius_old * weight + radius_meas * weight_old) / (weight_old * weight)
+    radius_new = (radius_old * weight + radius_meas * weight_old) / (weight_old + weight)
     weight_new = weight_old*weight/(weight_old+weight)
 
     new_vertex_spherical = vs_spherical.copy()
