@@ -13,6 +13,7 @@ from visualization import graphics
 from kinematics import sphere
 from dynamics import asteroid
 from lib import surface_mesh
+import utilities
 
 view = {'azimuth': 16.944197132093564, 'elevation': 66.34177792039738,
         'distance': 2.9356815748114435, 
@@ -90,7 +91,7 @@ def castalia_reconstruction(img_path):
 
     # load a low resolution ellipse to start
     ast = asteroid.Asteroid('castalia', 0, 'obj')
-    ellipsoid = surface_mesh.SurfMesh(ast.axes[0]*0.75, ast.axes[1]*0.75, ast.axes[2]*0.75,
+    ellipsoid = surface_mesh.SurfMesh(ast.axes[0], ast.axes[1], ast.axes[2],
                                      10, 0.025, 0.5)
     
     ve, fe = ellipsoid.verts(), ellipsoid.faces()
@@ -134,7 +135,7 @@ def castalia_reconstruct_generate_data(output_filename):
     asteroid_faces = 0
     
     ellipsoid_min_angle = 10
-    ellipsoid_max_radius = 0.02
+    ellipsoid_max_radius = 0.025
     ellipsoid_max_distance = 0.5
 
     surf_area = 0.01
@@ -174,14 +175,13 @@ def castalia_reconstruct_generate_data(output_filename):
         fout.create_dataset('truth_faces', data=fc)
         fout.create_dataset('estimate_faces', data=fe)
 
-        
-        reconstructed_vertex.create_dataset('initial_vertex', data=ve)
-        reconstructed_vertex.create_dataset('initial_faces', data=fe)
-        reconstructed_weight.create_dataset('initial_weight', data=vert_weight)
+        fout.create_dataset('initial_vertex', data=ve)
+        fout.create_dataset('initial_faces', data=fe)
+        fout.create_dataset('initial_weight', data=vert_weight)
 
         for ii, pt in enumerate(vc):
             ve, vert_weight = wavefront.spherical_incremental_mesh_update(pt, ve, fe,
-                                                                          vertex_weight=vertex_weight,
+                                                                          vertex_weight=vert_weight,
                                                                           max_angle=max_angle)
             # save the current array and weight to htpy
             reconstructed_vertex.create_dataset(str(ii), data=ve)
@@ -192,6 +192,39 @@ def castalia_reconstruct_generate_data(output_filename):
     
     return 0
 
+def castalia_generate_plots(data_path img_path='/tmp/diss_reconstruct'):
+    """Given a HDF5 file this will read the data and create a bunch of plots/images
+    """
+    with h5py.File(data_path, 'r') as hf:
+        rv = hf['reconstructed_vertex']
+        rw = hf['reconstructed_weight']
+
+        # get all the keys for the groups
+        v_keys = np.array(utilities.sorted_nicely(list(rv.keys())))
+        w_keys = np.array(utilities.sorted_nicely(list(rw.keys())))
+        
+        v_initial = hf['initial_vertex'][()]
+        f_initial = hf['initial_faces'][()]
+    
+        # create images at 0%, 25%, 50%, 75% of reconstruction
+        mfig = graphics.mayavi_figure(offscreen=True)
+        mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial)
+        ms = mesh.mlab_source
+
+        partial_index = np.array([0, v_keys.shape[0]*1/4, v_keys.shape[0]*1/2,
+                                  v_keys.shape[0]*3/4, v_keys.shape[0]*4/4],
+                                 dtype=np.int)
+        for img_index, vk in enumerate(partial_index):
+            print(vk)
+            v = rv[vk][()]
+            # generate an image and save it 
+            pdb.set_trace()
+
+    # images at a variety of different angles
+
+    # all the images for use in creating an animation
+    
+    return 0
 
 def sphere_into_ellipsoid_spherical_coordinates(img_path):
     """See if we can turn a sphere into an ellipse by changing the radius of
