@@ -216,13 +216,12 @@ def castalia_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
         ms = mesh.mlab_source
         graphics.mayavi_axes(mfig, [-1, 1, -1, 1, -1, 1], line_width=5, color=(1, 0, 0))
         graphics.mayavi_view(fig=mfig)
-        graphics.mlab.savefig(os.path.join(img_path, 'partial_0.jpg'), magnification=4)
 
         partial_index = np.array([0, v_keys.shape[0]*1/4, v_keys.shape[0]*1/2,
                                   v_keys.shape[0]*3/4, v_keys.shape[0]*4/4-1],
                                  dtype=np.int)
         for img_index, vk in enumerate(partial_index):
-            filename = os.path.join(img_path, 'partial_' + str(img_index+1) + '.jpg')
+            filename = os.path.join(img_path, 'partial_' + str(vk) + '.jpg')
             v = rv[str(vk)][()]
             # generate an image and save it 
             ms.reset(x=v[:, 0], y=v[:, 1], z=v[:,2], triangles=f_initial)
