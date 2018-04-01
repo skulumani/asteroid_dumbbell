@@ -1662,29 +1662,38 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
 
     return nv, nf
 
-def spherical_incremental_mesh_update(mfig, pt_spherical, vs_spherical, f,
-                                      surf_area, a=0.3, delta=0.5):
-    
-    # surface area on a spherical area gives us a range of long and lat
-    delta_lat, delta_lon = spherical_surface_area(pt_spherical, surf_area)
-    delta_sigma = spherical_distance(pt_spherical, vs_spherical)
-    region_index = delta_sigma < delta_lat
-    mesh_region = vs_spherical[region_index,:]
-    
-    # graphics.mayavi_points3d(mfig, spherical2cartesian(mesh_region), scale_factor=0.1, color=(1, 0, 0))
-    # graphics.mayavi_addPoint(mfig, spherical2cartesian(pt_spherical), color=(0, 1,1))
-    # now compute new radii for those in mesh region
-    radius_scale = radius_scale_factor(delta_sigma[region_index], a=a, delta=delta)
-    
-    mesh_region[:, 0] = radius_scale * (pt_spherical[np.newaxis, 0] - mesh_region[:, 0]) + mesh_region[:, 0]
-    
-    nv_spherical = vs_spherical.copy()
-    
-    nv_spherical[region_index, :] = mesh_region
+def spherical_incremental_mesh_update(pt, vs, f, vertex_weight, max_angle):
+    # normalize the vectors
+    pt_radius = np.linalg.norm(pt)
+    vs_radius = np.linalg.norm(vs, axis=1)
 
-    # graphics.mayavi_addPoint(mfig, spherical2cartesian(mesh_region), color=(1, 1, 0))
+    pt_uvec = pt / pt_radius
+    vs_uvec = vs / vs_radius[:, np.newaxis]
+    # angular distance from measurement to each vertex
+    delta_sigma = spherical_distance(pt_uvec, vs_uvec)
+    
+    # find vertices that satisfy the area/angle constraint
+    region_index = delta_sigma < max_angle 
+    
+    # compute new weight for those in the region of interest
+    # weight = radius_scale_factor(normalized_sigma[region_index], a=a, delta=delta)
+    weight = (delta_sigma[region_index] * pt_radius)**2
 
-    return nv_spherical, f
+    mesh_region = vs[region_index,:]
+    weight_old = vertex_weight[region_index]
+    radius_old = vs_radius[region_index]
+    radius_meas = pt_radius
+
+    radius_new = (radius_old * weight + radius_meas * weight_old) / (weight_old + weight)
+    weight_new = weight_old*weight/(weight_old+weight)
+
+    new_vertex = vs.copy()
+    new_vertex_weight = vertex_weight.copy()
+    
+    new_vertex[region_index, :] = radius_new[:, np.newaxis] * vs_uvec[region_index, :]
+    new_vertex_weight[region_index] = weight_new
+
+    return new_vertex, new_vertex_weight
 
 def distance_to_mesh(pt, v, f, mesh_parameters):
     r"""Minimum distance to a mesh
@@ -2382,46 +2391,39 @@ def spherical2cartesian(spherical):
 
     return vertices
 
-def spherical_surface_area(meas, surf_area, factor=1):
+def spherical_surface_area(radius, surf_area):
     """Find the range of latitutde and longitude given a desired surface area
     """
-    r, lat, lon = meas
-    del_angle = np.sqrt(surf_area/r**2 / np.cos(lat))
+    # del_angle = np.sqrt(surf_area/r**2 / np.cos(lat))
+    # delta_lat = del_angle;
+    # delta_lon = factor*delta_lat;
+    delta_angle = np.sqrt(surf_area / radius**2)
 
-    delta_lat = del_angle;
-    delta_lon = factor*delta_lat;
-
-    return delta_lat, delta_lon
+    return delta_angle
 
 def spherical_distance(s1, s2):
     """Find distance between between s1 and s2 on geodesic of sphere
-
-    Assume s1 is a scalar spherical coordinate (r, lat, lon)
-    and s2 can be a vector array n*3
+    
+    s1 is a 3 element vecotr
+    s2 is an nx3 of vectors
 
     Dist will be the same size as s2
     """
-    r1, lat1, lon1 = s1[np.newaxis, 0], s1[np.newaxis, 1], s1[np.newaxis, 2]
-    r2, lat2, lon2 = s2[:, 0], s2[:, 1], s2[:, 2]
-    
-    delta_lon =attitude.normalize( (lon2 - lon1), -np.pi, np.pi)
-    
-    num = np.sqrt((np.cos(lat2)*np.sin(delta_lon))**2 + (np.cos(lat1)*np.sin(lat2) - np.sin(lat1)*np.cos(lat2)*np.cos(delta_lon))**2)
-    den = np.sin(lat1)*np.sin(lat2) + np.cos(lat1)*np.cos(lat2)*np.cos(delta_lon)
+     
+    cross_product = np.cross(s1, s2) 
+    dot_product = np.inner(s1, s2)
 
-    delta_sigma = np.arctan2(num, den)
+    delta_sigma = np.arctan2(np.linalg.norm(cross_product, axis=1), dot_product)
 
-    # delta_sigma_cos = np.arccos(np.sin(lat1)*np.sin(lat2) + np.cos(lat1)*np.cos(lat2)*np.cos(delta_lon))
-
-    dist = 1 * delta_sigma
     return delta_sigma
    
 def radius_scale_factor(angle, a=0.5, delta=0.1):
     """Scale factor based on hyperbolic tangent
-        x is a percent of maximum value (normalized)
+    angle is a normalized distance (0 to 1)
         a is left right postioin
         delta is for steepness
     """
-    x = angle/np.max(angle) 
-    scale = 1/2 * ( 1- np.tanh((x-a)/delta))
+    scale = 1/2 * ( 1- np.tanh((angle-a)/delta))
+
+
     return scale

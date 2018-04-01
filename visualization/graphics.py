@@ -520,6 +520,79 @@ def mayavi_addTitle(fig, string, **kwargs):
     t = mlab.title(string, figure=fig, **kwargs)
     return t
 
+def mayavi_view(fig, azimuth=None, elevation=None, distance='auto', 
+                focalpoint='auto', **kwargs):
+    r"""Change the view of the mayavi figure
+
+    mayavi_view(fig, azimuth, elevation, **kwargs)
+
+    Parameters
+    ----------
+    fig : mayavi figure
+        Figure to add the title
+    azimuth : float
+        Angle (0-360) angle from the x axis (longitude)
+    elevation : float
+        Angle (0-180) from the vertical z axis (latitude)
+    distance : float or 'auto'
+        Distance to the focal point. Auto will best fit all objects
+    focalpoint : array_lik (3) or 'float'
+        Focal point of the camera. Auto will be the center of all objects
+    **kwargs : keyword list 
+        
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
+    mlab.view(azimuth=azimuth, elevation=elevation,
+              distance=distance, focalpoint=focalpoint, figure=fig, **kwargs)
+    return 0
+
+def mayavi_axes(fig, extent, tube_radius=None, line_width=2, **kwargs):
+    r"""Add axes to figure
+
+    mayavi_axes(fig, extent, line_width=2.0, **kwargs)
+
+    Parameters
+    ----------
+    fig : mayavi figure
+        Figure to add the axes
+    extent : array_like (6, )
+        [xmin, xmax, ymin, ymax, zmin, zmax]
+    line_width: float
+        Width of lines
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    """
+    mlab.plot3d([extent[0], extent[1]], [0, 0], [0, 0], color=(1, 0, 0), tube_radius=tube_radius, line_width=line_width)
+    mlab.plot3d([0, 0], [extent[2], extent[3]], [0, 0], color=(0, 1, 0), tube_radius=tube_radius, line_width=line_width)
+    mlab.plot3d([0, 0], [0, 0], [extent[4], extent[5]], color=(0, 0, 1), tube_radius=tube_radius, line_width=line_width)
+    return 0
+
+def mayavi_savefig(fig, filename, magnification=4, **kwargs):
+    r"""Save mayavi figure
+
+    mayavi_savefig(fig, magnification=4, **kwargs)
+
+    Parameters
+    ----------
+
+    fig : mayavi figure
+        Figure to save
+    magnification : float
+        Scale for the image
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+
+    """
+    mlab.savefig(filename, figure=fig, magnification=magnification, **kwargs)
+    return 0
+
 def point_cloud_asteroid_frame(point_cloud, bg=(0,0,0)):
     """Input the point cloud data and plot all in the asteroid fixed frame
     """
