@@ -1,9 +1,8 @@
 #include "mesh.hpp"
+#include "polyhedron.hpp"
 
 // forward declare functions
 void eigen_to_polyhedron(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F, Polyhedron &P);
-
-void build_polyhedron_index(Polyhedron &P);
 
 template<typename VectorType, typename IndexType>
 void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F);
@@ -97,19 +96,6 @@ void Polyhedron_builder<HDS>::operator() (HDS &hds) {
     B.end_surface();
 }
 
-
-//TODO Add documentationn V and F to a polyhedron
-void build_polyhedron_index(Polyhedron &P) {
-    std::size_t ii = 0;
-    for (Vertex_iterator vert = P.vertices_begin(); vert != P.vertices_end(); ++vert) {
-        vert->id() = ii++; 
-    }
-    ii = 0; // reset the counter
-    for (Facet_iterator facet = P.facets_begin(); facet != P.facets_end(); ++facet) {
-        facet->id() = ii++;
-    }
-
-}
 
 // TODO Add documentation
 template<typename VectorType, typename IndexType>

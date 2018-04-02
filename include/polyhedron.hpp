@@ -1,9 +1,7 @@
 #ifndef POLYHEDRON_H
 #define POLYHEDRON_H
 
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/Polyhedron_3.h>
-#include <CGAL/Polyhedron_items_with_id_3.h>
+#include "cgal_types.hpp"
 
 #include <Eigen/Dense>
 
@@ -15,8 +13,7 @@
 /* void eigen_to_polyhedron(Eigen::MatrixXd &V,Eigen::MatrixXi &F, */
 /*         CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3 > &P); */
 
-template<typename PolyType>
-void build_polyhedron_index(PolyType &poly);
+void build_polyhedron_index(Polyhedron &poly);
 
 /* void print_polyhedron_stats(CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3> &P); */
 

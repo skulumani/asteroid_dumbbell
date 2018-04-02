@@ -76,7 +76,8 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 # create a obj file reader executable
 
 # mesh loading
-set(mesh_src src/mesh.cpp src/mesh_main.cpp src/loader.cpp src/input_parser.cpp src/stats.cpp src/cgal.cpp)
+set(mesh_src src/mesh.cpp src/mesh_main.cpp src/polyhedron.cpp src/loader.cpp
+    src/input_parser.cpp src/stats.cpp src/cgal.cpp)
 add_executable(mesh ${mesh_src})
 
 # potential function
