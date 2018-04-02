@@ -89,10 +89,6 @@ add_executable(surface_mesher ${surface_mesher_src})
 ################################################################################
 # PYTHON BINDING
 ################################################################################
-pybind11_add_module(cgal_cpp MODULE 
-    src/bindings.cpp
-    src/polyhedron.cpp)
-
 pybind11_add_module(polyhedron_potential MODULE
     src/potential.cpp src/potential_bindings.cpp)
 
@@ -105,11 +101,11 @@ ENABLE_TESTING()
 
 set(test_all_src 
     tests/cpp/test_all.cpp
-    tests/cpp/test_polyhedron.cpp
     tests/cpp/test_gtest.cpp
     tests/cpp/test_wavefront.cpp
+    tests/cpp/test_surface_mesher.cpp
     src/wavefront.cpp
-    src/polyhedron.cpp)
+    src/surface_mesher.cpp)
 
 add_executable(test_all ${test_all_src})
 target_link_libraries(test_all gtest)
