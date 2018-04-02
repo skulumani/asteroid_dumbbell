@@ -1,8 +1,6 @@
 #include "mesh.hpp"
 #include "polyhedron.hpp"
 
-// forward declare functions
-/* void eigen_to_polyhedron(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F, Polyhedron &P); */
 
 template<typename VectorType, typename IndexType>
 void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F);
