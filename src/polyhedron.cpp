@@ -27,6 +27,33 @@ void build_polyhedron_index(Polyhedron &P) {
 
 }
 
+// TODO Add documentation - overload the () operator
+template<typename HDS>
+void Polyhedron_builder<HDS>::operator() (HDS &hds) {
+
+    typedef typename HDS::Vertex Vertex;
+    typedef typename Vertex::Point Point;
+
+    // create the cgal incremental builder
+    CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, true);
+    // initialize with #v, #f, #half-edges (optional)
+    B.begin_surface(V.rows(), F.rows());
+
+    // add all of the vertices
+    for (int ii = 0; ii < V.rows(); ++ii) {
+        B.add_vertex(Point(V(ii, 0), V(ii, 1), V(ii, 2)));
+    }
+    // add all of the faces
+    for (int ii = 0; ii < F.rows(); ++ii) {
+        B.begin_facet();
+        B.add_vertex_to_facet(F(ii, 0));
+        B.add_vertex_to_facet(F(ii, 1));
+        B.add_vertex_to_facet(F(ii, 2));
+        B.end_facet();
+    }
+    B.end_surface();
+}
+
 /* //TODO Add documentation */
 /* void print_vertices(Polyhedron& P) { */
 /*     CGAL::set_ascii_mode(std::cout); */
@@ -92,11 +119,11 @@ void build_polyhedron_index(Polyhedron &P) {
 /*     } */
 /* } */
 
-/* void eigen_to_polyhedron(Eigen::MatrixXd &V, Eigen::MatrixXi &F, Polyhedron &P) { */
-/*     Polyhedron_builder<HalfedgeDS> builder(V, F); */
-/*     P.delegate(builder); */
-/*     CGAL_assertion(P.is_triangle(P.halfedges_begin())); */
-/* } */
+void eigen_to_polyhedron(Eigen::MatrixXd &V, Eigen::MatrixXi &F, Polyhedron &P) {
+    Polyhedron_builder<HalfedgeDS> builder(V, F);
+    P.delegate(builder);
+    CGAL_assertion(P.is_triangle(P.halfedges_begin()));
+}
 
 /* // TODO Add documentation - overload the () operator */
 /* template<typename HDS> */
@@ -134,7 +161,7 @@ void build_polyhedron_index(Polyhedron &P) {
 /* } */
 
 /* // Explicit initialization of the template */
-/* template void Polyhedron_builder<CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> > >::operator()(CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> >&); */
+template void Polyhedron_builder<CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> > >::operator()(CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> >&);
 
 /* template void polyhedron_to_eigen<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1> > */
 /* (CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> >&, */ 
