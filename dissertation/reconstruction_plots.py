@@ -8,9 +8,9 @@ import itertools
 import scipy.io
 import h5py
 
-from point_cloud import wavefront
+from point_cloud import wavefront, raycaster
 from visualization import graphics
-from kinematics import sphere
+from kinematics import sphere, attitude
 from dynamics import asteroid
 from lib import surface_mesh
 import utilities
@@ -307,6 +307,53 @@ def sphere_into_ellipsoid_spherical_coordinates(img_path):
 
     graphics.mayavi_points3d(mfig, vs_cartesian, scale_factor=0.02, color=(1, 0, 0))
     return 0
+
+def castalia_raycasting_plot(img_path):
+    """Generate an image of the raycaster in work
+    """
+    if not os.path.exists(img_path):
+        os.makedirs(img_path)
+
+    output_filename = os.path.join(img_path, 'castalia_raycasting_plot.jpg')
+
+    input_filename = './data/shape_model/CASTALIA/castalia.obj'
+    polydata = wavefront.read_obj_to_polydata(input_filename)
+    
+    # initialize the raycaster
+    caster_obb = raycaster.RayCaster(polydata, flag='obb')
+    caster_bsp = raycaster.RayCaster(polydata, flag='bsp')
+
+    sensor = raycaster.Lidar(view_axis=np.array([1, 0, 0]), num_step=3)
+
+    # need to translate the sensor and give it a pointing direction
+    pos = np.array([2, 0, 0])
+    dist = 2# distance for each raycast
+    R = attitude.rot3(np.pi)
+
+    # find the inersections
+    # targets = pos + sensor.rotate_fov(R) * dist
+    targets = sensor.define_targets(pos, R, dist)
+    intersections_obb = caster_obb.castarray(pos, targets)
+    intersections_bsp = caster_bsp.castarray(pos, targets)
+
+    # plot
+    fig = graphics.mayavi_figure()
+
+    graphics.mayavi_addPoly(fig, polydata)
+    graphics.mayavi_addPoint(fig, pos, radius=0.05)
+
+    # draw lines from pos to all targets
+    for pt in targets:
+        graphics.mayavi_addLine(fig, pos, pt, color=(1, 0, 0))
+
+    for ints in intersections_bsp:
+        graphics.mayavi_addPoint(fig, ints, radius=0.05, color=(1, 1, 0))
+    
+    graphics.mayavi_axes(fig=fig, extent=[-1, 1, -1, 1, -1, 1] )
+    graphics.mayavi_view(fig=fig)
+    
+    # savefig
+    graphics.mayavi_savefig(fig=fig, filename=output_filename, magnification=4)
 
 if __name__ == "__main__":
     img_path = '/tmp/mayavi_figure'
