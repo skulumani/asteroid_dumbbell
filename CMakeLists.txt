@@ -95,6 +95,9 @@ pybind11_add_module(polyhedron_potential MODULE
 
 pybind11_add_module(surface_mesh MODULE
     src/surface_mesher.cpp src/surface_mesh_bindings.cpp)
+
+pybind11_add_module(mesh_data MODULE
+    src/mesh.cpp src/polyhedron.cpp src/mesh_bindings.cpp)
 ################################################################################
 # Testing example
 ################################################################################
