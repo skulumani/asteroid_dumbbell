@@ -13,4 +13,5 @@ PYBIND11_MODULE(mesh_data, m) {
              py::arg("vertices"), py::arg("faces"))
         .def("get_verts", &MeshData::get_verts, "Return vertices of the mesh")
         .def("get_faces", &MeshData::get_faces, "Return faces of the mesh");
+
 }
