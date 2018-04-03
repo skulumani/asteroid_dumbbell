@@ -56,6 +56,15 @@ void MeshData::build_surface_mesh() {
 
 }
 
+void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
+    // update the polyhedron and surface mesh
+    this->vertices = V;
+    this->faces = F;
+
+    this->build_polyhedron();
+    this->build_surface_mesh();
+}
+
 template<typename VectorType, typename IndexType>
 void surface_mesh_to_eigen(MeshData mesh) {
     // TODO add inputs for eigen v and f
