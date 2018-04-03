@@ -36,16 +36,5 @@ class MeshData {
         void build_surface_mesh();
 };
 
-// declaration for the polyhedron builder
-template<typename HDS> 
-class Polyhedron_builder : public CGAL::Modifier_base<HDS> {
-    public:
-        Eigen::MatrixXd V;
-        Eigen::MatrixXi F;
-
-        Polyhedron_builder(const Eigen::MatrixXd &V_input, const Eigen::MatrixXi &F_input) : V(V_input), F(F_input) {}
-    
-        void operator() (HDS &hds);		
-};
 
 #endif

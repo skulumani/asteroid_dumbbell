@@ -74,19 +74,10 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # create a obj file reader executable
-set(read_obj_src src/read_obj_main.cpp src/wavefront.cpp src/input_parser.cpp)
-add_executable(read_obj ${read_obj_src})
-target_link_libraries(read_obj gtest_main)
-
-
-# BUILD POLYHEDRON EXECUTABLE
-set(build_poly_src src/build_poly_main.cpp src/wavefront.cpp src/input_parser.cpp src/polyhedron.cpp)
-add_executable(build_poly ${build_poly_src})
-add_to_cached_list(CGAL_EXECUTABLE_TARGETS build_poly)
-target_link_libraries(build_poly gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
 
 # mesh loading
-set(mesh_src src/mesh.cpp src/mesh_main.cpp src/loader.cpp src/input_parser.cpp src/stats.cpp src/cgal.cpp)
+set(mesh_src src/mesh.cpp src/mesh_main.cpp src/polyhedron.cpp src/loader.cpp
+    src/input_parser.cpp src/stats.cpp src/cgal.cpp)
 add_executable(mesh ${mesh_src})
 
 # potential function
@@ -99,15 +90,14 @@ add_executable(surface_mesher ${surface_mesher_src})
 ################################################################################
 # PYTHON BINDING
 ################################################################################
-pybind11_add_module(cgal_cpp MODULE 
-    src/bindings.cpp
-    src/polyhedron.cpp)
-
 pybind11_add_module(polyhedron_potential MODULE
     src/potential.cpp src/potential_bindings.cpp)
 
 pybind11_add_module(surface_mesh MODULE
     src/surface_mesher.cpp src/surface_mesh_bindings.cpp)
+
+pybind11_add_module(mesh_data MODULE
+    src/mesh.cpp src/polyhedron.cpp src/mesh_bindings.cpp)
 ################################################################################
 # Testing example
 ################################################################################
@@ -115,10 +105,12 @@ ENABLE_TESTING()
 
 set(test_all_src 
     tests/cpp/test_all.cpp
-    tests/cpp/test_polyhedron.cpp
     tests/cpp/test_gtest.cpp
     tests/cpp/test_wavefront.cpp
+    tests/cpp/test_surface_mesher.cpp
+    tests/cpp/test_polyhedron.cpp
     src/wavefront.cpp
+    src/surface_mesher.cpp
     src/polyhedron.cpp)
 
 add_executable(test_all ${test_all_src})
@@ -126,15 +118,16 @@ target_link_libraries(test_all gtest)
 add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
+add_executable(test_polyhedron src/polyhedron.cpp tests/cpp/test_polyhedron.cpp tests/cpp/test_all.cpp)
+target_link_libraries(test_polyhedron gtest)
+add_test(NAME test_polyhedron COMMAND test_polyedron
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
 add_executable(test_wavefront src/wavefront.cpp tests/cpp/test_wavefront.cpp tests/cpp/test_all.cpp)
 target_link_libraries(test_wavefront gtest)
 add_test(NAME test_wavefront COMMAND test_wavefront
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
-add_executable(test_polyhedron src/wavefront.cpp src/polyhedron.cpp tests/cpp/test_polyhedron.cpp tests/cpp/test_all.cpp)
-target_link_libraries(test_polyhedron gtest)
-add_test(NAME test_polyhedron COMMAND test_polyhedron
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 add_executable(test_potential src/potential.cpp tests/cpp/test_potential.cpp tests/cpp/test_all.cpp)
 target_link_libraries(test_potential gtest)
