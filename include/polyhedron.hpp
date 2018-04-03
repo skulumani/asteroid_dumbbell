@@ -10,7 +10,7 @@ void polyhedron_to_eigen(Polyhedron &P,
         Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F);
 
 
-void eigen_to_polyhedron(Eigen::MatrixXd &V,Eigen::MatrixXi &F, Polyhedron &P);
+void eigen_to_polyhedron(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F, Polyhedron &P);
 
 void build_polyhedron_index(Polyhedron &poly);
 
