@@ -3,14 +3,6 @@
 #include <Eigen/Dense>
 #include "gtest/gtest.h"
 
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/Polyhedron_3.h>
-#include <CGAL/Polyhedron_items_with_id_3.h>
-
-typedef CGAL::Simple_cartesian<double>     Kernel;
-typedef CGAL::Polyhedron_3<Kernel, CGAL::Polyhedron_items_with_id_3>         Polyhedron;
-typedef Polyhedron::HalfedgeDS             HalfedgeDS;
-
 // The fixture for testing class Foo.
 class TestPolyhedron: public ::testing::Test {
  protected:
@@ -69,24 +61,25 @@ class TestPolyhedron: public ::testing::Test {
 
 // Tests that the Foo::Bar() method does Abc.
 TEST_F(TestPolyhedron, PolyhedronIsValid) {
-    Mesh mesh(input_file);
-    ASSERT_EQ(mesh.Poly.is_valid(), 1);
-    ASSERT_EQ(1, 1);
+    Polyhedron p;
+    eigen_to_polyhedron(Ve_true, Fe_true, p);
+    ASSERT_EQ(p.is_valid(), 1);
 }
 
 // Test number of vertices and faces
-TEST_F(TestPolyhedron, PolyhedronVertices) {
-    Mesh mesh(input_file);
-    EXPECT_EQ(mesh.Poly.size_of_vertices(), 8);
+TEST_F(TestPolyhedron, PolyhedronVerticesAndFaces) {
+    Polyhedron p;
+    eigen_to_polyhedron(Ve_true, Fe_true, p);
+    EXPECT_EQ(p.size_of_vertices(), Ve_true.rows());
+    EXPECT_EQ(p.size_of_facets(), Fe_true.rows());
 }
 
 TEST_F(TestPolyhedron, PolyhedronFaces) {
-    Mesh mesh(input_file);
-    EXPECT_EQ(mesh.Poly.size_of_facets(), 12);
-}
-
-TEST_F(TestPolyhedron, PolyhedronToEigen) {
-    Mesh mesh(input_file);
-    EXPECT_EQ(mesh.vertices.size(), Ve_true.size());
-    EXPECT_EQ(mesh.faces.size(), Fe_true.size());
+    Polyhedron p;
+    eigen_to_polyhedron(Ve_true, Fe_true, p);
+    Eigen::MatrixXd v;
+    Eigen::MatrixXi f;
+    polyhedron_to_eigen(p, v, f);
+    EXPECT_TRUE(Ve_true.isApprox(v));
+    EXPECT_TRUE(Fe_true.isApprox(f));
 }

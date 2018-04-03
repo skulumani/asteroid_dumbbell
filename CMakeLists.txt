@@ -95,6 +95,9 @@ pybind11_add_module(polyhedron_potential MODULE
 
 pybind11_add_module(surface_mesh MODULE
     src/surface_mesher.cpp src/surface_mesh_bindings.cpp)
+
+pybind11_add_module(mesh_data MODULE
+    src/mesh.cpp src/polyhedron.cpp src/mesh_bindings.cpp)
 ################################################################################
 # Testing example
 ################################################################################
@@ -105,13 +108,20 @@ set(test_all_src
     tests/cpp/test_gtest.cpp
     tests/cpp/test_wavefront.cpp
     tests/cpp/test_surface_mesher.cpp
+    tests/cpp/test_polyhedron.cpp
     src/wavefront.cpp
-    src/surface_mesher.cpp)
+    src/surface_mesher.cpp
+    src/polyhedron.cpp)
 
 add_executable(test_all ${test_all_src})
 target_link_libraries(test_all gtest)
 add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+add_executable(test_polyhedron src/polyhedron.cpp tests/cpp/test_polyhedron.cpp tests/cpp/test_all.cpp)
+target_link_libraries(test_polyhedron gtest)
+add_test(NAME test_polyhedron COMMAND test_polyedron
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 add_executable(test_wavefront src/wavefront.cpp tests/cpp/test_wavefront.cpp tests/cpp/test_all.cpp)
 target_link_libraries(test_wavefront gtest)

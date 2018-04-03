@@ -23,6 +23,11 @@ int main(int argc, char* argv[]) {
     if (!input_file.empty()) {
         mesh = Loader::load(input_file);
         // lets try and build a surface mesh now
+        Eigen::MatrixXd vertices = mesh->get_verts();
+        Eigen::MatrixXi faces = mesh->get_faces();
+
+        // update the mesh with new data
+        mesh->update_mesh(vertices, faces);
 
         surface_mesh_stats(mesh);
         /* print_surface_mesh_vertices(mesh); */
@@ -43,6 +48,7 @@ int main(int argc, char* argv[]) {
         MeshDistance mesh_dist(mesh);
 
         mesh_dist.k_nearest_neighbor(psource, 5);
+
     }
 
     /* std::cout << "Vertices: \n" << mesh->vertices << std::endl; */

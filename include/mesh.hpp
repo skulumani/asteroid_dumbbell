@@ -17,7 +17,14 @@ class MeshData {
         // other constructors
         MeshData(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
         // get and set the data here
+       
+        // member functions
+        Eigen::MatrixXd get_verts( void ) { return vertices; }
+        Eigen::MatrixXi get_faces( void ) { return faces; }
         
+        // update mesh from arrays and faces array
+        void update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
+
         // storing data of the mesh
         Eigen::MatrixXd vertices;
         Eigen::MatrixXi faces;
