@@ -5,9 +5,9 @@
 
 #include <Eigen/Dense>
 
-/* template<typename VectorType, typename IndexType> */
-/* void polyhedron_to_eigen(CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3 > &P, */
-/*         Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F); */
+template<typename VectorType, typename IndexType>
+void polyhedron_to_eigen(Polyhedron &P,
+        Eigen::PlainObjectBase<VectorType> &V, Eigen::PlainObjectBase<IndexType> &F);
 
 
 void eigen_to_polyhedron(Eigen::MatrixXd &V,Eigen::MatrixXi &F, Polyhedron &P);
