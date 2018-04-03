@@ -1,8 +1,6 @@
 #include "mesh.hpp"
 #include "polyhedron.hpp"
 
-
-
 // Member methods
 MeshData::MeshData(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
     this->vertices = V;
@@ -81,7 +79,3 @@ void surface_mesh_to_eigen(MeshData mesh) {
     }
 }
 
-// Explicit initialization of the template
-/* template void Polyhedron_builder<CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> > >::operator()(CGAL::HalfedgeDS_default<CGAL::Simple_cartesian<double>, CGAL::I_Polyhedron_derived_items_3<CGAL::Polyhedron_items_with_id_3>, std::allocator<int> >&); */
-
-/* template void eigen_to_polyhedron(Eigen::Matrix<double, -1, -1, 0, -1, -1> const&, Eigen::Matrix<int, -1, -1, 0, -1, -1> const&, CGAL::Polyhedron_3<CGAL::Simple_cartesian<double>, CGAL::Polyhedron_items_with_id_3, CGAL::HalfedgeDS_default, std::allocator<int> >&) */
