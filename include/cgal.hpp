@@ -16,6 +16,7 @@ class MeshDistance {
         void update_mesh(std::shared_ptr<MeshData> mesh_in);
         // funciton to compute distance from pt to mesh and return minimum distance, and primitive
         int k_nearest_neighbor(const Eigen::Ref<const Eigen::Vector3d>& pt, const int &K);
+
     private:
         std::shared_ptr<MeshData> mesh;
         Vertex_point_pmap vppmap;
@@ -30,6 +31,17 @@ class RayCaster {
 
         // cast many rays function
         void update_mesh(std::shared_ptr<MeshData> mesh_in);
+
+        /**
+            Compute the minimum distance to the mesh
+
+            This uses the AABB tree to find the distance from a point to the 
+            polyhedron.
+
+            @param pt Eigen::Vector3d point defining the test point
+            @returns Double distance type
+        */
+        double distance(const Eigen::Ref<const Eigen::Vector3d> &pt);
     private:
         // needs the mesh to operate on
         std::shared_ptr<MeshData> mesh;
