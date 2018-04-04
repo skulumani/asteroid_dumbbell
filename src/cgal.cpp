@@ -1,5 +1,5 @@
 #include "cgal.hpp"
-
+#include <cmath>
 
 // Raycaster class
 RayCaster::RayCaster(std::shared_ptr<MeshData> mesh_in) {
@@ -47,13 +47,13 @@ int RayCaster::castray(const Eigen::Ref<const Eigen::Vector3d>& psource, const E
 }
 
 // TODO Modify this to compute distance instead of doing raycasting
-double RayCaster::distance(const Eigen::Ref<const Eigen::Vector3d> &pt) {
+double RayCaster::minimum_distance(const Eigen::Ref<const Eigen::Vector3d> &pt) {
 
     // create a Point object
     Point a(pt(0), pt(1), pt(2));
-    std::cout << this->tree.squared_distance(a) << std::endl;
-
-}
+    
+    return sqrt(CGAL::to_double(tree.squared_distance(a)));
+ }
 
 // MeshDistance class
 // Raycaster class

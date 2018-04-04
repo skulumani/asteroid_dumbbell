@@ -45,6 +45,9 @@ int main(int argc, char* argv[]) {
         if (int_flag == 0) {
             std::cout << "Intersection point: " << intersection << std::endl;
         }
+        // compute minimum distance to mesh
+        double min_dist = caster.minimum_distance(psource);
+        std::cout << "Minimum distance: " << min_dist << std::endl;
 
         // Distance to mesh object
         MeshDistance mesh_dist(mesh);
@@ -55,7 +58,7 @@ int main(int argc, char* argv[]) {
         double vol;
         vol = polyhedron_volume(mesh->vertices, mesh->faces);
         std::cout << "Volume: " << vol << std::endl;
-
+    
     }
 
     /* std::cout << "Vertices: \n" << mesh->vertices << std::endl; */

@@ -5,6 +5,7 @@
 #include "mesh.hpp"
 
 #include <memory>
+#include <cmath>
 
 void distance_to_polyhedron(Eigen::Vector3d& pt, std::shared_ptr<MeshData> mesh);
 
@@ -41,7 +42,7 @@ class RayCaster {
             @param pt Eigen::Vector3d point defining the test point
             @returns Double distance type
         */
-        double distance(const Eigen::Ref<const Eigen::Vector3d> &pt);
+        double minimum_distance(const Eigen::Ref<const Eigen::Vector3d> &pt);
     private:
         // needs the mesh to operate on
         std::shared_ptr<MeshData> mesh;
