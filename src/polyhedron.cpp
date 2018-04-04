@@ -111,6 +111,33 @@ void eigen_to_polyhedron(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F, Pol
     CGAL_assertion(P.is_triangle(P.halfedges_begin()));
 }
 
+double polyhedron_volume(const Eigen::Ref<const Eigen::MatrixXd> &v, const Eigen::Ref<const Eigen::MatrixXi> &f) {
+    
+    double volume(0);
+    int a, b, c; 
+
+    Eigen::Vector3d v1, v2, v3, origin, ones;
+    origin.setZero();
+    ones.setOnes();
+
+    Eigen::Matrix<double, 4, 4> tetrahedron_matrix;
+
+    // loop over all faces
+    for(int ii = 0; ii != f.rows(); ++ii) {
+        a = f.row(ii)[0];
+        b = f.row(ii)[1];
+        c = f.row(ii)[2];
+        
+        v1 << v.row(a);
+        v2 << v.row(b);
+        v3 << v.row(c);
+        
+        tetrahedron_matrix.row(0) << v1[0], v1[1], v1[2], 1;
+    }
+
+    return volume;
+}
+
 /* // TODO Add documentation - overload the () operator */
 /* template<typename HDS> */
 /* void Polyhedron_builder<HDS>::operator() (HDS &hds) { */

@@ -1,6 +1,7 @@
 #include "loader.hpp"
 #include "mesh.hpp"
 #include "cgal.hpp"
+#include "polyhedron.hpp"
 
 #include "input_parser.hpp"
 
@@ -48,6 +49,11 @@ int main(int argc, char* argv[]) {
         MeshDistance mesh_dist(mesh);
 
         mesh_dist.k_nearest_neighbor(psource, 5);
+
+        // compute the volume of the mesh
+        double vol;
+        vol = polyhedron_volume(mesh->vertices, mesh->faces);
+        std::cout << "Volume: " << vol << std::endl;
 
     }
 
