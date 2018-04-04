@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
         mesh->update_mesh(vertices, faces);
 
         surface_mesh_stats(mesh);
+        
         /* print_surface_mesh_vertices(mesh); */
 
         Eigen::Vector3d psource, ptarget;
