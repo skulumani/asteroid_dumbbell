@@ -109,9 +109,12 @@ set(test_all_src
     tests/cpp/test_wavefront.cpp
     tests/cpp/test_surface_mesher.cpp
     tests/cpp/test_polyhedron.cpp
+    tests/cpp/test_loader.cpp
     src/wavefront.cpp
     src/surface_mesher.cpp
-    src/polyhedron.cpp)
+    src/polyhedron.cpp
+    src/loader.cpp
+    src/mesh.cpp)
 
 add_executable(test_all ${test_all_src})
 target_link_libraries(test_all gtest)
