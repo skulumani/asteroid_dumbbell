@@ -110,6 +110,7 @@ set(test_all_src
     tests/cpp/test_surface_mesher.cpp
     tests/cpp/test_polyhedron.cpp
     tests/cpp/test_loader.cpp
+    tests/cpp/test_mesh.cpp
     src/wavefront.cpp
     src/surface_mesher.cpp
     src/polyhedron.cpp
