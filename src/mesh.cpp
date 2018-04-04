@@ -60,6 +60,10 @@ void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
     // update the polyhedron and surface mesh
     this->vertices = V;
     this->faces = F;
+    
+    // clear the mesh
+    this->surface_mesh.clear();
+    this->polyhedron.clear();
 
     this->build_polyhedron();
     this->build_surface_mesh();
