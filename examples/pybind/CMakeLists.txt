@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(example)
 
+set(CMAKE_CXX_STANDARD 11)
+
 FIND_PACKAGE(PythonInterp REQUIRED)
 FIND_PACKAGE(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
 
@@ -13,6 +15,9 @@ include_directories(${SOURCE_DIR})
 
 add_subdirectory(lib/pybind11)
 
+# add_executable(pointer src/pointer.cpp)
+pybind11_add_module(shared_pointer MODULE src/pointer.cpp)
+
 # Can build a module or a shared library 
 pybind11_add_module(example MODULE ${SOURCE_DIR}/example.cpp)
 pybind11_add_module(python_example MODULE 
@@ -22,3 +27,6 @@ pybind11_add_module(python_example MODULE
 
 # add_executable(template src/template.cpp)
 pybind11_add_module(template MODULE ${SOURCE_DIR}/template.cpp)
+
+
+
