@@ -116,9 +116,7 @@ double polyhedron_volume(const Eigen::Ref<const Eigen::MatrixXd> &v, const Eigen
     double volume(0);
     int a, b, c; 
 
-    Eigen::Vector3d v1, v2, v3, origin, ones;
-    origin.setZero();
-    ones.setOnes();
+    Eigen::Vector3d v1, v2, v3;
 
     Eigen::Matrix<double, 4, 4> tetrahedron_matrix;
 
@@ -133,8 +131,14 @@ double polyhedron_volume(const Eigen::Ref<const Eigen::MatrixXd> &v, const Eigen
         v3 << v.row(c);
         
         tetrahedron_matrix.row(0) << v1[0], v1[1], v1[2], 1;
-    }
+        tetrahedron_matrix.row(1) << v2[0], v2[1], v2[2], 1;
+        tetrahedron_matrix.row(2) << v3[0], v3[1], v3[2], 1;
+        tetrahedron_matrix.row(3) << 0, 0, 0, 1;
 
+        volume = volume + tetrahedron_matrix.determinant();
+        std::cout << ii << " ";
+    }
+    std::cout << std::endl;
     return volume;
 }
 
