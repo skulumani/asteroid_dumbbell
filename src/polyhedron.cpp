@@ -130,16 +130,14 @@ double polyhedron_volume(const Eigen::Ref<const Eigen::MatrixXd> &v, const Eigen
         v2 << v.row(b);
         v3 << v.row(c);
         
-        tetrahedron_matrix.row(0) << v1[0], v1[1], v1[2], 1;
-        tetrahedron_matrix.row(1) << v2[0], v2[1], v2[2], 1;
-        tetrahedron_matrix.row(2) << v3[0], v3[1], v3[2], 1;
+        tetrahedron_matrix.row(0) << v(a, 0), v(a, 1), v(a, 2), 1;
+        tetrahedron_matrix.row(1) << v(b, 0), v(b, 1), v(b, 2), 1;
+        tetrahedron_matrix.row(2) << v(c, 0), v(c, 1), v(c, 2), 1;
         tetrahedron_matrix.row(3) << 0, 0, 0, 1;
 
         volume = volume + tetrahedron_matrix.determinant();
-        std::cout << ii << " ";
     }
-    std::cout << std::endl;
-    return volume;
+    return 1.0 / 6.0 * volume;
 }
 
 /* // TODO Add documentation - overload the () operator */
