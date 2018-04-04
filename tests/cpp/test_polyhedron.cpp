@@ -83,3 +83,9 @@ TEST_F(TestPolyhedron, PolyhedronFaces) {
     EXPECT_TRUE(Ve_true.isApprox(v));
     EXPECT_TRUE(Fe_true.isApprox(f));
 }
+
+TEST_F(TestPolyhedron, PolyhedronVolume) {
+    double volume;
+    volume = polyhedron_volume(Ve_true, Fe_true);
+    ASSERT_EQ(volume, 1);
+}
