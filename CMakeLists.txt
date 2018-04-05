@@ -98,6 +98,9 @@ pybind11_add_module(surface_mesh MODULE
 
 pybind11_add_module(mesh_data MODULE
     src/mesh.cpp src/polyhedron.cpp src/mesh_bindings.cpp)
+
+pybind11_add_module(cgal MODULE
+    src/cgal.cpp src/cgal_bindings.cpp src/mesh.cpp)
 ################################################################################
 # Testing example
 ################################################################################
