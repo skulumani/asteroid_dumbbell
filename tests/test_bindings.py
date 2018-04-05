@@ -49,10 +49,23 @@ class TestSurfaceMesher:
 class TestMeshDist:
     
     # load the vertices, faces
-
+    v, f = wavefront.read_obj('./integration/cube.obj') 
     # create a mesh
+    mesh = mesh_data.MeshData(v, f)
+    mesh_dist = cgal.MeshDistance(mesh)
+    caster = cgal.RayCaster(mesh)
+
+    pt = np.array([2, 0, 0], dtype=np.float64)
 
     # pass to distance function
-
+    def test_minimum_distance(self):
+        dist = self.caster.minimum_distance(self.pt)
+        np.testing.assert_allclose(dist, 1.5)
+    
+    def test_intersection_raycasting(self):
+        intersections = np.array([0, 0, 0], dtype=np.float64)
+        flag = self.caster.castray(self.pt, np.array([0, 0, 0], dtype=np.float64),
+                                   intersections)
+    
     # also test out the ray caster
     
