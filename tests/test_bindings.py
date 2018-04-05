@@ -36,3 +36,23 @@ class TestMeshData:
         self.mesh.update_mesh(v, f)
         np.testing.assert_allclose(self.mesh.get_verts(), v)
         np.testing.assert_allclose(self.mesh.get_faces(), f)
+
+class TestSurfaceMesher:
+    smesh = surface_mesh.SurfMesh(1, 1, 1, 10, 0.2, 0.5)
+
+    def test_vertices(self):
+        np.testing.assert_allclose(self.smesh.verts().shape[1], 3)
+
+    def test_faces(self):
+        np.testing.assert_allclose(self.smesh.faces().shape[1], 3)
+
+class TestMeshDist:
+    
+    # load the vertices, faces
+
+    # create a mesh
+
+    # pass to distance function
+
+    # also test out the ray caster
+    
