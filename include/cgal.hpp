@@ -43,6 +43,8 @@ class RayCaster {
             @returns Double distance type
         */
         double minimum_distance(const Eigen::Ref<const Eigen::Vector3d> &pt);
+
+        void minimum_primitive(const Eigen::Ref<const Eigen::Vector3d> &pt);
     private:
         // needs the mesh to operate on
         std::shared_ptr<MeshData> mesh;

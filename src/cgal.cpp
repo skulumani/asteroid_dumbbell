@@ -55,6 +55,10 @@ double RayCaster::minimum_distance(const Eigen::Ref<const Eigen::Vector3d> &pt) 
     return sqrt(CGAL::to_double(tree.squared_distance(a)));
  }
 
+void RayCaster::minimum_primitive(const Eigen::Ref<const Eigen::Vector3d> &pt) {
+
+}
+
 // MeshDistance class
 // Raycaster class
 MeshDistance::MeshDistance(std::shared_ptr<MeshData> mesh_in) {
