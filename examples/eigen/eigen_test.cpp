@@ -1,7 +1,9 @@
 // Test of eigen
-#include <iostream>
 #include <Eigen/Dense>
 #include <unsupported/Eigen/CXX11/Tensor>
+
+#include <iostream>
+#include <stdlib.h>
 
 // a - nonwriteable, b - writeable
 void eigen_reference_class(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& a, Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 3> > b) {
@@ -21,7 +23,15 @@ void eigen_tensor(const int & num_i, const int & num_j, const int & num_k) {
     Eigen::Tensor<double, 3> tensor(num_i, num_j, num_k);
     
     tensor.setZero();
-
+    
+    // loop through the tensor and set each value to a random number
+    for (int ii = 0; ii < num_i; ++ii) {
+        for (int jj = 0; jj < num_j; ++jj) {
+            for (int kk = 0; kk < num_k; ++kk) {
+                tensor(ii, jj, kk) = rand() % 10 + 1;
+            }
+        }
+    }
     std::cout << tensor << std::endl;
 
 }
