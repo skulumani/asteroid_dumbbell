@@ -36,9 +36,20 @@ if [[ -d "${INSTALL_DIR}/Eigen" ]]; then
 	rm -rf "${INSTALL_DIR}/Eigen"
 fi
 
+# delete the unsupported directory
+if [[ -d "${INSTALL_DIR}/unsupported" ]]; then
+    echo "Eigen unsupported directory already exists"
+    read -p "Press Enter to remove ${INSTALL_DIR}/unsupported"
+    rf -rf "${INSTALL_DIR}/Eigen"
+fi
+
 # copy to /usr/local/include
 echo "Now copying to ${INSTALL_DIR}/Eigen"
 sudo mv ${EIGEN_VER}/Eigen ${INSTALL_DIR}
 
-echo "Eigen ${EIGEN_VER} installed to ${INSTALL_DIR}/Eigen"
+# copy to usr/local/include
+echo "Now copying to ${INSTALL_DIR}/unsupported"
+sudo mv ${EIGEN_VER}/unsupported ${INSTALL_DIR}
+
+echo "Eigen ${EIGEN_VER} installed to ${INSTALL_DIR}/Eigen and ${INSTALL_DIR}/unsupported"
 read -p "Press enter to exit"

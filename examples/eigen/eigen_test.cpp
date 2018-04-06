@@ -1,6 +1,7 @@
 // Test of eigen
 #include <iostream>
 #include <Eigen/Dense>
+#include <unsupported/Eigen/CXX11/Tensor>
 
 // a - nonwriteable, b - writeable
 void eigen_reference_class(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& a, Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 3> > b) {
@@ -16,6 +17,14 @@ void eigen_template(const Eigen::PlainObjectBase<Derived>& a, Eigen::PlainObject
     b = 2*a;
 }
 
+void eigen_tensor(const int & num_i, const int & num_j, const int & num_k) {
+    Eigen::Tensor<double, 3> tensor(num_i, num_j, num_k);
+    
+    tensor.setZero();
+
+    std::cout << tensor << std::endl;
+
+}
 int main()
 {
     Eigen::Array<double, 1, 3> a, b, c, d;
@@ -27,5 +36,7 @@ int main()
     std::cout << "b: \n" << b << std::endl;
     std::cout << "c: \n" << c << std::endl;
     std::cout << "d: \n" << d << std::endl;
+
+    eigen_tensor(5, 2, 3);
 
 }
