@@ -12,12 +12,12 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     std::size_t num_e = 3 * (num_v -2);
 
     // calculate all the edges zero based. This assumes it's already subtracted from the original OBJ for example
-    Eigen::Array<int, Eigen::Dynamic, 1> Fa, Fb, Fc;
+    Eigen::Matrix<int, Eigen::Dynamic, 1> Fa, Fb, Fc;
     Fa = F.col(0);
     Fb = F.col(1);
     Fc = F.col(2);
 
-    Eigen::Array<double, Eigen::Dynamic, 3> V1, V2, V3;
+    Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
     V1.resize(Fa.rows(),3 );
     V2.resize(Fb.rows(),3 );
     V3.resize(Fc.rows(),3 );
@@ -28,13 +28,13 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     }
 
     // compute the edge vectors
-    Eigen::Array<double, Eigen::Dynamic, 3> e1, e2, e3;
+    Eigen::Matrix<double, Eigen::Dynamic, 3> e1, e2, e3;
     e1 = V2 - V1;
     e2 = V3 - V2;
     e3 = V1 - V3;
     
     // vertex map
-    Eigen::Array<int, Eigen::Dynamic, 2> e1_vertex_map, e2_vertex_map, e3_vertex_map, e_vertex_map;
+    Eigen::Matrix<int, Eigen::Dynamic, 2> e1_vertex_map, e2_vertex_map, e3_vertex_map, e_vertex_map;
     e1_vertex_map.resize(Fa.rows(), 2);
     e2_vertex_map.resize(Fb.rows(), 2);
     e3_vertex_map.resize(Fc.rows(), 2);
@@ -50,6 +50,33 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     e3_vertex_map.col(1) = Fc;
     
     e_vertex_map << e1_vertex_map, e2_vertex_map, e3_vertex_map;
+    
+    Eigen::Matrix<double, Eigen::Dynamic, 3> normal_face, e1_normal, e2_normal, e3_normal;
+    // compute the normal for every face and every edge
+    normal_face.resize(num_f, 3);
+    e1_normal.resize(num_f, 3);
+    e2_normal.resize(num_f, 3);
+    e3_normal.resize(num_f, 3);
+
+    for (int ii = 0; ii < num_f; ++ii) {
+        normal_face.row(ii) = e1.row(ii).cross(e2.row(ii));         
+        normal_face.row(ii) = normal_face.row(ii) / normal_face.row(ii).norm();
+
+        // normal vector to each set of edges
+        e1_normal.row(ii) = e1.row(ii).cross(normal_face.row(ii));
+        e1_normal.row(ii) = e1.row(ii) / e1.row(ii).norm();
+
+        e2_normal.row(ii) = e2.row(ii).cross(normal_face.row(ii));
+        e2_normal.row(ii) = e2.row(ii) / e2.row(ii).norm();
+
+        e3_normal.row(ii) = e3.row(ii).cross(normal_face.row(ii));
+        e3_normal.row(ii) = e3.row(ii) / e3.row(ii).norm();
+    }
+
+    // compute the centeroid of each face
+    Eigen::Matrix<double, Eigen::Dynamic, 3> center_face;
+    center_face = 1.0 / 3 * (V1 + V2 + V3);
+
 }
 
 // Start of polyhedron potential function code 
