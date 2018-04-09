@@ -231,7 +231,7 @@ def castalia_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
         
         """Partial images using a colormap for the data"""
         pdb.set_trace()
-        mfig = graphics.mayavi_figure(offscreen=False)
+        mfig = graphics.mayavi_figure(offscreen=True)
         mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial,
                                        color=None, colormap='viridis',
                                        scalars=w_initial)
@@ -396,6 +396,9 @@ if __name__ == "__main__":
     plotting_group.add_argument("--castalia_reconstruct_generate_data", 
                                 help="Reconstruction example using Castalia (output filename)",
                                 action="store")
+    plotting_group.add_argument("--castalia_generate_plots", 
+                                help="Plot output from castalia_reconstruct_generate_data (data path)",
+                                action="store")
 
     args = parser.parse_args()
     
@@ -405,10 +408,14 @@ if __name__ == "__main__":
         cube_into_sphere(img_path)
     elif args.castalia_reconstruct_generate_data:
         castalia_reconstruct_generate_data(args.castalia_reconstruct_generate_data)
+    elif args.castalia_generate_plots:
+        castalia_generate_plots(args.castalia_generate_plots, img_path)
+    
+    print("Images are saved to {}".format(img_path))
 
     # cube_into_sphere(img_path)
     # sphere_into_ellipsoid(img_path)
-    castalia_reconstruction(img_path)
+    # castalia_reconstruction(img_path)
     # sphere_into_ellipsoid_spherical_coordinates(img_path)
     # castalia_reconstruction_factor_tuning(img_path)
     # sphere_factor_tuning(img_path)
