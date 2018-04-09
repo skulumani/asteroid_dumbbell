@@ -21,28 +21,21 @@ import pdb
 sphere= surface_mesh.SurfMesh(0.5, 0.5, 0.5, 10, 0.05, 0.5)
 vs, fs = sphere.verts(), sphere.faces()
 
-# convert all vertices to spherical coordinates
-v_spherical = wavefront.cartesian2spherical(vs);
-# ve_spherical = wavefront.cartesian2spherical(ve);
+max_angle = wavefront.spherical_surface_area(0.5, surf_area=0.05)
 
 mfig = graphics.mayavi_figure()
-# vc, f = wavefront.read_obj('./integration/cube.obj')
-# v_spherical = wavefront.cartesian2spherical(vc)
 
 # mesh_param = wavefront.polyhedron_parameters(v, f)
 pt = np.array([1, 0, 0])
-pt_spherical = wavefront.cartesian2spherical(pt)
 
-vert_sigma = np.ones(v_spherical.shape[0])
+vert_weight = np.full(vs.shape[0], (np.pi * 0.5 )**2)
 
-nv_spherical, nf = wavefront.spherical_incremental_mesh_update(mfig, pt_spherical, v_spherical, fs,
-                                                                vert_sigma,
-                                                                surf_area=0.2,
-                                                                a=0.5,delta=0.1)
+vs, vert_weight = wavefront.spherical_incremental_mesh_update(pt, vs, fs,
+                                                     vertex_weight=vert_weight,
+                                                     max_angle=max_angle)
 
-# convert back to cartesian
-nv = wavefront.spherical2cartesian(nv_spherical)
 
 # view the mesh
-graphics.mayavi_addMesh(mfig, nv, nf, representation='surface')
+graphics.mayavi_addMesh(mfig, vs, fs, representation='surface',
+                        scalars=vert_weight, colormap='viridis', color=None)
 graphics.mayavi_addPoint(mfig, pt)
