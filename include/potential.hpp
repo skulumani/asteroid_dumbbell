@@ -28,4 +28,5 @@ int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >
 void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& V,
         const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F);
 
+
 #endif
