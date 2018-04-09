@@ -197,8 +197,8 @@ def incremental_reconstruction(input_filename, output_filename, asteroid_name='c
     max_angle = wavefront.spherical_surface_area(np.max(ast.axes), surf_area)
 
     # extract out all the points in the asteroid frame
-    time = point_cloud['time'][::100]
-    ast_ints = point_cloud['ast_ints'][::100]
+    time = point_cloud['time'][::1]
+    ast_ints = point_cloud['ast_ints'][::1]
     logger.info('Create HDF5 file {}'.format(output_filename))
     with h5py.File(output_filename, 'w') as fout:
         # store some extra data about teh simulation
