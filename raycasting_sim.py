@@ -23,15 +23,9 @@ from kinematics import attitude
 from visualization import plotting, graphics, animation
 from point_cloud import wavefront, raycaster
 import utilities
+from lib import surface_mesh
 
 # simulate dumbbell moving aroudn asteroid
-
-# TODO Add logger everywhere to know what stuff is happening
-
-# TODO Look into the profiler for speed
-
-# TODO Save the ast, dum, objects to the numpy
-
 
 
 def initialize():
@@ -213,20 +207,28 @@ def incremental_reconstruction(input_filename, output_filename, asteroid_name='c
 
     # define the asteroid and dumbbell objects
 
-    asteroid_faces = 4092
-    asteroid_type = 'mat'
-    max_angle = 10
+    asteroid_faces = 0
+    asteroid_type = 'obj'
     m1, m2, l = 500, 500, 0.003
-    density = 30
-    subdivisions = 2
+
+    ellipsoid_min_angle = 10
+    ellipsoid_max_radius = 0.03
+    ellipsoid_max_distance = 0.5
+
+    surf_area = 0.01
 
     ast = asteroid.Asteroid(asteroid_name, asteroid_faces, asteroid_type)
     dum = dumbbell.Dumbbell(m1=m1, m2=m2, l=l)
     
     logger.info('Creating ellipsoid mesh')
     # define a simple mesh to start
-    v_est, f_est = wavefront.ellipsoid_mesh(ast.axes[0]*0.75, ast.axes[1]*0.75, ast.axes[2]*0.75,
-                                    density=density, subdivisions=subdivisions)
+    ellipsoid = surface_mesh.SurfMesh(ast.axes[0], ast.axes[1], ast.axes[2],
+                                      ellipsoid_min_angle, ellipsoid_max_radius, ellipsoid_max_distance)
+    v_est, f_est = ellipsoid.verts(), ellipsoid.faces()
+    
+    vert_weight = np.full(v_est.shape[0], (np.pi * np.max(ast.axes))**2)
+    
+    max_angle = wavefront.spherical_surface_area(np.max(ast.axes), surf_area)
 
     # extract out all the points in the asteroid frame
     time = point_cloud['time'][::100]
@@ -234,6 +236,10 @@ def incremental_reconstruction(input_filename, output_filename, asteroid_name='c
     logger.info('Create HDF5 file {}'.format(output_filename))
     with h5py.File(output_filename, 'w') as fout:
         # store some extra data about teh simulation
+        v_group = fout.create_group('reconstructed_vertex')
+        f_group = fout.create_group('reconstructed_face')
+        w_group = fout.create_group('reconstructed_weight')
+
         sim_data = fout.create_group('simulation_data')
         sim_data.attrs['asteroid_name'] = np.string_(asteroid_name)
         sim_data.attrs['asteroid_faces'] =asteroid_faces
@@ -241,12 +247,22 @@ def incremental_reconstruction(input_filename, output_filename, asteroid_name='c
         sim_data.attrs['m1'] = dum.m1
         sim_data.attrs['m2'] = dum.m2
         sim_data.attrs['l'] = dum.l
-        sim_data.attrs['density'] = density
-        sim_data.attrs['subdivisions'] = subdivisions
-        sim_data['max_angle'] = max_angle
 
-        v_group = fout.create_group('vertex_array')
-        f_group = fout.create_group('face_array')
+        sim_data.attrs['ellipsoid_axes'] = ast.axes
+        sim_data.attrs['ellipsoid_min_angle'] = ellipsoid_min_angle
+        sim_data.attrs['ellipsoid_max_radius'] = ellipsoid_max_radius
+        sim_data.attrs['ellipsoid_max_distance'] = ellipsoid_max_distance
+        sim_data.attrs['surf_area'] = surf_area
+
+        sim_data.attrs['max_angle'] = max_angle
+        
+        fout.create_dataset('truth_vertex', data=ast.V)
+        fout.create_dataset('truth_faces', data=ast.F)
+        fout.create_dataset('estimate_faces', data=f_est)
+
+        fout.create_dataset('initial_vertex', data=v_est)
+        fout.create_dataset('initial_faces', data=f_est)
+        fout.create_dataset('initial_weight', data=vert_weight)
 
         logger.info('Starting loop over point cloud')
         for ii, (t, points) in enumerate(zip(time, ast_ints)):
@@ -256,11 +272,10 @@ def incremental_reconstruction(input_filename, output_filename, asteroid_name='c
                 # incremental update for each point in points
                 # check to make sure each pt is not nan
                 if not np.any(np.isnan(pt)):
-                    # v_est, f_est = wavefront.mesh_incremental_update(pt, v_est, f_est, 'vertex')
-                    mesh_param = wavefront.polyhedron_parameters(v_est, f_est)
-                    v_est, f_est = wavefront.radius_mesh_incremental_update(pt, v_est, f_est,
-                                                                            mesh_param,
-                                                                            max_angle=np.deg2rad(max_angle))
+                    v_est, vert_weight = wavefront.spherical_incremental_mesh_update(pt, 
+                                                                                     v_est, f_est,
+                                                                                     vertex_weight=vert_weight,
+                                                                                     max_angle=max_angle)
 
             # use HD5PY instead
             # save every so often and delete v_array,f_array to save memory
@@ -268,8 +283,8 @@ def incremental_reconstruction(input_filename, output_filename, asteroid_name='c
                 logger.info('Saving data to HDF5. ii = {}, t = {}'.format(ii, t))
                 v_group.create_dataset(str(ii), data=v_est)
                 f_group.create_dataset(str(ii), data=f_est)
+                w_group.create_dataset(str(ii), data=vert_weight)
         
-
     logger.info('Completed the reconstruction')
 
     return 0
@@ -442,6 +457,7 @@ def read_mesh_reconstruct_subdivide(filename, output_path='/tmp/reconstruct_imag
     logger.info('Finished')
 
     return mfig
+
 if __name__ == "__main__":
     # TODO Measure time for run
     logging_file = tempfile.mkstemp(suffix='.txt')[1]
