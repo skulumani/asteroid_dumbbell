@@ -7,6 +7,7 @@ import os
 import itertools
 import scipy.io
 import h5py
+import argparse
 
 from point_cloud import wavefront, raycaster
 from visualization import graphics
@@ -382,6 +383,25 @@ if __name__ == "__main__":
     img_path = '/tmp/mayavi_figure'
     if not os.path.exists(img_path):
         os.makedirs(img_path)
+    
+    parser = argparse.ArgumentParser(description="Generate example plots used in dissertation/papers",
+                                     formatter_class=argparse.RawTextHelpFormatter)
+    
+    # which type of plots to generate/output
+    plotting_group = parser.add_mutually_exclusive_group()
+    plotting_group.add_argument("--cube_into_sphere", help="Turn a cube into a sphere",
+                                action="store_true")
+    plotting_group.add_argument("--sphere_into_ellipsoid", help="Turn a sphere into an ellipsoid",
+                                action="store_true")
+    
+    args = parser.parse_args()
+    
+    if args.sphere_into_ellipsoid:
+        sphere_into_ellipsoid(img_path)
+    elif args.cube_into_sphere:
+        cube_into_sphere(img_path)
+    elif args.castalia_reconstruct_generate_data:
+        castalia_reconstruct_generate_data(output_filename)
 
     # cube_into_sphere(img_path)
     # sphere_into_ellipsoid(img_path)
