@@ -10,6 +10,7 @@ import os
 import tempfile
 import argparse
 import subprocess
+import itertools
 
 import warnings
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -267,27 +268,86 @@ def read_mesh_reconstruct(filename, output_path='/tmp/reconstruct_images'):
     
     logger.info('Opening {}'.format(filename))
     with h5py.File(filename, 'r') as hf:
-        face_array = hf['face_array']
-        vertex_array = hf['vertex_array']
-        
-        # get all the keys for both groups
-        face_keys = utilities.sorted_nicely(list(face_array.keys()))
-        vertex_keys = utilities.sorted_nicely(list(vertex_array.keys()))
+        rv = hf['reconstructed_vertex']
+        rf = hf['reconstructed_face']
+        rw = hf['reconstructed_weight']
 
-        # loop over keys in both and plot
+        # get all the keys for the groups
+        v_keys = np.array(utilities.sorted_nicely(list(rv.keys())))
+        f_keys = np.array(utilities.sorted_nicely(list(rf.keys())))
+        w_keys = np.array(utilities.sorted_nicely(list(rw.keys())))
+        
+        v_initial = hf['initial_vertex'][()]
+        f_initial = hf['initial_faces'][()]
+        w_initial = hf['initial_weight'][()]
+
+        """Partial images during the reconstruction"""
+        logger.info('Starting on partial reconstruction images')
+
         mfig = graphics.mayavi_figure(offscreen=True)
-        mesh = graphics.mayavi_addMesh(mfig, vertex_array[vertex_keys[0]][()], 
-                                       face_array[face_keys[0]][()])
+        mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial)
         ms = mesh.mlab_source
-        graphics.mlab.view(azimuth=-45)
-        for ii, (vk, fk) in enumerate(zip(vertex_keys, face_keys)):
-            filename = os.path.join(output_path, str.zfill(str(ii), 6) +'.jpg')
-            v, f = (vertex_array[vk][()], face_array[fk][()])
-            # draw the mesh
-            ms.reset(x=v[:,0], y=v[:,1], z=v[:,2], triangles=f)
-            # save the figure
+        graphics.mayavi_axes(mfig, [-1, 1, -1, 1, -1, 1], line_width=5, color=(1, 0, 0))
+        graphics.mayavi_view(fig=mfig)
+
+        partial_index = np.array([0, v_keys.shape[0]*1/4, v_keys.shape[0]*1/2,
+                                  v_keys.shape[0]*3/4, v_keys.shape[0]*4/4-1],
+                                 dtype=np.int)
+        for img_index, vk in enumerate(partial_index):
+            filename = os.path.join(output_path, 'partial_' + str(vk) + '.jpg')
+            v = rv[str(vk)][()]
+            # generate an image and save it 
+            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:,2], triangles=f_initial)
             graphics.mlab.savefig(filename, magnification=4)
-            logger.info('Saved image {}/{}'.format(ii, len(face_keys))) 
+        
+        """Partial images using a colormap for the data"""
+        logger.info('Now using a colormap for the uncertainty')
+        mfig = graphics.mayavi_figure(offscreen=True)
+        mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial,
+                                       color=None, colormap='viridis',
+                                       scalars=w_initial)
+        ms = mesh.mlab_source
+        graphics.mayavi_axes(mfig, [-1, 1, -1, 1, -1, 1], line_width=5, color=(1, 0, 0))
+        graphics.mayavi_view(fig=mfig)
+
+        partial_index = np.array([0, v_keys.shape[0]*1/4, v_keys.shape[0]*1/2,
+                                  v_keys.shape[0]*3/4, v_keys.shape[0]*4/4-1],
+                                 dtype=np.int)
+        for img_index, vk in enumerate(partial_index):
+            filename = os.path.join(output_path, 'partial_weights_' + str(vk) + '.jpg')
+            v = rv[str(vk)][()]
+            w = rw[str(vk)][()]
+            # generate an image and save it 
+            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:,2], triangles=f_initial,
+                     scalars=w)
+            graphics.mlab.savefig(filename, magnification=4)
+
+        """Generate the completed shape at a variety of different angles"""
+        logger.info('Now generating some views of the final shape')
+        # change the mesh to the finished mesh
+        ms.reset(x=rv[v_keys[-1]][()][:, 0],y=rv[v_keys[-1]][()][:, 1],z=rv[v_keys[-1]][()][:, 2],
+                 triangles=f_initial)
+        elevation = np.array([30, -30])
+        azimuth = np.array([0, 45, 135, 215, 315])
+    
+        for az, el in itertools.product(azimuth, elevation):
+            filename = os.path.join(output_path,'final_az=' + str(az) + '_el=' + str(el) + '.jpg')
+            graphics.mayavi_view(fig=mfig, azimuth=az, elevation=el)
+            graphics.mlab.savefig(filename, magnification=4)
+
+        """Create a bunch of images for animation"""
+        logger.info('Now making images for a movie')
+        animation_path = os.path.join(output_path, 'animation')
+        if not os.path.exists(animation_path):
+            os.makedirs(animation_path)
+        
+        ms.reset(x=v_initial[:, 0], y=v_initial[:, 1], z=v_initial[:, 2], triangles=f_initial)
+
+        for ii, vk in enumerate(v_keys):
+            filename = os.path.join(animation_path, str(ii).zfill(7) + '.jpg')
+            v = rv[vk][()]
+            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:, 2], triangles=f_initial)
+            graphics.mayavi_savefig(mfig, filename, magnification=4)
     
     logger.info('Finished')
 
