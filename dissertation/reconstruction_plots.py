@@ -230,7 +230,6 @@ def castalia_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
             graphics.mlab.savefig(filename, magnification=4)
         
         """Partial images using a colormap for the data"""
-        pdb.set_trace()
         mfig = graphics.mayavi_figure(offscreen=True)
         mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial,
                                        color=None, colormap='viridis',
