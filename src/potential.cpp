@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#include <tuple>
 
 // TODO Need to make this function
 void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> > & V,
@@ -78,8 +79,14 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     Eigen::Matrix<double, Eigen::Dynamic, 3> center_face;
     center_face = 1.0 / 3 * (V1 + V2 + V3);
     
+    // edge vertex map
+    std::tuple<Eigen::Matrix<int, Eigen::Dynamic, 2>, Eigen::Matrix<int, Eigen::Dynamic, 2>, Eigen::Matrix<int, Eigen::Dynamic, 2> > edge_vertex_map;
+    edge_vertex_map = std::make_tuple(e1_vertex_map, e2_vertex_map, e3_vertex_map);
+
     // build vertex face map
     std::vector<std::vector<int> > vf_map = vertex_face_map(V, F);
+
+    // TODO Need to searching to find matching edges (search_edge_vertex_map)
 }
 
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {

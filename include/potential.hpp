@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 
 #include <vector>
+#include <tuple>
 
 // declare some shit
 void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::MatrixXi F, 
