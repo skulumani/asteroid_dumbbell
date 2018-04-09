@@ -8,36 +8,7 @@ of the point cloud data
 
 ### Reconstruction
 
-* 20180110_raycasting_castalia_reconstruct.hdf5
-    * uses face, edge, vertex contributions by finding the closest primitive 
-    and then adding it
-    * The process crashed because it took forever
-    * The mesh was kind of crazy
-* 20180110_raycasting_castalia_reconstruct_vertexonly_smaller.hdf5
-    * Only modifies the closest vertex to a given point measurement
-    * The initial ellipse is smaller than the asteroid
-* 20180215_castalia_highres_ellipse_reconstruct_vertexonly_smaller.hdf5
-    * Uses the reconstruction by only modifying the closest vertex
-    * The ellipse is a higher resolution
-    * Some of the points are skipped to save on time
-* 20180110_raycasting_castalia_reconstruct_vertexonly.hdf5
-    * Uses only the vertices and modifies the closest vertex to a point
-    * The size of the initial asteroid mesh is the semimajor axes of castalia
 
-### Castalia testing using the radius with edge/face modifications
-
-These simulations are using the point cloud data from
-
-20180110_raycasting_castalia.npz
-
-There are four related simulations with slightly different settings:
-
-1. `20180226_castalia_reconstruct_highres_45deg_cone.hdf5`
-2. `20180226_castalia_reconstruct_highres_5deg_cone.hdf5`
-3. `20180226_castalia_reconstruct_lowres_45deg_cone.hdf5`
-4. `20180226_castalia_reconstruct_lowres_5deg_cone.hdf5`
-
-These are comparing the effect of the angle constraint on the vertex and the effect of resolution of the initial mesh.
 
 ## Itokawa simulations
 
