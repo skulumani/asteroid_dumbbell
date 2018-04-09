@@ -393,7 +393,10 @@ if __name__ == "__main__":
                                 action="store_true")
     plotting_group.add_argument("--sphere_into_ellipsoid", help="Turn a sphere into an ellipsoid",
                                 action="store_true")
-    
+    plotting_group.add_argument("--castalia_reconstruct_generate_data", 
+                                help="Reconstruction example using Castalia (output filename)",
+                                action="store")
+
     args = parser.parse_args()
     
     if args.sphere_into_ellipsoid:
@@ -401,7 +404,7 @@ if __name__ == "__main__":
     elif args.cube_into_sphere:
         cube_into_sphere(img_path)
     elif args.castalia_reconstruct_generate_data:
-        castalia_reconstruct_generate_data(output_filename)
+        castalia_reconstruct_generate_data(args.castalia_reconstruct_generate_data)
 
     # cube_into_sphere(img_path)
     # sphere_into_ellipsoid(img_path)
