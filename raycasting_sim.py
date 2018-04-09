@@ -157,41 +157,6 @@ def animate(time, state, ast, dum, point_cloud):
                                             pc_lines))
 
 
-def reconstruct(time, state, ast, dum, point_cloud):
-    """Reconstruct the shape given the simulation results
-    """
-
-    # transform all the point cloud to a consistent reference frame (ast frame)
-    rot_ast2int = point_cloud['ast_state']
-    intersections = point_cloud['ast_ints']
-    ast_pts = []
-
-    for pcs in intersections:
-        for pt in pcs:
-            if not np.isnan(pt).any():
-                ast_pts.append(pt)
-
-    ast_pts = np.asarray(ast_pts)
-
-    # pick a subset of the total amount point cloud
-
-    # load the ellipsoid mesh
-    # ve, _ = wavefront.ellipsoid_mesh(ast.axes[0], ast.axes[1], ast.axes[2], density=20)
-
-    # TODO Need an intelligent method of combining shape models to fill in gaps
-    # call the reconstruct function
-    # ast_pts = np.concatenate((ast_pts, ve), axis=0)
-
-    v, f = wavefront.reconstruct_numpy(ast_pts)
-
-    # plot and visualize
-    mfig = graphics.mayavi_figure(size=(800, 600), bg=(0, 0, 0))
-    mesh, ast_axes = graphics.draw_polyhedron_mayavi(v, f, mfig)
-    # points = graphics.mayavi_points3d(ve, mfig, scale=0.01)
-
-    return v, f
-
-
 def incremental_reconstruction(input_filename, output_filename, asteroid_name='castalia'):
     """Incrementally update the mesh
 
@@ -289,98 +254,6 @@ def incremental_reconstruction(input_filename, output_filename, asteroid_name='c
 
     return 0
 
-def incremental_reconstruction_subdivide(input_filename, output_filename, asteroid_name='castalia'):
-    """Incrementally update the mesh
-
-    Now we'll use the radial mesh reconstruction.
-
-    After running through all the points we'll do a smoothing again go over teh points
-    """
-    logger = logging.getLogger(__name__)
-    # output_filename = './data/raycasting/20180226_castalia_reconstruct_highres_45deg_cone.hdf5'
-    
-    logger.info('Loading {}'.format(input_filename))
-    data = np.load(input_filename)
-    point_cloud = data['point_cloud'][()]
-
-    # define the asteroid and dumbbell objects
-
-    asteroid_faces = 4092
-    asteroid_type = 'mat'
-    max_angle = 10
-    m1, m2, l = 500, 500, 0.003
-    density = 30
-    subdivisions = 2
-
-    ast = asteroid.Asteroid(asteroid_name, asteroid_faces, asteroid_type)
-    dum = dumbbell.Dumbbell(m1=m1, m2=m2, l=l)
-    
-    logger.info('Creating ellipsoid mesh')
-    # define a simple mesh to start
-    v_est, f_est = wavefront.ellipsoid_mesh(ast.axes[0]*0.75, ast.axes[1]*0.75, ast.axes[2]*0.75,
-                                    density=density, subdivisions=subdivisions)
-
-    # extract out all the points in the asteroid frame
-    time = point_cloud['time'][::200]
-    ast_ints = point_cloud['ast_ints'][::200]
-    logger.info('Create HDF5 file {}'.format(output_filename))
-    with h5py.File(output_filename, 'w') as fout:
-        # store some extra data about teh simulation
-        sim_data = fout.create_group('simulation_data')
-        sim_data.attrs['asteroid_name'] = np.string_(asteroid_name)
-        sim_data.attrs['asteroid_faces'] =asteroid_faces
-        sim_data.attrs['asteroid_type'] = np.string_(asteroid_type)
-        sim_data.attrs['m1'] = dum.m1
-        sim_data.attrs['m2'] = dum.m2
-        sim_data.attrs['l'] = dum.l
-        sim_data.attrs['density'] = density
-        sim_data.attrs['subdivisions'] = subdivisions
-        sim_data['max_angle'] = max_angle
-
-
-        logger.info('Starting loop over point cloud')
-        for ii in range(2):
-            v_group = fout.create_group('vertex_array' + '_' + str(ii))
-            f_group = fout.create_group('face_array' + '_' + str(ii))
-            v_est, f_est = add_points(time, ast_ints, v_est, f_est, logger, max_angle, v_group, f_group)    
-            logger.info('Finished all the points. Now subdividing')
-            logger.info('vertices: {}  faces: {}'.format(v_est.shape[0], f_est.shape[0]))
-            v_est, f_est = wavefront.mesh_subdivide(v_est, f_est, 1)
-            logger.info('Finished subdivisions')
-            logger.info('vertices: {}  faces: {}'.format(v_est.shape[0], f_est.shape[0]))
-
-
-    logger.info('Completed the reconstruction')
-
-    return 0
-
-def add_points(time, ast_ints, v_est, f_est, logger, max_angle, v_group, f_group):
-    """
-    Loop over the point cloud and include each one into the mesh and update
-
-    This will also add the new meshes to the HDF5 datasets v_group, f_group
-    """
-    for ii, (t, points) in enumerate(zip(time, ast_ints)):
-        # check if points is empty
-        logger.info('Current : t = {} with {} points'.format(t, len(points)))
-        for pt in points:
-            # incremental update for each point in points
-            # check to make sure each pt is not nan
-            if not np.any(np.isnan(pt)):
-                # v_est, f_est = wavefront.mesh_incremental_update(pt, v_est, f_est, 'vertex')
-                mesh_param = wavefront.polyhedron_parameters(v_est, f_est)
-                v_est, f_est = wavefront.radius_mesh_incremental_update(pt, v_est, f_est,
-                                                                        mesh_param,
-                                                                        max_angle=np.deg2rad(max_angle))
-
-        # use HD5PY instead
-        # save every so often and delete v_array,f_array to save memory
-        if (ii % 1) == 0:
-            logger.info('Saving data to HDF5. ii = {}, t = {}'.format(ii, t))
-            v_group.create_dataset(str(ii), data=v_est)
-            f_group.create_dataset(str(ii), data=f_est)
-
-    return v_est, f_est
 
 def read_mesh_reconstruct(filename, output_path='/tmp/reconstruct_images'):
     """Use H5PY to read the data back and plot
@@ -396,44 +269,6 @@ def read_mesh_reconstruct(filename, output_path='/tmp/reconstruct_images'):
     with h5py.File(filename, 'r') as hf:
         face_array = hf['face_array']
         vertex_array = hf['vertex_array']
-        
-        # get all the keys for both groups
-        face_keys = utilities.sorted_nicely(list(face_array.keys()))
-        vertex_keys = utilities.sorted_nicely(list(vertex_array.keys()))
-
-        # loop over keys in both and plot
-        mfig = graphics.mayavi_figure(offscreen=True)
-        mesh = graphics.mayavi_addMesh(mfig, vertex_array[vertex_keys[0]][()], 
-                                       face_array[face_keys[0]][()])
-        ms = mesh.mlab_source
-        graphics.mlab.view(azimuth=-45)
-        for ii, (vk, fk) in enumerate(zip(vertex_keys, face_keys)):
-            filename = os.path.join(output_path, str.zfill(str(ii), 6) +'.jpg')
-            v, f = (vertex_array[vk][()], face_array[fk][()])
-            # draw the mesh
-            ms.reset(x=v[:,0], y=v[:,1], z=v[:,2], triangles=f)
-            # save the figure
-            graphics.mlab.savefig(filename, magnification=4)
-            logger.info('Saved image {}/{}'.format(ii, len(face_keys))) 
-    
-    logger.info('Finished')
-
-    return mfig
-
-def read_mesh_reconstruct_subdivide(filename, output_path='/tmp/reconstruct_images'):
-    """Use H5PY to read the data back and plot
-    """
-    logger = logging.getLogger(__name__)
-    logger.info('Starting the image generation')
-
-    # check if location exists
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
-    
-    logger.info('Opening {}'.format(filename))
-    with h5py.File(filename, 'r') as hf:
-        face_array = hf['face_array_1']
-        vertex_array = hf['vertex_array_1']
         
         # get all the keys for both groups
         face_keys = utilities.sorted_nicely(list(face_array.keys()))
@@ -482,17 +317,13 @@ if __name__ == "__main__":
     group.add_argument("-s", "--simulate", help='Run the point cloud simulation',
                         action="store_true")
     # reconstruct has several different options based on the selection
-    group.add_argument("-r", "--reconstruct", choices=['i', 's'], 
-                       help="Run the reconstruction algorithm.\n"
-                       "i = incremental reconstruction\n"
-                       "s = incremental reconstruction with subdivisions",
-                       action="store")
+    group.add_argument("-r", "--reconstruct",
+                       help="Run the reconstruction algorithm.\n",
+                       action="store_true")
     # plot the output - 1 matches r 1 and 2 matches with r 2
-    group.add_argument("-p", "--plot", choices=['i', 's'],
-                       help="Read the reconstruction data and images\n"
-                       "i = incremental reconstruction\n"
-                       "s = incremental reconstruction with subdivision",
-                       action="store")
+    group.add_argument("-p", "--plot",
+                       help="Read the reconstruction data and images\n",
+                       action="store_true")
     group.add_argument("-m", "--movie", nargs=2,
                        help="Create movie from all images in temp folder\n"
                        "Path to images folder\n"
@@ -511,21 +342,16 @@ if __name__ == "__main__":
         # to access the data again
         # data = np.load(filename)
         # point_cloud = data['point_cloud'][()]
-    elif args.reconstruct == "i":
+    elif args.reconstruct:
         # now reconstruct
         # reconstruct_filename = os.path.join('./data/raycasting', args.fnames[1])
         # filename = './data/raycasting/20180110_raycasting_castalia.npz'
         
         incremental_reconstruction(args.point_cloud_data, args.reconstruct_data, 'castalia')
-    elif args.reconstruct == "s":
-        incremental_reconstruction_subdivide(args.point_cloud_data, args.reconstruct_data, 'castalia')
-    elif args.plot == "i":
+    elif args.plot:
         # generate the images
         print("Images saved to {}".format(output_path))
         read_mesh_reconstruct(args.reconstruct_data, output_path=output_path)
-    elif args.plot == "s":
-        print("Images saved to {}".format(output_path))
-        read_mesh_reconstruct_subdivide(args.reconstruct_data, output_path=output_path)
     elif args.movie[0]:
         os.chdir(args.movie[0][0])
         subprocess.call(['ffmpeg', '-i', args.movie[0][1], 'output.mp4'])
