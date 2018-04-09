@@ -209,7 +209,8 @@ def castalia_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
         
         v_initial = hf['initial_vertex'][()]
         f_initial = hf['initial_faces'][()]
-    
+        w_initial = hf['initial_weight'][()]
+
         """Partial images during the reconstruction"""
         mfig = graphics.mayavi_figure(offscreen=True)
         mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial)
@@ -225,6 +226,28 @@ def castalia_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
             v = rv[str(vk)][()]
             # generate an image and save it 
             ms.reset(x=v[:, 0], y=v[:, 1], z=v[:,2], triangles=f_initial)
+            graphics.mlab.savefig(filename, magnification=4)
+        
+        """Partial images using a colormap for the data"""
+        pdb.set_trace()
+        mfig = graphics.mayavi_figure(offscreen=False)
+        mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial,
+                                       color=None, colormap='viridis',
+                                       scalars=w_initial)
+        ms = mesh.mlab_source
+        graphics.mayavi_axes(mfig, [-1, 1, -1, 1, -1, 1], line_width=5, color=(1, 0, 0))
+        graphics.mayavi_view(fig=mfig)
+
+        partial_index = np.array([0, v_keys.shape[0]*1/4, v_keys.shape[0]*1/2,
+                                  v_keys.shape[0]*3/4, v_keys.shape[0]*4/4-1],
+                                 dtype=np.int)
+        for img_index, vk in enumerate(partial_index):
+            filename = os.path.join(img_path, 'partial_weights_' + str(vk) + '.jpg')
+            v = rv[str(vk)][()]
+            w = rw[str(vk)][()]
+            # generate an image and save it 
+            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:,2], triangles=f_initial,
+                     scalars=w)
             graphics.mlab.savefig(filename, magnification=4)
 
         """Generate the completed shape at a variety of different angles"""
