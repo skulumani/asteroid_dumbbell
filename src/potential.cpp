@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <vector>
 
 // TODO Need to make this function
 void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> > & V,
@@ -76,11 +77,22 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     // compute the centeroid of each face
     Eigen::Matrix<double, Eigen::Dynamic, 3> center_face;
     center_face = 1.0 / 3 * (V1 + V2 + V3);
-
+    
+    // build vertex face map
+    std::vector<std::vector<int> > vf_map = vertex_face_map(V, F);
 }
 
-void vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
+std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
 
+    std::vector<std::vector<int> > vf_map(V.rows());
+    // loop over faces in F array
+    for (int ii = 0; ii < F.rows(); ++ii) {
+        for (int jj = 0; jj < 3; ++jj) {
+            vf_map[jj].push_back(ii);
+        }
+    }
+
+    return vf_map;
 }
 
 // Start of polyhedron potential function code 

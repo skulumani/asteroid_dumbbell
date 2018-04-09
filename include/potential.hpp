@@ -3,6 +3,8 @@
 
 #include <Eigen/Dense>
 
+#include <vector>
+
 // declare some shit
 void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::MatrixXi F, 
         Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> F_face, Eigen::Matrix<double, Eigen::Dynamic, 1> w_face);
@@ -29,4 +31,6 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
         const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F);
 
 
+std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> &V,
+                                                const Eigen::Ref<const Eigen::MatrixXi> &F);
 #endif
