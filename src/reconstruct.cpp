@@ -38,11 +38,11 @@ void ReconstructMesh::update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt,
     std::cout << pt_uvec.transpose().cross(vert_uvec.row(0)) << std::endl;
     // compute the angular distance between the pt and each vertex
     Eigen::Matrix<double, Eigen::Dynamic, 3> cross_product(vert_uvec.rows(), 3);
-    Eigen::Matrix<double, Eigen::Dynamic, 3> dot_product(vert_uvec.rows(), 3);
+    Eigen::Matrix<double, Eigen::Dynamic, 1> dot_product(vert_uvec.rows(), 1);
 
     cross_product = - vert_uvec.rowwise().cross(pt_uvec.transpose());
+    dot_product = - (vert_uvec.array().rowwise() * pt_uvec.transpose().array()).rowwise().sum();
 
-    std::cout << cross_product << std::endl;
 }
 
 Eigen::VectorXd spherical_distance(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,
