@@ -35,6 +35,7 @@ class ReconstructMesh {
 Eigen::VectorXd spherical_distance(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,
                                     const Eigen::Ref<const Eigen::MatrixXd> &vert_uvec);
 
-Eigen::VectorXi vector_find(const Eigen::Ref<const Eigen::Array<bool, Eigen::Dynamic, 1> > &);
+template<typename T>
+Eigen::VectorXi vector_find(const Eigen::Ref<const T> &);
 
 #endif

@@ -25,7 +25,8 @@ Eigen::MatrixXd ReconstructMesh::get_weights( void ) {
     return this->weights;
 }
 
-Eigen::VectorXi vector_find(const Eigen::Ref<const Eigen::Array<bool, Eigen::Dynamic, 1> > &logical_vec) {
+template<typename T>
+Eigen::VectorXi vector_find(const Eigen::Ref<const T> &logical_vec) {
     Eigen::VectorXi index = Eigen::VectorXi::LinSpaced(logical_vec.size(), 0, logical_vec.size() - 1);
     index.conservativeResize(std::stable_partition(
                 index.data(), index.data() + index.size(), [&logical_vec](int i){return logical_vec(i);}) - index.data());
@@ -61,7 +62,7 @@ void ReconstructMesh::update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt,
     /* index.conservativeResize(std::stable_partition( */
     /*             index.data(), index.data() + index.size(), [&region_index](int i){return region_index(i);})- index.data()); */
     
-    Eigen::VectorXi index = vector_find(region_index);
+    Eigen::VectorXi index = vector_find<Eigen::Array<bool, Eigen::Dynamic, 1> >(region_index);
 
     std::cout << region_index << std::endl;
     std::cout << index << std::endl;
