@@ -68,11 +68,21 @@ TEST_F(TestReconstruct, EigenConstructor) {
     ASSERT_TRUE(reconstruct_mesh.get_weights().isApprox(W_true));
 }
 
-TEST_F(TestReconstruct, UpdateMesh) {
+TEST_F(TestReconstruct, UpdateMeshVertices) {
     ReconstructMesh reconstruct_mesh(Ve_true, Fe_true, W_true);
     Eigen::Vector3d pt(1, 1, 1);
     double max_angle(1);
 
     reconstruct_mesh.update_mesh(pt, max_angle);
     ASSERT_TRUE(reconstruct_mesh.get_verts().row(7).isApprox(pt.transpose()));
+}
+
+TEST_F(TestReconstruct, UpdateMeshWeight) {
+    ReconstructMesh reconstruct_mesh(Ve_true, Fe_true, W_true);
+    Eigen::Vector3d pt(1, 1, 1);
+    double max_angle(1);
+
+    reconstruct_mesh.update_mesh(pt, max_angle);
+    ASSERT_NEAR(reconstruct_mesh.get_weights()(7), 0, 1e-6);
+
 }
