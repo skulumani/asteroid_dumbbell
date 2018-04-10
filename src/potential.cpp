@@ -53,6 +53,7 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     
     e_vertex_map << e1_vertex_map, e2_vertex_map, e3_vertex_map;
     
+    // TODO Find unique edges
     Eigen::Matrix<double, Eigen::Dynamic, 3> normal_face, e1_normal, e2_normal, e3_normal;
     // compute the normal for every face and every edge
     normal_face.resize(num_f, 3);
