@@ -49,9 +49,9 @@ void ReconstructMesh::update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt,
     Eigen::Matrix<double, Eigen::Dynamic, 1> dot_product(vert_uvec.rows(), 1);
 
     cross_product =  vert_uvec.rowwise().cross(pt_uvec.transpose()).rowwise().norm();
-    dot_product = - (vert_uvec.array().rowwise() * pt_uvec.transpose().array()).rowwise().sum();
+    dot_product = (vert_uvec.array().rowwise() * pt_uvec.transpose().array()).rowwise().sum();
+    
     Eigen::Matrix<double, Eigen::Dynamic, 1> delta_sigma(vert_uvec.rows(), 1);
-
     delta_sigma = cross_product.binaryExpr(dot_product, [] (double a, double b) { return std::atan2(a,b);} );
     
     Eigen::Array<bool, Eigen::Dynamic, 1> region_condition(this->vertices.rows());
@@ -83,6 +83,7 @@ void ReconstructMesh::update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt,
         this->vertices.row(region_index(ii)) = radius_new(ii) * vert_uvec.row(region_index(ii));
         this->weights(region_index(ii)) = weight_new(region_index(ii));
     }
+
 }
 
 Eigen::VectorXd spherical_distance(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,

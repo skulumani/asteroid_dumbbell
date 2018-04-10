@@ -70,9 +70,9 @@ TEST_F(TestReconstruct, EigenConstructor) {
 
 TEST_F(TestReconstruct, UpdateMesh) {
     ReconstructMesh reconstruct_mesh(Ve_true, Fe_true, W_true);
-    Eigen::Vector3d pt(1, 0, 0);
+    Eigen::Vector3d pt(1, 1, 1);
     double max_angle(1);
 
     reconstruct_mesh.update_mesh(pt, max_angle);
-    ASSERT_EQ(1, 1);
+    ASSERT_TRUE(reconstruct_mesh.get_verts().row(7).isApprox(pt.transpose()));
 }
