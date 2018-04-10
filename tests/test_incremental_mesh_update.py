@@ -3,6 +3,7 @@
 import numpy as np
 from point_cloud import wavefront
 
+import pdb
 
 class TestVertexInsertion():
     v, f = wavefront.read_obj('./integration/cube.obj')
@@ -214,3 +215,19 @@ class TestRadiusMeshUpdate():
 
         np.testing.assert_allclose(nv, nv_exp)
         np.testing.assert_allclose(nf, nf_exp)
+
+class TestSphericalMeshUpdate():
+    """Test out the spherical mesh update function
+    """
+    v, f = wavefront.read_obj('./integration/cube.obj')
+    weight = np.full(v.shape[0], 1)
+    max_angle = 1
+
+    def test_mesh_update(self):
+        pt = np.array([1, 1, 1])
+        nv, nw = wavefront.spherical_incremental_mesh_update(pt, 
+                                                             self.v, self.f,
+                                                             self.weight, self.max_angle)
+        np.testing.assert_allclose(nv[-1, :], pt)        
+        np.testing.assert_allclose(nw[-1], 0)
+
