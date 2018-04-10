@@ -47,10 +47,13 @@ void ReconstructMesh::update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt,
     
     Eigen::Array<bool, Eigen::Dynamic, 1> region_index(this->vertices.rows());
     region_index = delta_sigma.array() < max_angle;
+    
+    auto region_count = region_index.count();
+    Eigen::VectorXd weight(region_count), weight_old(region_count), radius_old(region_count), radius_new(region_count), weight_new(region_count);
 
     // TODO now loop over and modify the vertices that are in region index
     for (int ii = 0; ii < delta_sigma.size(); ++ii) {
-
+        
     }
 }
 
