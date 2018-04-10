@@ -62,11 +62,26 @@ void ReconstructMesh::update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt,
     auto region_count = region_index.size();
 
     Eigen::VectorXd weight(region_count), weight_old(region_count), radius_old(region_count), radius_new(region_count), weight_new(region_count);
-    
-    // TODO now loop over and modify the vertices that are in region index
-    for (int ii = 0; ii < region_count; ++ii) {
-        weight(ii) = pow(delta_sigma(ii) * pt_radius, 2);
+    double &radius_meas = pt_radius;
 
+    Eigen::Matrix<double, Eigen::Dynamic, 3> mesh_region(region_count, 3);
+
+    for (int ii = 0; ii < region_index.size(); ++ii) {
+        weight(ii) = pow(delta_sigma(region_index(ii)) * pt_radius, 2);
+        mesh_region.row(ii) = this->vertices.row(region_index(ii));
+        weight_old(ii) = this->weights(region_index(ii));
+        radius_old(ii) = vert_radius(region_index(ii));
+    
+    }
+
+    radius_new = (radius_old.array() * weight.array() + radius_meas * weight_old.array()) / (weight_old.array() + weight.array());
+
+    weight_new = weight_old.array() * weight.array() / (weight_old.array() + weight.array());
+    
+    // Now update the vertices of the object/self
+    for (int ii = 0; ii < region_index.size(); ++ii) {
+        this->vertices.row(region_index(ii)) = radius_new(ii) * vert_uvec.row(region_index(ii));
+        this->weights(region_index(ii)) = weight_new(region_index(ii));
     }
 }
 
