@@ -11,3 +11,16 @@ ReconstructMesh::ReconstructMesh( const Eigen::Ref<const Eigen::MatrixXd> &v_in,
     this->weights = w_in;
 
 }
+
+Eigen::MatrixXd ReconstructMesh::get_verts( void ) {
+    return this->vertices;
+}
+
+Eigen::MatrixXi ReconstructMesh::get_faces( void ) {
+    return this->faces;
+}
+
+Eigen::MatrixXd ReconstructMesh::get_weights( void ) {
+    return this->weights;
+}
+

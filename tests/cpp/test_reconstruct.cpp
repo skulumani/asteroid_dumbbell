@@ -63,8 +63,8 @@ class TestReconstruct: public ::testing::Test {
 
 TEST_F(TestReconstruct, EigenConstructor) {
     ReconstructMesh reconstruct_mesh(Ve_true, Fe_true, W_true);
-    ASSERT_TRUE(reconstruct_mesh.vertices.isApprox(Ve_true));
-    ASSERT_TRUE(reconstruct_mesh.faces.isApprox(Fe_true));
-    ASSERT_TRUE(reconstruct_mesh.weights.isApprox(W_true));
+    ASSERT_TRUE(reconstruct_mesh.get_verts().isApprox(Ve_true));
+    ASSERT_TRUE(reconstruct_mesh.get_faces().isApprox(Fe_true));
+    ASSERT_TRUE(reconstruct_mesh.get_weights().isApprox(W_true));
 }
 
