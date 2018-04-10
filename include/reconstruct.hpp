@@ -16,6 +16,10 @@ class ReconstructMesh {
                          const Eigen::Ref<const Eigen::MatrixXd> &w_in );
         
         ReconstructMesh( std::shared_ptr<MeshData> mesh_in);
+        
+        // Modify the vertices/weights with a new point
+        void update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt_in,
+                        const double &max_angle);
 
         // functions to access the private members
         Eigen::MatrixXd get_verts( void );

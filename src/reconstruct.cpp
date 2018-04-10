@@ -24,3 +24,14 @@ Eigen::MatrixXd ReconstructMesh::get_weights( void ) {
     return this->weights;
 }
 
+void ReconstructMesh::update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt,
+                                    const double &max_angle) {
+    
+    double pt_radius = pt.norm();
+    Eigen::VectorXd vert_radius = this->vertices.rowwise().norm();
+
+    Eigen::Vector3d pt_uvec = pt.normalized();
+    Eigen::MatrixXd vert_uvec = this->vertices.rowwise().normalized();
+
+    // compute the angular distance between the pt and each vertex
+}
