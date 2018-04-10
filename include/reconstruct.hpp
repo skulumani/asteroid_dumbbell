@@ -32,5 +32,6 @@ class ReconstructMesh {
         Eigen::MatrixXd weights;
 };
 
-
+Eigen::VectorXd spherical_distance(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,
+                                    const Eigen::Ref<const Eigen::MatrixXd> &vert_uvec);
 #endif
