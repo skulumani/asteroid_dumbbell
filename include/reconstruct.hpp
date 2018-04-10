@@ -10,9 +10,8 @@ class ReconstructMesh {
 
         ReconstructMesh( const Eigen::Ref<const Eigen::MatrixXd> &v_in, 
                          const Eigen::Ref<const Eigen::MatrixXi> &f_in,
-                         const Eigen::Ref<const Eigen::MatrixXd> &weight_in );
+                         const Eigen::Ref<const Eigen::MatrixXd> &w_in );
 
-    private:
         Eigen::MatrixXd vertices;
         Eigen::MatrixXi faces;
         Eigen::MatrixXd weights;

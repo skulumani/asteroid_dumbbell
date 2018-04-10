@@ -37,7 +37,7 @@ class TestReconstruct: public ::testing::Test {
     W_true.setOnes();
   }
 
-  virtual ~TestReconstruct{
+  virtual ~TestReconstruct() {
     // You can do clean-up work that doesn't throw exceptions here.
   }
 
