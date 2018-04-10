@@ -35,6 +35,18 @@ void eigen_tensor(const int & num_i, const int & num_j, const int & num_k) {
     std::cout << tensor << std::endl;
 
 }
+
+void eigen_fancy_indexing( void ) {
+     // try fancy indexing using another Eigen Matrix/Array of integers
+    Eigen::Matrix<double, 5, 1> A;
+    A << 1, 2, 3, 4, 5;
+    Eigen::Array<int, 2, 1> index(2);
+    index << 1, 2;
+
+    std::cout << index.unaryExpr(A) << std::endl;
+
+}
+
 int main()
 {
     Eigen::Array<double, 1, 3> a, b, c, d;
@@ -48,5 +60,6 @@ int main()
     std::cout << "d: \n" << d << std::endl;
 
     eigen_tensor(5, 2, 3);
+    eigen_fancy_indexing();
 
 }
