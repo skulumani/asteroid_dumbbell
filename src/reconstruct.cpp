@@ -49,7 +49,9 @@ void ReconstructMesh::update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt,
     region_index = delta_sigma.array() < max_angle;
 
     // TODO now loop over and modify the vertices that are in region index
+    for (int ii = 0; ii < delta_sigma.size(); ++ii) {
 
+    }
 }
 
 Eigen::VectorXd spherical_distance(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,
