@@ -25,6 +25,13 @@ Eigen::MatrixXd ReconstructMesh::get_weights( void ) {
     return this->weights;
 }
 
+Eigen::VectorXi vector_find(const Eigen::Ref<const Eigen::Array<bool, Eigen::Dynamic, 1> > &logical_vec) {
+    Eigen::VectorXi index = Eigen::VectorXi::LinSpaced(logical_vec.size(), 0, logical_vec.size() - 1);
+    index.conservativeResize(std::stable_partition(
+                index.data(), index.data() + index.size(), [&logical_vec](int i){return logical_vec(i);}) - index.data());
+    return index;
+}
+
 void ReconstructMesh::update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt,
                                     const double &max_angle) {
     
@@ -49,8 +56,18 @@ void ReconstructMesh::update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt,
     region_index = delta_sigma.array() < max_angle;
     
     auto region_count = region_index.count();
-    Eigen::VectorXd weight(region_count), weight_old(region_count), radius_old(region_count), radius_new(region_count), weight_new(region_count);
+    
+    /* Eigen::VectorXi index = Eigen::VectorXi::LinSpaced(region_index.size(), 0, region_index.size() - 1); */
+    /* index.conservativeResize(std::stable_partition( */
+    /*             index.data(), index.data() + index.size(), [&region_index](int i){return region_index(i);})- index.data()); */
+    
+    Eigen::VectorXi index = vector_find(region_index);
 
+    std::cout << region_index << std::endl;
+    std::cout << index << std::endl;
+
+    Eigen::VectorXd weight(region_count), weight_old(region_count), radius_old(region_count), radius_new(region_count), weight_new(region_count);
+    
     // TODO now loop over and modify the vertices that are in region index
     for (int ii = 0; ii < delta_sigma.size(); ++ii) {
         
@@ -62,3 +79,5 @@ Eigen::VectorXd spherical_distance(const Eigen::Ref<const Eigen::Vector3d> &pt_u
 
     return pt_uvec;
 }
+
+
