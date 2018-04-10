@@ -1663,6 +1663,34 @@ def radius_mesh_incremental_update(pt, v, f, mesh_parameters,
     return nv, nf
 
 def spherical_incremental_mesh_update(pt, vs, f, vertex_weight, max_angle):
+    r"""Incremental reconstruction via radius modification
+
+    vnew, weight_new = spherical_incremental_mesh_update(pt, v, f, weight, max_angle)
+
+    Parameters
+    ----------
+    pt : (3,) numpy array
+        Measurement point in asteroid body frame
+    vs : numpy array (v, 3)
+        All the vertices of the current mesh
+    f : numpy array (f, 3)
+        Face topology of the current mesh
+    vertex_weight : numpy array (v, 1)
+        Uncertainty of each vertex (geodesic distance from vertex to closest measurement)
+    max_angle : float
+        Angle over which to consider the point associating with  vertices
+
+    Returns
+    -------
+    v_new : numpy array (v, 3)
+        Modified vertices
+    weight_new : numpy array (v,)
+        Modified weights
+
+    Author
+    ------
+    Shankar Kulumani		GWU		skulumani@gwu.edu
+    """
     # normalize the vectors
     pt_radius = np.linalg.norm(pt)
     vs_radius = np.linalg.norm(vs, axis=1)
