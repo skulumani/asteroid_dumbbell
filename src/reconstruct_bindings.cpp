@@ -22,7 +22,6 @@ PYBIND11_MODULE(reconstruct, m) {
                             pybind11::arg("vertices"), pybind11::arg("faces"), pybind11::arg("weights"))
         .def("update", &ReconstructMesh::update, "Update the mesh by incorporating the pt into the mesh",
                 pybind11::arg("pt"), pybind11::arg("max_angle"))
-        .def("update_meshdata", &ReconstructMesh::update_meshdata, "Update the meshdata object with the new mesh")
         .def("get_verts", &ReconstructMesh::get_verts, "Get the vertices")
         .def("get_faces", &ReconstructMesh::get_faces, "Get the faces")
         .def("get_weights", &ReconstructMesh::get_weights, "Get the weights of the vertices");
