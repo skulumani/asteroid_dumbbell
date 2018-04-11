@@ -125,3 +125,27 @@ TEST_F(TestGeodesic, Cartesian2SphericalArray) {
 
     ASSERT_TRUE(s1.isApprox(s1_true));
 }
+
+TEST_F(TestGeodesic, Spherical2Cartesian) {
+    Eigen::Matrix<double, 1, 3> c1(3), c1_true(3);
+    Eigen::Matrix<double, 1, 3> s1(3);
+    
+    s1 << 1, 0, 0;
+    c1_true << 1, 0, 0;
+    
+    c1 = spherical2cartesian(s1);
+
+    ASSERT_TRUE(c1.isApprox(c1_true));
+}
+
+TEST_F(TestGeodesic, Spherical2CartesianArray) {
+    Eigen::Matrix<double, 2, 3> c1(2, 3), c1_true(2, 3);
+    Eigen::Matrix<double, 2, 3> s1(2, 3);
+
+    c1_true << 1, 0, 0, 1, 0, 0;
+    s1 << 1, 0, 0, 1, 0, 0;
+    
+    c1 = spherical2cartesian(s1);
+
+    ASSERT_TRUE(c1.isApprox(c1_true));
+}
