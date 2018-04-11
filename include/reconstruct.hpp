@@ -25,7 +25,8 @@ class ReconstructMesh {
         Eigen::MatrixXd get_verts( void );
         Eigen::MatrixXi get_faces( void );
         Eigen::MatrixXd get_weights( void );
-
+        
+        void update_meshdata( void );
     private:
         Eigen::MatrixXd vertices;
         Eigen::MatrixXi faces;
