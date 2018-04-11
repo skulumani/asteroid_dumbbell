@@ -20,6 +20,7 @@ cgal = pytest.importorskip('lib.cgal')
 mesh_data = pytest.importorskip('lib.mesh_data')
 polyhedron_potential = pytest.importorskip('lib.polyhedron_potential')
 surface_mesh = pytest.importorskip('lib.surface_mesh')
+reconstruct = pytest.importorskip('lib.reconstruct')
 
 class TestMeshData:
     v, f = wavefront.read_obj('./integration/cube.obj')
@@ -68,4 +69,13 @@ class TestMeshDist:
                                    intersections)
     
     # also test out the ray caster
+ 
+class TestReconstructMesh:
     
+    # load the vertices, faces
+    v, f = wavefront.read_obj('./integration/cube.obj') 
+    # create a mesh
+    mesh = mesh_data.MeshData(v, f)
+
+    def test_constructor(self):
+        pass
