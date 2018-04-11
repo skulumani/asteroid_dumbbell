@@ -25,9 +25,14 @@ int main(int argc, char* argv[])
     }
 
     // reconstruct using a point
-    ReconstructMesh reconstruct_mesh();
-    //
-    // output the updated mesh and weights
+    ReconstructMesh reconstruct_mesh(mesh);
+
+    Eigen::Vector3d pt(1, 1, 1);
+    double max_angle(1);
+
+    std::cout << reconstruct_mesh.get_verts() << std::endl << std::endl;
+
+    reconstruct_mesh.update_mesh(pt, max_angle);
     return 0;
 }
 

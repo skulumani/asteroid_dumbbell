@@ -1,4 +1,6 @@
 #include "reconstruct.hpp"
+#include "mesh.hpp"
+#include "loader.hpp"
 
 #include <gtest/gtest.h>
 
@@ -68,8 +70,19 @@ TEST_F(TestReconstruct, EigenConstructor) {
     ASSERT_TRUE(reconstruct_mesh.get_weights().isApprox(W_true));
 }
 
+TEST_F(TestReconstruct, MeshDataConstructor) {
+    std::shared_ptr<MeshData> mesh;
+    mesh = Loader::load("./integration/cube.obj");
+    ReconstructMesh reconstruct_mesh(mesh);
+    ASSERT_TRUE(reconstruct_mesh.get_verts().isApprox(Ve_true));
+    ASSERT_TRUE(reconstruct_mesh.get_faces().isApprox(Fe_true));
+}
+
 TEST_F(TestReconstruct, UpdateMeshVertices) {
-    ReconstructMesh reconstruct_mesh(Ve_true, Fe_true, W_true);
+    std::shared_ptr<MeshData> mesh;
+    mesh = Loader::load("./integration/cube.obj");
+    ReconstructMesh reconstruct_mesh(mesh);
+
     Eigen::Vector3d pt(1, 1, 1);
     double max_angle(1);
 
@@ -77,12 +90,12 @@ TEST_F(TestReconstruct, UpdateMeshVertices) {
     ASSERT_TRUE(reconstruct_mesh.get_verts().row(7).isApprox(pt.transpose()));
 }
 
-TEST_F(TestReconstruct, UpdateMeshWeight) {
-    ReconstructMesh reconstruct_mesh(Ve_true, Fe_true, W_true);
-    Eigen::Vector3d pt(1, 1, 1);
-    double max_angle(1);
+/* TEST_F(TestReconstruct, UpdateMeshWeight) { */
+/*     ReconstructMesh reconstruct_mesh(Ve_true, Fe_true, W_true); */
+/*     Eigen::Vector3d pt(1, 1, 1); */
+/*     double max_angle(1); */
 
-    reconstruct_mesh.update_mesh(pt, max_angle);
-    ASSERT_NEAR(reconstruct_mesh.get_weights()(7), 0, 1e-6);
+/*     reconstruct_mesh.update_mesh(pt, max_angle); */
+/*     ASSERT_NEAR(reconstruct_mesh.get_weights()(7), 0, 1e-6); */
 
-}
+/* } */
