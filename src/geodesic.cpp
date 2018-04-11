@@ -33,3 +33,22 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> cartesian2spherical(const Eigen::Ref<co
 
     return spherical;
 }
+
+Eigen::Matrix<double, Eigen::Dynamic, 3> spherical2cartesian(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> > &spherical) {
+    
+    Eigen::Matrix<double, Eigen::Dynamic, 1> radius(spherical.rows()), latitude(spherical.rows()), longitude(spherical.rows()),
+        x(spherical.rows()), y(spherical.rows()), z(spherical.rows());
+    
+    radius = spherical.col(0);
+    latitude = spherical.col(1);
+    longitude = spherical.col(2);
+
+    x = radius.array() * latitude.array().cos() * longitude.array().cos();
+    y = radius.array() * latitude.array().cos() * longitude.array().sin();
+    z = radius.array() * latitude.array().sin();
+    
+    Eigen::Matrix<double, Eigen::Dynamic, 3> cartesian(spherical.rows(), 3);
+
+    cartesian << x, y, z;
+    return cartesian;
+}
