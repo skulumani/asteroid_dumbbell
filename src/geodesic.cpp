@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 
+#include <cmath>
 
 Eigen::VectorXd central_angle(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,
                                     const Eigen::Ref<const Eigen::MatrixXd> &vert_uvec) {
@@ -17,4 +18,18 @@ Eigen::VectorXd central_angle(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,
     delta_sigma = cross_product.binaryExpr(dot_product, [] (double a, double b) { return std::atan2(a,b);} );
 
     return delta_sigma;
+}
+
+Eigen::Matrix<double, Eigen::Dynamic, 3> cartesian2spherical(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> > &cartesian) {
+    Eigen::Matrix<double, Eigen::Dynamic, 1> radius(cartesian.rows()), longitude(cartesian.rows()), latitude(cartesian.rows());
+    
+    Eigen::Matrix<double, Eigen::Dynamic, 3> spherical(cartesian.rows(), 3);
+
+    radius = cartesian.rowwise().norm();
+    longitude = cartesian.col(1).binaryExpr(cartesian.col(0), [] (double a, double b) { return std::atan2(a, b); } ); 
+    latitude = (cartesian.col(2).array() / radius.array()).asin(); 
+    
+    spherical << radius, latitude, longitude;
+
+    return spherical;
 }

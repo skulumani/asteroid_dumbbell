@@ -124,6 +124,7 @@ set(test_all_src
     tests/cpp/test_loader.cpp
     tests/cpp/test_mesh.cpp
     tests/cpp/test_reconstruct.cpp
+    tests/cpp/test_geodesic.cpp
     src/wavefront.cpp
     src/surface_mesher.cpp
     src/polyhedron.cpp
