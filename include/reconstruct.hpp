@@ -10,11 +10,11 @@ class ReconstructMesh {
     public:
         ReconstructMesh( void ) {}
         virtual ~ReconstructMesh( void ) {}
+    
+        ReconstructMesh(const Eigen::Ref<const Eigen::MatrixXd> &v_in,
+                        const Eigen::Ref<const Eigen::MatrixXi> &f_in,
+                        const Eigen::Ref<const Eigen::MatrixXd> &w_in);
 
-        ReconstructMesh( const Eigen::Ref<const Eigen::MatrixXd> &v_in, 
-                         const Eigen::Ref<const Eigen::MatrixXi> &f_in,
-                         const Eigen::Ref<const Eigen::MatrixXd> &w_in );
-        
         ReconstructMesh( std::shared_ptr<MeshData> mesh_in);
         
         // Modify the vertices/weights with a new point
@@ -30,6 +30,8 @@ class ReconstructMesh {
         Eigen::MatrixXd vertices;
         Eigen::MatrixXi faces;
         Eigen::MatrixXd weights;
+
+        std::shared_ptr<MeshData> mesh;
 };
 
 Eigen::VectorXd spherical_distance(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,
