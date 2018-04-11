@@ -23,6 +23,7 @@ ReconstructMesh::ReconstructMesh(std::shared_ptr<MeshData> mesh_in) {
     
     // set the weight to the maximum norm length of all vertices
     Eigen::Matrix<double, Eigen::Dynamic, 1> vert_radius(this->vertices.rows(), 1);
+    this->weights.resize(this->vertices.rows(), 1);
     vert_radius = this->vertices.rowwise().norm();
     double max_radius = vert_radius.maxCoeff();
     const double PI = 3.141592653589793115997963468544185161591;
@@ -71,12 +72,14 @@ void ReconstructMesh::update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt,
     
     Eigen::Array<bool, Eigen::Dynamic, 1> region_condition(this->vertices.rows());
     region_condition = delta_sigma.array() < max_angle;
-    
+
     Eigen::VectorXi region_index = vector_find<Eigen::Array<bool, Eigen::Dynamic, 1> >(region_condition);
     
     auto region_count = region_index.size();
 
-    Eigen::VectorXd weight(region_count), weight_old(region_count), radius_old(region_count), radius_new(region_count), weight_new(region_count);
+    Eigen::VectorXd weight(region_count), weight_old(region_count),
+        radius_old(region_count), radius_new(region_count),
+        weight_new(region_count);
     double &radius_meas = pt_radius;
 
     Eigen::Matrix<double, Eigen::Dynamic, 3> mesh_region(region_count, 3);
@@ -85,9 +88,8 @@ void ReconstructMesh::update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt,
         weight(ii) = pow(delta_sigma(region_index(ii)) * pt_radius, 2);
         mesh_region.row(ii) = this->vertices.row(region_index(ii));
         weight_old(ii) = this->weights(region_index(ii));
-        radius_old(ii) = vert_radius(region_index(ii));
+        /* radius_old(ii) = vert_radius(region_index(ii)); */
     }
-
 
     radius_new = (radius_old.array() * weight.array() + radius_meas * weight_old.array()) / (weight_old.array() + weight.array());
 
