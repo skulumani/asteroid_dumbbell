@@ -87,6 +87,10 @@ add_executable(potential ${potential_src})
 # surface mesher
 set( surface_mesher_src src/surface_mesher_main.cpp src/surface_mesher.cpp src/input_parser.cpp)
 add_executable(surface_mesher ${surface_mesher_src})
+
+# incremental mesh reconstruction
+set( reconstruct_mesh_src src/reconstruct_main.cpp src/reconstruct.cpp src/mesh.cpp src/input_parser.cpp src/loader.cpp src/polyhedron.cpp)
+add_executable(reconstruct_mesh ${reconstruct_mesh_src})
 ################################################################################
 # PYTHON BINDING
 ################################################################################
@@ -101,6 +105,10 @@ pybind11_add_module(mesh_data MODULE
 
 pybind11_add_module(cgal MODULE
     src/cgal.cpp src/cgal_bindings.cpp src/mesh.cpp)
+
+pybind11_add_module(reconstruct MODULE
+    src/reconstruct.cpp src/reconstruct_bindings.cpp src/mesh.cpp)
+
 ################################################################################
 # Testing example
 ################################################################################
