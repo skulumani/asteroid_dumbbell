@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 
     std::cout << reconstruct_mesh.get_verts() << std::endl << std::endl;
 
-    reconstruct_mesh.update_mesh(pt, max_angle);
+    reconstruct_mesh.update(pt, max_angle);
 
     return 0;
 }

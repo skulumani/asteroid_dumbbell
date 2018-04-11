@@ -86,7 +86,7 @@ TEST_F(TestReconstruct, UpdateMeshVertices) {
     Eigen::Vector3d pt(1, 1, 1);
     double max_angle(1);
 
-    reconstruct_mesh.update_mesh(pt, max_angle);
+    reconstruct_mesh.update(pt, max_angle);
     ASSERT_TRUE(reconstruct_mesh.get_verts().row(7).isApprox(pt.transpose()));
 }
 
@@ -95,7 +95,23 @@ TEST_F(TestReconstruct, UpdateMeshWeight) {
     Eigen::Vector3d pt(1, 1, 1);
     double max_angle(1);
 
-    reconstruct_mesh.update_mesh(pt, max_angle);
+    reconstruct_mesh.update(pt, max_angle);
     ASSERT_NEAR(reconstruct_mesh.get_weights()(7), 0, 1e-6);
 
+}
+
+TEST_F(TestReconstruct, UpdateMeshData) {
+    std::shared_ptr<MeshData> mesh;
+    mesh = Loader::load("./integration/cube.obj");
+    ReconstructMesh reconstruct_mesh(mesh);
+    Eigen::Vector3d pt(1, 1, 1);
+    double max_angle(1);
+
+    reconstruct_mesh.update(pt, max_angle);
+    
+    // now update the mesh object
+    reconstruct_mesh.update_meshdata();
+
+    ASSERT_EQ(reconstruct_mesh.get_verts(), mesh->get_verts());
+    ASSERT_EQ(reconstruct_mesh.get_faces(), mesh->get_faces());
 }

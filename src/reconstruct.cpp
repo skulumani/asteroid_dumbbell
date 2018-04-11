@@ -50,7 +50,7 @@ Eigen::VectorXi vector_find(const Eigen::Ref<const T> &logical_vec) {
     return index;
 }
 
-void ReconstructMesh::update_mesh(const Eigen::Ref<const Eigen::Vector3d> &pt,
+void ReconstructMesh::update(const Eigen::Ref<const Eigen::Vector3d> &pt,
                                     const double &max_angle) {
     
     double pt_radius = pt.norm();
