@@ -107,7 +107,8 @@ pybind11_add_module(cgal MODULE
     src/cgal.cpp src/cgal_bindings.cpp src/mesh.cpp)
 
 pybind11_add_module(reconstruct MODULE
-    src/reconstruct.cpp src/reconstruct_bindings.cpp src/mesh.cpp)
+    src/reconstruct.cpp src/reconstruct_bindings.cpp src/mesh.cpp
+    src/polyhedron.cpp)
 
 ################################################################################
 # Testing example
