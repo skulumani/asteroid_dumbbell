@@ -96,7 +96,7 @@ TEST_F(TestReconstruct, UpdateMeshWeight) {
     double max_angle(1);
 
     reconstruct_mesh.update(pt, max_angle);
-    ASSERT_NEAR(reconstruct_mesh.get_weights()(7), 0, 1e-6);
+    ASSERT_NE(reconstruct_mesh.get_weights()(7), 1);
 
 }
 

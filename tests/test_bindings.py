@@ -77,7 +77,21 @@ class TestReconstructMesh:
     # create a mesh
     mesh = mesh_data.MeshData(v, f)
 
-    def test_constructor(self):
+    def test_mesh_constructor(self):
         rmesh = reconstruct.ReconstructMesh(self.mesh)
         np.testing.assert_allclose(rmesh.get_verts(), self.v)
         np.testing.assert_allclose(rmesh.get_faces(), self.f)
+
+    def test_array_constructor(self):
+        w = np.full(self.v.shape[0], 1)
+        rmesh = reconstruct.ReconstructMesh(self.v, self.f, w)
+        np.testing.assert_allclose(rmesh.get_verts(), self.v)
+        np.testing.assert_allclose(rmesh.get_faces(), self.f)
+
+    def test_update_point(self):
+        rmesh = reconstruct.ReconstructMesh(self.mesh)
+        pt = np.array([1, 1, 1])
+        rmesh.update(pt, 1)
+        np.testing.assert_allclose(rmesh.get_verts()[-1, :], pt)
+
+
