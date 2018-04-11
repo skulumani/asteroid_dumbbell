@@ -78,4 +78,6 @@ class TestReconstructMesh:
     mesh = mesh_data.MeshData(v, f)
 
     def test_constructor(self):
-        pass
+        rmesh = reconstruct.ReconstructMesh(self.mesh)
+        np.testing.assert_allclose(rmesh.get_verts(), self.v)
+        np.testing.assert_allclose(rmesh.get_faces(), self.f)
