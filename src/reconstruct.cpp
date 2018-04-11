@@ -1,5 +1,6 @@
 #include "reconstruct.hpp"
 #include "mesh.hpp"
+#include "geodesic.hpp"
 
 #include <Eigen/Dense>
 #include <iostream>
@@ -62,7 +63,7 @@ void ReconstructMesh::update(const Eigen::Ref<const Eigen::Vector3d> &pt,
     
     // compute the angular distance between the pt and each vertex
     Eigen::Matrix<double, Eigen::Dynamic, 1> delta_sigma(vert_uvec.rows(), 1);
-    delta_sigma = spherical_distance(pt_uvec, vert_uvec);
+    delta_sigma = central_angle(pt_uvec, vert_uvec);
 
     Eigen::Array<bool, Eigen::Dynamic, 1> region_condition(this->vertices.rows());
     region_condition = delta_sigma.array() < max_angle;
@@ -95,21 +96,6 @@ void ReconstructMesh::update(const Eigen::Ref<const Eigen::Vector3d> &pt,
         this->weights(region_index(ii)) = weight_new(region_index(ii));
     }
 
-}
-
-Eigen::VectorXd spherical_distance(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,
-                                    const Eigen::Ref<const Eigen::MatrixXd> &vert_uvec) {
-
-    // compute the angular distance between the pt and each vertex
-    Eigen::Matrix<double, Eigen::Dynamic, 1> cross_product(vert_uvec.rows(), 1);
-    Eigen::Matrix<double, Eigen::Dynamic, 1> dot_product(vert_uvec.rows(), 1);
-
-    cross_product =  vert_uvec.rowwise().cross(pt_uvec.transpose()).rowwise().norm();
-    dot_product = (vert_uvec.array().rowwise() * pt_uvec.transpose().array()).rowwise().sum();
-    
-    Eigen::Matrix<double, Eigen::Dynamic, 1> delta_sigma(vert_uvec.rows(), 1);
-    delta_sigma = cross_product.binaryExpr(dot_product, [] (double a, double b) { return std::atan2(a,b);} );
-    return delta_sigma;
 }
 
 void ReconstructMesh::update_meshdata( void ) {

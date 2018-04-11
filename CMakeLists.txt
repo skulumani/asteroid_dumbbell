@@ -89,7 +89,7 @@ set( surface_mesher_src src/surface_mesher_main.cpp src/surface_mesher.cpp src/i
 add_executable(surface_mesher ${surface_mesher_src})
 
 # incremental mesh reconstruction
-set( reconstruct_mesh_src src/reconstruct_main.cpp src/reconstruct.cpp src/mesh.cpp src/input_parser.cpp src/loader.cpp src/polyhedron.cpp)
+set( reconstruct_mesh_src src/reconstruct_main.cpp src/reconstruct.cpp src/mesh.cpp src/input_parser.cpp src/loader.cpp src/polyhedron.cpp src/geodesic.cpp)
 add_executable(reconstruct_mesh ${reconstruct_mesh_src})
 ################################################################################
 # PYTHON BINDING
@@ -108,7 +108,7 @@ pybind11_add_module(cgal MODULE
 
 pybind11_add_module(reconstruct MODULE
     src/reconstruct.cpp src/reconstruct_bindings.cpp src/mesh.cpp
-    src/polyhedron.cpp)
+    src/polyhedron.cpp src/geodesic.cpp)
 
 ################################################################################
 # Testing example
@@ -129,7 +129,8 @@ set(test_all_src
     src/polyhedron.cpp
     src/loader.cpp
     src/mesh.cpp
-    src/reconstruct.cpp)
+    src/reconstruct.cpp
+    src/geodesic.cpp)
 
 add_executable(test_all ${test_all_src})
 target_link_libraries(test_all gtest)
