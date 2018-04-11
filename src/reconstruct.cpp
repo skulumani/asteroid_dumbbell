@@ -109,7 +109,7 @@ Eigen::VectorXd spherical_distance(const Eigen::Ref<const Eigen::Vector3d> &pt_u
     return pt_uvec;
 }
 
-ReconstructMesh::update_meshdata( void ) {
+void ReconstructMesh::update_meshdata( void ) {
     // update the data inside the mesh_ptr
     this->mesh->update_mesh(this->vertices, this->faces);
 }
