@@ -22,17 +22,21 @@ int main(int argc, char* argv[])
     if (!input_file.empty()) {
         // create the mesh
         mesh = Loader::load(input_file);
+        // reconstruct using a point
+        ReconstructMesh reconstruct_mesh(mesh);
+
+        Eigen::Vector3d pt(1, 1, 1);
+        double max_angle(1);
+
+
+        reconstruct_mesh.update(pt, max_angle);
+        reconstruct_mesh.update_meshdata();
+
+        std::cout << reconstruct_mesh.get_verts() << std::endl << std::endl;
+        std::cout << mesh->get_verts() << std::endl;
     }
 
-    // reconstruct using a point
-    ReconstructMesh reconstruct_mesh(mesh);
 
-    Eigen::Vector3d pt(1, 1, 1);
-    double max_angle(1);
-
-    std::cout << reconstruct_mesh.get_verts() << std::endl << std::endl;
-
-    reconstruct_mesh.update(pt, max_angle);
 
     return 0;
 }
