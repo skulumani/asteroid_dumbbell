@@ -8,6 +8,7 @@
 #include "mesh.hpp"
 #include "input_parser.hpp"
 #include "loader.hpp"
+#include "geodesic.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -36,6 +37,15 @@ int main(int argc, char* argv[])
         std::cout << mesh->get_verts() << std::endl;
     }
 
+    Eigen::Vector3d s1(3);
+    Eigen::Matrix<double, 1, 3> s2(3);
+    s1 << 1, 0, 0;
+    s2 << 1, 0, 0;
+    
+    Eigen::VectorXd delta_sigma;
+    delta_sigma = central_angle(s1, s2);
+
+    std::cout << delta_sigma << std::endl;
 
 
     return 0;
