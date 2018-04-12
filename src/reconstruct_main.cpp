@@ -26,27 +26,13 @@ int main(int argc, char* argv[])
         // reconstruct using a point
         ReconstructMesh reconstruct_mesh(mesh);
 
-        Eigen::Vector3d pt(1, 1, 1);
+        Eigen::Vector3d pt(3);
+        pt << 5, 0, 0;
         double max_angle(1);
-
-
+        
         reconstruct_mesh.update(pt, max_angle);
-        reconstruct_mesh.update_meshdata();
-
-        std::cout << reconstruct_mesh.get_verts() << std::endl << std::endl;
-        std::cout << mesh->get_verts() << std::endl;
+        
     }
-
-    Eigen::Vector3d s1(3);
-    Eigen::Matrix<double, 1, 3> s2(3);
-    s1 << 1, 0, 0;
-    s2 << 1, 0, 0;
-    
-    Eigen::VectorXd delta_sigma;
-    delta_sigma = central_angle(s1, s2);
-
-    std::cout << delta_sigma << std::endl;
-
 
     return 0;
 }
