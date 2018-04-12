@@ -8,6 +8,7 @@
 */
 #include <Eigen/Dense>
 
+const double kPI = 3.141592653589793115997963468544185161591;
 /**
     Central angle between vectors on the two sphere
 
@@ -37,5 +38,11 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> spherical2cartesian(const Eigen::Ref<co
     @returns spherical Eigen n x 3 array of radius, latitude, longitude
 */
 Eigen::Matrix<double, Eigen::Dynamic, 3> cartesian2spherical(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> > &cartesian);
+
+Eigen::Matrix<double, 2, 1> course_azimuth(const Eigen::Ref<const Eigen::Matrix<double, 3, 1> > &initial_point,
+                                           const Eigen::Ref<const Eigen::Matrix<double, 3, 1> > &final_point);
+
+double deg2rad(const double &degrees);
+double rad2deg(const double &radians);
 
 #endif

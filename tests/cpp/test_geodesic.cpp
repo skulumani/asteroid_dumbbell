@@ -149,3 +149,23 @@ TEST_F(TestGeodesic, Spherical2CartesianArray) {
 
     ASSERT_TRUE(c1.isApprox(c1_true));
 }
+
+TEST(TestAzimuth, WikipediaExample) {
+    Eigen::Matrix<double, 3, 1> initial_point(3), final_point(3);
+    initial_point << 6378.137, deg2rad(-33), deg2rad(-71.6);
+    final_point << 6378.137, deg2rad(31.4), deg2rad(121.8);
+}
+
+TEST(TestDegree2Radians, SomeCommonValues) {
+    ASSERT_EQ(deg2rad(0), 0);
+    ASSERT_EQ(deg2rad(90), kPI / 2);
+    ASSERT_EQ(deg2rad(180), kPI);
+    ASSERT_EQ(deg2rad(-180), -kPI);
+}
+
+TEST(TestRadians2Degree, SomeCommonValues) {
+    ASSERT_EQ(rad2deg(0), 0);
+    ASSERT_EQ(rad2deg(kPI), 180);
+    ASSERT_EQ(rad2deg(kPI / 2), 90);
+    ASSERT_EQ(rad2deg(-kPI / 2), -90);
+}

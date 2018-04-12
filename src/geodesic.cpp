@@ -4,6 +4,7 @@
 
 #include <cmath>
 
+
 Eigen::VectorXd central_angle(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,
                                     const Eigen::Ref<const Eigen::MatrixXd> &vert_uvec) {
 
@@ -52,3 +53,34 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> spherical2cartesian(const Eigen::Ref<co
     cartesian << x, y, z;
     return cartesian;
 }
+
+Eigen::Matrix<double, 2, 1> course_azimuth(const Eigen::Ref<const Eigen::Matrix<double, 3, 1> > &initial_point,
+                                           const Eigen::Ref<const Eigen::Matrix<double, 3, 1> > &final_point) {
+    double lat1, lat2, long1, long2, delta_long, alpha1, alpha2;
+    
+    lat1 = initial_point(1);
+    long1 = initial_point(2);
+
+    lat2 = final_point(1);
+    long2 = final_point(2);
+    
+    delta_long = long2 - long1;
+    // compute the initial and final azimuth between two spherical points on teh sphere
+    alpha1 = atan2(sin(delta_long), cos(lat1) + lat2 - sin(lat1) * cos(delta_long) );
+    alpha2 = atan2(sin(delta_long), -cos(lat2) + lat1 + sin(lat2) * cos(delta_long) );
+
+    Eigen::Matrix<double, 2, 1> azimuth(2);
+    azimuth << alpha1, alpha2;
+    return azimuth;
+}
+
+double deg2rad(const double &degrees) {
+    double radians = degrees * (kPI / 180.0);
+    return radians;
+}
+
+double rad2deg(const double &radians) {
+    double degrees = radians * (180.0 / kPI);
+    return degrees;
+}
+
