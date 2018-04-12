@@ -8,6 +8,17 @@
 */
 #include <Eigen/Dense>
 
+/**
+    Central angle between vectors on the two sphere
+
+    This finds the central angle between two vectors on the sphere.
+    The inputs should be unit vectors. 
+
+    @param pt_uvec Eigen column vector of a single point
+    @param vert_uvec Eigen array of many vectors to find the distance to
+    @returns sigma Eigen column vector of the same size as vert_uvec of the 
+        central angle (sigma)
+*/
 Eigen::VectorXd central_angle(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,
                               const Eigen::Ref<const Eigen::MatrixXd> &vert_uvec);
 
