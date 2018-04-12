@@ -13,7 +13,7 @@ from point_cloud import wavefront, raycaster
 from visualization import graphics
 from kinematics import sphere, attitude
 from dynamics import asteroid
-from lib import surface_mesh
+from lib import surface_mesh, mesh_data, reconstruct
 import utilities
 
 view = {'azimuth': 16.944197132093564, 'elevation': 66.34177792039738,
@@ -156,6 +156,10 @@ def castalia_reconstruct_generate_data(output_filename):
 
     # calculate the maximum angle as a function of desired surface area
     max_angle = wavefront.spherical_surface_area(np.max(ast.axes), surf_area)
+    
+    # generate a mesh and reconstruct object from c++
+    mesh = mesh_data.MeshData(ve, fe)
+    rmesh = reconstruct.ReconstructMesh(ve, fe, vert_weight)
 
     # loop over all the points and save the data
     output_path = os.path.join(output_filename)
@@ -181,9 +185,12 @@ def castalia_reconstruct_generate_data(output_filename):
         fout.create_dataset('initial_weight', data=vert_weight)
 
         for ii, pt in enumerate(vc):
-            ve, vert_weight = wavefront.spherical_incremental_mesh_update(pt, ve, fe,
-                                                                          vertex_weight=vert_weight,
-                                                                          max_angle=max_angle)
+            # ve, vert_weight = wavefront.spherical_incremental_mesh_update(pt, ve, fe,
+            #                                                               vertex_weight=vert_weight,
+            #                                                               max_angle=max_angle)
+            rmesh.update(pt, max_angle)
+            ve = rmesh.get_verts()
+            vert_weight = np.squeeze(rmesh.get_weights())
             # save the current array and weight to htpy
             reconstructed_vertex.create_dataset(str(ii), data=ve)
             reconstructed_weight.create_dataset(str(ii), data=vert_weight)
@@ -379,9 +386,6 @@ def castalia_raycasting_plot(img_path):
     graphics.mayavi_savefig(fig=fig, filename=output_filename, magnification=4)
 
 if __name__ == "__main__":
-    img_path = '/tmp/mayavi_figure'
-    if not os.path.exists(img_path):
-        os.makedirs(img_path)
     
     parser = argparse.ArgumentParser(description="Generate example plots used in dissertation/papers",
                                      formatter_class=argparse.RawTextHelpFormatter)
@@ -396,8 +400,12 @@ if __name__ == "__main__":
                                 help="Reconstruction example using Castalia (output filename)",
                                 action="store")
     plotting_group.add_argument("--castalia_generate_plots", 
-                                help="Plot output from castalia_reconstruct_generate_data (data path)",
+                                help="Plot output from castalia_reconstruct_generate_data (data path and image output path)",
                                 action="store")
+    
+    img_path = '/tmp/mayavi_figure'
+    if not os.path.exists(img_path):
+        os.makedirs(img_path)
 
     args = parser.parse_args()
     
@@ -409,12 +417,6 @@ if __name__ == "__main__":
         castalia_reconstruct_generate_data(args.castalia_reconstruct_generate_data)
     elif args.castalia_generate_plots:
         castalia_generate_plots(args.castalia_generate_plots, img_path)
+        print("Images are saved to {}".format(img_path))
     
-    print("Images are saved to {}".format(img_path))
 
-    # cube_into_sphere(img_path)
-    # sphere_into_ellipsoid(img_path)
-    # castalia_reconstruction(img_path)
-    # sphere_into_ellipsoid_spherical_coordinates(img_path)
-    # castalia_reconstruction_factor_tuning(img_path)
-    # sphere_factor_tuning(img_path)
