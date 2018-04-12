@@ -70,12 +70,15 @@ class TestMeshDist:
     
     # also test out the ray caster
  
-class TestReconstructMesh:
+class TestReconstructMeshCube:
     
     # load the vertices, faces
     v, f = wavefront.read_obj('./integration/cube.obj') 
     # create a mesh
     mesh = mesh_data.MeshData(v, f)
+    pt = np.array([1, 1, 1])
+    w = np.full(v.shape[0], 1)
+    max_angle = 0.5
 
     def test_mesh_constructor(self):
         rmesh = reconstruct.ReconstructMesh(self.mesh)
@@ -83,15 +86,42 @@ class TestReconstructMesh:
         np.testing.assert_allclose(rmesh.get_faces(), self.f)
 
     def test_array_constructor(self):
-        w = np.full(self.v.shape[0], 1)
-        rmesh = reconstruct.ReconstructMesh(self.v, self.f, w)
+        rmesh = reconstruct.ReconstructMesh(self.v, self.f, self.w)
         np.testing.assert_allclose(rmesh.get_verts(), self.v)
         np.testing.assert_allclose(rmesh.get_faces(), self.f)
 
-    def test_update_point(self):
+    def test_update_matches_python(self):
+        vp, wp = wavefront.spherical_incremental_mesh_update(self.pt, self.v, self.f, self.w, self.max_angle)
+        rmesh = reconstruct.ReconstructMesh(self.v, self.f, self.w)
+        rmesh.update(self.pt, self.max_angle)
+
+        np.testing.assert_allclose(vp, rmesh.get_verts())
+
+
+class TestReconstructMeshCastalia:
+    
+    # load the vertices, faces
+    v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj') 
+    # create a mesh
+    mesh = mesh_data.MeshData(v, f)
+    pt = np.array([1, 1, 1])
+    w = np.full(v.shape[0], 1)
+    max_angle = 0.5
+
+    def test_mesh_constructor(self):
         rmesh = reconstruct.ReconstructMesh(self.mesh)
-        pt = np.array([1, 1, 1])
-        rmesh.update(pt, 1)
-        np.testing.assert_allclose(rmesh.get_verts()[-1, :], pt)
+        np.testing.assert_allclose(rmesh.get_verts(), self.v)
+        np.testing.assert_allclose(rmesh.get_faces(), self.f)
 
+    def test_array_constructor(self):
+        rmesh = reconstruct.ReconstructMesh(self.v, self.f, self.w)
+        np.testing.assert_allclose(rmesh.get_verts(), self.v)
+        np.testing.assert_allclose(rmesh.get_faces(), self.f)
 
+    def test_update_matches_python(self):
+        vp, wp = wavefront.spherical_incremental_mesh_update(self.pt, self.v, self.f, self.w, self.max_angle)
+        rmesh = reconstruct.ReconstructMesh(self.v, self.f, self.w)
+        rmesh.update(self.pt, self.max_angle)
+        min_index = 0
+        max_index = 10
+        np.testing.assert_allclose(vp[min_index:max_index, :], rmesh.get_verts()[min_index:max_index, :])
