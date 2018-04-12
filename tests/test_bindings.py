@@ -21,6 +21,7 @@ mesh_data = pytest.importorskip('lib.mesh_data')
 polyhedron_potential = pytest.importorskip('lib.polyhedron_potential')
 surface_mesh = pytest.importorskip('lib.surface_mesh')
 reconstruct = pytest.importorskip('lib.reconstruct')
+geodesic = pytest.importorskip('lib.geodesic')
 
 class TestMeshData:
     v, f = wavefront.read_obj('./integration/cube.obj')
@@ -122,6 +123,16 @@ class TestReconstructMeshCastalia:
         vp, wp = wavefront.spherical_incremental_mesh_update(self.pt, self.v, self.f, self.w, self.max_angle)
         rmesh = reconstruct.ReconstructMesh(self.v, self.f, self.w)
         rmesh.update(self.pt, self.max_angle)
-        min_index = 0
-        max_index = 10
-        np.testing.assert_allclose(vp[min_index:max_index, :], rmesh.get_verts()[min_index:max_index, :])
+        np.testing.assert_allclose(vp, rmesh.get_verts())
+
+class TestGeodesic:
+    # generate some random unit vectors
+    pt = np.random.rand(3)
+    pt = pt / np.linalg.norm(pt)
+
+    v, _ = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_high.obj')
+
+    def test_central_angle(self):
+        csigma = geodesic.central_angle(self.pt, self.v)
+        psigma = wavefront.spherical_distance(self.pt, self.v)
+        np.testing.assert_allclose(csigma, psigma)

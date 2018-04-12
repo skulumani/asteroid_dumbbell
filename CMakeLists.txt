@@ -110,6 +110,9 @@ pybind11_add_module(reconstruct MODULE
     src/reconstruct.cpp src/reconstruct_bindings.cpp src/mesh.cpp
     src/polyhedron.cpp src/geodesic.cpp)
 
+pybind11_add_module(geodesic MODULE
+    src/geodesic.cpp src/geodesic_bindings.cpp)
+
 ################################################################################
 # Testing example
 ################################################################################
