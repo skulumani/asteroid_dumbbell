@@ -272,12 +272,14 @@ def asteroid_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
         if not os.path.exists(animation_path):
             os.makedirs(animation_path)
         
-        ms.reset(x=v_initial[:, 0], y=v_initial[:, 1], z=v_initial[:, 2], triangles=f_initial)
+        ms.reset(x=v_initial[:, 0], y=v_initial[:, 1], z=v_initial[:, 2], triangles=f_initial,
+                 scalars=w_initial)
 
         for ii, vk in enumerate(v_keys):
             filename = os.path.join(animation_path, str(ii).zfill(7) + '.jpg')
             v = rv[vk][()]
-            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:, 2], triangles=f_initial)
+            w = rw[str(vk)][()]
+            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:, 2], triangles=f_initial, scalars=w)
             graphics.mayavi_savefig(mfig, filename, magnification=4)
     
     return 0
