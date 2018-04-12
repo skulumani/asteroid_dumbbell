@@ -83,7 +83,7 @@ void ReconstructMesh::update(const Eigen::Ref<const Eigen::Vector3d> &pt,
         weight(ii) = pow(delta_sigma(region_index(ii)) * pt_radius, 2);
         mesh_region.row(ii) = this->vertices.row(region_index(ii));
         weight_old(ii) = this->weights(region_index(ii));
-        /* radius_old(ii) = vert_radius(region_index(ii)); */
+        radius_old(ii) = vert_radius(region_index(ii));
     }
 
     radius_new = (radius_old.array() * weight.array() + radius_meas * weight_old.array()) / (weight_old.array() + weight.array());
