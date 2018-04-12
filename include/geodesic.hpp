@@ -22,9 +22,20 @@
 Eigen::VectorXd central_angle(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,
                               const Eigen::Ref<const Eigen::MatrixXd> &vert_uvec);
 
-// convert spherical to cartesian and vice versa
+/**
+    Convert spherical coords to cartesian
+
+    @param spherical Eigen n x 3 array of radius, latitude, and longitude in radians
+    @returns cartesian Eigen n x 3 array of x, y, z components
+*/
 Eigen::Matrix<double, Eigen::Dynamic, 3> spherical2cartesian(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> > &spherical);
 
+/**
+    Convert cartesian coords to spherical
+
+    @param cartesian Eigen n x 3 array of x, y, z coords
+    @returns spherical Eigen n x 3 array of radius, latitude, longitude
+*/
 Eigen::Matrix<double, Eigen::Dynamic, 3> cartesian2spherical(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> > &cartesian);
 
 #endif
