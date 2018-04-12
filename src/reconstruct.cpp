@@ -71,7 +71,7 @@ void ReconstructMesh::update(const Eigen::Ref<const Eigen::Vector3d> &pt,
     Eigen::VectorXi region_index = vector_find<Eigen::Array<bool, Eigen::Dynamic, 1> >(region_condition);
     
     auto region_count = region_index.size();
-
+    
     Eigen::VectorXd weight(region_count), weight_old(region_count),
         radius_old(region_count), radius_new(region_count),
         weight_new(region_count);
@@ -87,13 +87,11 @@ void ReconstructMesh::update(const Eigen::Ref<const Eigen::Vector3d> &pt,
     }
 
     radius_new = (radius_old.array() * weight.array() + radius_meas * weight_old.array()) / (weight_old.array() + weight.array());
-
     weight_new = (weight_old.array() * weight.array()) / (weight_old.array() + weight.array());
-    
     // Now update the vertices of the object/self
     for (int ii = 0; ii < region_index.size(); ++ii) {
         this->vertices.row(region_index(ii)) = radius_new(ii) * vert_uvec.row(region_index(ii));
-        this->weights(region_index(ii)) = weight_new(region_index(ii));
+        this->weights(region_index(ii)) = weight_new(ii);
     }
 
 }
