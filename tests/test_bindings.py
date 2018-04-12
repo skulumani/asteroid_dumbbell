@@ -97,7 +97,7 @@ class TestReconstructMeshCube:
         rmesh.update(self.pt, self.max_angle)
 
         np.testing.assert_allclose(vp, rmesh.get_verts())
-
+        np.testing.assert_allclose(wp, np.squeeze(rmesh.get_weights()))
 
 class TestReconstructMeshCastalia:
     
@@ -124,6 +124,7 @@ class TestReconstructMeshCastalia:
         rmesh = reconstruct.ReconstructMesh(self.v, self.f, self.w)
         rmesh.update(self.pt, self.max_angle)
         np.testing.assert_allclose(vp, rmesh.get_verts())
+        # np.testing.assert_allclose(wp, np.squeeze(rmesh.get_weights()))
 
 class TestGeodesic:
     # generate some random unit vectors
