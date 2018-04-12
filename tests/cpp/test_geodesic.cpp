@@ -63,7 +63,7 @@ class TestGeodesic: public ::testing::Test {
 
 TEST_F(TestGeodesic, SphericalDistanceZero) {
 
-    Eigen::Vector3d s1(3);
+    Eigen::Matrix<double, 1, 3> s1(3);
     Eigen::Matrix<double, 1, 3> s2(3);
     s1 << 1, 0, 0;
     s2 << 1, 0, 0;
@@ -75,7 +75,7 @@ TEST_F(TestGeodesic, SphericalDistanceZero) {
 }
 
 TEST_F(TestGeodesic, SphericalDistanceNinety) {
-    Eigen::Vector3d s1(3);
+    Eigen::Matrix<double, 1, 3> s1(3);
     Eigen::Matrix<double, 1, 3> s2(3);
     s1 << 1, 0, 0;
     s2 << 0, 0, 1;
@@ -88,7 +88,7 @@ TEST_F(TestGeodesic, SphericalDistanceNinety) {
 }
 
 TEST_F(TestGeodesic, SphericalDistanceZeroArray) {
-    Eigen::Vector3d s1(3);
+    Eigen::Matrix<double, 1, 3> s1(3);
     Eigen::Matrix<double, 2, 3> s2(2, 3);
 
     s1 << 1, 0, 0;
@@ -151,9 +151,12 @@ TEST_F(TestGeodesic, Spherical2CartesianArray) {
 }
 
 TEST(TestAzimuth, WikipediaExample) {
-    Eigen::Matrix<double, 3, 1> initial_point(3), final_point(3);
+    Eigen::Matrix<double, 1, 3> initial_point(3), final_point(3);
     initial_point << 6378.137, deg2rad(-33), deg2rad(-71.6);
     final_point << 6378.137, deg2rad(31.4), deg2rad(121.8);
+
+    Eigen::Matrix<double, 1, 2> azimuth = course_azimuth(initial_point, final_point);
+    std::cout << azimuth << std::endl;
 }
 
 TEST(TestDegree2Radians, SomeCommonValues) {
@@ -168,4 +171,12 @@ TEST(TestRadians2Degree, SomeCommonValues) {
     ASSERT_EQ(rad2deg(kPI), 180);
     ASSERT_EQ(rad2deg(kPI / 2), 90);
     ASSERT_EQ(rad2deg(-kPI / 2), -90);
+}
+
+TEST(TestWaypoint, WikipediaExample) {
+    Eigen::Matrix<double, 1, 3> initial_point(3), final_point(3);
+    initial_point << 6378.137, deg2rad(-33), deg2rad(-71.6);
+    final_point << 6378.137, deg2rad(31.4), deg2rad(121.8);
+    
+    Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints = geodesic_waypoint(initial_point, final_point);
 }

@@ -20,8 +20,8 @@ const double kPI = 3.141592653589793115997963468544185161591;
     @returns sigma Eigen column vector of the same size as vert_uvec of the 
         central angle (sigma)
 */
-Eigen::VectorXd central_angle(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,
-                              const Eigen::Ref<const Eigen::MatrixXd> &vert_uvec);
+Eigen::VectorXd central_angle(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &pt_uvec,
+                              const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> > &vert_uvec);
 
 /**
     Convert spherical coords to cartesian
@@ -39,10 +39,23 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> spherical2cartesian(const Eigen::Ref<co
 */
 Eigen::Matrix<double, Eigen::Dynamic, 3> cartesian2spherical(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> > &cartesian);
 
-Eigen::Matrix<double, 2, 1> course_azimuth(const Eigen::Ref<const Eigen::Matrix<double, 3, 1> > &initial_point,
-                                           const Eigen::Ref<const Eigen::Matrix<double, 3, 1> > &final_point);
+/**
+    Course azimuth between two points on teh sphere (latitude/longitude)
+
+    Given a start and end point on the sphere, this will find the azimuth at the initial and final point.
+    The azimuth is defined as the angle from the north.
+
+    @param initial_point Eigen 3 x 1 spherical coordinate (r, lat, long)
+    @param final_point Eigen 3 x 1 spherical coordinate (r, lat, long)
+    @returns azimuth Eigen 2 x 1 angle at initial and final piont in radians
+*/
+Eigen::Matrix<double, 1, 2> course_azimuth(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
+                                           const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point);
 
 double deg2rad(const double &degrees);
 double rad2deg(const double &radians);
+
+Eigen::Matrix<double, Eigen::Dynamic, 3> geodesic_waypoint(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
+                                                           const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point);
 
 #endif

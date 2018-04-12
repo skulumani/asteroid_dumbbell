@@ -3,17 +3,17 @@
 #include <Eigen/Dense>
 
 #include <cmath>
+#include <iostream>
 
-
-Eigen::VectorXd central_angle(const Eigen::Ref<const Eigen::Vector3d> &pt_uvec,
-                                    const Eigen::Ref<const Eigen::MatrixXd> &vert_uvec) {
+Eigen::VectorXd central_angle(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &pt_uvec,
+                                    const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> > &vert_uvec) {
 
     // compute the angular distance between the pt and each vertex
     Eigen::Matrix<double, Eigen::Dynamic, 1> cross_product(vert_uvec.rows(), 1);
     Eigen::Matrix<double, Eigen::Dynamic, 1> dot_product(vert_uvec.rows(), 1);
 
-    cross_product =  vert_uvec.rowwise().cross(pt_uvec.transpose()).rowwise().norm();
-    dot_product = (vert_uvec.array().rowwise() * pt_uvec.transpose().array()).rowwise().sum();
+    cross_product =  vert_uvec.rowwise().cross(pt_uvec).rowwise().norm();
+    dot_product = (vert_uvec.array().rowwise() * pt_uvec.array()).rowwise().sum();
     
     Eigen::Matrix<double, Eigen::Dynamic, 1> delta_sigma(vert_uvec.rows(), 1);
     delta_sigma = cross_product.binaryExpr(dot_product, [] (double a, double b) { return std::atan2(a,b);} );
@@ -54,8 +54,8 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> spherical2cartesian(const Eigen::Ref<co
     return cartesian;
 }
 
-Eigen::Matrix<double, 2, 1> course_azimuth(const Eigen::Ref<const Eigen::Matrix<double, 3, 1> > &initial_point,
-                                           const Eigen::Ref<const Eigen::Matrix<double, 3, 1> > &final_point) {
+Eigen::Matrix<double, 1, 2> course_azimuth(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
+                                           const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point) {
     double lat1, lat2, long1, long2, delta_long, alpha1, alpha2;
     
     lat1 = initial_point(1);
@@ -66,8 +66,8 @@ Eigen::Matrix<double, 2, 1> course_azimuth(const Eigen::Ref<const Eigen::Matrix<
     
     delta_long = long2 - long1;
     // compute the initial and final azimuth between two spherical points on teh sphere
-    alpha1 = atan2(sin(delta_long), cos(lat1) + lat2 - sin(lat1) * cos(delta_long) );
-    alpha2 = atan2(sin(delta_long), -cos(lat2) + lat1 + sin(lat2) * cos(delta_long) );
+    alpha1 = atan2(sin(delta_long), cos(lat1) * tan(lat2) - sin(lat1) * cos(delta_long) );
+    alpha2 = atan2(sin(delta_long), -cos(lat2) * tan(lat1) + sin(lat2) * cos(delta_long) );
 
     Eigen::Matrix<double, 2, 1> azimuth(2);
     azimuth << alpha1, alpha2;
@@ -84,3 +84,34 @@ double rad2deg(const double &radians) {
     return degrees;
 }
 
+Eigen::Matrix<double, Eigen::Dynamic, 3> geodesic_waypoint(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
+                                                           const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point) {
+    
+    double lat1, lat2, long1, long2, delta_long, alpha1, alpha2;
+    
+    lat1 = initial_point(1);
+    long1 = initial_point(2);
+
+    lat2 = final_point(1);
+    long2 = final_point(2);
+    
+    delta_long = long2 - long1;
+
+    // get the initial and final azimuths
+    Eigen::Matrix<double, 1, 2>  azimuth = course_azimuth(initial_point, final_point); 
+    alpha1 = azimuth(0);
+    alpha2 = azimuth(1);
+
+    // find the initial azimuth at the equator node
+    double alpha0 = asin(sin(alpha1) * cos(lat1));
+
+    // find the central angle between initial and final points
+    Eigen::Matrix<double, 1, 3> initial_point_cartesian = spherical2cartesian(initial_point).normalized();
+    Eigen::Matrix<double, 1, 3> final_point_cartesian = spherical2cartesian(final_point).normalized();
+    
+    std::cout << initial_point_cartesian << std::endl;
+    /* Eigen::VectorXd central_angle = central_angle(initial_point_cartesian, final_point_cartesian); */
+
+    Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints;
+    return waypoints;
+}
