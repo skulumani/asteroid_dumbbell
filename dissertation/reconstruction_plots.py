@@ -127,11 +127,9 @@ def castalia_reconstruction(img_path):
 
     return 0
 
-def castalia_reconstruct_generate_data(output_filename):
+def asteroid_reconstruct_generate_data(output_filename, asteroid_name='castalia'):
     """Generate all the data for an example for reconstructing asteroid 
-    castalia
     """
-    asteroid_name = 'castalia'
     asteroid_type = 'obj'
     asteroid_faces = 0
     
@@ -200,7 +198,7 @@ def castalia_reconstruct_generate_data(output_filename):
     
     return 0
 
-def castalia_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
+def asteroid_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
     """Given a HDF5 file this will read the data and create a bunch of plots/images
     """
     # check and create output directory if not existed
@@ -396,11 +394,12 @@ if __name__ == "__main__":
                                 action="store_true")
     plotting_group.add_argument("--sphere_into_ellipsoid", help="Turn a sphere into an ellipsoid",
                                 action="store_true")
-    plotting_group.add_argument("--castalia_reconstruct_generate_data", 
-                                help="Reconstruction example using Castalia (output filename)",
+    plotting_group.add_argument("--asteroid_reconstruct_generate_data", 
+                                nargs=2,
+                                help="Reconstruction example using an Asteroid(output filename and asteroid)",
                                 action="store")
-    plotting_group.add_argument("--castalia_generate_plots", 
-                                help="Plot output from castalia_reconstruct_generate_data (data path and image output path)",
+    plotting_group.add_argument("--asteroid_generate_plots", 
+                                help="Plot output from asteroid_reconstruct_generate_data (data path and image output path)",
                                 action="store")
     
     img_path = '/tmp/mayavi_figure'
@@ -413,10 +412,10 @@ if __name__ == "__main__":
         sphere_into_ellipsoid(img_path)
     elif args.cube_into_sphere:
         cube_into_sphere(img_path)
-    elif args.castalia_reconstruct_generate_data:
-        castalia_reconstruct_generate_data(args.castalia_reconstruct_generate_data)
-    elif args.castalia_generate_plots:
-        castalia_generate_plots(args.castalia_generate_plots, img_path)
+    elif args.asteroid_reconstruct_generate_data:
+        asteroid_reconstruct_generate_data(args.asteroid_reconstruct_generate_data[0], args.asteroid_reconstruct_generate_data[1])
+    elif args.asteroid_generate_plots:
+        asteroid_generate_plots(args.asteroid_generate_plots, img_path)
         print("Images are saved to {}".format(img_path))
     
 
