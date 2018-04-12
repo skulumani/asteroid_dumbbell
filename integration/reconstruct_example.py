@@ -13,19 +13,18 @@ import pdb
 # sphere= surface_mesh.SurfMesh(0.5, 0.5, 0.5, 10, 0.15, 0.5)
 # vs, fs = sphere.verts(), sphere.faces()
 
-vs, fs = wavefront.read_obj('./integration/sphere.obj')
+vs, fs = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj')
 
 # max_angle = wavefront.spherical_surface_area(0.5, surf_area=0.03)
-max_angle = 1
+max_angle = 0.5
 
 mfig = graphics.mayavi_figure()
 
 # mesh_param = wavefront.polyhedron_parameters(v, f)
-pt = np.array([5, 0, 0])
+pt = np.array([1, 1, 1])
 
 vert_weight = np.full(vs.shape[0], (np.pi * np.max(np.linalg.norm(vs, axis=1)) )**2)
 
-pdb.set_trace()
 vs_new, vw_new = wavefront.spherical_incremental_mesh_update(pt, vs, fs,
                                                      vertex_weight=vert_weight,
                                                      max_angle=max_angle)

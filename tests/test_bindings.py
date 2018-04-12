@@ -126,6 +126,7 @@ class TestReconstructMeshCastalia:
         np.testing.assert_allclose(vp, rmesh.get_verts())
         # np.testing.assert_allclose(wp, np.squeeze(rmesh.get_weights()))
 
+
 class TestGeodesic:
     # generate some random unit vectors
     pt = np.random.rand(3)
