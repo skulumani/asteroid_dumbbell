@@ -156,7 +156,9 @@ TEST(TestAzimuth, WikipediaExample) {
     final_point << 6378.137, deg2rad(31.4), deg2rad(121.8);
 
     Eigen::Matrix<double, 1, 2> azimuth = course_azimuth(initial_point, final_point);
-    std::cout << azimuth << std::endl;
+    
+    ASSERT_NEAR(azimuth(0), deg2rad(-94.413131), 1e-4);
+    ASSERT_NEAR(azimuth(1), deg2rad(-78.42), 1e-2);
 }
 
 TEST(TestDegree2Radians, SomeCommonValues) {
