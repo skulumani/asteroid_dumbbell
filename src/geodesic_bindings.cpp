@@ -13,5 +13,8 @@ PYBIND11_MODULE(geodesic, m) {
             pybind11::arg("spherical"));
     m.def("cartesian2spherical", &cartesian2spherical, "Convert cartesian to spherical", 
             pybind11::arg("cartesian"));
+
+    m.def("geodesic_waypoint", &geodesic_waypoint, "Find waypoints between two spherical coordinates along a great circle connecting the two",
+            pybind11::arg("initial_point"), pybind11::arg("final_point"), pybind11::arg("num_points") = 5);
 }
 
