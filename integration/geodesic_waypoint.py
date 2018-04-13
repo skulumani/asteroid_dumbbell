@@ -14,19 +14,19 @@ sphere_mesh = surface_mesh.SurfMesh(1, 1, 1, 10, 0.15, 0.5)
 vs, fs = sphere_mesh.verts(), sphere_mesh.faces()
 
 # create two random points on the sphere
-# initial_point_cartesian = sphere.rand(2);
-# final_point_cartesian = sphere.rand(2);
+initial_point_cartesian = sphere.rand(2);
+final_point_cartesian = sphere.rand(2);
 
-initial_point_cartesian = np.array([0, 0, 1])
-final_point_cartesian = np.array([0, 0.1, -1]) 
-final_point_cartesian = final_point_cartesian / np.linalg.norm(final_point_cartesian)
+# initial_point_cartesian = np.array([0, 0, 1])
+# final_point_cartesian = np.array([1, 0, 0]) 
+# final_point_cartesian = final_point_cartesian / np.linalg.norm(final_point_cartesian)
 
 # convert both to spherical coordinates
 initial_point_spherical = wavefront.cartesian2spherical(initial_point_cartesian)
 final_point_spherical = wavefront.cartesian2spherical(final_point_cartesian)
 
 # compute waypoints inbetween
-waypoints = geodesic.geodesic_waypoint(initial_point_spherical, final_point_spherical, 10)
+waypoints = geodesic.geodesic_waypoint(initial_point_spherical, final_point_spherical, 100)
 
 # convert waypoints to cartesian for plotting
 waypoints_cartesian = wavefront.spherical2cartesian(waypoints)
