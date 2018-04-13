@@ -38,7 +38,7 @@ Eigen::Matrix<double, 1, 3> RayCaster::castray(const Eigen::Ref<const Eigen::Vec
         const Point* p = boost::get<Point>(&(intersection->first));
         if (p) {
             // output from function
-            pint << CGAL::to_double(p->x()), CGAL::to_double(p->y()), CGAL::to_double(p->y());
+            pint << CGAL::to_double(p->x()), CGAL::to_double(p->y()), CGAL::to_double(p->z());
         } else {
             return pint.setZero();
         }
@@ -53,15 +53,16 @@ Eigen::Matrix<double, 1, 3> RayCaster::castray(const Eigen::Ref<const Eigen::Vec
 Eigen::Matrix<double, Eigen::Dynamic, 3> RayCaster::castarray(const Eigen::Ref<const Eigen::Vector3d> &psource,
                                                               const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> > &targets) {
     
+
     int num_targets = targets.rows();
 
-    Eigen::Matrix<double, Eigen::Dynamic, 3> all_intersections(num_targets, 3), intersection(1, 3);
+    Eigen::Matrix<double, Eigen::Dynamic, 3> all_intersections(num_targets, 3);
 
     for (int ii = 0; ii < num_targets; ++ii) {
-        intersection = this->castray(psource, targets.row(ii));
-        all_intersections.row(ii) = intersection;
+        all_intersections.row(ii) = this->castray(psource, targets.row(ii));
     }
-    return intersection;
+    
+    return all_intersections;
 }
 
 // TODO Modify this to compute distance instead of doing raycasting

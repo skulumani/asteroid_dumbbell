@@ -28,7 +28,9 @@ PYBIND11_MODULE(cgal, m) {
         .def("castray", &RayCaster::castray, "Cast a ray and return the first intersections",
                 pybind11::arg("psource"), pybind11::arg("ptarget"))
         .def("minimum_distance", &RayCaster::minimum_distance, "Minimum distance from point to mesh",
-                pybind11::arg("pt"));
+                pybind11::arg("pt"))
+        .def("castarray", &RayCaster::castarray, "Cast many rays to the targets",
+                pybind11::arg("psource"), pybind11::arg("targets"));
         
 }
 
