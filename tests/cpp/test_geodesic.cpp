@@ -191,11 +191,11 @@ TEST(TestRadians2Degree, EigenArrayCommonValues) {
     ASSERT_TRUE(degrees.isApprox(degrees_true));
 }
 
-TEST(TestWaypoint, WikipediaExample) {
+TEST(TestWaypoint, EquatorialPlain) {
     Eigen::Matrix<double, 1, 3> initial_point(3), final_point(3);
-    initial_point << 6378.137, deg2rad(-33), deg2rad(-71.6);
-    final_point << 6378.137, deg2rad(31.4), deg2rad(121.8);
+    initial_point << 1, 0, 0;
+    final_point << 0, 1, 0;
     
-    Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints = geodesic_waypoint(initial_point, final_point, 2);
-    std::cout << rad2deg(waypoints.col(1)) << std::endl;
+    Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints = sphere_waypoint(initial_point, final_point, 5);
+    std::cout << waypoints << std::endl;
 }

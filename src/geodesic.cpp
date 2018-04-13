@@ -165,11 +165,27 @@ Eigen::Matrix<double, Eigen::Dynamic, 1> eigen_atan2(const Eigen::Ref<const Eige
     return angle;
 }
 
-Eigen::Matrix<double, Eigen::Dynamic, 3> sphere_waypoints(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
+Eigen::Matrix<double, Eigen::Dynamic, 3> sphere_waypoint(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
                                                           const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point,
                                                           const int &num_points) {
     
     // Find a rotation vector (cross product)
+    Eigen::Matrix<double, 1, 3> normal_vector = initial_point.cross(final_point);
+    double max_angle = acos(initial_point.dot(final_point) / initial_point.norm() / final_point.norm());
+
+    Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_points, 3);
+
     // rotate inital vector about normal vector by angle steps
+    Eigen::Matrix<double, Eigen::Dynamic, 1> angles(num_points);
+    angles = Eigen::VectorXd::LinSpaced(num_points, 0, max_angle);
+
+    Eigen::Matrix<double, 3, 3> rot_mat(3, 3);
+
+    for (int ii = 0; ii < num_points; ++ii) {
+        rot_mat = Eigen::AngleAxisd(angles(ii), normal_vector.normalized());
+        waypoints.row(ii) = rot_mat * initial_point.transpose();
+    }
+
+    return waypoints;
 }
 

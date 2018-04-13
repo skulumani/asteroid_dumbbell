@@ -17,19 +17,8 @@ vs, fs = sphere_mesh.verts(), sphere_mesh.faces()
 initial_point_cartesian = sphere.rand(2);
 final_point_cartesian = sphere.rand(2);
 
-# initial_point_cartesian = np.array([0, 0, 1])
-# final_point_cartesian = np.array([1, 0, 0]) 
-# final_point_cartesian = final_point_cartesian / np.linalg.norm(final_point_cartesian)
-
-# convert both to spherical coordinates
-initial_point_spherical = wavefront.cartesian2spherical(initial_point_cartesian)
-final_point_spherical = wavefront.cartesian2spherical(final_point_cartesian)
-
 # compute waypoints inbetween
-waypoints = geodesic.geodesic_waypoint(initial_point_spherical, final_point_spherical, 100)
-
-# convert waypoints to cartesian for plotting
-waypoints_cartesian = wavefront.spherical2cartesian(waypoints)
+waypoints_cartesian = geodesic.sphere_waypoint(initial_point_spherical, final_point_spherical, 100)
 
 # plot everythign on a mayavi figure
 mfig = graphics.mayavi_figure()

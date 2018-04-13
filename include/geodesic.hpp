@@ -67,7 +67,7 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> geodesic_waypoint(const Eigen::Ref<cons
                                                            const int &num_points = 5);
 
 // Cartesian coordinates now
-Eigen::Matrix<double, Eigen::Dynamic, 3> sphere_waypoints(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
+Eigen::Matrix<double, Eigen::Dynamic, 3> sphere_waypoint(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
                                                           const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point,
                                                           const int &num_points = 5);
 
