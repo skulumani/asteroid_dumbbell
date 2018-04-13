@@ -79,8 +79,23 @@ double deg2rad(const double &degrees) {
     return radians;
 }
 
+Eigen::Matrix<double, Eigen::Dynamic, 1> deg2rad(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> > &degrees) {
+    // handle eigen single dimensional vectors (row or column)
+    Eigen::Matrix<double, Eigen::Dynamic, 1> radians(degrees.size());
+    
+    radians = degrees.array() * (kPI / 180.0 );
+    return radians;
+}
+
 double rad2deg(const double &radians) {
     double degrees = radians * (180.0 / kPI);
+    return degrees;
+}
+
+Eigen::Matrix<double, Eigen::Dynamic, 1> rad2deg(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> > &radians) {
+    Eigen::Matrix<double, Eigen::Dynamic, 1> degrees(radians.size());
+
+    degrees = radians.array() * ( 180.0 / kPI);
     return degrees;
 }
 

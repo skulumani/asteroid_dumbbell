@@ -52,8 +52,14 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> cartesian2spherical(const Eigen::Ref<co
 Eigen::Matrix<double, 1, 2> course_azimuth(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
                                            const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point);
 
+// degress to and from radians
 double deg2rad(const double &degrees);
+
+Eigen::Matrix<double, Eigen::Dynamic, 1> deg2rad(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> > &degrees);
+
 double rad2deg(const double &radians);
+
+Eigen::Matrix<double, Eigen::Dynamic, 1> rad2deg(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> > &radians);
 
 Eigen::Matrix<double, Eigen::Dynamic, 3> geodesic_waypoint(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
                                                            const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point);

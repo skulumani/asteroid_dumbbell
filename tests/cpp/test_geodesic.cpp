@@ -175,6 +175,22 @@ TEST(TestRadians2Degree, SomeCommonValues) {
     ASSERT_EQ(rad2deg(-kPI / 2), -90);
 }
 
+TEST(TestDegree2Radians, EigenArrayCommonValues) {
+    Eigen::Matrix<double, 5, 1> degrees(5), radians(5), radians_true(5);
+    degrees << 0, 45, -90, 180, 360;
+    radians_true << 0, kPI / 4, -kPI/2, kPI, 2 * kPI;
+    radians = deg2rad(degrees);
+    ASSERT_TRUE(radians.isApprox(radians_true));
+}
+
+TEST(TestRadians2Degree, EigenArrayCommonValues) {
+    Eigen::Matrix<double, 5, 1> degrees(5), radians(5), degrees_true(5);
+    degrees_true << 0, 45, -90, 180, 360;
+    radians << 0, kPI / 4, -kPI/2, kPI, 2 * kPI;
+    degrees = rad2deg(radians);
+    ASSERT_TRUE(degrees.isApprox(degrees_true));
+}
+
 TEST(TestWaypoint, WikipediaExample) {
     Eigen::Matrix<double, 1, 3> initial_point(3), final_point(3);
     initial_point << 6378.137, deg2rad(-33), deg2rad(-71.6);
