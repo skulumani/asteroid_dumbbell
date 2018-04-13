@@ -115,3 +115,11 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> geodesic_waypoint(const Eigen::Ref<cons
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints;
     return waypoints;
 }
+
+Eigen::Matrix<double, Eigen::Dynamic, 1> eigen_atan2(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> > &numerator, 
+                                                     const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> > &denominator) {
+    
+    Eigen::Matrix<double, Eigen::Dynamic, 1> angle(numerator.size());
+    angle = numerator.binaryExpr(denominator, [] (double a, double b) { return std::atan2(a,b);} );
+    return angle;
+}
