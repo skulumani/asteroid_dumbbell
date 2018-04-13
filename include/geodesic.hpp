@@ -61,9 +61,15 @@ double rad2deg(const double &radians);
 
 Eigen::Matrix<double, Eigen::Dynamic, 1> rad2deg(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> > &radians);
 
+// Points should be in spherical coordinates
 Eigen::Matrix<double, Eigen::Dynamic, 3> geodesic_waypoint(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
                                                            const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point,
                                                            const int &num_points = 5);
+
+// Cartesian coordinates now
+Eigen::Matrix<double, Eigen::Dynamic, 3> sphere_waypoints(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
+                                                          const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point,
+                                                          const int &num_points = 5);
 
 Eigen::Matrix<double, Eigen::Dynamic, 1> eigen_atan2(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> > &numerator,
                                                      const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> > &denominator);

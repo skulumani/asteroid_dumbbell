@@ -164,3 +164,12 @@ Eigen::Matrix<double, Eigen::Dynamic, 1> eigen_atan2(const Eigen::Ref<const Eige
     angle = numerator.binaryExpr(denominator, [] (double a, double b) { return std::atan2(a,b);} );
     return angle;
 }
+
+Eigen::Matrix<double, Eigen::Dynamic, 3> sphere_waypoints(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
+                                                          const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point,
+                                                          const int &num_points) {
+    
+    // Find a rotation vector (cross product)
+    // rotate inital vector about normal vector by angle steps
+}
+
