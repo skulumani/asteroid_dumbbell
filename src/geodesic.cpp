@@ -87,7 +87,7 @@ double rad2deg(const double &radians) {
 Eigen::Matrix<double, Eigen::Dynamic, 3> geodesic_waypoint(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
                                                            const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point) {
     
-    double lat1, lat2, long1, long2, delta_long, alpha1, alpha2;
+    double lat1, lat2, long1, long2, long12, alpha1, alpha2;
     
     lat1 = initial_point(1);
     long1 = initial_point(2);
@@ -95,7 +95,7 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> geodesic_waypoint(const Eigen::Ref<cons
     lat2 = final_point(1);
     long2 = final_point(2);
     
-    delta_long = long2 - long1;
+    long12 = long2 - long1;
 
     // get the initial and final azimuths
     Eigen::Matrix<double, 1, 2>  azimuth = course_azimuth(initial_point, final_point); 
@@ -106,13 +106,36 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> geodesic_waypoint(const Eigen::Ref<cons
     double alpha0 = asin(sin(alpha1) * cos(lat1));
 
     // find the central angle between initial and final points
-    Eigen::Matrix<double, 1, 3> initial_point_cartesian = spherical2cartesian(initial_point).normalized();
-    Eigen::Matrix<double, 1, 3> final_point_cartesian = spherical2cartesian(final_point).normalized();
+    Eigen::Matrix<double, 1, 3> initial_point_cartesian = spherical2cartesian(initial_point);
+    Eigen::Matrix<double, 1, 3> final_point_cartesian = spherical2cartesian(final_point);
     
-    std::cout << initial_point_cartesian << std::endl;
-    /* Eigen::VectorXd central_angle = central_angle(initial_point_cartesian, final_point_cartesian); */
+    initial_point_cartesian = initial_point_cartesian.array() / initial_point_cartesian.norm();
+    final_point_cartesian = final_point_cartesian.array() / final_point_cartesian.norm();
+
+    Eigen::VectorXd sigma12 = central_angle(initial_point_cartesian, final_point_cartesian);
+    
+    double sigma1;
+    if  ( (abs(lat1) < 1e-6) && (abs(alpha1 - kPI / 2 ) ) < 1e-6 ) {
+        sigma1 = 0;
+    } 
+    else {
+        sigma1 = atan2(tan(lat1), cos(alpha1));
+    }
+
+    double sigma2 = sigma1 + sigma12(0);
+    
+    double long01 = atan2(sin(alpha0) * sin(sigma1), cos(sigma1));
+    double long0 = long1 - long01;
+    
+    
+    Eigen::Matrix<double, Eigen::Dynamic, 1> latw, longw, sigmaw;
+    sigmaw = Eigen::VectorXd::LinSpaced(5, 0, 1).array() * (sigma1 + sigma2);
+    
+    latw = (cos(alpha0) * sigmaw.array().sin()).asin();
+    longw = eigen_atan2(sin(alpha0) * sigmaw.array().sin(), sigmaw.array().cos()).array() + long0;
 
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints;
+
     return waypoints;
 }
 
