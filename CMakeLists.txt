@@ -128,13 +128,15 @@ set(test_all_src
     tests/cpp/test_mesh.cpp
     tests/cpp/test_reconstruct.cpp
     tests/cpp/test_geodesic.cpp
+    tests/cpp/test_cgal.cpp
     src/wavefront.cpp
     src/surface_mesher.cpp
     src/polyhedron.cpp
     src/loader.cpp
     src/mesh.cpp
     src/reconstruct.cpp
-    src/geodesic.cpp)
+    src/geodesic.cpp
+    src/cgal.cpp)
 
 add_executable(test_all ${test_all_src})
 target_link_libraries(test_all gtest)

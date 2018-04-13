@@ -4,6 +4,8 @@
 #include "cgal_types.hpp"
 #include "mesh.hpp"
 
+#include <Eigen/Dense>
+
 #include <memory>
 #include <cmath>
 
@@ -31,7 +33,7 @@ class RayCaster {
 
         // cast many rays function
         Eigen::Matrix<double, Eigen::Dynamic, 3> castarray(const Eigen::Ref<const Eigen::Vector3d> &psource,
-                                                           const Eigen::Ref<const Eigen::Matrix<double, Eigen:Dynamic, 3> > &targets);
+                                                           const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> > &targets);
 
         // update the raycaster with a new mesh ptr
         void update_mesh(std::shared_ptr<MeshData> mesh_in);
