@@ -100,7 +100,8 @@ Eigen::Matrix<double, Eigen::Dynamic, 1> rad2deg(const Eigen::Ref<const Eigen::M
 }
 
 Eigen::Matrix<double, Eigen::Dynamic, 3> geodesic_waypoint(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &initial_point,
-                                                           const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point) {
+                                                           const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &final_point,
+                                                           const int &num_points) {
     
     double lat1, lat2, long1, long2, long12, alpha1, alpha2;
     

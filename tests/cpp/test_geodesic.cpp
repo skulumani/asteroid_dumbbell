@@ -197,4 +197,5 @@ TEST(TestWaypoint, WikipediaExample) {
     final_point << 6378.137, deg2rad(31.4), deg2rad(121.8);
     
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints = geodesic_waypoint(initial_point, final_point);
+    std::cout << waypoints << std::endl;
 }
