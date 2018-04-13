@@ -18,12 +18,12 @@ initial_point_cartesian = sphere.rand(2);
 final_point_cartesian = sphere.rand(2);
 
 # compute waypoints inbetween
-waypoints_cartesian = geodesic.sphere_waypoint(initial_point_spherical, final_point_spherical, 100)
+waypoints_cartesian = geodesic.sphere_waypoint(initial_point_cartesian, final_point_cartesian, 5)
 
 # plot everythign on a mayavi figure
 mfig = graphics.mayavi_figure()
 graphics.mayavi_axes(mfig, [-1, 1, -1, 1, -1, 1])
-graphics.mayavi_addPoint(mfig, initial_point_cartesian, color=(0, 1, 0))
-graphics.mayavi_addPoint(mfig, final_point_cartesian, color=(1, 0, 0))
 graphics.mayavi_addMesh(mfig, vs, fs, color=(0, 0, 1), opacity=0.2)
 graphics.mayavi_points3d(mfig, waypoints_cartesian, color=(0,0, 1))
+graphics.mayavi_addPoint(mfig, initial_point_cartesian, color=(0, 1, 0))
+graphics.mayavi_addPoint(mfig, final_point_cartesian, color=(1, 0, 0))
