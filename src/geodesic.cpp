@@ -127,14 +127,18 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> geodesic_waypoint(const Eigen::Ref<cons
     double long01 = atan2(sin(alpha0) * sin(sigma1), cos(sigma1));
     double long0 = long1 - long01;
     
-    
-    Eigen::Matrix<double, Eigen::Dynamic, 1> latw, longw, sigmaw;
-    sigmaw = Eigen::VectorXd::LinSpaced(5, 0, 1).array() * (sigma1 + sigma2);
+   
+    int num_waypoints = 5;
+    Eigen::Matrix<double, Eigen::Dynamic, 1> latw(num_waypoints), longw(num_waypoints), sigmaw(num_waypoints), radiusw(num_waypoints);
+    sigmaw = Eigen::VectorXd::LinSpaced(num_waypoints, 0, 1).array() * (sigma1 + sigma2);
     
     latw = (cos(alpha0) * sigmaw.array().sin()).asin();
     longw = eigen_atan2(sin(alpha0) * sigmaw.array().sin(), sigmaw.array().cos()).array() + long0;
+    radiusw.fill(initial_point(0));
 
-    Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints;
+    // TODO Also calculate the azimuth at the midpoints
+    Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_waypoints, 3);
+    waypoints << radiusw, latw, longw;
 
     return waypoints;
 }
