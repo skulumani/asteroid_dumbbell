@@ -96,10 +96,3 @@ TEST_F(TestRayCaster, ItokawaIntersection) {
 
 }
 
-/* TEST_F(TestReconstruct, MeshDataConstructor) { */
-/*     std::shared_ptr<MeshData> mesh; */
-/*     mesh = Loader::load("./integration/cube.obj"); */
-/*     ReconstructMesh reconstruct_mesh(mesh); */
-/*     ASSERT_TRUE(reconstruct_mesh.get_verts().isApprox(Ve_true)); */
-/*     ASSERT_TRUE(reconstruct_mesh.get_faces().isApprox(Fe_true)); */
-/* } */
