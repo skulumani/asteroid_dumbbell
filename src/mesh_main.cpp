@@ -41,10 +41,8 @@ int main(int argc, char* argv[]) {
         // instantiate the raycaster object
         RayCaster caster(mesh);
         Eigen::Vector3d intersection;
-        int int_flag = caster.castray(psource, ptarget, intersection);
-        if (int_flag == 0) {
-            std::cout << "Intersection point: " << intersection << std::endl;
-        }
+        intersection = caster.castray(psource, ptarget);
+        std::cout << "Intersection point: " << intersection << std::endl;
         // compute minimum distance to mesh
         double min_dist = caster.minimum_distance(psource);
         std::cout << "Minimum distance: " << min_dist << std::endl;

@@ -26,9 +26,14 @@ class RayCaster {
         RayCaster(std::shared_ptr<MeshData> mesh_in);
 
         // cast ray function
-        int castray(const Eigen::Ref<const Eigen::Vector3d>& psource, const Eigen::Ref<const Eigen::Vector3d>& ptarget, Eigen::Ref<Eigen::Vector3d> intersection);
+        Eigen::Matrix<double, 1, 3> castray(const Eigen::Ref<const Eigen::Vector3d>& psource,
+                const Eigen::Ref<const Eigen::Vector3d>& ptarget);
 
         // cast many rays function
+        Eigen::Matrix<double, Eigen::Dynamic, 3> castarray(const Eigen::Ref<const Eigen::Vector3d> &psource,
+                                                           const Eigen::Ref<const Eigen::Matrix<double, Eigen:Dynamic, 3> > &targets);
+
+        // update the raycaster with a new mesh ptr
         void update_mesh(std::shared_ptr<MeshData> mesh_in);
 
         /**

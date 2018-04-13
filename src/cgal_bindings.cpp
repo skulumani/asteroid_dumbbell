@@ -25,8 +25,8 @@ PYBIND11_MODULE(cgal, m) {
                 pybind11::arg("shared_ptr to MeshData object"))
         .def("update_mesh", &RayCaster::update_mesh, "Update the mesh",
                 pybind11::arg("mesh"))
-        .def("castray", &RayCaster::castray, "Cast a ray and return the intersections",
-                pybind11::arg("psource"), pybind11::arg("ptarget"), pybind11::arg("intersection"))
+        .def("castray", &RayCaster::castray, "Cast a ray and return the first intersections",
+                pybind11::arg("psource"), pybind11::arg("ptarget"))
         .def("minimum_distance", &RayCaster::minimum_distance, "Minimum distance from point to mesh",
                 pybind11::arg("pt"));
         

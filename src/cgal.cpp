@@ -20,13 +20,14 @@ void RayCaster::update_mesh(std::shared_ptr<MeshData> mesh_in) {
     tree.accelerate_distance_queries();
 }
 
-int RayCaster::castray(const Eigen::Ref<const Eigen::Vector3d>& psource, const Eigen::Ref<const Eigen::Vector3d>& ptarget, Eigen::Ref<Eigen::Vector3d> pint) {
+Eigen::Matrix<double, 1, 3> RayCaster::castray(const Eigen::Ref<const Eigen::Vector3d>& psource, const Eigen::Ref<const Eigen::Vector3d>& ptarget) {
     // TODO Also look at closest_point_and_primitive
     // create a Point object
     Point a(psource(0),psource(1),psource(2));
     Point b(ptarget(0), ptarget(1), ptarget(2));
     Ray ray_query(a, b);
-    
+    Eigen::Matrix<double, 1, 3> pint(3);
+
     // May need to add a skip function here https://doc.cgal.org/latest/AABB_tree/AABB_tree_2AABB_ray_shooting_example_8cpp-example.html
     Ray_intersection intersection = this->tree.first_intersection(ray_query);
     if (intersection) {
@@ -36,14 +37,28 @@ int RayCaster::castray(const Eigen::Ref<const Eigen::Vector3d>& psource, const E
             // output from function
             pint << CGAL::to_double(p->x()), CGAL::to_double(p->y()), CGAL::to_double(p->y());
         } else {
-            return 1;
+            return pint.setZero();
         }
 
     } else {
-        return 1;
+        return pint.setZero();
     }
 
-    return 0;
+    return pint;
+}
+
+Eigen::Matrix<double, Eigen::Dynamic, 3> RayCaster::castarray(const Eigen::Ref<const Eigen::Vector3d> &psource,
+                                                              const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> &targets) {
+    
+    int num_targets = targets.rows();
+
+    Eigen::Matrix<double, Eigen::Dynamic, 3> all_intersections(num_targets, 3), intersection(1, 3);
+
+    for (int ii = 0; ii < num_targets; ++ii) {
+        intersection = this->castray(psource, targets.row(ii));
+        all_intersection.row(ii) = intersection;
+    }
+    return intersection;
 }
 
 // TODO Modify this to compute distance instead of doing raycasting
