@@ -30,3 +30,7 @@ bash ${DIR}/build_cgal.sh
 # build numba
 
 # build cgal
+
+# if on mac do the following
+# create teh anaconda enviornment
+# brew install eigen boost-python3 cgal eigen cmake 
