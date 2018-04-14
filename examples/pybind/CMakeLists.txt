@@ -10,6 +10,9 @@ include_directories(${PYTHON_INCLUDE_DIRS})
 link_libraries(${PYTHON_LIBRARIES})
 link_directories(${PYTHON_LIBRARY_DIRS})
     
+find_package(Eigen3)
+include(${EIGEN3_USE_FILE})
+
 set(SOURCE_DIR "src")
 include_directories(${SOURCE_DIR})
 
