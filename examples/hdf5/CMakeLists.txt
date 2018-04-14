@@ -17,3 +17,6 @@ include_directories(${HDF5_INCLUDE_DIRS})
 
 add_executable(writedata src/writedata.cpp)
 target_link_libraries(writedata ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
+
+add_executable(simple src/hdf5_simple.cpp)
+target_link_libraries(simple ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
