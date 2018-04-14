@@ -19,6 +19,14 @@ endif()
 # include helper file
 include( ${CGAL_USE_FILE} )
 
+# Eigen setup
+find_package(Eigen3 REQUIRED)
+if (NOT Eigen3_FOUND)
+    message(STATUS "This project requires Eigen3 and will not be compiled.")
+    return()
+endif()
+include(${EIGEN3_USE_FILE})
+
 # Boost and its components
 find_package( Boost REQUIRED )
 if ( NOT Boost_FOUND )
