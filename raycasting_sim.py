@@ -141,6 +141,14 @@ def simulate():
 
     return time, state, point_cloud
 
+def kinematics_simulation():
+    """Test out a  controlled reconstruction with moving to new pionts"""
+
+    logger = logging.getLogger(__name__)
+    # define a new asteroid and reconstructor
+
+    ast, dum, _, _, _, _ = initialize()
+
 
 def animate(time, state, ast, dum, point_cloud):
     graphics.point_cloud_asteroid_frame(point_cloud)
