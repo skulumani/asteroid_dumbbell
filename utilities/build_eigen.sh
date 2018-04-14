@@ -43,6 +43,9 @@ if [[ -d "${INSTALL_DIR}/unsupported" ]]; then
     rf -rf "${INSTALL_DIR}/Eigen"
 fi
 
+echo "Now going to copy Eigen headers to /usr/include/local"
+read -p "Press enter to continue"
+
 # copy to /usr/local/include
 echo "Now copying to ${INSTALL_DIR}/Eigen"
 sudo mv ${EIGEN_VER}/Eigen ${INSTALL_DIR}
