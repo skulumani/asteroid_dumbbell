@@ -19,6 +19,9 @@ endif()
 # include helper file
 include( ${CGAL_USE_FILE} )
 
+# Eigen
+find_package(Eigen3 REQUIRED)
+include(${EIGEN3_USE_FILE})
 
 # Boost and its components
 find_package( Boost REQUIRED )
