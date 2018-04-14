@@ -2,7 +2,7 @@
 
 HDF5_VER=1.10.1
 INSTALL_DIR="/usr/local/include"
-HDF5_RELEASE_URL="https://support.hdfgroup.org/ftp/HDF5/current/src/${HDF5_VER}.tar.gz"
+HDF5_RELEASE_URL="https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-${HDF5_VER}.tar.gz"
 TEMP_DIR="$(mktemp -d)"
 
 # This will download the latest eigen and install for the sy tem
@@ -27,14 +27,14 @@ echo "We're going to download HDF5 ${EIGEN_VER} and install to ${INSTALL_DIR}"
 cd ${TEMP_DIR}
 mkdir ${HDF5_VER}
 wget ${HDF5_RELEASE_URL} -O ${TEMP_DIR}/${HDF5_VER}.tar.gz
-tar -xvzf ${HDF5_VER}.tar.gz -C ./${HDF5_VER}
+tar -xvzf ${HDF5_VER}.tar.gz -C ./${HDF5_VER} --strip-components=1
 
 echo "Going to install HDF5 using the configure script"
 read -p "Press enter to continue"
 cd ${HDF5_VER}
-./configure --prefix=/usr/local --enable-cxx 
+bash ./configure --prefix=/usr/local --includedir=/usr/local/include/hdf5 --enable-cxx 
 make -j5
-make check
+# make check
 sudo checkinstall make install
 
 read -p "Press enter to exit"
