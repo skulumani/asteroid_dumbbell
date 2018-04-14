@@ -43,16 +43,25 @@ if [[ -d "${INSTALL_DIR}/unsupported" ]]; then
     rf -rf "${INSTALL_DIR}/Eigen"
 fi
 
-echo "Now going to copy Eigen headers to /usr/include/local"
+# echo "Now going to copy Eigen headers to /usr/include/local"
+# read -p "Press enter to continue"
+
+# # copy to /usr/local/include
+# echo "Now copying to ${INSTALL_DIR}/Eigen"
+# sudo mv ${EIGEN_VER}/Eigen ${INSTALL_DIR}
+
+# # copy to usr/local/include
+# echo "Now copying to ${INSTALL_DIR}/unsupported"
+# sudo mv ${EIGEN_VER}/unsupported ${INSTALL_DIR}
+
+# echo "Eigen ${EIGEN_VER} installed to ${INSTALL_DIR}/Eigen and ${INSTALL_DIR}/unsupported"
+
+echo "Going to install Eigen using CMake"
 read -p "Press enter to continue"
+cd ${EIGEN_VER}
+mkdir build
+cd build
+cmake ..
+sudo checkinstall make install
 
-# copy to /usr/local/include
-echo "Now copying to ${INSTALL_DIR}/Eigen"
-sudo mv ${EIGEN_VER}/Eigen ${INSTALL_DIR}
-
-# copy to usr/local/include
-echo "Now copying to ${INSTALL_DIR}/unsupported"
-sudo mv ${EIGEN_VER}/unsupported ${INSTALL_DIR}
-
-echo "Eigen ${EIGEN_VER} installed to ${INSTALL_DIR}/Eigen and ${INSTALL_DIR}/unsupported"
 read -p "Press enter to exit"
