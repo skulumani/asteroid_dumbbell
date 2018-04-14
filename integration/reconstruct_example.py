@@ -21,7 +21,7 @@ max_angle = 0.5
 mfig = graphics.mayavi_figure()
 
 # mesh_param = wavefront.polyhedron_parameters(v, f)
-pt = np.array([1, 1, 1])
+pt = np.array([0, 0, 1])
 
 vert_weight = np.full(vs.shape[0], (np.pi * np.max(np.linalg.norm(vs, axis=1)) )**2)
 
