@@ -116,7 +116,7 @@ class Asteroid(object):
         elif self.name == 'itokawa':
             self.M = 3.51e10
             self.sigma = 1.9  # g/cm^3
-            self.axes = np.array([535, 294, 209]) / 1.0e3  # size in meters
+            self.axes = np.array([535, 294, 209]) / 2 / 1.0e3  # size in meters
             self.omega = 2 * np.pi / 12.132 / 3600
 
         elif self.name == 'eros':
