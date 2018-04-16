@@ -133,9 +133,17 @@ def asteroid_reconstruct_generate_data(output_filename, asteroid_name='castalia'
     asteroid_type = 'obj'
     asteroid_faces = 0
     
-    ellipsoid_min_angle = 10
-    ellipsoid_max_radius = 0.03
-    ellipsoid_max_distance = 0.5
+    if asteroid_name=='castalia':
+        ellipsoid_min_angle = 10
+        ellipsoid_max_radius = 0.03
+        ellipsoid_max_distance = 0.5
+        step=1
+    elif asteroid_name == 'itokawa':
+        ellipsoid_min_angle = 10
+        ellipsoid_max_radius = 0.01
+        ellipsoid_max_distance = 0.5
+        step = 10
+
 
     surf_area = 0.01
     
@@ -148,6 +156,8 @@ def asteroid_reconstruct_generate_data(output_filename, asteroid_name='castalia'
     
     # cort the truth vertices in increasing order of x component
     vc = vc[vc[:, 0].argsort()]
+    vc = vc[::step, :]
+    # np.random.shuffle(vc)
 
     # define initial uncertainty for our estimate
     vert_weight = np.full(ve.shape[0], (np.pi * np.max(ast.axes))**2)
@@ -190,8 +200,8 @@ def asteroid_reconstruct_generate_data(output_filename, asteroid_name='castalia'
             ve = rmesh.get_verts()
             vert_weight = np.squeeze(rmesh.get_weights())
             # save the current array and weight to htpy
-            reconstructed_vertex.create_dataset(str(ii), data=ve)
-            reconstructed_weight.create_dataset(str(ii), data=vert_weight)
+            reconstructed_vertex.create_dataset(str(ii), data=ve, compression='lzf')
+            reconstructed_weight.create_dataset(str(ii), data=vert_weight, compression='lzf')
             
     
     print('Finished generating data. Saved to {}'.format(output_path))
