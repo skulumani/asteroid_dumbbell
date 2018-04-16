@@ -138,14 +138,15 @@ def asteroid_reconstruct_generate_data(output_filename, asteroid_name='castalia'
         ellipsoid_max_radius = 0.03
         ellipsoid_max_distance = 0.5
         step=1
+        surf_area = 0.01
     elif asteroid_name == 'itokawa':
         ellipsoid_min_angle = 10
-        ellipsoid_max_radius = 0.01
+        ellipsoid_max_radius = 0.003
         ellipsoid_max_distance = 0.5
-        step = 10
+        step = 1
+        surf_area = 0.0001
 
 
-    surf_area = 0.01
     
     # load asteroid castalia
     ast = asteroid.Asteroid(asteroid_name, asteroid_faces, asteroid_type)
@@ -155,7 +156,7 @@ def asteroid_reconstruct_generate_data(output_filename, asteroid_name='castalia'
     vc, fc = ast.V, ast.F
     
     # cort the truth vertices in increasing order of x component
-    vc = vc[vc[:, 0].argsort()]
+    vc = vc[np.flipud(vc[:, 0].argsort())]
     vc = vc[::step, :]
     # np.random.shuffle(vc)
 
