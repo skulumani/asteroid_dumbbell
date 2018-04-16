@@ -146,8 +146,6 @@ def asteroid_reconstruct_generate_data(output_filename, asteroid_name='castalia'
         step = 1
         surf_area = 0.0001
 
-
-    
     # load asteroid castalia
     ast = asteroid.Asteroid(asteroid_name, asteroid_faces, asteroid_type)
     ellipsoid = surface_mesh.SurfMesh(ast.axes[0], ast.axes[1], ast.axes[2],
@@ -156,7 +154,7 @@ def asteroid_reconstruct_generate_data(output_filename, asteroid_name='castalia'
     vc, fc = ast.V, ast.F
     
     # cort the truth vertices in increasing order of x component
-    vc = vc[np.flipud(vc[:, 0].argsort())]
+    vc = vc[vc[:, 0].argsort()]
     vc = vc[::step, :]
     # np.random.shuffle(vc)
 
@@ -396,6 +394,19 @@ def castalia_raycasting_plot(img_path):
     # savefig
     graphics.mayavi_savefig(fig=fig, filename=output_filename, magnification=4)
 
+def view_final_reconstruction(data_path):
+    """View the final mesh after reconstruction"""
+    with h5py.File(data_path, 'r') as hf:
+        rv = hf['reconstructed_vertex']
+
+        v_keys = np.array(utilities.sorted_nicely(list(rv.keys())))
+        
+        v = rv[v_keys[-1]][()]
+        f = hf['initial_faces'][()]        
+        
+        mfig = graphics.mayavi_figure()
+        graphics.mayavi_addMesh(mfig, v, f)
+
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description="Generate example plots used in dissertation/papers",
@@ -415,6 +426,10 @@ if __name__ == "__main__":
                                 help="Plot output from asteroid_reconstruct_generate_data (data path and image output path)",
                                 action="store")
     
+    plotting_group.add_argument("--view_final_reconstruction",
+                                help="View the final mesh using mayavi",
+                                action="store")
+
     img_path = '/tmp/mayavi_figure'
     if not os.path.exists(img_path):
         os.makedirs(img_path)
@@ -430,5 +445,7 @@ if __name__ == "__main__":
     elif args.asteroid_generate_plots:
         asteroid_generate_plots(args.asteroid_generate_plots, img_path)
         print("Images are saved to {}".format(img_path))
+    elif args.view_final_reconstruction:
+        view_final_reconstruction(args.view_final_reconstruction)
     
 
