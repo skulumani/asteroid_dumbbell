@@ -423,6 +423,7 @@ if __name__ == "__main__":
                                 help="Reconstruction example using an Asteroid(output filename and asteroid)",
                                 action="store")
     plotting_group.add_argument("--asteroid_generate_plots", 
+                                nargs=2,
                                 help="Plot output from asteroid_reconstruct_generate_data (data path and image output path)",
                                 action="store")
     
@@ -443,8 +444,11 @@ if __name__ == "__main__":
     elif args.asteroid_reconstruct_generate_data:
         asteroid_reconstruct_generate_data(args.asteroid_reconstruct_generate_data[0], args.asteroid_reconstruct_generate_data[1])
     elif args.asteroid_generate_plots:
-        asteroid_generate_plots(args.asteroid_generate_plots, img_path)
-        print("Images are saved to {}".format(img_path))
+        if not os.path.exists(args.asteroid_generate_plots[1]):
+            os.makedirs(args.asteroid_generate_plots[1])
+
+        asteroid_generate_plots(args.asteroid_generate_plots[0], args.asteroid_generate_plots[1])
+        print("Images are saved to {}".format(args.asteroid_generate_plots[1]))
     elif args.view_final_reconstruction:
         view_final_reconstruction(args.view_final_reconstruction)
     
