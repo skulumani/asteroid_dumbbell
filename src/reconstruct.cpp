@@ -15,6 +15,19 @@ ReconstructMesh::ReconstructMesh( const Eigen::Ref<const Eigen::MatrixXd> &v_in,
     this->weights = w_in;
 }
 
+// build object with only v and f
+ReconstructMesh::ReconstructMesh( const Eigen::Ref<const Eigen::MatrixXd> &v_in,
+                                 const Eigen::Ref<const Eigen::MatrixXi> &f_in) {
+
+    // need to save vectors to the object
+    this->vertices = v_in;
+    this->faces = f_in;
+    
+    // now define the weights
+    this->weights.resize(this->vertices.rows(), 1);
+    this->weights << initial_weight(this->vertices);
+}
+
 ReconstructMesh::ReconstructMesh(std::shared_ptr<MeshData> mesh_in) {
     
     // save another ptr to object

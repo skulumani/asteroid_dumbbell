@@ -17,6 +17,9 @@ class ReconstructMesh {
 
         ReconstructMesh( std::shared_ptr<MeshData> mesh_in);
         
+        ReconstructMesh(const Eigen::Ref<const Eigen::MatrixXd> &v_in,
+                        const Eigen::Ref<const Eigen::MatrixXi> &f_in);
+
         // Modify the vertices/weights with a new point
         void update(const Eigen::Ref<const Eigen::Vector3d> &pt_in,
                         const double &max_angle);
