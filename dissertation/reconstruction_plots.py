@@ -207,7 +207,7 @@ def asteroid_reconstruct_generate_data(output_filename, asteroid_name='castalia'
     
     return 0
 
-def asteroid_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
+def asteroid_generate_plots(data_path, img_path='/tmp/diss_reconstruct', magnification=1, step=10):
     """Given a HDF5 file this will read the data and create a bunch of plots/images
     """
     # check and create output directory if not existed
@@ -283,13 +283,13 @@ def asteroid_generate_plots(data_path, img_path='/tmp/diss_reconstruct'):
         
         ms.reset(x=v_initial[:, 0], y=v_initial[:, 1], z=v_initial[:, 2], triangles=f_initial,
                  scalars=w_initial)
-
-        for ii, vk in enumerate(v_keys):
+        graphics.mayavi_view(mfig)
+        for ii, vk in enumerate(v_keys[::step]):
             filename = os.path.join(animation_path, str(ii).zfill(7) + '.jpg')
             v = rv[vk][()]
             w = rw[str(vk)][()]
             ms.reset(x=v[:, 0], y=v[:, 1], z=v[:, 2], triangles=f_initial, scalars=w)
-            graphics.mayavi_savefig(mfig, filename, magnification=4)
+            graphics.mayavi_savefig(mfig, filename, magnification=magnification)
     
     return 0
 
