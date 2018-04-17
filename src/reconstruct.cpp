@@ -23,12 +23,8 @@ ReconstructMesh::ReconstructMesh(std::shared_ptr<MeshData> mesh_in) {
     this->faces = mesh_in->faces;
     
     // set the weight to the maximum norm length of all vertices
-    Eigen::Matrix<double, Eigen::Dynamic, 1> vert_radius(this->vertices.rows(), 1);
     this->weights.resize(this->vertices.rows(), 1);
-    vert_radius = this->vertices.rowwise().norm();
-    double max_radius = vert_radius.maxCoeff();
-    const double PI = 3.141592653589793115997963468544185161591;
-    this->weights.fill(pow(PI * max_radius, 2));
+    this->weights << initial_weight(this->vertices);
 }
 
 Eigen::MatrixXd ReconstructMesh::get_verts( void ) {
@@ -100,3 +96,17 @@ void ReconstructMesh::update_meshdata( void ) {
     // update the data inside the mesh_ptr
     this->mesh->update_mesh(this->vertices, this->faces);
 }
+
+// compute the initial weighting matrix given the vertices
+Eigen::Matrix<double, Eigen::Dynamic, 1> initial_weight(const Eigen::Ref<const Eigen::MatrixXd> &v_in) {
+    Eigen::Matrix<double, Eigen::Dynamic, 1> vert_radius(v_in.rows(), 1);
+    vert_radius = v_in.rowwise().norm();
+    // define the weights
+    Eigen::Matrix<double, Eigen::Dynamic, 1> weights(v_in.rows(), 1);
+
+    double max_radius = vert_radius.maxCoeff();
+    weights.fill(pow(kPI * max_radius, 2));
+    
+    return weights;
+}
+

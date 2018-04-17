@@ -38,4 +38,7 @@ class ReconstructMesh {
 template<typename T>
 Eigen::VectorXi vector_find(const Eigen::Ref<const T> &);
 
+// compute the weights 
+Eigen::Matrix<double, Eigen::Dynamic, 1> initial_weight(const Eigen::Ref<const Eigen::MatrixXd> &v_in);
+
 #endif
