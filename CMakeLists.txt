@@ -99,6 +99,13 @@ add_executable(surface_mesher ${surface_mesher_src})
 # incremental mesh reconstruction
 set( reconstruct_mesh_src src/reconstruct_main.cpp src/reconstruct.cpp src/mesh.cpp src/input_parser.cpp src/loader.cpp src/polyhedron.cpp src/geodesic.cpp)
 add_executable(reconstruct_mesh ${reconstruct_mesh_src})
+
+# exploration example 
+set( explore_src src/explore_main.cpp src/loader.cpp src/mesh.cpp 
+        src/reconstruct.cpp src/geodesic.cpp src/input_parser.cpp
+        src/surface_mesher.cpp src/cgal.cpp src/polyhedron.cpp)
+add_executable(explore ${explore_src})
+
 ################################################################################
 # PYTHON BINDING
 ################################################################################
