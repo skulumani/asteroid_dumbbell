@@ -35,6 +35,22 @@ TEST(TestLidar, UpAxis) {
     sensor_z.up_axis((Eigen::Vector3d() << 0, 0, 1).finished());
     
     ASSERT_TRUE(sensor_z.get_lidar_array().isApprox((R * sensor_y.get_lidar_array().transpose()).transpose()));
+}
 
+TEST(TestLidar, ViewAxis) {
+    Lidar sensor_y, sensor_x;
+    sensor_y.view_axis((Eigen::Vector3d() << 0, 1, 0).finished());
+    Eigen::Matrix<double, 3, 3> R(3, 3);
+    R = Eigen::AngleAxis<double>(3.141592653589793 / 2.0, Eigen::Vector3d(0, 0, 1));
+    
+    ASSERT_TRUE(sensor_y.get_lidar_array().isApprox((R * sensor_x.get_lidar_array().transpose()).transpose()));
+}
+
+TEST(TestLidar, Rotation) {
+    Eigen::Matrix<double, 3, 3> R(3, 3);
+    R = Eigen::AngleAxis<double>(3.141592653589793 / 2.0, Eigen::Vector3d(0, 0, 1));
+    Lidar sensor_x;
+    
+    ASSERT_TRUE(sensor_x.rotate_fov(R).isApprox((R * sensor_x.get_lidar_array().transpose()).transpose()));
 }
 
