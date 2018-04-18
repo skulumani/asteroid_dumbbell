@@ -11,14 +11,7 @@
 
 class Lidar {
     public:
-        Lidar( void ) {
-            view_axis << 1, 0, 0;
-            up_axis << 0, 0, 1;
-            fov << 7, 7;
-            sigma = 0.2;
-            dist = 1;
-            num_steps = 3;
-        }
+        Lidar( void );
         virtual ~Lidar( void ) {}
         
         /** @fn Lidar(const Eigen::Ref<const Eigen::Vector3d> &view_axis, const Eigen::Ref<const Eigen::Vector3d> &up_axis, const Eigen::Ref<const Eigen::Vector2d> &fov, const double &sigma, const double &dist, const int &num_steps)
@@ -38,17 +31,29 @@ class Lidar {
             @version 17 April 2018
         */
         Lidar(const Eigen::Ref<const Eigen::Vector3d> &view_axis,
-              const Eigen::Ref<const Eigen::Vector3d> &up_axis,
-              const Eigen::Ref<const Eigen::Vector2d> &fov,
+              const Eigen::Ref<const Eigen::Vector3d> &up_axis ,
+              const Eigen::Ref<const Eigen::Vector2d> &fov, 
               const double &sigma = 0.2,
               const double &dist = 1,
               const int &num_steps = 3);
-
+        
         Eigen::Vector3d view_axis;
         Eigen::Vector3d up_axis;
         Eigen::Vector2d fov;
+        Eigen::Vector3d right_axis;
+        Eigen::Matrix<double, Eigen::Dynamic, 3> lidar_arr;
         double sigma;
         double dist;
         int num_steps;
+    private:
+        /** @fn void init( void )
+                
+            Initialize some of the Lidar parameters
+
+            @author Shankar Kulumani
+            @version 17 April 2017
+        */
+        void init();
+
 };
 #endif
