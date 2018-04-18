@@ -14,7 +14,6 @@ Lidar::Lidar( void ) {
 }
 
 void Lidar::init( void ) {
-	Eigen::Vector3d right_axis;
 	this->right_axis = this->view_axis.cross(up_axis);
 
 	double H, W;
@@ -39,5 +38,10 @@ void Lidar::init( void ) {
 			this->lidar_arr.row(ii *  num_steps + jj) << lidar_vec.normalized();
 		}
 	}
+}
+
+Eigen::Matrix<double, Eigen::Dynamic, 3> Lidar::rotate_fov(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_body2frame) {
+	
+	return this->lidar_arr;
 }
 

@@ -37,6 +37,8 @@ class Lidar {
               const double &dist = 1,
               const int &num_steps = 3);
         
+        Eigen::Matrix<double, Eigen::Dynamic, 3> rotate_fov(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_body2frame);
+
         Eigen::Vector3d view_axis;
         Eigen::Vector3d up_axis;
         Eigen::Vector2d fov;
