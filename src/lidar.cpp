@@ -50,6 +50,15 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> Lidar::rotate_fov(const Eigen::Ref<cons
 	return lidar_arr;
 }
 
+Eigen::Matrix<double, Eigen::Dynamic, 3> Lidar::define_targets(const Eigen::Ref<const Eigen::RowVector3d> &pos,
+                                                               const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_b2f,
+                                                               const double &dist) {
+
+    Eigen::Matrix<double, Eigen::Dynamic, 3> targets(mnum_steps * mnum_steps, 3);
+    targets = (dist * rotate_fov(R_b2f)).rowwise() + pos;
+    return targets;
+}
+
 Eigen::Vector3d Lidar::get_view_axis() {
     return mview_axis;
 }

@@ -54,3 +54,27 @@ TEST(TestLidar, Rotation) {
     ASSERT_TRUE(sensor_x.rotate_fov(R).isApprox((R * sensor_x.get_lidar_array().transpose()).transpose()));
 }
 
+TEST(TestLidar, Targets) {
+    Eigen::Vector3d pos;
+    Eigen::Matrix<double, 3, 3> R;
+    R = Eigen::AngleAxis<double>(0, Eigen::Vector3d(1, 0, 0));
+    double dist = 5;
+    
+    pos << 1.5, 0, 0;
+    Lidar sensor;
+    Eigen::Matrix<double, Eigen::Dynamic, 3> targets = sensor.define_targets(pos, R, dist);
+    
+    Eigen::Matrix<double, 9, 3> targets_true(9, 3);
+    targets_true <<
+        6.48139997,  0.30467547, -0.30467547,
+        6.49067399,  0.        , -0.3052427,                                 
+        6.48139997, -0.30467547, -0.30467547,                                 
+        6.49067399,  0.3052427 ,  0.,                                 
+        6.5       ,  0.        ,  0.,                                 
+        6.49067399, -0.3052427 ,  0.,                                 
+        6.48139997,  0.30467547,  0.30467547,                                 
+        6.49067399,  0.        ,  0.3052427,                                 
+        6.48139997, -0.30467547,  0.30467547;
+
+    ASSERT_TRUE(targets.isApprox(targets_true, 1e-3));
+}
