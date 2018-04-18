@@ -103,7 +103,8 @@ add_executable(reconstruct_mesh ${reconstruct_mesh_src})
 # exploration example 
 set( explore_src src/explore_main.cpp src/loader.cpp src/mesh.cpp 
         src/reconstruct.cpp src/geodesic.cpp src/input_parser.cpp
-        src/surface_mesher.cpp src/cgal.cpp src/polyhedron.cpp)
+        src/surface_mesher.cpp src/cgal.cpp src/polyhedron.cpp
+        src/lidar.cpp)
 add_executable(explore ${explore_src})
 
 ################################################################################

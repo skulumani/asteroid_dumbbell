@@ -94,6 +94,7 @@ class Lidar {
         Eigen::Matrix<double, Eigen::Dynamic, 3> rotate_fov(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_body2frame);
         
         Eigen::Vector3d get_view_axis();
+        Eigen::Vector3d get_up_axis();
         Eigen::Matrix<double, Eigen::Dynamic, 3> get_lidar_array();
 
     private:
