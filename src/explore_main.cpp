@@ -5,6 +5,7 @@
 #include "surface_mesher.hpp"
 #include "cgal.hpp"
 #include "polyhedron.hpp"
+#include "lidar.hpp"
 
 #include "input_parser.hpp"
 
@@ -39,6 +40,9 @@ int main(int argc, char* argv[])
     SurfMesh ellipsoid(axes(0), axes(1), axes(2),
             min_angle, max_radius, max_distance);
     ReconstructMesh rmesh(ellipsoid.verts(), ellipsoid.faces());
+
+    Lidar sensor;
+
     // place satellite in a specific location and define view axis
     // define the initial position of the sensor
     // LOOP HERE
