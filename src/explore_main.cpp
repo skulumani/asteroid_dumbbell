@@ -40,9 +40,13 @@ int main(int argc, char* argv[])
             min_angle, max_radius, max_distance);
     ReconstructMesh rmesh(ellipsoid.verts(), ellipsoid.faces());
     // place satellite in a specific location and define view axis
-    // compute the intersections using the raycaster
-    // reconstruct the mesh with the estimate
-    // compute a new position
-    // loop over new position
+    // define the initial position of the sensor
+    // LOOP HERE
+    // compute targets for use in caster (point at the asteroid origin)
+    // perform raycasting on the true mesh (true_asteroid pointer)
+    // use this measurement to update rmesh (inside holds teh mesh estimate)
+    // use the updated weight to find a new positoin to move to
+    // save the data (raycast interseciton, position of sat, ast estimate, targets) to hdf5
+    // LOOP
     return 0;
 }
