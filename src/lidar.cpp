@@ -3,45 +3,54 @@
 #include <cmath>
 
 Lidar::Lidar( void ) {
-	this->view_axis << 1, 0, 0;
-	this->up_axis << 0, 0, 1;
-	this->fov << 7, 7;
-	this->sigma = 0.2;
-	this->dist = 1;
-	this->num_steps = 3;
+	mview_axis << 1, 0, 0;
+	mup_axis << 0, 0, 1;
+	mfov << 7, 7;
+	msigma = 0.2;
+	mdist = 1;
+	mnum_steps = 3;
 
 	this->init();
 }
 
+
 void Lidar::init( void ) {
-	this->right_axis = this->view_axis.cross(up_axis);
+	mright_axis = mview_axis.cross(mup_axis);
 
 	double H, W;
-	H = std::tan(this->fov(1)/2) * this->dist;
-	W = std::tan(this->fov(0)/2) * this->dist;
+	H = std::tan(mfov(1)/2) * mdist;
+	W = std::tan(mfov(0)/2) * mdist;
 
 	// center of the view fustrum
 	Eigen::Vector3d c;
-	c = this->view_axis * dist;
+	c = mview_axis * mdist;
 
 	// corners of the fustrum
-	Eigen::Matrix<double, Eigen::Dynamic, 1> hsteps(this->num_steps), wsteps(this->num_steps);
-	hsteps = Eigen::VectorXd::LinSpaced(-H, H, num_steps);
-	wsteps = Eigen::VectorXd::LinSpaced(-W, W, num_steps);
+	Eigen::Matrix<double, Eigen::Dynamic, 1> hsteps(mnum_steps), wsteps(mnum_steps);
+	hsteps = Eigen::VectorXd::LinSpaced(-H, H, mnum_steps);
+	wsteps = Eigen::VectorXd::LinSpaced(-W, W, mnum_steps);
 
 	// define  all the unit vectors for the sensor
-	this->lidar_arr.resize(pow(num_steps, 2), 3);
+	mlidar_array.resize(pow(mnum_steps, 2), 3);
 	Eigen::Vector3d lidar_vec;
 	for (int ii = 0; ii < hsteps.size(); ++ii) {
 		for (int jj = 0; jj < wsteps.size(); ++jj) {
-			lidar_vec = c + hsteps(ii) * up_axis + wsteps(jj) * right_axis;
-			this->lidar_arr.row(ii *  num_steps + jj) << lidar_vec.normalized();
+			lidar_vec = c + hsteps(ii) * mup_axis + wsteps(jj) * mright_axis;
+			mlidar_array.row(ii *  mnum_steps + jj) << lidar_vec.normalized();
 		}
 	}
 }
 
 Eigen::Matrix<double, Eigen::Dynamic, 3> Lidar::rotate_fov(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_body2frame) {
-	
-	return this->lidar_arr;
+    Eigen::Matrix<double, Eigen::Dynamic, 3> lidar_arr(mlidar_array.rows(), 3);
+    lidar_arr = (R_body2frame * mlidar_array.transpose()).transpose();
+	return lidar_arr;
 }
 
+Eigen::Vector3d Lidar::get_view_axis() {
+    return mview_axis;
+}
+
+Eigen::Matrix<double, Eigen::Dynamic, 3> Lidar::get_lidar_array() {
+    return mlidar_array;
+}

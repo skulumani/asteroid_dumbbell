@@ -14,6 +14,48 @@ class Lidar {
         Lidar( void );
         virtual ~Lidar( void ) {}
         
+        // Named parameters idiom
+        inline Lidar& view_axis(const Eigen::Ref<const Eigen::Vector3d> &view_axis_in) {
+            mview_axis << view_axis_in;
+            init();
+            return *this;
+        }
+        
+        inline Lidar& up_axis(const Eigen::Ref<const Eigen::Vector3d> &up_axis_in) {
+            mup_axis << up_axis_in;
+            init();
+            return *this;
+        }
+
+        inline Lidar& fov(const Eigen::Ref<const Eigen::Vector2d> &fov_in) {
+            mfov << fov_in;
+            init();
+            return *this;
+        }
+        
+        inline Lidar& right_axis(const Eigen::Ref<const Eigen::Vector3d> &right_axis_in) {
+            mright_axis << right_axis_in;
+            init();
+            return *this;
+        }
+
+        inline Lidar& sigma(const double &sigma_in) {
+            msigma = sigma_in;
+            init();
+            return *this;
+        }
+
+        inline Lidar& dist(const double &dist_in) {
+            mdist = dist_in;
+            init();
+            return *this;
+        }
+
+        inline Lidar& num_steps(const int &num_steps_in) {
+            mnum_steps = num_steps_in;
+            init();
+            return *this;
+        }
         /** @fn Lidar(const Eigen::Ref<const Eigen::Vector3d> &view_axis, const Eigen::Ref<const Eigen::Vector3d> &up_axis, const Eigen::Ref<const Eigen::Vector2d> &fov, const double &sigma, const double &dist, const int &num_steps)
          *
             Construct the lidar object from some view parameters
@@ -37,16 +79,23 @@ class Lidar {
               const double &dist = 1,
               const int &num_steps = 3);
         
-        Eigen::Matrix<double, Eigen::Dynamic, 3> rotate_fov(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_body2frame);
+        /** @fn rotate_fov(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_body2frame)
+            
+            Rotate the FOV by a given rotation matrix. Rotates all of the lidar
+            arr by the R. Only outputs the unit vectors
 
-        Eigen::Vector3d view_axis;
-        Eigen::Vector3d up_axis;
-        Eigen::Vector2d fov;
-        Eigen::Vector3d right_axis;
-        Eigen::Matrix<double, Eigen::Dynamic, 3> lidar_arr;
-        double sigma;
-        double dist;
-        int num_steps;
+            @param R_body2frame Eigen (3,3) rotation matrix of body frame to inertial frame
+
+            @returns lidar_arr return the rotated lidar array
+
+            @author Shankar Kulumani
+            @version 18 April 2018
+        */
+        Eigen::Matrix<double, Eigen::Dynamic, 3> rotate_fov(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_body2frame);
+        
+        Eigen::Vector3d get_view_axis();
+        Eigen::Matrix<double, Eigen::Dynamic, 3> get_lidar_array();
+
     private:
         /** @fn void init( void )
                 
@@ -57,5 +106,17 @@ class Lidar {
         */
         void init();
 
+        Eigen::Vector3d mview_axis;
+        Eigen::Vector3d mup_axis;
+        Eigen::Vector2d mfov;
+        Eigen::Vector3d mright_axis;
+        Eigen::Matrix<double, Eigen::Dynamic, 3> mlidar_array;
+        double msigma;
+        double mdist;
+        int mnum_steps;
+
 };
+
+
 #endif
+
