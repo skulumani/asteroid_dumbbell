@@ -81,32 +81,64 @@ endif()
 ################################################################################
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-# create a obj file reader executable
+# LIBRARIES
+# create some shared libraries for things
+set(cgal_src
+    ${PROJECT_SOURCE_DIR}/src/mesh.cpp
+    ${PROJECT_SOURCE_DIR}/src/polyhedron.cpp
+    ${PROJECT_SOURCE_DIR}/src/loader.cpp
+    ${PROJECT_SOURCE_DIR}/src/stats.cpp
+    ${PROJECT_SOURCE_DIR}/src/cgal.cpp
+    )
+add_library(cgal_cpp SHARED ${cgal_src})
 
+set(input_parser_src
+    ${PROJECT_SOURCE_DIR}/src/input_parser.cpp
+    )
+add_library(input_parser_cpp SHARED ${input_parser_src})
+
+set(potential_src 
+    ${PROJECT_SOURCE_DIR}/src/potential.cpp
+    )
+add_library(potential_cpp SHARED ${potential_src})
+
+set(surface_mesher_src
+    ${PROJECT_SOURCE_DIR}/src/surface_mesher.cpp
+    )
+add_library(surface_mesher_cpp SHARED ${surface_mesher_src})
+
+set(polyhedron_src
+    ${PROJECT_SOURCE_DIR}/src/reconstruct.cpp
+    ${PROJECT_SOURCE_DIR}/src/geodesic.cpp
+    ${PROJECT_SOURCE_DIR}/src/polyhedron.cpp
+    ${PROJECT_SOURCE_DIR}/src/lidar.cpp)
+add_library(polyhedron_cpp SHARED ${polyhedron_src})
+
+# EXECUTABLES
 # mesh loading
-set(mesh_src src/mesh.cpp src/mesh_main.cpp src/polyhedron.cpp src/loader.cpp
-    src/input_parser.cpp src/stats.cpp src/cgal.cpp)
+set(mesh_src src/mesh_main.cpp)
 add_executable(mesh ${mesh_src})
+target_link_libraries(mesh cgal_cpp input_parser_cpp)
 
 # potential function
-set(potential_src src/potential.cpp src/potential_main.cpp)
+set(potential_src src/potential_main.cpp)
 add_executable(potential ${potential_src})
+target_link_libraries(potential potential_cpp)
 
 # surface mesher
-set( surface_mesher_src src/surface_mesher_main.cpp src/surface_mesher.cpp src/input_parser.cpp)
+set( surface_mesher_src src/surface_mesher_main.cpp )
 add_executable(surface_mesher ${surface_mesher_src})
+target_link_libraries(surface_mesher input_parser_cpp surface_mesher_cpp)
 
 # incremental mesh reconstruction
-set( reconstruct_mesh_src src/reconstruct_main.cpp src/reconstruct.cpp src/mesh.cpp src/input_parser.cpp src/loader.cpp src/polyhedron.cpp src/geodesic.cpp)
+set( reconstruct_mesh_src src/reconstruct_main.cpp )
 add_executable(reconstruct_mesh ${reconstruct_mesh_src})
+target_link_libraries(reconstruct_mesh polyhedron_cpp cgal_cpp input_parser_cpp)
 
 # exploration example 
-set( explore_src src/explore_main.cpp src/loader.cpp src/mesh.cpp 
-        src/reconstruct.cpp src/geodesic.cpp src/input_parser.cpp
-        src/surface_mesher.cpp src/cgal.cpp src/polyhedron.cpp
-        src/lidar.cpp)
+set( explore_src src/explore_main.cpp)
 add_executable(explore ${explore_src})
-
+target_link_libraries(explore cgal_cpp polyhedron_cpp input_parser_cpp surface_mesher_cpp)
 ################################################################################
 # PYTHON BINDING
 ################################################################################
