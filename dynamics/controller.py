@@ -681,8 +681,8 @@ def random_sweep_attitude(time, state, cone_angle=2):
 
     Rd_dot = np.zeros((3,3))
 
-    ang_vel_d = np.zeros(3) 
-    ang_vel_d_dot = np.zeros(3) 
+    ang_vel_d = np.zeros(3)
+    ang_vel_d_dot = np.zeros(3)
 
     return (Rd, Rd_dot, ang_vel_d, ang_vel_d_dot)
 
