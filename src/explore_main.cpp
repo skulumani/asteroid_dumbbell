@@ -42,15 +42,34 @@ int main(int argc, char* argv[])
     ReconstructMesh rmesh(ellipsoid.verts(), ellipsoid.faces());
 
     Lidar sensor;
+    double dist = 5;
+    int num_steps = 3;
+    sensor.dist(5);
 
     // place satellite in a specific location and define view axis
-    // define the initial position of the sensor
+    Eigen::RowVector3d pos(3);
+    Eigen::Matrix<double, 3, 3> R(3, 3);
+    pos << 1.5, 0, 0;
+    R = Eigen::MatrixXd::Identity(3, 3); 
+    
+    // targets to be updated in the loop
+    Eigen::Matrix<double, Eigen::Dynamic, 3> targets(num_steps * num_steps, 3);
+    Eigen::Matrix<double, Eigen::Dynamic, 3> intersections(num_steps * num_steps, 3);
+
     // LOOP HERE
-    // compute targets for use in caster (point at the asteroid origin)
-    // perform raycasting on the true mesh (true_asteroid pointer)
-    // use this measurement to update rmesh (inside holds teh mesh estimate)
-    // use the updated weight to find a new positoin to move to
-    // save the data (raycast interseciton, position of sat, ast estimate, targets) to hdf5
-    // LOOP
+    for (int ii = 0; ii < 1; ++ii) {
+
+        // compute targets for use in caster (point at the asteroid origin)
+        targets = sensor.define_targets(pos, R, dist);    
+
+        // perform raycasting on the true mesh (true_asteroid pointer)
+        intersections = caster.castarray(pos, targets);
+
+        // use this measurement to update rmesh (inside holds teh mesh estimate)
+        // use the updated weight to find a new positoin to move to
+        // save the data (raycast interseciton, position of sat, ast estimate, targets) to hdf5
+        // LOOP
+    }
+    std::cout << intersections << std::endl;
     return 0;
 }
