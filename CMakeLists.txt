@@ -89,6 +89,11 @@ set(cgal_src
     ${PROJECT_SOURCE_DIR}/src/loader.cpp
     ${PROJECT_SOURCE_DIR}/src/stats.cpp
     ${PROJECT_SOURCE_DIR}/src/cgal.cpp
+    ${PROJECT_SOURCE_DIR}/src/reconstruct.cpp
+    ${PROJECT_SOURCE_DIR}/src/geodesic.cpp
+    ${PROJECT_SOURCE_DIR}/src/polyhedron.cpp
+    ${PROJECT_SOURCE_DIR}/src/lidar.cpp
+    ${PROJECT_SOURCE_DIR}/src/controller.cpp
     )
 add_library(cgal_cpp SHARED ${cgal_src})
 
@@ -107,13 +112,6 @@ set(surface_mesher_src
     )
 add_library(surface_mesher_cpp SHARED ${surface_mesher_src})
 
-set(polyhedron_src
-    ${PROJECT_SOURCE_DIR}/src/reconstruct.cpp
-    ${PROJECT_SOURCE_DIR}/src/geodesic.cpp
-    ${PROJECT_SOURCE_DIR}/src/polyhedron.cpp
-    ${PROJECT_SOURCE_DIR}/src/lidar.cpp
-    ${PROJECT_SOURCE_DIR}/src/controller.cpp)
-add_library(polyhedron_cpp SHARED ${polyhedron_src})
 
 # EXECUTABLES
 # mesh loading
@@ -134,12 +132,12 @@ target_link_libraries(surface_mesher input_parser_cpp surface_mesher_cpp)
 # incremental mesh reconstruction
 set( reconstruct_mesh_src src/reconstruct_main.cpp )
 add_executable(reconstruct_mesh ${reconstruct_mesh_src})
-target_link_libraries(reconstruct_mesh polyhedron_cpp cgal_cpp input_parser_cpp)
+target_link_libraries(reconstruct_mesh cgal_cpp input_parser_cpp)
 
 # exploration example 
 set( explore_src src/explore_main.cpp)
 add_executable(explore ${explore_src})
-target_link_libraries(explore cgal_cpp polyhedron_cpp input_parser_cpp surface_mesher_cpp)
+target_link_libraries(explore cgal_cpp input_parser_cpp surface_mesher_cpp)
 ################################################################################
 # PYTHON BINDING
 ################################################################################
@@ -179,11 +177,15 @@ set(test_all_src
     tests/cpp/test_geodesic.cpp
     tests/cpp/test_cgal.cpp
 	tests/cpp/test_lidar.cpp
+    tests/cpp/test_controller.cpp
     src/wavefront.cpp)
 
 add_executable(test_all ${test_all_src})
-target_link_libraries(test_all gtest cgal_cpp potential_cpp surface_mesher_cpp 
-    polyhedron_cpp)
+target_link_libraries(test_all gtest 
+    cgal_cpp 
+    potential_cpp 
+    surface_mesher_cpp 
+    )
 add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 

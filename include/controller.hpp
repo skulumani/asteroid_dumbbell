@@ -6,11 +6,11 @@
 
 class AttitudeController {
     public:
-        AttitudeController( void );
+        /* AttitudeController( void ); */
         virtual ~AttitudeController( void ) {};
     
         void body_fixed_pointing_attitude(const double &current_time,
-                     const Eigen::Ref<const Eigen::Matrix<double, 1, Eigen::Dynamic> > &state);
+                     const Eigen::Ref<const Eigen::Matrix<double, 1, 18> > &state);
         
         // getters for the desired attitude state
         Eigen::Matrix<double, 3, 3> get_Rd();
@@ -20,7 +20,7 @@ class AttitudeController {
 
     private:
         Eigen::Matrix<double, 3, 3> mRd;
-        Eigen::Matrrix<double, 3, 3> mRd_dot;
+        Eigen::Matrix<double, 3, 3> mRd_dot;
         Eigen::Matrix<double, 3, 1> mang_vel_d;
         Eigen::Matrix<double, 3, 1> mang_vel_d_dot;
 };

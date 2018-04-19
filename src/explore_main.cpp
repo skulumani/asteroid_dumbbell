@@ -6,6 +6,7 @@
 #include "cgal.hpp"
 #include "polyhedron.hpp"
 #include "lidar.hpp"
+#include "controller.hpp"
 
 #include "input_parser.hpp"
 
@@ -71,5 +72,10 @@ int main(int argc, char* argv[])
         // LOOP
     }
     std::cout << intersections << std::endl;
+    
+    AttitudeController att_control;
+    Eigen::Matrix<double, 1, 18> state;
+    state = Eigen::MatrixXd::Random(1, 18);
+    att_control.body_fixed_pointing_attitude(0.0, state);
     return 0;
 }

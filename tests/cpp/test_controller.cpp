@@ -34,11 +34,14 @@ class TestController: public ::testing::Test {
 
         // Objects declared here can be used by all tests in the test case for Foo.
         Eigen::Matrix<double, 3, 1> pos, vel;
+
 };
 
-TEST(TestController, RotationMatrixDeterminant) {
+TEST_F(TestController, RotationMatrixDeterminant) {
     AttitudeController att_controller;
     // define the state
-    //
+    Eigen::Matrix<double, 1, 18> state;
+    state = Eigen::MatrixXd::Random(1, 18);
+    double current_time = 1;
     att_controller.body_fixed_pointing_attitude(current_time, state);
 }
