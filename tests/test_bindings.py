@@ -65,9 +65,8 @@ class TestMeshDist:
         np.testing.assert_allclose(dist, 1.5)
     
     def test_intersection_raycasting(self):
-        intersections = np.array([0, 0, 0], dtype=np.float64)
-        flag = self.caster.castray(self.pt, np.array([0, 0, 0], dtype=np.float64),
-                                   intersections)
+        intersections = self.caster.castray(self.pt, np.array([0, 0, 0],
+                                                              dtype=np.float64))
     
     # also test out the ray caster
  
