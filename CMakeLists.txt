@@ -111,7 +111,8 @@ set(polyhedron_src
     ${PROJECT_SOURCE_DIR}/src/reconstruct.cpp
     ${PROJECT_SOURCE_DIR}/src/geodesic.cpp
     ${PROJECT_SOURCE_DIR}/src/polyhedron.cpp
-    ${PROJECT_SOURCE_DIR}/src/lidar.cpp)
+    ${PROJECT_SOURCE_DIR}/src/lidar.cpp
+    ${PROJECT_SOURCE_DIR}/src/controller.cpp)
 add_library(polyhedron_cpp SHARED ${polyhedron_src})
 
 # EXECUTABLES
@@ -178,36 +179,14 @@ set(test_all_src
     tests/cpp/test_geodesic.cpp
     tests/cpp/test_cgal.cpp
 	tests/cpp/test_lidar.cpp
-    src/wavefront.cpp
-    src/surface_mesher.cpp
-    src/polyhedron.cpp
-    src/loader.cpp
-    src/mesh.cpp
-    src/reconstruct.cpp
-    src/geodesic.cpp
-    src/cgal.cpp
-	src/lidar.cpp)
+    src/wavefront.cpp)
 
 add_executable(test_all ${test_all_src})
-target_link_libraries(test_all gtest)
+target_link_libraries(test_all gtest cgal_cpp potential_cpp surface_mesher_cpp 
+    polyhedron_cpp)
 add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
-add_executable(test_polyhedron src/polyhedron.cpp tests/cpp/test_polyhedron.cpp tests/cpp/test_all.cpp)
-target_link_libraries(test_polyhedron gtest)
-add_test(NAME test_polyhedron COMMAND test_polyedron
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-
-add_executable(test_wavefront src/wavefront.cpp tests/cpp/test_wavefront.cpp tests/cpp/test_all.cpp)
-target_link_libraries(test_wavefront gtest)
-add_test(NAME test_wavefront COMMAND test_wavefront
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-
-
-add_executable(test_potential src/potential.cpp tests/cpp/test_potential.cpp tests/cpp/test_all.cpp)
-target_link_libraries(test_potential gtest)
-add_test(NAME test_potential COMMAND test_potential
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 # this will install to /usr/local by default
 # install(TARGETS read_obj DESTINATION bin)
