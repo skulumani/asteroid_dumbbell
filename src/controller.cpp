@@ -16,19 +16,19 @@ AttitudeController::AttitudeController( void ) {
 }
 
 // getters for variables
-Eigen::Matrix<double, 3, 3> AttitudeController::get_Rd() {
+Eigen::Matrix<double, 3, 3> AttitudeController::get_Rd() const {
     return mRd;
 }
 
-Eigen::Matrix<double, 3, 3> AttitudeController::get_Rd_dot() {
+Eigen::Matrix<double, 3, 3> AttitudeController::get_Rd_dot() const { 
     return mRd_dot;
 }
 
-Eigen::Matrix<double, 3, 1> AttitudeController::get_ang_vel_d() {
+Eigen::Matrix<double, 3, 1> AttitudeController::get_ang_vel_d() const {
     return mang_vel_d;
 }
 
-Eigen::Matrix<double, 3, 1> AttitudeController::get_ang_vel_d_dot() {
+Eigen::Matrix<double, 3, 1> AttitudeController::get_ang_vel_d_dot() const {
     return mang_vel_d_dot;
 }
 
@@ -63,6 +63,24 @@ TranslationController::TranslationController( void ) {
     mposd.setZero(3);
     mveld.setZero(3);
     macceld.setZero(3);
+}
+
+void TranslationController::inertial_fixed_state(std::shared_ptr<const State> des_state) {
+    mposd = des_state->get_pos();
+    mveld.setZero(3);
+    macceld.setZero(3);
+}
+
+Eigen::Matrix<double, 3, 1> TranslationController::get_posd( void ) const {
+    return mposd;
+}
+
+Eigen::Matrix<double, 3, 1> TranslationController::get_veld( void ) const {
+    return mveld;
+}
+
+Eigen::Matrix<double, 3, 1> TranslationController::get_acceld( void ) const {
+    return macceld;
 }
 
 Controller::Controller( void ) {

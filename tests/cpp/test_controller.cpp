@@ -83,3 +83,15 @@ TEST_F(TestAttitudeController, ZAxisAlignedWithPositivePole) {
     ASSERT_LE(angle, kPI / 2);
 }
 
+TEST(TestController, Inheritance) { 
+    Controller controller;
+    
+    ASSERT_TRUE(controller.get_posd().isApprox((Eigen::Vector3d() << 0, 0, 0).finished())); 
+    ASSERT_TRUE(controller.get_veld().isApprox((Eigen::Vector3d() << 0, 0, 0).finished())); 
+    ASSERT_TRUE(controller.get_acceld().isApprox((Eigen::Vector3d() << 0, 0, 0).finished())); 
+
+    ASSERT_TRUE(controller.get_Rd().isApprox((Eigen::MatrixXd::Identity(3, 3)))); 
+    ASSERT_TRUE(controller.get_Rd_dot().isApprox((Eigen::MatrixXd::Identity(3, 3)))); 
+    ASSERT_TRUE(controller.get_ang_vel_d().isApprox( Eigen::VectorXd::Zero(3))); 
+    ASSERT_TRUE(controller.get_ang_vel_d_dot().isApprox(Eigen::VectorXd::Zero(3))); 
+}
