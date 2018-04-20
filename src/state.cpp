@@ -2,6 +2,8 @@
 
 #include <Eigen/Dense>
 
+#include <memory>
+
 State::State( void ) {
     mpos.setZero(3);
     mvel.setZero(3);
@@ -27,6 +29,10 @@ Eigen::Matrix<double, 3, 3> State::get_att( void ) {
 
 Eigen::Vector3d State::get_ang_vel( void ) {
     return mang_vel;
+}
+
+Eigen::Matrix<double, 1, 18> get_state( void ) {
+    return mstate;
 }
 
 void State::state_to_array() {
@@ -55,4 +61,14 @@ void State::state_to_array() {
     mstate(15) = mang_vel(0);
     mstate(16) = mang_vel(1);
     mstate(17) = mang_vel(2);
+}
+
+void State::update_state(std::shared_ptr<State> new_state) {
+    mpos = new_state->get_pos();
+    mvel = new_state->get_vel();
+    mR = new_state->get_att();
+    mang_vel = new_state->get_ang_vel();
+    
+    state_to_array();
+
 }
