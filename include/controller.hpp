@@ -7,12 +7,12 @@
 #include <memory>
 
 class AttitudeController {
+
     public:
         /* AttitudeController( void ); */
         virtual ~AttitudeController( void ) {};
     
-        void body_fixed_pointing_attitude(const double &current_time,
-                     std::shared_ptr<State> state_in);
+        void body_fixed_pointing_attitude(std::shared_ptr<State> state_in);
         
         // getters for the desired attitude state
         Eigen::Matrix<double, 3, 3> get_Rd();
@@ -25,5 +25,20 @@ class AttitudeController {
         Eigen::Matrix<double, 3, 3> mRd_dot;
         Eigen::Matrix<double, 3, 1> mang_vel_d;
         Eigen::Matrix<double, 3, 1> mang_vel_d_dot;
+};
+
+class TranslationController {
+
+    public:
+        virtual ~TranslationController( void ) {};
+
+    private:
+        Eigen::Matrix<double, 3, 1> mposd;
+        Eigen::Matrix<double, 3, 1> mveld;
+        Eigen::Matrix<double, 3, 1> macceld;
+};
+
+class Controller {
+    
 };
 #endif

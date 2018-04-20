@@ -20,6 +20,7 @@ class TestController: public ::testing::Test {
             state_ptr->vel((Eigen::Vector3d() << 0, 0 ,0).finished());
             state_ptr->att(Eigen::MatrixXd::Identity(3, 3));
             state_ptr->ang_vel((Eigen::Vector3d() << 1, 1, 1).finished());
+            state_ptr->time(0);
         }
 
         virtual ~TestController() {
@@ -47,8 +48,7 @@ class TestController: public ::testing::Test {
 
 TEST_F(TestController, RotationMatrixDeterminant) {
     AttitudeController att_controller;
-    double current_time = 1;
     // define the state
-    att_controller.body_fixed_pointing_attitude(current_time, state_ptr);
+    att_controller.body_fixed_pointing_attitude(state_ptr);
     ASSERT_TRUE(assert_SO3(att_controller.get_Rd()));
 }
