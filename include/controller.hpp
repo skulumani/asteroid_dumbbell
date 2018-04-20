@@ -6,6 +6,8 @@
 #include <Eigen/Dense>
 #include <memory>
 
+class ReconstructMesh;
+
 class AttitudeController {
     friend class Controller;
 
@@ -31,7 +33,11 @@ class AttitudeController {
 class TranslationController {
     friend class Controller; 
     public:
+        TranslationController( void );
         virtual ~TranslationController( void ) {};
+        
+        void inertial_fixed_state(std::shared_ptr<const State> state_in,
+                std::shared_ptr<const State> des_state);
 
     private:
         Eigen::Matrix<double, 3, 1> mposd;
@@ -41,6 +47,12 @@ class TranslationController {
 
 class Controller {
     public:
+        Controller( void );
+        virtual ~Controller( void ) {};
+
+        std::shared_ptr<State> explore_asteroid(std::shared_ptr<const State> state, 
+                std::shared_ptr<const ReconstructMesh> rmesh);
+    private:
         AttitudeController att_control;
         TranslationController tran_control;
 };

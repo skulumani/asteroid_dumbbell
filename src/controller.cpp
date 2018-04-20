@@ -1,5 +1,6 @@
 #include "controller.hpp"
 #include "utilities.hpp"
+#include "reconstruct.hpp"
 
 #include <Eigen/Dense>
 
@@ -31,8 +32,6 @@ Eigen::Matrix<double, 3, 1> AttitudeController::get_ang_vel_d_dot() {
     return mang_vel_d_dot;
 }
 
-// TODO Write a function to take a square number of elements (4, 9, n*n) and make a
-// n by n matrix
 void AttitudeController::body_fixed_pointing_attitude(std::shared_ptr<const State> state_in) {
     
     // extract out the elements of the state
@@ -58,4 +57,24 @@ void AttitudeController::body_fixed_pointing_attitude(std::shared_ptr<const Stat
     mang_vel_d_dot.setZero(3, 1);
     
     assert(assert_SO3(mRd));
+}
+
+TranslationController::TranslationController( void ) {
+    mposd.setZero(3);
+    mveld.setZero(3);
+    macceld.setZero(3);
+}
+
+Controller::Controller( void ) {
+    
+}
+
+std::shared_ptr<State> Controller::explore_asteroid(std::shared_ptr<cont State> state_ptr,
+        std::shared_ptr<const ReconstructMesh> rmesh_ptr) {
+
+    // instantiate a pointer to a new state for exploration
+    std::shared_ptr<State> new_state_ptr = std::make_shared<State>();
+
+    // update with teh calculated state data
+    return new_state_ptr;
 }
