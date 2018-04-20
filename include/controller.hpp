@@ -1,8 +1,10 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include <Eigen/Dense>
+#include "state.hpp"
 
+#include <Eigen/Dense>
+#include <memory>
 
 class AttitudeController {
     public:
@@ -10,7 +12,7 @@ class AttitudeController {
         virtual ~AttitudeController( void ) {};
     
         void body_fixed_pointing_attitude(const double &current_time,
-                     const Eigen::Ref<const Eigen::Matrix<double, 1, 18> > &state);
+                     std::shared_ptr<State> state_in);
         
         // getters for the desired attitude state
         Eigen::Matrix<double, 3, 3> get_Rd();

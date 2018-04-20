@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 
+#include <memory>
 #include <iostream>
 
 // getters for variables
@@ -24,21 +25,10 @@ Eigen::Matrix<double, 3, 1> AttitudeController::get_ang_vel_d_dot() {
 // TODO Write a function to take a square number of elements (4, 9, n*n) and make a
 // n by n matrix
 void AttitudeController::body_fixed_pointing_attitude(const double &current_time,
-                                  const Eigen::Ref<const Eigen::Matrix<double, 1, 18> > &state) {
+                                                     std::shared_ptr<State> state_in) {
     
     // extract out the elements of the state
-    Eigen::Matrix<double, 3, 1> pos(3), vel(3), ang_vel(3);
-    Eigen::Matrix<double, 1, 9> R_flat;
-    pos = state.segment<3>(0);
-    vel = state.segment<3>(3);
-    Eigen::MatrixXd A(3,3);
-    R_flat = state.segment<9>(6);
-    A = Eigen::Map<Eigen::MatrixXd>(R_flat.data(), 3, 3);
-    std::cout << state.segment<9>(6) << std::endl;
-    std::cout << A << std::endl;
-    /* R = Eigen::Map<Eigen::Matrix<double, 3, 3>>(state.segment(6, 9)); */
-    /* ang_vel = state.segment(15, 3); */
-
+    std::cout << "hello" << std::endl;
 
     /* // desired attitude such that b1 points to origin/asteroid */
     /* Eigen::Matrix<double, 3, 1> b1_des(3), b2_des(3), b3_des(3), z_axis(0, 0, 1); */
