@@ -16,9 +16,10 @@ class TestController: public ::testing::Test {
         TestController() {
             // You can do set-up work for each test here.
             // initialize the mesh
-            state_ptr->pos((Eigen::Vector3d() << 1.5, 0, 0).finished());
-            state_ptr->vel((Eigen::Vector3d() << 0, 0 ,0).finished());
-            state_ptr->att(Eigen::MatrixXd::Identity(3, 3));
+            state_ptr->pos(Eigen::VectorXd::Random(3, 1) + (Eigen::Vector3d() << 2, 2, 2).finished());
+            state_ptr->vel(Eigen::VectorXd::Random(3, 1));
+            R = Eigen::AngleAxisd(0, (Eigen::Vector3d() << 1, 0, 0).finished());
+            state_ptr->att(R);
             state_ptr->ang_vel((Eigen::Vector3d() << 1, 1, 1).finished());
             state_ptr->time(0);
         }
@@ -43,12 +44,14 @@ class TestController: public ::testing::Test {
         // Objects declared here can be used by all tests in the test case for Foo.
         // define a state
         std::shared_ptr<State> state_ptr = std::make_shared<State>();
+        Eigen::Matrix<double, 3, 3> R;
 
 };
 
-TEST_F(TestController, RotationMatrixDeterminant) {
+TEST_F(TestController, RotationMatrixSO3) {
     AttitudeController att_controller;
     // define the state
     att_controller.body_fixed_pointing_attitude(state_ptr);
     ASSERT_TRUE(assert_SO3(att_controller.get_Rd()));
 }
+

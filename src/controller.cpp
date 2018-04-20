@@ -69,7 +69,7 @@ Controller::Controller( void ) {
     
 }
 
-std::shared_ptr<State> Controller::explore_asteroid(std::shared_ptr<cont State> state_ptr,
+std::shared_ptr<State> Controller::explore_asteroid(std::shared_ptr<const State> state_ptr,
         std::shared_ptr<const ReconstructMesh> rmesh_ptr) {
 
     // instantiate a pointer to a new state for exploration
