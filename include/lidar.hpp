@@ -96,7 +96,10 @@ class Lidar {
         Eigen::Matrix<double, Eigen::Dynamic, 3> define_targets(const Eigen::Ref<const Eigen::RowVector3d> &pos,
                                                                 const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_b2f,
                                                                 const double &dist);
-
+        
+        Eigen::RowVector3d define_target(const Eigen::Ref<const Eigen::RowVector3d> &pos,
+                                                  const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_b2f,
+                                                  const double &dist);
         Eigen::Vector3d get_view_axis();
         Eigen::Vector3d get_up_axis();
         Eigen::Matrix<double, Eigen::Dynamic, 3> get_lidar_array();

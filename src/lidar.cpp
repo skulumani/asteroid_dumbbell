@@ -59,6 +59,15 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> Lidar::define_targets(const Eigen::Ref<
     return targets;
 }
 
+Eigen::RowVector3d Lidar::define_target(const Eigen::Ref<const Eigen::RowVector3d> &pos,
+                                       const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_b2f,
+                                       const double &dist) {
+    
+    Eigen::RowVector3d target;
+    target = (R_b2f * (dist * mview_axis)).transpose();
+    return target;
+}
+
 Eigen::Vector3d Lidar::get_view_axis() {
     return mview_axis;
 }
