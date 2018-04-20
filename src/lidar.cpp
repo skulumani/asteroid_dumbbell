@@ -64,7 +64,7 @@ Eigen::RowVector3d Lidar::define_target(const Eigen::Ref<const Eigen::RowVector3
                                        const double &dist) {
     
     Eigen::RowVector3d target;
-    target = (R_b2f * (dist * mview_axis)).transpose();
+    target = (R_b2f * (dist * mview_axis)).transpose() + pos;
     return target;
 }
 

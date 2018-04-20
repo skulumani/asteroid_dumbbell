@@ -78,3 +78,17 @@ TEST(TestLidar, Targets) {
 
     ASSERT_TRUE(targets.isApprox(targets_true, 1e-3));
 }
+
+TEST(TestLidar, SingleTarget) {
+    Eigen::Vector3d pos;
+    Eigen::Matrix<double, 3, 3> R;
+    R = Eigen::AngleAxis<double>(0, Eigen::Vector3d(1, 0, 0));
+    double dist = 5;
+
+    pos << 1.5 , 0, 0;
+    Lidar sensor;
+    Eigen::Matrix<double, 1, 3> target = sensor.define_target(pos, R, dist);
+    Eigen::Matrix<double, 1, 3> target_true(1, 3);
+    target_true << 6.5, 0, 0;
+    ASSERT_TRUE(target.isApprox(target_true));
+}
