@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 
+#include <memory>
 #include <iostream>
 
 // The fixture for testing class Foo.
@@ -14,6 +15,10 @@ class TestController: public ::testing::Test {
         TestController() {
             // You can do set-up work for each test here.
             // initialize the mesh
+            state_ptr->pos((Eigen::Vector3d() << 1.5, 0, 0).finished());
+            state_ptr->vel((Eigen::Vector3d() << 0, 0 ,0).finished());
+            state_ptr->att(Eigen::MatrixXd::Identity(3, 3));
+            state_ptr->ang_vel((Eigen::Vector3d() << 1, 1, 1).finished());
         }
 
         virtual ~TestController() {
@@ -34,15 +39,14 @@ class TestController: public ::testing::Test {
         }
 
         // Objects declared here can be used by all tests in the test case for Foo.
-        Eigen::Matrix<double, 3, 1> pos, vel;
+        // define a state
+        std::shared_ptr<State> state_ptr = std::make_shared<State>();
 
 };
 
 TEST_F(TestController, RotationMatrixDeterminant) {
     AttitudeController att_controller;
-    // define the state
-    Eigen::Matrix<double, 1, 18> state;
-    state = Eigen::MatrixXd::Random(1, 18);
     double current_time = 1;
-    /* att_controller.body_fixed_pointing_attitude(current_time, state);g */
+    // define the state
+    att_controller.body_fixed_pointing_attitude(current_time, state_ptr);
 }
