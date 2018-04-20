@@ -94,6 +94,7 @@ set(cgal_src
     ${PROJECT_SOURCE_DIR}/src/polyhedron.cpp
     ${PROJECT_SOURCE_DIR}/src/lidar.cpp
     ${PROJECT_SOURCE_DIR}/src/controller.cpp
+    ${PROJECT_SOURCE_DIR}/src/state.cpp
     )
 add_library(cgal_cpp SHARED ${cgal_src})
 
