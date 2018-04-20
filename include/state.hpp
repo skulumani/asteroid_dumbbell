@@ -43,7 +43,23 @@ class State {
         Eigen::Vector3d get_ang_vel( void );
 
     private:
-        Eigen::Vector3d mpos, mvel, mang_vel;
-        Eigen::Matrix<double, 3, 3> mR;
+        Eigen::Vector3d mpos; /**< Position of the vehicle COM wrt to inertial frame and expressed in the inertial frame */
+        Eigen::Vector3d mvel; /**< Velocity of teh vehicle COM wrt to inertial frame and expressed in the inertial frame */
+        Eigen::Vector3d mang_vel; /**< Angular velocity of body frame wrt inertial frame defined in body frame */
+        Eigen::Matrix<double, 3, 3> mR; /**< Rotation of vectors from the body frame to the inertial frame */
+        Eigen::Array<double, 1, 18> state; /**< Big array holding all the member state variables */
+        
+        /** @fn Build an array out of the member variables
+                
+            Turn all of the individual member variables into one giant
+            row vector for the state
+
+            @param none 
+            @returns none
+
+            @author Shankar Kulumani
+            @version 20 April 2018
+        */
+        void state_to_array();
 };
 #endif
