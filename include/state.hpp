@@ -60,12 +60,12 @@ class State {
         void update_state(std::shared_ptr<State> new_state);
 
         // Getters to return member attributes
-        Eigen::Vector3d get_pos( void );
-        Eigen::Vector3d get_vel( void );
-        Eigen::Matrix<double, 3, 3> get_att( void );
-        Eigen::Vector3d get_ang_vel( void );
-        Eigen::Matrix<double, 1, 18> get_state( void );
-        double get_time( void );
+        Eigen::Vector3d get_pos( void ) const;
+        Eigen::Vector3d get_vel( void ) const;
+        Eigen::Matrix<double, 3, 3> get_att( void ) const;
+        Eigen::Vector3d get_ang_vel( void ) const;
+        Eigen::Matrix<double, 1, 18> get_state( void ) const;
+        double get_time( void ) const;
     private:
         double mtime;
         Eigen::Vector3d mpos; /**< Position of the vehicle COM wrt to inertial frame and expressed in the inertial frame */

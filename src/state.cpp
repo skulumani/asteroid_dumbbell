@@ -15,27 +15,27 @@ State::State( void ) {
 }
 
 // Definitions for getters of member variables
-Eigen::Vector3d State::get_pos( void ) {
+Eigen::Vector3d State::get_pos( void ) const {
     return mpos;
 }
 
-Eigen::Vector3d State::get_vel( void ) {
+Eigen::Vector3d State::get_vel( void ) const {
     return mvel;
 }
 
-Eigen::Matrix<double, 3, 3> State::get_att( void ) {
+Eigen::Matrix<double, 3, 3> State::get_att( void ) const {
     return mR;
 }
 
-Eigen::Vector3d State::get_ang_vel( void ) {
+Eigen::Vector3d State::get_ang_vel( void ) const {
     return mang_vel;
 }
 
-Eigen::Matrix<double, 1, 18> get_state( void ) {
+Eigen::Matrix<double, 1, 18> State::get_state( void ) const {
     return mstate;
 }
 
-double get_time( void  ) {
+double State::get_time( void  ) const {
     return mtime;
 }
 
