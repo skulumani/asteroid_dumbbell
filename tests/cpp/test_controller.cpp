@@ -1,30 +1,32 @@
 #include "controller.hpp"
 #include "state.hpp"
 #include "utilities.hpp"
+#include "geodesic.hpp"
 
 #include <gtest/gtest.h>
 
 #include <memory>
 #include <iostream>
+#include <cmath>
 
 // The fixture for testing class Foo.
-class TestController: public ::testing::Test {
+class TestAttitudeController: public ::testing::Test {
     protected:
         // You can remove any or all of the following functions if its body
         // is empty.
 
-        TestController() {
+        TestAttitudeController() {
             // You can do set-up work for each test here.
             // initialize the mesh
             state_ptr->pos(Eigen::VectorXd::Random(3, 1) + (Eigen::Vector3d() << 2, 2, 2).finished());
             state_ptr->vel(Eigen::VectorXd::Random(3, 1));
-            R = Eigen::AngleAxisd(0, (Eigen::Vector3d() << 1, 0, 0).finished());
+            R = Eigen::AngleAxisd(rd(), (Eigen::Vector3d() << 1, 0, 0).finished());
             state_ptr->att(R);
             state_ptr->ang_vel((Eigen::Vector3d() << 1, 1, 1).finished());
-            state_ptr->time(0);
+            state_ptr->time(rd() * 100);
         }
 
-        virtual ~TestController() {
+        virtual ~TestAttitudeController() {
             // You can do clean-up work that doesn't throw exceptions here.
         }
 
@@ -45,13 +47,39 @@ class TestController: public ::testing::Test {
         // define a state
         std::shared_ptr<State> state_ptr = std::make_shared<State>();
         Eigen::Matrix<double, 3, 3> R;
+        Rand_double rd{ 0, 2 * kPI };
 
 };
 
-TEST_F(TestController, RotationMatrixSO3) {
+TEST_F(TestAttitudeController, RotationMatrixSO3) {
     AttitudeController att_controller;
     // define the state
     att_controller.body_fixed_pointing_attitude(state_ptr);
     ASSERT_TRUE(assert_SO3(att_controller.get_Rd()));
+}
+
+TEST_F(TestAttitudeController, SatisfyKinematics) {
+    AttitudeController att_controller;
+    att_controller.body_fixed_pointing_attitude(state_ptr);
+}
+
+TEST_F(TestAttitudeController, XAxisAntiAlignedWithPositionVector) {
+    AttitudeController att_controller;
+    att_controller.body_fixed_pointing_attitude(state_ptr);
+    
+    double dot_product = att_controller.get_Rd().col(0).dot(state_ptr->get_pos().normalized()); 
+    ASSERT_NEAR(dot_product, -1, 1e-6);
+}
+
+TEST_F(TestAttitudeController, ZAxisAlignedWithPositivePole) {
+    AttitudeController att_controller;
+    att_controller.body_fixed_pointing_attitude(state_ptr);
+
+    Eigen::Matrix<double, 3, 1> bodyz_inertial, z_inertial;
+    bodyz_inertial = att_controller.get_Rd().col(2);
+    z_inertial << 0, 0, 1;
+    
+    double angle = std::acos(bodyz_inertial.dot(z_inertial));
+    ASSERT_LE(angle, kPI / 2);
 }
 
