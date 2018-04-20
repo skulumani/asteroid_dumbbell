@@ -1,5 +1,6 @@
 #include "controller.hpp"
 #include "state.hpp"
+#include "utilities.hpp"
 
 #include <gtest/gtest.h>
 
@@ -49,4 +50,5 @@ TEST_F(TestController, RotationMatrixDeterminant) {
     double current_time = 1;
     // define the state
     att_controller.body_fixed_pointing_attitude(current_time, state_ptr);
+    ASSERT_TRUE(assert_SO3(att_controller.get_Rd()));
 }
