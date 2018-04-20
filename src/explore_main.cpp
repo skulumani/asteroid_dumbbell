@@ -68,6 +68,7 @@ int main(int argc, char* argv[])
 
         // use this measurement to update rmesh (inside holds teh mesh estimate)
         // use the updated weight to find a new positoin to move to
+        // update the state ptr with the newly calculated state
         // save the data (raycast interseciton, position of sat, ast estimate, targets) to hdf5
         // LOOP
     }
