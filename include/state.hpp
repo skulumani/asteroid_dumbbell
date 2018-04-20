@@ -8,7 +8,7 @@
 #ifndef STATE_H
 #define STATE_H
 
-#inclue <Eigen/Dense>
+#include <Eigen/Dense>
 
 class State {
     public:
@@ -26,8 +26,8 @@ class State {
             return *this;
         }
 
-        inline State& att(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> &R_in) {
-            mR << R;
+        inline State& att(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_in) {
+            mR << R_in;
             return *this;
         }
 
@@ -37,13 +37,13 @@ class State {
         }
         
         // Getters to return member attributes
-        Eigen::Vector3d get_pos();
-        Eigen::Vector3d get_vel();
-        Eigen::Matrix<double, 3, 3> get_att();
-        Eigen::Vector3d get_ang_vel();
+        Eigen::Vector3d get_pos( void );
+        Eigen::Vector3d get_vel( void );
+        Eigen::Matrix<double, 3, 3> get_att( void );
+        Eigen::Vector3d get_ang_vel( void );
 
     private:
-        Eigen::Vector3d mpos(3), mvel(3), mang_vel(3);
-        Eigen::Matrix<double, 3, 3> mR(3, 3);
+        Eigen::Vector3d mpos, mvel, mang_vel;
+        Eigen::Matrix<double, 3, 3> mR;
 };
 #endif
