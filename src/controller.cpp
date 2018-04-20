@@ -79,7 +79,9 @@ void TranslationController::minimize_uncertainty(std::shared_ptr<const State> st
     
     std::cout << rmesh->get_verts().row(maxRow) << std::endl;
     // pick out the corresponding vertex of the asteroid that should be viewed
-
+    
+    // use current norm of position and output a position with same radius but just above the minium point
+    //
     // determine a xd, veld, acceld that is above the vertex
 }
 
