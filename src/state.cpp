@@ -35,6 +35,10 @@ Eigen::Matrix<double, 1, 18> get_state( void ) {
     return mstate;
 }
 
+double get_time( void  ) {
+    return mtime;
+}
+
 void State::state_to_array() {
     // add postion to the array
     mstate(0) = mpos(0);
