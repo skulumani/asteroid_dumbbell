@@ -47,7 +47,7 @@ class State {
         Eigen::Vector3d mvel; /**< Velocity of teh vehicle COM wrt to inertial frame and expressed in the inertial frame */
         Eigen::Vector3d mang_vel; /**< Angular velocity of body frame wrt inertial frame defined in body frame */
         Eigen::Matrix<double, 3, 3> mR; /**< Rotation of vectors from the body frame to the inertial frame */
-        Eigen::Array<double, 1, 18> state; /**< Big array holding all the member state variables */
+        Eigen::Array<double, 1, 18> mstate; /**< Big array holding all the member state variables */
         
         /** @fn Build an array out of the member variables
                 
