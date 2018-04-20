@@ -74,8 +74,6 @@ int main(int argc, char* argv[])
     std::cout << intersections << std::endl;
     
     AttitudeController att_control;
-    Eigen::Matrix<double, 1, 18> state;
-    state = Eigen::MatrixXd::Random(1, 18);
-    att_control.body_fixed_pointing_attitude(0.0, state);
+    /* att_control.body_fixed_pointing_attitude(0.0, state); */
     return 0;
 }

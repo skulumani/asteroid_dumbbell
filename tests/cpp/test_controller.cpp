@@ -1,4 +1,5 @@
 #include "controller.hpp"
+#include "state.hpp"
 
 #include <gtest/gtest.h>
 
@@ -43,5 +44,5 @@ TEST_F(TestController, RotationMatrixDeterminant) {
     Eigen::Matrix<double, 1, 18> state;
     state = Eigen::MatrixXd::Random(1, 18);
     double current_time = 1;
-    att_controller.body_fixed_pointing_attitude(current_time, state);
+    /* att_controller.body_fixed_pointing_attitude(current_time, state);g */
 }
