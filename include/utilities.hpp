@@ -3,6 +3,6 @@
 
 #include <Eigen/Dense>
 
-bool assert_so3(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R);
+bool assert_SO3(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R);
 
 #endif
