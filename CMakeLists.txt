@@ -180,6 +180,7 @@ set(test_all_src
     tests/cpp/test_cgal.cpp
 	tests/cpp/test_lidar.cpp
     tests/cpp/test_controller.cpp
+	tests/cpp/test_utilities.cpp
     src/wavefront.cpp)
 
 add_executable(test_all ${test_all_src})
