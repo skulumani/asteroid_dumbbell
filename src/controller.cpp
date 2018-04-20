@@ -77,12 +77,16 @@ void TranslationController::minimize_uncertainty(std::shared_ptr<const State> st
     Eigen::MatrixXd::Index maxRow, maxCol;
     rmesh->get_weights().maxCoeff(&maxRow, &maxCol);
     
-    std::cout << rmesh->get_verts().row(maxRow) << std::endl;
+    Eigen::RowVector3d max_vertex;
+    max_vertex = rmesh->get_verts().row(maxRow);
     // pick out the corresponding vertex of the asteroid that should be viewed
     
     // use current norm of position and output a position with same radius but just above the minium point
-    //
-    // determine a xd, veld, acceld that is above the vertex
+    double current_radius = state->get_pos().norm();
+
+    mposd = max_vertex.normalized() * current_radius;
+    mveld.setZero(3);
+    macceld.setZero(3);
 }
 
 Eigen::Matrix<double, 3, 1> TranslationController::get_posd( void ) const {
@@ -105,7 +109,7 @@ void Controller::explore_asteroid(std::shared_ptr<const State> state_ptr,
         std::shared_ptr<const ReconstructMesh> rmesh_ptr) {
     
     // choose a position to minimize the uncertainty
-
+    minimize_uncertainty(state_ptr, rmesh_ptr);
     // from that position make sure we're looking at the object
 
     // instantiate a pointer to a new state for exploration
