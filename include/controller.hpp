@@ -38,6 +38,9 @@ class TranslationController {
         virtual ~TranslationController( void ) {};
         
         void inertial_fixed_state(std::shared_ptr<const State> des_state);
+    
+        void minimize_uncertainty(std::shared_ptr<const State> state,
+                                  std::shared_ptr<const ReconstructMesh> rmesh);
 
         Eigen::Matrix<double, 3, 1> get_posd( void ) const;
         Eigen::Matrix<double, 3, 1> get_veld( void ) const;
@@ -53,8 +56,9 @@ class Controller: public TranslationController, public AttitudeController {
         Controller( void );
         virtual ~Controller( void ) {};
 
-        std::shared_ptr<State> explore_asteroid(std::shared_ptr<const State> state, 
+       void explore_asteroid(std::shared_ptr<const State> state, 
                 std::shared_ptr<const ReconstructMesh> rmesh);
-
+    
+       
 };
 #endif

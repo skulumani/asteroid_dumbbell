@@ -71,6 +71,15 @@ void TranslationController::inertial_fixed_state(std::shared_ptr<const State> de
     macceld.setZero(3);
 }
 
+void TranslationController::minimize_uncertainty(std::shared_ptr<const State> state,
+                                                 std::shared_ptr<const ReconstructMesh> rmesh) {
+    // find index of largest uncertainty (first one)
+
+    // pick out the corresponding vertex of the asteroid that should be viewed
+
+    // determine a xd, veld, acceld that is above the vertex
+}
+
 Eigen::Matrix<double, 3, 1> TranslationController::get_posd( void ) const {
     return mposd;
 }
@@ -87,12 +96,16 @@ Controller::Controller( void ) {
     
 }
 
-std::shared_ptr<State> Controller::explore_asteroid(std::shared_ptr<const State> state_ptr,
+void Controller::explore_asteroid(std::shared_ptr<const State> state_ptr,
         std::shared_ptr<const ReconstructMesh> rmesh_ptr) {
+    
+    // choose a position to minimize the uncertainty
+
+    // from that position make sure we're looking at the object
 
     // instantiate a pointer to a new state for exploration
-    std::shared_ptr<State> new_state_ptr = std::make_shared<State>();
 
     // update with teh calculated state data
-    return new_state_ptr;
 }
+
+
