@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
     RayCaster caster(true_asteroid);
     SurfMesh ellipsoid(axes(0), axes(1), axes(2),
             min_angle, max_radius, max_distance);
-    ReconstructMesh rmesh(ellipsoid.verts(), ellipsoid.faces());
+    std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(ellipsoid.verts(), ellipsoid.faces());
     Controller controller;
 
     Lidar sensor;
@@ -60,6 +60,8 @@ int main(int argc, char* argv[])
 
     state_ptr->update_state(initial_state_ptr);
     // modify the initial state to point at the body using the controller
+    controller.minimize_uncertainty(state_ptr, rmesh_ptr);
+
     // targets to be updated in the loop
     Eigen::Matrix<double, 1, 3> target(1, 3);
     Eigen::Matrix<double, 1, 3> intersection(1, 3);
