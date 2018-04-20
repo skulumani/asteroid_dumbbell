@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <iostream>
+#include <cassert>
 
 // getters for variables
 Eigen::Matrix<double, 3, 3> AttitudeController::get_Rd() {
