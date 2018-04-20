@@ -7,7 +7,8 @@ State::State( void ) {
     mvel.setZero(3);
     mR.setIdentity(3, 3);
     mang_vel.setZero(3);
-
+    
+    mtime = 0;
     state_to_array();
 }
 

@@ -40,6 +40,11 @@ class State {
             return *this;
         }
         
+        inline State& time(const double &time_in) {
+            mtime = time_in;
+            return *this;
+        }
+
         // Getters to return member attributes
         Eigen::Vector3d get_pos( void );
         Eigen::Vector3d get_vel( void );
@@ -47,6 +52,7 @@ class State {
         Eigen::Vector3d get_ang_vel( void );
 
     private:
+        double mtime;
         Eigen::Vector3d mpos; /**< Position of the vehicle COM wrt to inertial frame and expressed in the inertial frame */
         Eigen::Vector3d mvel; /**< Velocity of teh vehicle COM wrt to inertial frame and expressed in the inertial frame */
         Eigen::Vector3d mang_vel; /**< Angular velocity of body frame wrt inertial frame defined in body frame */
