@@ -7,6 +7,13 @@
 #include <iostream>
 #include <cassert>
 
+AttitudeController::AttitudeController( void ) {
+    mRd.setIdentity(3, 3);
+    mRd_dot.setIdentity(3, 3);
+    mang_vel_d.setZero(3, 1);
+    mang_vel_d_dot.setZero(3, 1);
+}
+
 // getters for variables
 Eigen::Matrix<double, 3, 3> AttitudeController::get_Rd() {
     return mRd;
@@ -26,7 +33,7 @@ Eigen::Matrix<double, 3, 1> AttitudeController::get_ang_vel_d_dot() {
 
 // TODO Write a function to take a square number of elements (4, 9, n*n) and make a
 // n by n matrix
-void AttitudeController::body_fixed_pointing_attitude(std::shared_ptr<State> state_in) {
+void AttitudeController::body_fixed_pointing_attitude(std::shared_ptr<const State> state_in) {
     
     // extract out the elements of the state
     Eigen::Vector3d pos, vel, ang_vel;
