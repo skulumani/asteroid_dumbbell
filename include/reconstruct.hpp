@@ -25,9 +25,9 @@ class ReconstructMesh {
                         const double &max_angle);
 
         // functions to access the private members
-        Eigen::MatrixXd get_verts( void );
-        Eigen::MatrixXi get_faces( void );
-        Eigen::MatrixXd get_weights( void );
+        Eigen::MatrixXd get_verts( void ) const;
+        Eigen::MatrixXi get_faces( void ) const;
+        Eigen::MatrixXd get_weights( void ) const;
         
         void update_meshdata( void );
     private:

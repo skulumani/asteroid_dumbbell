@@ -40,15 +40,15 @@ ReconstructMesh::ReconstructMesh(std::shared_ptr<MeshData> mesh_in) {
     this->weights << initial_weight(this->vertices);
 }
 
-Eigen::MatrixXd ReconstructMesh::get_verts( void ) {
+Eigen::MatrixXd ReconstructMesh::get_verts( void ) const {
     return this->vertices;
 }
 
-Eigen::MatrixXi ReconstructMesh::get_faces( void ) {
+Eigen::MatrixXi ReconstructMesh::get_faces( void ) const {
     return this->faces;
 }
 
-Eigen::MatrixXd ReconstructMesh::get_weights( void ) {
+Eigen::MatrixXd ReconstructMesh::get_weights( void ) const {
     return this->weights;
 }
 
