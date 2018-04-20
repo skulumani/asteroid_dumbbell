@@ -18,21 +18,25 @@ class State {
         // named parameters idiom to set member attributes
         inline State& pos(const Eigen::Ref<const Eigen::Vector3d> &pos_in) {
             mpos << pos_in;
+            state_to_array();
             return *this;
         }
 
         inline State& vel(const Eigen::Ref<const Eigen::Vector3d> &vel_in) {
             mvel << vel_in;
+            state_to_array();
             return *this;
         }
 
         inline State& att(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_in) {
             mR << R_in;
+            state_to_array();
             return *this;
         }
 
         inline State& ang_vel(const Eigen::Ref<const Eigen::Vector3d> &ang_vel_in) {
             mang_vel << ang_vel_in;
+            state_to_array();
             return *this;
         }
         

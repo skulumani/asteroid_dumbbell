@@ -7,6 +7,8 @@ State::State( void ) {
     mvel.setZero(3);
     mR.setIdentity(3, 3);
     mang_vel.setZero(3);
+
+    state_to_array();
 }
 
 // Definitions for getters of member variables
