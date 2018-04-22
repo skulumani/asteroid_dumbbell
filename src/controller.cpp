@@ -80,7 +80,8 @@ void TranslationController::minimize_uncertainty(std::shared_ptr<const State> st
     Eigen::RowVector3d max_vertex;
     max_vertex = rmesh->get_verts().row(maxRow);
     // pick out the corresponding vertex of the asteroid that should be viewed
-    
+    // TODO Look at finding a vertex that is closest to the current state
+    //
     // use current norm of position and output a position with same radius but just above the minium point
     double current_radius = state->get_pos().norm();
 
