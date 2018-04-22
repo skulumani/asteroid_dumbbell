@@ -39,6 +39,19 @@ class TranslationController {
         
         void inertial_fixed_state(std::shared_ptr<const State> des_state);
     
+        /** @fn Compute desired translation state to minimize uncertainty
+                
+            Given the current state and the reconstructed mesh this will
+            find the desired position, velocity, and acceleration to be 
+            directly above the vertex with the maximum uncertainty.
+
+            @param state State object defining the current state
+            @param rmesh ReconstructMesh object with the v, f, and w 
+            @returns void Desired state is saved to member variables
+
+            @author Shankar Kulumani
+            @version 22 April 2018
+        */
         void minimize_uncertainty(std::shared_ptr<const State> state,
                                   std::shared_ptr<const ReconstructMesh> rmesh);
 
