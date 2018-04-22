@@ -86,8 +86,15 @@ void State::state_to_array() {
 void State::update_state(std::shared_ptr<State> new_state) {
     mpos = new_state->get_pos();
     mvel = new_state->get_vel();
+    maccel = new_state->get_accel();
+
     mR = new_state->get_att();
+    mR_dot = new_state->get_att_dot();
+
     mang_vel = new_state->get_ang_vel();
+    mang_vel_dot = new_state->get_ang_vel_dot();
+
+    // update teh controller varaibles too
     
     state_to_array();
 
