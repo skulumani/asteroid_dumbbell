@@ -111,8 +111,41 @@ TEST(TestTranslationController, MinimumUncertaintyCube) {
     tran_controller.minimize_uncertainty(state_ptr, rmesh_ptr);
     
     ASSERT_TRUE(tran_controller.get_posd().isApprox((Eigen::Vector3d() << -1 , -1, -1).finished()));
+    ASSERT_TRUE(tran_controller.get_veld().isApprox((Eigen::Vector3d::Zero(3))));
+    ASSERT_TRUE(tran_controller.get_acceld().isApprox((Eigen::Vector3d::Zero(3))));
 }
 
 TEST(TestController, MinimumUncertaintyCube) {
+    std::shared_ptr<MeshData> mesh_ptr;
+    mesh_ptr = Loader::load("./integration/cube.obj");
+    std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(mesh_ptr);
+    Controller controller;
+    // define an initial state right above one of the corners    
+    std::shared_ptr<State> state_ptr = std::make_shared<State>();
+    state_ptr->pos((Eigen::Vector3d() << -1, -1, -1).finished());
 
+    controller.minimize_uncertainty(state_ptr, rmesh_ptr);
+    
+    ASSERT_TRUE(controller.get_posd().isApprox((Eigen::Vector3d() << -1 , -1, -1).finished()));
+    ASSERT_TRUE(controller.get_veld().isApprox((Eigen::Vector3d::Zero(3))));
+    ASSERT_TRUE(controller.get_acceld().isApprox((Eigen::Vector3d::Zero(3))));
+
+}
+
+TEST(TestController, ExploreCube) {
+    std::shared_ptr<MeshData> mesh_ptr;
+    mesh_ptr = Loader::load("./integration/cube.obj");
+    std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(mesh_ptr);
+    Controller controller;
+    // define an initial state right above one of the corners    
+    std::shared_ptr<State> state_ptr = std::make_shared<State>();
+    state_ptr->pos((Eigen::Vector3d() << -1, -1, -1).finished());
+
+    controller.explore_asteroid(state_ptr, rmesh_ptr);
+    
+    ASSERT_TRUE(controller.get_posd().isApprox((Eigen::Vector3d() << -1 , -1, -1).finished()));
+    ASSERT_TRUE(controller.get_veld().isApprox((Eigen::Vector3d::Zero(3))));
+    ASSERT_TRUE(controller.get_acceld().isApprox((Eigen::Vector3d::Zero(3))));
+    
+    ASSERT_TRUE(controller.get_Rd().col(0).isApprox((Eigen::Vector3d() << 1, 1, 1).finished().normalized()));
 }
