@@ -148,4 +148,27 @@ TEST(TestController, ExploreCube) {
     ASSERT_TRUE(controller.get_acceld().isApprox((Eigen::Vector3d::Zero(3))));
     
     ASSERT_TRUE(controller.get_Rd().col(0).isApprox((Eigen::Vector3d() << 1, 1, 1).finished().normalized()));
+    ASSERT_TRUE(controller.get_Rd_dot().isApprox((Eigen::MatrixXd::Zero(3,3))));
+}
+
+TEST(TestController, ExploreCubeReturnState) {
+    std::shared_ptr<MeshData> mesh_ptr;
+    mesh_ptr = Loader::load("./integration/cube.obj");
+    std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(mesh_ptr);
+    Controller controller;
+    // define an initial state right above one of the corners    
+    std::shared_ptr<State> state_ptr = std::make_shared<State>();
+    state_ptr->pos((Eigen::Vector3d() << -1, -1, -1).finished());
+
+    controller.explore_asteroid(state_ptr, rmesh_ptr);
+    
+    std::shared_ptr<State> new_state_ptr = controller.get_desired_state();
+
+    ASSERT_TRUE(new_state_ptr->get_pos().isApprox((Eigen::Vector3d() << -1 , -1, -1).finished()));
+    ASSERT_TRUE(new_state_ptr->get_vel().isApprox((Eigen::Vector3d::Zero(3))));
+    ASSERT_TRUE(new_state_ptr->get_accel().isApprox((Eigen::Vector3d::Zero(3))));
+    
+    ASSERT_TRUE(new_state_ptr->get_att().col(0).isApprox((Eigen::Vector3d() << 1, 1, 1).finished().normalized()));
+    ASSERT_TRUE(new_state_ptr->get_att_dot().isApprox((Eigen::MatrixXd::Zero(3,3))));
+
 }
