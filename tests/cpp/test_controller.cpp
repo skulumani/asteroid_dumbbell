@@ -2,6 +2,9 @@
 #include "state.hpp"
 #include "utilities.hpp"
 #include "geodesic.hpp"
+#include "mesh.hpp"
+#include "loader.hpp"
+#include "reconstruct.hpp"
 
 #include <gtest/gtest.h>
 
@@ -94,4 +97,13 @@ TEST(TestController, Inheritance) {
     ASSERT_TRUE(controller.get_Rd_dot().isApprox((Eigen::MatrixXd::Identity(3, 3)))); 
     ASSERT_TRUE(controller.get_ang_vel_d().isApprox( Eigen::VectorXd::Zero(3))); 
     ASSERT_TRUE(controller.get_ang_vel_d_dot().isApprox(Eigen::VectorXd::Zero(3))); 
+}
+
+TEST_F(TestAttitudeController, MinimumUncertaintyCube) {
+    std::shared_ptr<MeshData> mesh_ptr;
+    mesh_ptr = Loader::load("./integration/cube.obj");
+    std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(mesh_ptr);
+    TranslationController tran_controller;
+    
+    tran_controller.minimize_uncertainty(state_ptr, rmesh_ptr);
 }
