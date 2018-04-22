@@ -35,6 +35,9 @@ int main(int argc, char* argv[])
     }
 
     // initialize all the objects
+    double surf_area(axes(0));
+    double max_angle( pow(surf_area / (axes(0) * axes(0)), 0.5));
+
     std::shared_ptr<MeshData> true_asteroid;
     true_asteroid = Loader::load(input_file);
      
@@ -57,17 +60,20 @@ int main(int argc, char* argv[])
          .ang_vel((Eigen::RowVector3d() << 0, 0, 0).finished());
     std::shared_ptr<State> state_ptr = std::make_shared<State>(state);
     std::shared_ptr<State> initial_state_ptr = std::make_shared<State>(initial_state);
+    std::shared_ptr<State> new_state_ptr = std::make_shared<State>();
 
     state_ptr->update_state(initial_state_ptr);
     // modify the initial state to point at the body using the controller
-    controller.minimize_uncertainty(state_ptr, rmesh_ptr);
-
+    controller.explore_asteroid(state_ptr, rmesh_ptr);
+    new_state_ptr = controller.get_desired_state();
+    state_ptr->update_state(new_state_ptr);
+    
     // targets to be updated in the loop
     Eigen::Matrix<double, 1, 3> target(1, 3);
     Eigen::Matrix<double, 1, 3> intersection(1, 3);
 
     // LOOP HERE
-    for (int ii = 0; ii < 1; ++ii) {
+    for (int ii = 0; ii < 10; ++ii) {
         
         // compute targets for use in caster (point at the asteroid origin)
         target = sensor.define_target(state_ptr->get_pos(), state_ptr->get_att(), dist);    
@@ -76,15 +82,15 @@ int main(int argc, char* argv[])
         intersection = caster.castray(state_ptr->get_pos(), target);
 
         // use this measurement to update rmesh (inside holds teh mesh estimate)
+        rmesh_ptr->update(intersection, max_angle);
         // use the updated weight to find a new positoin to move to
+        controller.explore_asteroid(state_ptr, rmesh_ptr);
+        new_state_ptr = controller.get_desired_state();
         // update the state ptr with the newly calculated state
+        state_ptr->update_state(new_state_ptr);
         // save the data (raycast interseciton, position of sat, ast estimate, targets) to hdf5
         // LOOP
     }
-    std::cout << target << std::endl;
-    std::cout << intersection << std::endl;
     
-    AttitudeController att_control;
-    /* att_control.body_fixed_pointing_attitude(0.0, state); */
     return 0;
 }

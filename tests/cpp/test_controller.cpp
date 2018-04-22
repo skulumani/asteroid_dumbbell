@@ -168,6 +168,9 @@ TEST(TestController, ExploreCubeReturnState) {
     ASSERT_TRUE(new_state_ptr->get_vel().isApprox((Eigen::Vector3d::Zero(3))));
     ASSERT_TRUE(new_state_ptr->get_accel().isApprox((Eigen::Vector3d::Zero(3))));
     
+    double dot_product = controller.get_Rd().col(0).dot(state_ptr->get_pos().normalized()); 
+    ASSERT_NEAR(dot_product, -1, 1e-6);
+
     ASSERT_TRUE(new_state_ptr->get_att().col(0).isApprox((Eigen::Vector3d() << 1, 1, 1).finished().normalized()));
     ASSERT_TRUE(new_state_ptr->get_att_dot().isApprox((Eigen::MatrixXd::Zero(3,3))));
 

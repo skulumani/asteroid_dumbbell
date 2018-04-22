@@ -111,8 +111,12 @@ void Controller::explore_asteroid(std::shared_ptr<const State> state_ptr,
     
     // choose a position to minimize the uncertainty
     minimize_uncertainty(state_ptr, rmesh_ptr);
+
+    // Need a new state pointer with the updated position from above
+    std::shared_ptr<State> new_state = get_desired_state();
+
     // from that position make sure we're looking at the object
-    body_fixed_pointing_attitude(state_ptr);
+    body_fixed_pointing_attitude(new_state);
     
 }
 
