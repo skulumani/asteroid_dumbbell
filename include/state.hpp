@@ -42,6 +42,21 @@ class State {
             return *this;
         }
         
+        inline State& accel(const Eigen::Ref<const Eigen::Vector3d> &accel) {
+            maccel << accel;
+            return *this;
+        }
+
+        inline State& att_dot(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_dot) {
+            mR_dot << R_dot;
+            return *this;
+        }
+
+        inline State& ang_vel_dot(const Eigen::Ref<const Eigen::Vector3d> &ang_vel_dot) {
+            mang_vel_dot << ang_vel_dot;
+            return *this;
+        }
+
         inline State& time(const double &time_in) {
             mtime = time_in;
             return *this;
@@ -64,6 +79,11 @@ class State {
         Eigen::Vector3d get_vel( void ) const;
         Eigen::Matrix<double, 3, 3> get_att( void ) const;
         Eigen::Vector3d get_ang_vel( void ) const;
+
+        Eigen::Vector3d get_accel( void ) const;
+        Eigen::Vector3d get_ang_vel_dot( void ) const;
+        Eigen::Matrix<double, 3, 3> get_att_dot( void ) const;
+
         Eigen::Matrix<double, 1, 18> get_state( void ) const;
         double get_time( void ) const;
     private:
@@ -74,6 +94,11 @@ class State {
         Eigen::Matrix<double, 3, 3> mR; /**< Rotation of vectors from the body frame to the inertial frame */
         Eigen::Array<double, 1, 18> mstate; /**< Big array holding all the member state variables */
         
+        // Extra state variables required for controllers
+        Eigen::Vector3d maccel;
+        Eigen::Matrix<double, 3, 3> mR_dot;
+        Eigen::Vector3d mang_vel_dot;
+
         /** @fn Build an array out of the member variables
                 
             Turn all of the individual member variables into one giant

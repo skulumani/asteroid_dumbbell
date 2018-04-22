@@ -10,6 +10,10 @@ State::State( void ) {
     mR.setIdentity(3, 3);
     mang_vel.setZero(3);
     
+    maccel.setZero(3);
+    mR_dot.setZero(3, 3);
+    mang_vel_dot.setZero(3);
+
     mtime = 0;
     state_to_array();
 }
@@ -33,6 +37,18 @@ Eigen::Vector3d State::get_ang_vel( void ) const {
 
 Eigen::Matrix<double, 1, 18> State::get_state( void ) const {
     return mstate;
+}
+
+Eigen::Vector3d State::get_accel( void ) const {
+    return maccel;
+}
+
+Eigen::Vector3d State::get_ang_vel_dot( void ) const {
+    return mang_vel_dot;
+}
+
+Eigen::Matrix<double, 3, 3> State::get_att_dot( void ) const {
+    return mR_dot;
 }
 
 double State::get_time( void  ) const {
