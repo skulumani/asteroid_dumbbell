@@ -114,10 +114,24 @@ void Controller::explore_asteroid(std::shared_ptr<const State> state_ptr,
     // from that position make sure we're looking at the object
     body_fixed_pointing_attitude(state_ptr);
     
-    // return a new state?
-    // instantiate a pointer to a new state for exploration
+}
 
-    // update with teh calculated state data
+std::shared_ptr<State> Controller::get_desired_state() {
+    
+    std::shared_ptr<State> state_ptr = std::make_shared<State>();
+
+    // update teh state with the desired data
+    state_ptr->pos(mposd);
+    state_ptr->vel(mveld);
+    state_ptr->accel(macceld);
+
+    state_ptr->att(mRd);
+    state_ptr->att_dot(mRd_dot);
+
+    state_ptr->ang_vel(mang_vel_d);
+    state_ptr->ang_vel_dot(mang_vel_d_dot);
+
+    return state_ptr;
 }
 
 

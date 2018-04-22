@@ -71,7 +71,15 @@ class Controller: public TranslationController, public AttitudeController {
 
        void explore_asteroid(std::shared_ptr<const State> state, 
                 std::shared_ptr<const ReconstructMesh> rmesh);
-    
-       
+        /** @fn Output a state object with the desired state
+                
+            Output a state object with the desired state
+
+            @returns state_ptr Pointer to a state object
+
+            @author Shankar Kulumani
+            @version 22 April 2018
+        */ 
+        std::shared_ptr<State> get_desired_state();       
 };
 #endif
