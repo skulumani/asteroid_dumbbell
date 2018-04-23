@@ -4,7 +4,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.5.4
-  - cgal
+  # - cgal
   - h5py
   - ipython
   - numpy>=1.14
