@@ -111,44 +111,7 @@ namespace internal
     bool write_rowmat(const Eigen::EigenBase<Derived> &mat,
         const H5::DataType * const datatype,
         H5::DataSet *dataset,
-        const H5::DataSpace* dspace)
-    {
-        if (mat.derived().innerStride() != 1)
-        {
-            // inner stride != 1 is an edge case this function does not (yet) handle. (I think it
-            // could by using the inner stride as the first element of mstride below. But I do
-            // not have a test case to try it out, so just return false for now.) 
-            return false;
-        }
-
-        assert(mat.rows() >= 0);
-        assert(mat.cols() >= 0);
-        assert(mat.derived().outerStride() >= 0);
-        hsize_t rows = hsize_t(mat.rows());
-        hsize_t cols = hsize_t(mat.cols());
-        hsize_t stride = hsize_t(mat.derived().outerStride());
-
-        // slab params for the file data
-        hsize_t fstride[2] = { 1, cols };
-
-        // slab params for the memory data
-        hsize_t mstride[2] = { 1, stride };
-
-        // slab params for both file and memory data
-        hsize_t count[2] = { 1, 1 };
-        hsize_t block[2] = { rows, cols };
-        hsize_t start[2] = { 0, 0 };
-
-        // memory dataspace
-        hsize_t mdim[2] = { rows, stride };
-        H5::DataSpace mspace(2, mdim);
-
-        dspace->selectHyperslab(H5S_SELECT_SET, count, start, fstride, block);
-        mspace.selectHyperslab(H5S_SELECT_SET, count, start, mstride, block);
-        dataset->write(mat.derived().data(), *datatype, mspace, *dspace);
-
-        return true;
-    }
+        const H5::DataSpace* dspace);
 
     template <typename Derived>
     bool write_colmat(const Eigen::EigenBase<Derived> &mat,
