@@ -29,6 +29,6 @@ target_link_libraries(writedata ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 add_executable(simple src/hdf5_simple.cpp)
 target_link_libraries(simple ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 
-add_executable(eigen_test src/eigen_test.cpp)
+add_executable(eigen_test src/eigen_test.cpp src/eigen_hdf5.cpp)
 target_link_libraries(eigen_test ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 target_include_directories(eigen_test PUBLIC include/)
