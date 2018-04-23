@@ -4,10 +4,6 @@
 #include "H5Cpp.h"
 
 #include <iostream>
-#include <stdexcept>
-#include <cassert>
-
-
 
 
 
