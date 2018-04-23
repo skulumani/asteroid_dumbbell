@@ -110,6 +110,10 @@ set(potential_src
     )
 add_library(potential_cpp SHARED ${potential_src})
 
+set(eigen_hdf5_src 
+    ${PROJECT_SOURCE_DIR}/src/eigen_hdf5.cpp)
+add_library(eigen_hdf5 SHARED ${eigen_hdf5_src})
+
 # EXECUTABLES
 # mesh loading
 set(mesh_src src/mesh_main.cpp)
@@ -134,7 +138,7 @@ target_link_libraries(reconstruct_mesh cgal_cpp input_parser_cpp)
 # exploration example 
 set( explore_src src/explore_main.cpp)
 add_executable(explore ${explore_src})
-target_link_libraries(explore cgal_cpp input_parser_cpp )
+target_link_libraries(explore cgal_cpp input_parser_cpp eigen_hdf5)
 ################################################################################
 # PYTHON BINDING
 ################################################################################

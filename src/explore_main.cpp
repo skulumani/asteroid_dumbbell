@@ -8,8 +8,12 @@
 #include "lidar.hpp"
 #include "controller.hpp"
 #include "state.hpp"
+#include "eigen_hdf5.hpp"
 
 #include "input_parser.hpp"
+
+#include <Eigen/Dense>
+#include "H5Cpp.h"
 
 #include <memory>
 #include <iostream>
