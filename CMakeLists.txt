@@ -12,13 +12,15 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 # CGAL Setup
-find_package(CGAL QUIET COMPONENTS)
+set(ENV{CGAL_DIR} /usr/local/lib/CGAL)
+find_package(CGAL COMPONENTS)
 if (NOT CGAL_FOUND)
    message(STATUS "This project requires the CGAL Library and will not compile")
    return()
 endif()
 # include helper file
 include( ${CGAL_USE_FILE} )
+message(STATUS ${CGAL_LIBRARIES})
 
 # Eigen setup
 find_package(Eigen3 REQUIRED)
@@ -45,13 +47,13 @@ find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
 add_subdirectory(extern/pybind11)
 
 # HDF5 Setup
-set(ENV{HDF5_ROOT} /usr/local)
-find_package(HDF5 REQUIRED COMPONENTS C CXX)
-if (NOT HDF5_FOUND)
-    message(STATUS "This project requires HDF5 and will not compile")
-    return()
-endif()
-set(hdf5_libs hdf5 hdf5_cpp)
+# set(ENV{HDF5_ROOT} /usr/local)
+# find_package(HDF5 REQUIRED COMPONENTS C CXX)
+# if (NOT HDF5_FOUND)
+#     message(STATUS "This project requires HDF5 and will not compile")
+#     return()
+# endif()
+# set(hdf5_libs hdf5 hdf5_cpp)
 
 # just link executables against HDF5 target_link_libraries(target ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 
@@ -124,10 +126,10 @@ set(potential_src
     )
 add_library(potential_cpp SHARED ${potential_src})
 
-set(eigen_hdf5_src 
-    ${PROJECT_SOURCE_DIR}/src/eigen_hdf5.cpp)
-add_library(eigen_hdf5 SHARED ${eigen_hdf5_src})
-target_link_libraries(eigen_hdf5 ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
+# set(eigen_hdf5_src 
+#     ${PROJECT_SOURCE_DIR}/src/eigen_hdf5.cpp)
+# add_library(eigen_hdf5 SHARED ${eigen_hdf5_src})
+# target_link_libraries(eigen_hdf5 ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 
 # EXECUTABLES
 # mesh loading
@@ -151,10 +153,10 @@ add_executable(reconstruct_mesh ${reconstruct_mesh_src})
 target_link_libraries(reconstruct_mesh cgal_cpp input_parser_cpp)
 
 # exploration example 
-set( explore_src src/explore_main.cpp src/eigen_hdf5.cpp)
-add_executable(explore ${explore_src})
-target_link_libraries(explore cgal_cpp input_parser_cpp
-    ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
+# set( explore_src src/explore_main.cpp src/eigen_hdf5.cpp)
+# add_executable(explore ${explore_src})
+# target_link_libraries(explore cgal_cpp input_parser_cpp
+#     ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 ################################################################################
 # PYTHON BINDING
 ################################################################################
