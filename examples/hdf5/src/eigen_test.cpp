@@ -1,114 +1,11 @@
+#include "eigen_hdf5.hpp"
+
 #include <Eigen/Dense>
 #include "H5Cpp.h"
 
 #include <iostream>
 #include <stdexcept>
-
-template <typename T>
-struct DatatypeSpecialization;
-
-// floating-point types
-
-template <>
-struct DatatypeSpecialization<float>
-{
-    static inline const H5::DataType * get (void)
-        {
-            return &H5::PredType::NATIVE_FLOAT;
-        }
-};
-
-template <>
-struct DatatypeSpecialization<double>
-{
-    static inline const H5::DataType * get (void)
-        {
-            return &H5::PredType::NATIVE_DOUBLE;
-        }
-};
-
-template <>
-struct DatatypeSpecialization<long double>
-{
-    static inline const H5::DataType * get (void)
-        {
-            return &H5::PredType::NATIVE_LDOUBLE;
-        }
-};
-
-// integer types
-
-template <>
-struct DatatypeSpecialization<short>
-{
-    static inline const H5::DataType * get (void)
-        {
-            return &H5::PredType::NATIVE_SHORT;
-        }
-};
-
-template <>
-struct DatatypeSpecialization<unsigned short>
-{
-    static inline const H5::DataType * get (void)
-        {
-            return &H5::PredType::NATIVE_USHORT;
-        }
-};
-
-template <>
-struct DatatypeSpecialization<int>
-{
-    static inline const H5::DataType * get (void)
-        {
-            return &H5::PredType::NATIVE_INT;
-        }
-};
-
-template <>
-struct DatatypeSpecialization<unsigned int>
-{
-    static inline const H5::DataType * get (void)
-        {
-            return &H5::PredType::NATIVE_UINT;
-        }
-};
-
-template <>
-struct DatatypeSpecialization<long>
-{
-    static inline const H5::DataType * get (void)
-        {
-            return &H5::PredType::NATIVE_LONG;
-        }
-};
-
-template <>
-struct DatatypeSpecialization<unsigned long>
-{
-    static inline const H5::DataType * get (void)
-        {
-            return &H5::PredType::NATIVE_ULONG;
-        }
-};
-
-template <>
-struct DatatypeSpecialization<long long>
-{
-    static inline const H5::DataType * get (void)
-        {
-            return &H5::PredType::NATIVE_LLONG;
-        }
-};
-
-template <>
-struct DatatypeSpecialization<unsigned long long>
-{
-    static inline const H5::DataType * get (void)
-        {
-            return &H5::PredType::NATIVE_ULLONG;
-        }
-};
+#include <cassert>
 
 namespace internal
 {
@@ -409,6 +306,8 @@ int main() {
     H5::H5File file("eigen_test.hdf5", H5F_ACC_RDONLY);
     load(file, "eigen_test", mat_read);
 
-    std::cout << mat << std::endl;
+    std::cout << mat_read << std::endl;
+
+    assert(mat.isApprox(mat_read));
     return 0;
 }
