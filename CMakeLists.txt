@@ -96,6 +96,7 @@ set(cgal_src
     ${PROJECT_SOURCE_DIR}/src/controller.cpp
     ${PROJECT_SOURCE_DIR}/src/state.cpp
     ${PROJECT_SOURCE_DIR}/src/utilities.cpp
+    ${PROJECT_SOURCE_DIR}/src/surface_mesher.cpp
     )
 add_library(cgal_cpp SHARED ${cgal_src})
 
@@ -108,12 +109,6 @@ set(potential_src
     ${PROJECT_SOURCE_DIR}/src/potential.cpp
     )
 add_library(potential_cpp SHARED ${potential_src})
-
-set(surface_mesher_src
-    ${PROJECT_SOURCE_DIR}/src/surface_mesher.cpp
-    )
-add_library(surface_mesher_cpp SHARED ${surface_mesher_src})
-
 
 # EXECUTABLES
 # mesh loading
@@ -129,7 +124,7 @@ target_link_libraries(potential potential_cpp)
 # surface mesher
 set( surface_mesher_src src/surface_mesher_main.cpp )
 add_executable(surface_mesher ${surface_mesher_src})
-target_link_libraries(surface_mesher input_parser_cpp surface_mesher_cpp)
+target_link_libraries(surface_mesher input_parser_cpp cgal_cpp)
 
 # incremental mesh reconstruction
 set( reconstruct_mesh_src src/reconstruct_main.cpp )
@@ -139,7 +134,7 @@ target_link_libraries(reconstruct_mesh cgal_cpp input_parser_cpp)
 # exploration example 
 set( explore_src src/explore_main.cpp)
 add_executable(explore ${explore_src})
-target_link_libraries(explore cgal_cpp input_parser_cpp surface_mesher_cpp)
+target_link_libraries(explore cgal_cpp input_parser_cpp )
 ################################################################################
 # PYTHON BINDING
 ################################################################################
@@ -187,7 +182,6 @@ add_executable(test_all ${test_all_src})
 target_link_libraries(test_all gtest 
     cgal_cpp 
     potential_cpp 
-    surface_mesher_cpp 
     )
 add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
