@@ -20,7 +20,7 @@ if (NOT CGAL_FOUND)
 endif()
 # include helper file
 include( ${CGAL_USE_FILE} )
-message(STATUS ${CGAL_LIBRARIES})
+message(STATUS "CGAL Lib: ${CGAL_LIBRARIES}")
 
 # Eigen setup
 find_package(Eigen3 REQUIRED)
@@ -38,8 +38,8 @@ if ( NOT Boost_FOUND )
 endif()
 
 # Pybind11 setup
-find_package(PythonInterp REQUIRED)
-find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
+# find_package(PythonInterp REQUIRED)
+# find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
 # include_directories(${PYTHON_INCLUDE_DIRS})
 # link_libraries(${PYTHON_LIBRARIES})
 # link_directories(${PYTHON_LIBRARY_DIRS})
@@ -47,13 +47,13 @@ find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
 add_subdirectory(extern/pybind11)
 
 # HDF5 Setup
-# set(ENV{HDF5_ROOT} /usr/local)
-# find_package(HDF5 REQUIRED COMPONENTS C CXX)
-# if (NOT HDF5_FOUND)
-#     message(STATUS "This project requires HDF5 and will not compile")
-#     return()
-# endif()
-# set(hdf5_libs hdf5 hdf5_cpp)
+set(ENV{HDF5_ROOT} /usr/local)
+find_package(HDF5 REQUIRED COMPONENTS C CXX)
+if (NOT HDF5_FOUND)
+    message(STATUS "This project requires HDF5 and will not compile")
+    return()
+endif()
+set(hdf5_libs hdf5 hdf5_cpp)
 
 # just link executables against HDF5 target_link_libraries(target ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 
@@ -95,7 +95,7 @@ endif()
 ################################################################################
 # BUILD TARGETS
 ################################################################################
-include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 
 # LIBRARIES
 # create some shared libraries for things
@@ -126,10 +126,10 @@ set(potential_src
     )
 add_library(potential_cpp SHARED ${potential_src})
 
-# set(eigen_hdf5_src 
-#     ${PROJECT_SOURCE_DIR}/src/eigen_hdf5.cpp)
-# add_library(eigen_hdf5 SHARED ${eigen_hdf5_src})
-# target_link_libraries(eigen_hdf5 ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
+set(eigen_hdf5_src 
+    ${PROJECT_SOURCE_DIR}/src/eigen_hdf5.cpp)
+add_library(eigen_hdf5 SHARED ${eigen_hdf5_src})
+target_link_libraries(eigen_hdf5 ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 
 # EXECUTABLES
 # mesh loading
@@ -153,31 +153,31 @@ add_executable(reconstruct_mesh ${reconstruct_mesh_src})
 target_link_libraries(reconstruct_mesh cgal_cpp input_parser_cpp)
 
 # exploration example 
-# set( explore_src src/explore_main.cpp src/eigen_hdf5.cpp)
-# add_executable(explore ${explore_src})
-# target_link_libraries(explore cgal_cpp input_parser_cpp
-#     ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
+set( explore_src src/explore_main.cpp)
+add_executable(explore ${explore_src})
+target_link_libraries(explore cgal_cpp input_parser_cpp eigen_hdf5
+    ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 ################################################################################
 # PYTHON BINDING
 ################################################################################
 pybind11_add_module(polyhedron_potential MODULE
 src/potential.cpp src/potential_bindings.cpp)
 
-pybind11_add_module(surface_mesh MODULE
-src/surface_mesher.cpp src/surface_mesh_bindings.cpp)
+# pybind11_add_module(surface_mesh MODULE
+# src/surface_mesher.cpp src/surface_mesh_bindings.cpp)
 
-pybind11_add_module(mesh_data MODULE
-src/mesh.cpp src/polyhedron.cpp src/mesh_bindings.cpp)
+# pybind11_add_module(mesh_data MODULE
+# src/mesh.cpp src/polyhedron.cpp src/mesh_bindings.cpp)
 
-pybind11_add_module(cgal MODULE
-   src/cgal.cpp src/cgal_bindings.cpp src/mesh.cpp)
+# pybind11_add_module(cgal MODULE
+#    src/cgal.cpp src/cgal_bindings.cpp src/mesh.cpp)
 
-pybind11_add_module(reconstruct MODULE
-   src/reconstruct.cpp src/reconstruct_bindings.cpp src/mesh.cpp
-   src/polyhedron.cpp src/geodesic.cpp)
+# pybind11_add_module(reconstruct MODULE
+#    src/reconstruct.cpp src/reconstruct_bindings.cpp src/mesh.cpp
+#    src/polyhedron.cpp src/geodesic.cpp)
 
-pybind11_add_module(geodesic MODULE
-   src/geodesic.cpp src/geodesic_bindings.cpp)
+# pybind11_add_module(geodesic MODULE
+#    src/geodesic.cpp src/geodesic_bindings.cpp)
 
 ################################################################################
 # Testing example
