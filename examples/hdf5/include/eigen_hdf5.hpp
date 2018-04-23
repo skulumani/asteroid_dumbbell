@@ -117,63 +117,19 @@ namespace internal
     bool write_colmat(const Eigen::EigenBase<Derived> &mat,
         const H5::DataType * const datatype,
         H5::DataSet *dataset,
-        const H5::DataSpace* dspace)
-    {
-        if (mat.derived().innerStride() != 1)
-        {
-            // inner stride != 1 is an edge case this function does not (yet) handle. (I think it
-            // could by using the inner stride as the first element of mstride below. But I do
-            // not have a test case to try it out, so just return false for now.) 
-            return false;
-        }
-
-        assert(mat.rows() >= 0);
-        assert(mat.cols() >= 0);
-        assert(mat.derived().outerStride() >= 0);
-        hsize_t rows = hsize_t(mat.rows());
-        hsize_t cols = hsize_t(mat.cols());
-        hsize_t stride = hsize_t(mat.derived().outerStride());
-        
-        // slab params for the file data
-        hsize_t fstride[2] = { 1, cols };
-        hsize_t fcount[2] = { 1, 1 };
-        hsize_t fblock[2] = { 1, cols };
-
-        // slab params for the memory data
-        hsize_t mstride[2] = { stride, 1 };
-        hsize_t mcount[2] = { 1, 1 };
-        hsize_t mblock[2] = { cols, 1 };
-
-        // memory dataspace
-        hsize_t mdim[2] = { cols, stride };
-        H5::DataSpace mspace(2, mdim);
-
-        // transpose the column major data in memory to the row major data in the file by
-        // writing one row slab at a time. 
-        for (hsize_t i = 0; i < rows; i++)
-        {
-            hsize_t fstart[2] = { i, 0 };
-            hsize_t mstart[2] = { 0, i };
-            dspace->selectHyperslab(H5S_SELECT_SET, fcount, fstart, fstride, fblock);
-            mspace.selectHyperslab(H5S_SELECT_SET, mcount, mstart, mstride, mblock);
-            dataset->write(mat.derived().data(), *datatype, mspace, *dspace);
-        }
-        return true;
-    }
+        const H5::DataSpace* dspace);
 
     // H5::Attribute and H5::DataSet both have similar API's, and although they
     // share a common base class, the relevant methods are not virtual.  Worst
     // of all, they take their arguments in different orders!
 
     template <typename Scalar>
-    inline void read_data (const H5::DataSet &dataset, Scalar *data, const H5::DataType &datatype)
-    {
+    inline void read_data (const H5::DataSet &dataset, Scalar *data, const H5::DataType &datatype) {
         dataset.read(data, datatype);
     }
 
     template <typename Scalar>
-    inline void read_data (const H5::Attribute &dataset, Scalar *data, const H5::DataType &datatype)
-    {
+    inline void read_data (const H5::Attribute &dataset, Scalar *data, const H5::DataType &datatype) {
         dataset.read(datatype, data);
     }
 
@@ -183,15 +139,7 @@ namespace internal
     template <typename Derived>
     bool read_colmat(const Eigen::DenseBase<Derived> &mat,
         const H5::DataType * const datatype,
-        const H5::Attribute &dataset)
-    {
-        typename Derived::Index rows = mat.rows();
-        typename Derived::Index cols = mat.cols();
-        typename Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> temp(rows, cols);
-        internal::read_data(dataset, temp.data(), *datatype);
-        const_cast<Eigen::DenseBase<Derived> &>(mat) = temp;
-        return true;
-    }
+        const H5::Attribute &dataset);
 
     template <typename Derived>
     bool read_colmat(const Eigen::DenseBase<Derived> &mat,

@@ -44,8 +44,8 @@ void save (H5::H5Location &h5group, const std::string &name, const Eigen::EigenB
 
 int main() {
     // random matrix to write to hdf5
-    Eigen::Matrix<int, Eigen::Dynamic, 3> mat(3, 3);
-    mat << Eigen::MatrixXi::Identity(3, 3);
+    Eigen::Matrix<double, Eigen::Dynamic, 3> mat(3, 3);
+    mat << Eigen::MatrixXd::Random(3, 3);
     // open a new file
     H5::H5File hf("eigen_test.hdf5", H5F_ACC_TRUNC);
     
@@ -54,7 +54,7 @@ int main() {
     hf.close();
 
     // now load the file
-    Eigen::Matrix<int, Eigen::Dynamic, 3> mat_read(3, 3);
+    Eigen::Matrix<double, Eigen::Dynamic, 3> mat_read(3, 3);
     H5::H5File file("eigen_test.hdf5", H5F_ACC_RDONLY);
     load(file, "eigen_test", mat_read);
 
