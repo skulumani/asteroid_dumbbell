@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     Eigen::Matrix<double, 1, 3> intersection(1, 3);
 
     // LOOP HERE
-    for (int ii = 0; ii < 10; ++ii) {
+    for (int ii = 0; ii < rmesh_ptr->get_verts().rows(); ++ii) {
         
         // compute targets for use in caster (point at the asteroid origin)
         target = sensor.define_target(state_ptr->get_pos(), state_ptr->get_att(), dist);    
@@ -92,5 +92,6 @@ int main(int argc, char* argv[])
         // LOOP
     }
     
+    std::cout << rmesh_ptr->get_weights() << std::endl;
     return 0;
 }
