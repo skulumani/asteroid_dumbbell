@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
         std::cout << "Kinematic only exploration with asteroid reconstruction" << std::endl;
-
     }
+
     const std::string input_file = input.get_command_option("-i");
     if (input_file.empty()) {
         std::cout << "You need to input file name!" << std::endl;
@@ -55,7 +55,12 @@ int main(int argc, char* argv[])
     double dist = 5;
     int num_steps = 3;
     sensor.dist(dist).num_steps(num_steps);
-
+    
+    // Create HDF5 file for saving the data
+    H5::H5File hf("/tmp/explore.hdf5", H5F_ACC_TRUNC);
+    H5::Group reconstructed_vertex(hf.createGroup("/reconstructed_vertex"));
+    H5::Group reconstructed_weight(hf.createGroup("/reconstructed_weight"));
+    
     // place satellite in a specific location and define view axis
     State initial_state, state;
     initial_state.pos((Eigen::RowVector3d() << 1.5, 0, 0).finished())
@@ -75,6 +80,10 @@ int main(int argc, char* argv[])
     // targets to be updated in the loop
     Eigen::Matrix<double, 1, 3> target(1, 3);
     Eigen::Matrix<double, 1, 3> intersection(1, 3);
+    
+    // save initial data to the HDF5 file
+    save(hf, "truth_vertex", true_asteroid->get_verts());
+    save(hf, "truth_faces", true_asteroid->get_faces());
 
     // LOOP HERE
     for (int ii = 0; ii < rmesh_ptr->get_verts().rows(); ++ii) {
@@ -96,6 +105,6 @@ int main(int argc, char* argv[])
         // LOOP
     }
     
-    std::cout << rmesh_ptr->get_weights() << std::endl;
+    hf.close();
     return 0;
 }
