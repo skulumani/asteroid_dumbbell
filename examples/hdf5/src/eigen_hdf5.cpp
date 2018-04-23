@@ -237,6 +237,34 @@ void load (const H5::H5Location &h5group, const std::string &name, const Eigen::
     internal::_load(dataset, mat);
 }
 
+template <typename Derived>
+void save (H5::H5Location &h5group, const std::string &name,
+        const Eigen::EigenBase<Derived> &mat, 
+        const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT) {
+    typedef typename Derived::Scalar Scalar;
+    const H5::DataType * const datatype = DatatypeSpecialization<Scalar>::get();
+    const H5::DataSpace dataspace = internal::create_dataspace(mat);
+    H5::DataSet dataset = h5group.createDataSet(name, *datatype, dataspace, plist);
+
+    bool written = false;  // flag will be true when the data has been written
+    if (mat.derived().Flags & Eigen::RowMajor)
+    {
+        written = internal::write_rowmat(mat, datatype, &dataset, &dataspace);
+    }
+    else
+    {
+        written = internal::write_colmat(mat, datatype, &dataset, &dataspace);
+    }
+    
+    if (!written)
+    {
+        // data has not yet been written, so there is nothing else to try but copy the input
+        // matrix to a row major matrix and write it. 
+        const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> row_major_mat(mat);
+        dataset.write(row_major_mat.data(), *datatype);
+    }
+}
+
 // Explicit template specialization
 template H5::DataSpace internal::create_dataspace<Eigen::Matrix<double, -1 , 3> >(const Eigen::EigenBase<Eigen::Matrix<double, -1, 3> >&);
 template H5::DataSpace internal::create_dataspace<Eigen::Matrix<int, -1 , 3> >(const Eigen::EigenBase<Eigen::Matrix<int, -1, 3> >&);
@@ -278,3 +306,8 @@ template void internal::_load<Eigen::Matrix<int, -1, 3>, H5::DataSet>(H5::DataSe
 
 template void load<Eigen::Matrix<double, -1, 3> >(const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Eigen::Matrix<double, -1, 3> > & mat);
 template void load<Eigen::Matrix<int, -1, 3> >(const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Eigen::Matrix<int, -1, 3> > & mat);
+
+/* template void save<Eigen::Matrix<double, -1, 3> >(const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Eigen::Matrix<double, -1, 3> > & mat, */
+/*         const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT); */
+/* template void save<Eigen::Matrix<int, -1, 3> >(const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Eigen::Matrix<int, -1, 3> > & mat, */
+/*         const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT); */

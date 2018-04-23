@@ -9,32 +9,6 @@
 
 
 
-template <typename Derived>
-void save (H5::H5Location &h5group, const std::string &name, const Eigen::EigenBase<Derived> &mat, const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT)
-{
-    typedef typename Derived::Scalar Scalar;
-    const H5::DataType * const datatype = DatatypeSpecialization<Scalar>::get();
-    const H5::DataSpace dataspace = internal::create_dataspace(mat);
-    H5::DataSet dataset = h5group.createDataSet(name, *datatype, dataspace, plist);
-
-    bool written = false;  // flag will be true when the data has been written
-    if (mat.derived().Flags & Eigen::RowMajor)
-    {
-        written = internal::write_rowmat(mat, datatype, &dataset, &dataspace);
-    }
-    else
-    {
-        written = internal::write_colmat(mat, datatype, &dataset, &dataspace);
-    }
-    
-    if (!written)
-    {
-        // data has not yet been written, so there is nothing else to try but copy the input
-        // matrix to a row major matrix and write it. 
-        const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> row_major_mat(mat);
-        dataset.write(row_major_mat.data(), *datatype);
-    }
-}
 
 
 int main() {
