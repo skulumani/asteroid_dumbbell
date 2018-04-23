@@ -231,6 +231,11 @@ namespace internal {
     }
 }
 
+template <typename Derived>
+void load (const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Derived> &mat) {
+    const H5::DataSet dataset = h5group.openDataSet(name);
+    internal::_load(dataset, mat);
+}
 
 // Explicit template specialization
 template H5::DataSpace internal::create_dataspace<Eigen::Matrix<double, -1 , 3> >(const Eigen::EigenBase<Eigen::Matrix<double, -1, 3> >&);
@@ -270,3 +275,6 @@ template bool internal::read_colmat<Eigen::Matrix<int, -1, 3> > (const Eigen::De
 
 template void internal::_load<Eigen::Matrix<double, -1, 3>, H5::DataSet>(H5::DataSet const& dataset, Eigen::DenseBase<Eigen::Matrix<double, -1, 3> > const& mat);
 template void internal::_load<Eigen::Matrix<int, -1, 3>, H5::DataSet>(H5::DataSet const& dataset, Eigen::DenseBase<Eigen::Matrix<int, -1, 3> > const& mat);
+
+template void load<Eigen::Matrix<double, -1, 3> >(const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Eigen::Matrix<double, -1, 3> > & mat);
+template void load<Eigen::Matrix<int, -1, 3> >(const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Eigen::Matrix<int, -1, 3> > & mat);

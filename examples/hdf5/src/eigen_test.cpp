@@ -8,11 +8,6 @@
 #include <cassert>
 
 
-template <typename Derived>
-void load (const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Derived> &mat) {
-    const H5::DataSet dataset = h5group.openDataSet(name);
-    internal::_load(dataset, mat);
-}
 
 template <typename Derived>
 void save (H5::H5Location &h5group, const std::string &name, const Eigen::EigenBase<Derived> &mat, const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT)
