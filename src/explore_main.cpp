@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <iostream>
+#include <string>
 
 int main(int argc, char* argv[])
 {
@@ -34,12 +35,19 @@ int main(int argc, char* argv[])
     const std::string input_file = input.get_command_option("-i");
     if (input_file.empty()) {
         std::cout << "You need to input file name!" << std::endl;
-        std::cout << "explore -i asteroid.obj" << std::endl;
+        std::cout << "explore -i asteroid.obj -o data.hdf5" << std::endl;
+        return 1;
+    }
+    
+    const std::string output_file = input.get_command_option("-o");
+    if (output_file.empty()) {
+        std::cout << "You need an output file name!" << std::endl;
+        std::cout << "explore -i asteroid.obj -o data.hdf5" << std::endl;
         return 1;
     }
 
     // initialize all the objects
-    double surf_area(axes(0));
+    double surf_area(0.01);
     double max_angle( pow(surf_area / (axes(0) * axes(0)), 0.5));
 
     std::shared_ptr<MeshData> true_asteroid;
@@ -57,9 +65,12 @@ int main(int argc, char* argv[])
     sensor.dist(dist).num_steps(num_steps);
     
     // Create HDF5 file for saving the data
-    H5::H5File hf("/tmp/explore.hdf5", H5F_ACC_TRUNC);
-    H5::Group reconstructed_vertex(hf.createGroup("/reconstructed_vertex"));
-    H5::Group reconstructed_weight(hf.createGroup("/reconstructed_weight"));
+    H5::H5File hf(output_file, H5F_ACC_TRUNC);
+    H5::Group reconstructed_vertex_group(hf.createGroup("/reconstructed_vertex"));
+    H5::Group reconstructed_weight_group(hf.createGroup("/reconstructed_weight"));
+    H5::Group state_group(hf.createGroup("/state"));
+    H5::Group targets_group(hf.createGroup("/targets"));
+    H5::Group intersections_group(hf.createGroup("/intersections"));
     
     // place satellite in a specific location and define view axis
     State initial_state, state;
@@ -84,6 +95,12 @@ int main(int argc, char* argv[])
     // save initial data to the HDF5 file
     save(hf, "truth_vertex", true_asteroid->get_verts());
     save(hf, "truth_faces", true_asteroid->get_faces());
+    
+    save(hf, "initial_vertex", rmesh_ptr->get_verts());
+    save(hf, "initial_faces", rmesh_ptr->get_faces());
+    save(hf, "initial_weight", rmesh_ptr->get_weights());
+    
+    save(hf, "initial_state", state_ptr->get_state());
 
     // LOOP HERE
     for (int ii = 0; ii < rmesh_ptr->get_verts().rows(); ++ii) {
@@ -102,7 +119,9 @@ int main(int argc, char* argv[])
         // update the state ptr with the newly calculated state
         state_ptr->update_state(new_state_ptr);
         // save the data (raycast interseciton, position of sat, ast estimate, targets) to hdf5
-        // LOOP
+        save(reconstructed_vertex_group, std::to_string(ii), rmesh_ptr->get_verts());
+        save(reconstructed_weight_group, std::to_string(ii), rmesh_ptr->get_weights());
+        save(state_group, std::to_string(ii), state_ptr->get_state());
     }
     
     hf.close();
