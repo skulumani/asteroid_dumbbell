@@ -15,6 +15,55 @@
 
 #include <stdexcept>
 
+// TODO Use H5::H5Object isntead of H5Location it has attribute member functions
+// TODO Turn on compression by default or maybe with a flag as well
+class HDF5DataSet {
+    // save data to the dataset (eigen arrays)
+    // save attribute to dataset
+};
+
+class HDF5Group : public HDF5DataSet {
+    // create a new dataset inside the group
+    // create attribute in the group
+};
+
+class HDF5File : public HDF5Group {
+    public: 
+        HDF5File( void );
+
+        // close the file
+        virtual ~HDF5File( void );
+        
+        /** @fn Open the HDF5 file
+                
+            Open the file for reading (default to only opening new file)
+
+            @param file_name File_name for the file
+
+            @author Shankar Kulumani
+            @version 23 April 2018
+        */
+        HDF5File(const std::string& file_name);
+        
+        /** @fn Open HDF5 file for reading/writing
+                
+            Can specify some options for the file
+
+            @param file_name File name to open/create
+            @param access_mode "r", "w"
+
+            @author Shankar Kulumani
+            @version 23 April 2018
+        */
+        HDF5File(const std::string& file_name, const std::string& access_mode);
+        
+        // create a group inside this file and return HDF5Group
+        // create a dataset and return HDF5DataSet
+        // create attribute
+    private:
+        H5::H5File hf;
+};
+
 template <typename T>
 struct DatatypeSpecialization;
 
@@ -107,9 +156,6 @@ void save (H5::H5Location &h5group, const std::string &name,
         const Eigen::EigenBase<Derived> &mat,
         const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT);
 
-class EigenHDF5 {
-    public: 
-};
 
 namespace internal
 {
