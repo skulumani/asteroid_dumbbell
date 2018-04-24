@@ -23,6 +23,13 @@ namespace HDF5 {
     // Ahead of time declaration
     class File;
     class Group;
+    class DataSet;
+
+    class DataSet {
+        
+         
+        std::shared_ptr<H5::DataSet> dataset_ptr;
+    };
 /** @class HDF5Object
 
     @brief File/Group of HDF5 file
@@ -84,7 +91,8 @@ class File {
         const std::string getName( void ) const;
         
         Group create_group(const std::string& group_name) const;
-        
+        DataSet create_dataset(const std::string& dataset_name) const;
+
         // TODO Add attribute saving
         // TODO Add saving scalar double, int, strings
         // create a dataset and return HDF5DataSet
