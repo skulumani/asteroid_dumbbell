@@ -41,6 +41,11 @@ namespace HDF5 {
     Group File::create_group(const std::string& group_name) const {
         return Group(this, group_name);
     }
+    
+    int File::create_dataset(const std::string& dataset_name, const Eigen::Matrix<double, 1, 3>& mat) {
+        save(*file_ptr,dataset_name, mat); 
+        return 0;
+    }
 
 }
 namespace internal {
@@ -345,6 +350,7 @@ template void internal::_load<Eigen::Matrix<int, -1, 3>, H5::DataSet>(H5::DataSe
 template void load<Eigen::Matrix<double, -1, 3> >(const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Eigen::Matrix<double, -1, 3> > & mat);
 template void load<Eigen::Matrix<int, -1, 3> >(const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Eigen::Matrix<int, -1, 3> > & mat);
 
+// Big Save template specification
 template void save<Eigen::Matrix<double, -1, 3> >(H5::H5Location& h5group,const std::string &name, const Eigen::EigenBase<Eigen::Matrix<double, -1, 3> > &mat, const H5::DSetCreatPropList& plist);
 template void save<Eigen::Matrix<int, -1, 3> >(H5::H5Location& h5group,const std::string &name, const Eigen::EigenBase<Eigen::Matrix<int, -1, 3> > &mat, const H5::DSetCreatPropList& plist);
 
@@ -353,3 +359,4 @@ template void save<Eigen::Matrix<int, -1, -1> >(H5::H5Location& h5group, const s
 
 template void save<Eigen::Matrix<double, 1, 18> >(H5::H5Location& h5group, const std::string &name, const Eigen::EigenBase<Eigen::Matrix<double, 1, 18> > &mat, const H5::DSetCreatPropList &plist);
 template void save<Eigen::Matrix<double, 1, -1> >(H5::H5Location& h5group, const std::string &name, const Eigen::EigenBase<Eigen::Matrix<double, 1, -1> > &mat, const H5::DSetCreatPropList &plist);
+

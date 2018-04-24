@@ -79,8 +79,9 @@ class File {
         
         Group create_group(const std::string& group_name) const;
 
-        // create a group inside this file and return HDF5Group
         // create a dataset and return HDF5DataSet
+        int create_dataset(const std::string& dataset_name, const Eigen::Matrix<double, 1, 3>& mat);
+
         // create attribute
         
         std::shared_ptr<H5::H5File> file_ptr; /**< HDF5 file to save data */
