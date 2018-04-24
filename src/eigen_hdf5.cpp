@@ -9,6 +9,10 @@
 // class definitions for working with HDF5
 namespace HDF5 {
     
+    DataSet::~DataSet( void ) {
+        dataset_ptr->close();
+    }
+
     Group::~Group( void ) {
         group_ptr->close();
     }

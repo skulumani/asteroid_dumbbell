@@ -26,8 +26,18 @@ namespace HDF5 {
     class DataSet;
 
     class DataSet {
-        
-         
+        DataSet( void );
+        virtual ~DataSet( void );
+
+        DataSet(const File* file, const std::string& dataset_name);
+        DataSet(const Group* group, const std::string& dataset_name);
+
+        template<typename Derived>
+        int write(const Eigen::EigenBase<Derived>& mat);
+
+        template<typename Derived>
+        int read(const Eigen::DenseBase<Derived>& mat);
+
         std::shared_ptr<H5::DataSet> dataset_ptr;
     };
 /** @class HDF5Object
