@@ -37,12 +37,13 @@ class Object {
 
 class File : public Object {
     public: 
-        static const int ReadOnly = 0x00; /**< Read only access */
-        static const int ReadWrite = 0x01; /**< ReadWrite access */
-        static const int Truncate = 0x02; /**< Overwrite a file if it exists or create a new one */
-        static const int Excl = 0x04; /**< Only open if the file doesn't exist */
-        static const int Debug = 0x08; /**< Open in debug mode */
-        static const int Create = 0x10; /**< Create a new file */
+
+        static const int ReadOnly = H5F_ACC_RDONLY; /**< Read only access */
+        static const int ReadWrite = H5F_ACC_RDWR; /**< ReadWrite access */
+        static const int Truncate = H5F_ACC_TRUNC; /**< Overwrite a file if it exists or create a new one */
+        static const int Excl = H5F_ACC_EXCL; /**< Only open if the file doesn't exist */
+        static const int Debug = 0; /**< Open in debug mode */
+        static const int Create = H5F_ACC_CREAT; /**< Create a new file */
 
         File( void );
 
@@ -59,13 +60,13 @@ class File : public Object {
             @author Shankar Kulumani
             @version 23 April 2018
         */
-        File(const std::string& file_name, const int& open_flag = ReadOnly);
-       
+        File(const std::string& file_name, const int& open_flag);
+        
         const std::string getName( void );
         // create a group inside this file and return HDF5Group
         // create a dataset and return HDF5DataSet
         // create attribute
-    private:
+        
         H5::H5File hf;
 };
 

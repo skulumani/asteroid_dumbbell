@@ -13,7 +13,15 @@ namespace HDF5 {
     }
     
     File::File( const std::string& file_name , const int & open_flag ) {
-        hf.open(file_name, open_flag);
+        // logic to open the file based on open_flag
+        if (open_flag == 0) {
+            hf.openFile(file_name, H5F_ACC_RDONLY);
+        } else (open_flag == 1) {
+            hf.openFile(file_name, H5F_ACC_RDWR);
+        } else ( open_flag == 2) {
+            hf.openFile(file_name, H5F_ACC_TRUNC);
+        }
+
     }
 
 }
