@@ -22,7 +22,7 @@ namespace HDF5 {
         file_ptr->close();
     }
     
-    File::File( const std::string& file_name , const int & open_flag ) {
+    File::File( const std::string& file_name , const int open_flag ) {
 
         H5::H5File file;
         // logic to open the file based on open_flag

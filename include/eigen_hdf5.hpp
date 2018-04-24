@@ -73,7 +73,7 @@ class File {
             @author Shankar Kulumani
             @version 23 April 2018
         */
-        File(const std::string& file_name, const int& open_flag = 0);
+        File(const std::string& file_name, const int open_flag = File::ReadOnly);
         
         const std::string getName( void ) const;
         
