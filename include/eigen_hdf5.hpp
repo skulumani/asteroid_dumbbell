@@ -51,10 +51,10 @@ class Group {
         Group(const File* file, const std::string& group_name);
         
         template<typename Derived>
-        int create_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat);
+        int write(const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat);
 
         template<typename Derived>
-        int read_dataset(const std::string& dataset_name, const Eigen::DenseBase<Derived>& mat);
+        int read(const std::string& dataset_name, const Eigen::DenseBase<Derived>& mat);
 
         /* template <typename Derived> */
         /* int save(const Eigen::EigenBase<Derived> &mat); */
@@ -97,10 +97,10 @@ class File {
         // TODO Add saving scalar double, int, strings
         // create a dataset and return HDF5DataSet
         template<typename Derived>
-        int create_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat);
+        int write(const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat);
         
         template<typename Derived>
-        int read_dataset(const std::string& dataset_name, const Eigen::DenseBase<Derived> &mat);
+        int read(const std::string& dataset_name, const Eigen::DenseBase<Derived> &mat);
 
         // create attribute
         
