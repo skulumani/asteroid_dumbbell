@@ -10,6 +10,8 @@ find_package(HDF5 REQUIRED COMPONENTS C CXX)
 if (NOT HDF5_FOUND)
     message(STATUS "This project requires HDF5 and will not compile")
     return()
+else()
+    message(STATUS "HDF5: ${HDF5_VERSION}")
 endif()
 set(hdf5_libs hdf5 hdf5_cpp)
 
