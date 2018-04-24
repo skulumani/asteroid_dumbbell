@@ -82,6 +82,9 @@ class File {
         // create a dataset and return HDF5DataSet
         template<typename Derived>
         int create_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat);
+        
+        template<typename Derived>
+        int read_dataset(const std::string& dataset_name, const Eigen::DenseBase<Derived> &mat);
 
         // create attribute
         
