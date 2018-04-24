@@ -80,7 +80,8 @@ class File {
         Group create_group(const std::string& group_name) const;
 
         // create a dataset and return HDF5DataSet
-        int create_dataset(const std::string& dataset_name, const Eigen::Matrix<double, 1, 3>& mat);
+        template<typename Derived>
+        int create_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat);
 
         // create attribute
         

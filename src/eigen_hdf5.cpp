@@ -42,7 +42,8 @@ namespace HDF5 {
         return Group(this, group_name);
     }
     
-    int File::create_dataset(const std::string& dataset_name, const Eigen::Matrix<double, 1, 3>& mat) {
+    template<typename Derived>
+    int File::create_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat) {
         save(*file_ptr,dataset_name, mat); 
         return 0;
     }
@@ -360,3 +361,6 @@ template void save<Eigen::Matrix<int, -1, -1> >(H5::H5Location& h5group, const s
 template void save<Eigen::Matrix<double, 1, 18> >(H5::H5Location& h5group, const std::string &name, const Eigen::EigenBase<Eigen::Matrix<double, 1, 18> > &mat, const H5::DSetCreatPropList &plist);
 template void save<Eigen::Matrix<double, 1, -1> >(H5::H5Location& h5group, const std::string &name, const Eigen::EigenBase<Eigen::Matrix<double, 1, -1> > &mat, const H5::DSetCreatPropList &plist);
 
+// File::create_dataset template specilization
+template int HDF5::File::create_dataset<Eigen::Matrix<double, -1, -1> >(const std::string &name, const Eigen::EigenBase<Eigen::Matrix<double, -1, -1> > &mat);
+//
