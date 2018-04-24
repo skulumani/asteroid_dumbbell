@@ -37,6 +37,9 @@ if ( NOT Boost_FOUND )
   return()  
 endif()
 
+# setup Python
+set(PYBIND11_PYTHON_VERSION 3.5 CACHE STRING "")
+# include(${PROJECT_SOURCE_DIR}/FindPythonAnaconda.cmake)
 # Pybind11 setup
 # find_package(PythonInterp REQUIRED)
 # find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
@@ -48,11 +51,20 @@ add_subdirectory(extern/pybind11)
 
 # HDF5 Setup
 set(ENV{HDF5_ROOT} /usr/local)
-find_package(HDF5 REQUIRED COMPONENTS C CXX)
+find_package(HDF5 REQUIRED COMPONENTS CXX)
 if (NOT HDF5_FOUND)
     message(STATUS "This project requires HDF5 and will not compile")
     return()
+else()
+    message(STATUS "Found HDF5: ${HDF5_VERSION}")
 endif()
+
+if ( HDF5_IS_PARALLEL )
+    message(STATUS "HDF5 parallel is installed")
+else()
+    message(STATUS "HDF5 parallel is NOT installed")
+endif()
+# message(STATUS "HDF5 Lib: ${HDF5_LIBRARIES}")
 set(hdf5_libs hdf5 hdf5_cpp)
 
 # just link executables against HDF5 target_link_libraries(target ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
@@ -129,7 +141,7 @@ add_library(potential_cpp SHARED ${potential_src})
 set(eigen_hdf5_src 
     ${PROJECT_SOURCE_DIR}/src/eigen_hdf5.cpp)
 add_library(eigen_hdf5 SHARED ${eigen_hdf5_src})
-target_link_libraries(eigen_hdf5 ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
+target_link_libraries(eigen_hdf5 ${HDF5_CXX_LIBRARIES} )
 
 # EXECUTABLES
 # mesh loading
@@ -156,28 +168,28 @@ target_link_libraries(reconstruct_mesh cgal_cpp input_parser_cpp)
 set( explore_src src/explore_main.cpp)
 add_executable(explore ${explore_src})
 target_link_libraries(explore cgal_cpp input_parser_cpp eigen_hdf5
-    ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
+    ${HDF5_CXX_LIBRARIES} )
 ################################################################################
 # PYTHON BINDING
 ################################################################################
 pybind11_add_module(polyhedron_potential MODULE
 src/potential.cpp src/potential_bindings.cpp)
 
-# pybind11_add_module(surface_mesh MODULE
-# src/surface_mesher.cpp src/surface_mesh_bindings.cpp)
+pybind11_add_module(surface_mesh MODULE
+src/surface_mesher.cpp src/surface_mesh_bindings.cpp)
 
-# pybind11_add_module(mesh_data MODULE
-# src/mesh.cpp src/polyhedron.cpp src/mesh_bindings.cpp)
+pybind11_add_module(mesh_data MODULE
+src/mesh.cpp src/polyhedron.cpp src/mesh_bindings.cpp)
 
-# pybind11_add_module(cgal MODULE
-#    src/cgal.cpp src/cgal_bindings.cpp src/mesh.cpp)
+pybind11_add_module(cgal MODULE
+   src/cgal.cpp src/cgal_bindings.cpp src/mesh.cpp)
 
-# pybind11_add_module(reconstruct MODULE
-#    src/reconstruct.cpp src/reconstruct_bindings.cpp src/mesh.cpp
-#    src/polyhedron.cpp src/geodesic.cpp)
+pybind11_add_module(reconstruct MODULE
+   src/reconstruct.cpp src/reconstruct_bindings.cpp src/mesh.cpp
+   src/polyhedron.cpp src/geodesic.cpp)
 
-# pybind11_add_module(geodesic MODULE
-#    src/geodesic.cpp src/geodesic_bindings.cpp)
+pybind11_add_module(geodesic MODULE
+   src/geodesic.cpp src/geodesic_bindings.cpp)
 
 ################################################################################
 # Testing example
