@@ -24,7 +24,7 @@ function cleanup {
 
 # trap cleanup EXIT
 
-echo "We're going to download HDF5 ${EIGEN_VER} and install to ${INSTALL_DIR}"
+echo "We're going to download HDF5 ${HDF5_VER} and install to ${INSTALL_DIR}"
 cd ${TEMP_DIR}
 mkdir ${HDF5_VER}
 wget ${HDF5_RELEASE_URL} -O ${TEMP_DIR}/${HDF5_VER}.tar.gz
@@ -33,9 +33,10 @@ tar -xvzf ${HDF5_VER}.tar.gz -C ./${HDF5_VER} --strip-components=1
 echo "Going to install HDF5 using the configure script"
 read -p "Press enter to continue"
 cd ${HDF5_VER}
-bash ./configure --prefix=/usr/local --includedir=/usr/local/include/hdf5 --enable-cxx --enable-production 
+bash ./configure --prefix=/usr/local/hdf5 --enable-cxx 
 make -j5
 # make check
 sudo checkinstall make install
+sudo make check-install
 
 read -p "Press enter to exit"
