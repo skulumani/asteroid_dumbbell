@@ -1,8 +1,9 @@
 #!/bin/bash
 
-HDF5_VER=1.10.1
+HDF5_VER=1.10.2
 INSTALL_DIR="/usr/local/include"
-HDF5_RELEASE_URL="https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-${HDF5_VER}.tar.gz"
+# HDF5_RELEASE_URL="https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-${HDF5_VER}.tar.gz"
+HDF5_RELEASE_URL="https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.2/src/hdf5-${HDF5_VER}.tar.gz"
 TEMP_DIR="$(mktemp -d)"
 
 # This will download the latest eigen and install for the sy tem
@@ -21,7 +22,7 @@ function cleanup {
     echo "Deleted temp working directory $TEMP_DIR"
 }
 
-trap cleanup EXIT
+# trap cleanup EXIT
 
 echo "We're going to download HDF5 ${EIGEN_VER} and install to ${INSTALL_DIR}"
 cd ${TEMP_DIR}
@@ -32,7 +33,7 @@ tar -xvzf ${HDF5_VER}.tar.gz -C ./${HDF5_VER} --strip-components=1
 echo "Going to install HDF5 using the configure script"
 read -p "Press enter to continue"
 cd ${HDF5_VER}
-bash ./configure --prefix=/usr/local --includedir=/usr/local/include/hdf5 --enable-cxx 
+bash ./configure --prefix=/usr/local --includedir=/usr/local/include/hdf5 --enable-cxx --enable-production 
 make -j5
 # make check
 sudo checkinstall make install
