@@ -147,6 +147,43 @@ struct DatatypeSpecialization<unsigned long long> {
         return &H5::PredType::NATIVE_ULLONG;
     }
 };
+// string types, to be used mainly for attributes
+
+template <>
+struct DatatypeSpecialization<const char *> {
+    static inline const H5::DataType * get (void) {
+        static const H5::StrType strtype(0, H5T_VARIABLE);
+        return &strtype;
+    }
+};
+
+template <>
+struct DatatypeSpecialization<char *> {
+    static inline const H5::DataType * get (void){
+        static const H5::StrType strtype(0, H5T_VARIABLE);
+        return &strtype;
+    }
+};
+
+// XXX: for some unknown reason the following two functions segfault if
+// H5T_VARIABLE is used.  The passed strings should still be null-terminated,
+// so this is a bit worrisome.
+
+template <std::size_t N>
+struct DatatypeSpecialization<const char [N]> {
+    static inline const H5::DataType * get (void) {
+        static const H5::StrType strtype(0, N);
+        return &strtype;
+    }
+};
+
+template <std::size_t N>
+struct DatatypeSpecialization<char [N]> {
+    static inline const H5::DataType * get (void) {
+        static const H5::StrType strtype(0, N);
+        return &strtype;
+    }
+};
 
 template <typename Derived>
 void load (const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Derived> &mat);
