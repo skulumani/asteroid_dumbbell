@@ -66,11 +66,11 @@ int main(int argc, char* argv[])
     
     // Create HDF5 file for saving the data
     H5::H5File hf(output_file, H5F_ACC_TRUNC);
-    H5::Group reconstructed_vertex_group(hf.createGroup("/reconstructed_vertex"));
-    H5::Group reconstructed_weight_group(hf.createGroup("/reconstructed_weight"));
-    H5::Group state_group(hf.createGroup("/state"));
-    H5::Group targets_group(hf.createGroup("/targets"));
-    H5::Group intersections_group(hf.createGroup("/intersections"));
+    H5::Group reconstructed_vertex_group(hf.createGroup("reconstructed_vertex"));
+    H5::Group reconstructed_weight_group(hf.createGroup("reconstructed_weight"));
+    H5::Group state_group(hf.createGroup("state"));
+    H5::Group targets_group(hf.createGroup("targets"));
+    H5::Group intersections_group(hf.createGroup("intersections"));
     
     // place satellite in a specific location and define view axis
     State initial_state, state;
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
     save(hf, "initial_state", state_ptr->get_state());
 
     // LOOP HERE
-    for (int ii = 0; ii < rmesh_ptr->get_verts().rows(); ++ii) {
+    for (int ii = 0; ii < 10; ++ii) {
         
         // compute targets for use in caster (point at the asteroid origin)
         target = sensor.define_target(state_ptr->get_pos(), state_ptr->get_att(), dist);    
