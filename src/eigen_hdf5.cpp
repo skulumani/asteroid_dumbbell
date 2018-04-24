@@ -13,8 +13,7 @@ namespace HDF5 {
     }
     
     Group::Group(const File* file, const std::string& group_name) {
-        H5::Group group;
-        group = file->file_ptr->createGroup(group_name);
+        H5::Group group(file->file_ptr->createGroup(group_name));
         group_ptr = std::make_shared<H5::Group>(group);
     }
 
@@ -24,21 +23,19 @@ namespace HDF5 {
     
     File::File( const std::string& file_name , const int open_flag ) {
 
-        H5::H5File file;
         // logic to open the file based on open_flag
         if (open_flag == 0) {
-            file.openFile(file_name, H5F_ACC_RDONLY);
+            file_ptr = std::make_shared<H5::H5File>(file_name, H5F_ACC_RDONLY);
         } else if (open_flag == 1) {
-            file.openFile(file_name, H5F_ACC_RDWR);
+            file_ptr = std::make_shared<H5::H5File>(file_name, H5F_ACC_RDWR);
         } else if ( open_flag == 2) {
-            file.openFile(file_name, H5F_ACC_TRUNC);
+            file_ptr = std::make_shared<H5::H5File>(file_name, H5F_ACC_TRUNC);
         } else if ( open_flag == 3 ) {
-            file.openFile(file_name, H5F_ACC_EXCL);
+            file_ptr = std::make_shared<H5::H5File>(file_name,H5F_ACC_EXCL);
         } else if ( open_flag == 4 ) {
-            file.openFile(file_name, H5F_ACC_CREAT);
+            file_ptr = std::make_shared<H5::H5File>(file_name,H5F_ACC_CREAT);
         }
         
-        file_ptr = std::make_shared<H5::H5File>(file);
     }
 
     Group File::create_group(const std::string& group_name) const {
