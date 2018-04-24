@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 project(hdf5-example)
 
-set(ENV{HDF5_ROOT} /usr/local)
+set(ENV{HDF5_ROOT} /usr/local/hdf5)
 
 enable_language(CXX)
 
