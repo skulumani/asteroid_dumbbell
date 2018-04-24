@@ -5,6 +5,18 @@
 
 #include <stdexcept>
 
+// class definitions for working with HDF5
+namespace HDF5 {
+
+    File::~File ( void ) {
+        hf.close();
+    }
+    
+    File::File( const std::string& file_name , const int & open_flag ) {
+        hf.open(file_name, open_flag);
+    }
+
+}
 namespace internal {
     template <typename Derived>
     H5::DataSpace create_dataspace (const Eigen::EigenBase<Derived> &mat) {

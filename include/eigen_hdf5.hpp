@@ -17,46 +17,51 @@
 
 // TODO Use H5::H5Object isntead of H5Location it has attribute member functions
 // TODO Turn on compression by default or maybe with a flag as well
-class HDF5DataSet {
-    // save data to the dataset (eigen arrays)
-    // save attribute to dataset
-};
 
-class HDF5Group : public HDF5DataSet {
+namespace HDF5 {
+/** @class HDF5Object
+
+    @brief File/Group of HDF5 file
+    
+    This class is a wrapper for HDF5 groups/files. It has member functions to
+    ease the creation of datasets within the object. Already assumes an open 
+    file but will create new datasets, groups, or attributes as desired.
+
+    @author Shankar Kulumani
+    @version 24 April 2018
+*/
+class Object {
     // create a new dataset inside the group
     // create attribute in the group
 };
 
-class HDF5File : public HDF5Group {
+class File : public Object {
     public: 
-        HDF5File( void );
+        static const int ReadOnly = 0x00; /**< Read only access */
+        static const int ReadWrite = 0x01; /**< ReadWrite access */
+        static const int Truncate = 0x02; /**< Overwrite a file if it exists or create a new one */
+        static const int Excl = 0x04; /**< Only open if the file doesn't exist */
+        static const int Debug = 0x08; /**< Open in debug mode */
+        static const int Create = 0x10; /**< Create a new file */
+
+        File( void );
 
         // close the file
-        virtual ~HDF5File( void );
-        
-        /** @fn Open the HDF5 file
-                
-            Open the file for reading (default to only opening new file)
-
-            @param file_name File_name for the file
-
-            @author Shankar Kulumani
-            @version 23 April 2018
-        */
-        HDF5File(const std::string& file_name);
+        virtual ~File( void );
         
         /** @fn Open HDF5 file for reading/writing
                 
             Can specify some options for the file
 
             @param file_name File name to open/create
-            @param access_mode "r", "w"
+            @param open_flag Choice of mode to open the file in
 
             @author Shankar Kulumani
             @version 23 April 2018
         */
-        HDF5File(const std::string& file_name, const std::string& access_mode);
-        
+        File(const std::string& file_name, const int& open_flag = ReadOnly);
+       
+        const std::string getName( void );
         // create a group inside this file and return HDF5Group
         // create a dataset and return HDF5DataSet
         // create attribute
@@ -64,6 +69,7 @@ class HDF5File : public HDF5Group {
         H5::H5File hf;
 };
 
+}
 template <typename T>
 struct DatatypeSpecialization;
 
