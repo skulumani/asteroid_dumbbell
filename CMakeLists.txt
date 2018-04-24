@@ -22,6 +22,25 @@ endif()
 include( ${CGAL_USE_FILE} )
 message(STATUS "CGAL Lib: ${CGAL_LIBRARIES}")
 
+# HDF5 Setup
+set(ENV{HDF5_ROOT} /usr/local/hdf5)
+find_package(HDF5 REQUIRED COMPONENTS C CXX)
+if (NOT HDF5_FOUND)
+    message(STATUS "This project requires HDF5 and will not compile")
+    return()
+else()
+    message(STATUS "Found HDF5: ${HDF5_VERSION}")
+endif()
+
+if ( HDF5_IS_PARALLEL )
+    message(STATUS "HDF5 parallel is installed")
+else()
+    message(STATUS "HDF5 parallel is NOT installed")
+endif()
+# message(STATUS "HDF5 Lib: ${HDF5_LIBRARIES}")
+include_directories(${HDF5_INCLUDE_DIRS})
+set(hdf5_libs hdf5 hdf5_cpp)
+
 # Eigen setup
 find_package(Eigen3 REQUIRED)
 if (NOT Eigen3_FOUND)
@@ -37,37 +56,21 @@ if ( NOT Boost_FOUND )
   return()  
 endif()
 
+
+# just link executables against HDF5 target_link_libraries(target ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
+
 # setup Python
-set(PYBIND11_PYTHON_VERSION 3.5 CACHE STRING "")
+#set(PYBIND11_PYTHON_VERSION 3.5 CACHE STRING "")
 # include(${PROJECT_SOURCE_DIR}/FindPythonAnaconda.cmake)
 # Pybind11 setup
-# find_package(PythonInterp REQUIRED)
-# find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
-# include_directories(${PYTHON_INCLUDE_DIRS})
-# link_libraries(${PYTHON_LIBRARIES})
-# link_directories(${PYTHON_LIBRARY_DIRS})
+find_package(PythonInterp REQUIRED)
+find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
+link_libraries(${PYTHON_LIBRARIES})
+link_directories(${PYTHON_LIBRARY_DIRS})
 
 add_subdirectory(extern/pybind11)
 
-# HDF5 Setup
-set(ENV{HDF5_ROOT} /usr/local)
-find_package(HDF5 REQUIRED COMPONENTS CXX)
-if (NOT HDF5_FOUND)
-    message(STATUS "This project requires HDF5 and will not compile")
-    return()
-else()
-    message(STATUS "Found HDF5: ${HDF5_VERSION}")
-endif()
-
-if ( HDF5_IS_PARALLEL )
-    message(STATUS "HDF5 parallel is installed")
-else()
-    message(STATUS "HDF5 parallel is NOT installed")
-endif()
-# message(STATUS "HDF5 Lib: ${HDF5_LIBRARIES}")
-set(hdf5_libs hdf5 hdf5_cpp)
-
-# just link executables against HDF5 target_link_libraries(target ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 
 ################################################################################
 # GOOGLE TESTING
@@ -141,7 +144,7 @@ add_library(potential_cpp SHARED ${potential_src})
 set(eigen_hdf5_src 
     ${PROJECT_SOURCE_DIR}/src/eigen_hdf5.cpp)
 add_library(eigen_hdf5 SHARED ${eigen_hdf5_src})
-target_link_libraries(eigen_hdf5 ${HDF5_CXX_LIBRARIES} )
+target_link_libraries(eigen_hdf5 ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 
 # EXECUTABLES
 # mesh loading
