@@ -314,3 +314,4 @@ template void save<Eigen::Matrix<double, -1, -1> >(H5::H5Location& h5group, cons
 template void save<Eigen::Matrix<int, -1, -1> >(H5::H5Location& h5group, const std::string &name, const Eigen::EigenBase<Eigen::Matrix<int, -1, -1> > &mat, const H5::DSetCreatPropList &plist);
 
 template void save<Eigen::Matrix<double, 1, 18> >(H5::H5Location& h5group, const std::string &name, const Eigen::EigenBase<Eigen::Matrix<double, 1, 18> > &mat, const H5::DSetCreatPropList &plist);
+template void save<Eigen::Matrix<double, 1, -1> >(H5::H5Location& h5group, const std::string &name, const Eigen::EigenBase<Eigen::Matrix<double, 1, -1> > &mat, const H5::DSetCreatPropList &plist);

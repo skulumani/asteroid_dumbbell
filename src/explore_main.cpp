@@ -89,8 +89,8 @@ int main(int argc, char* argv[])
     state_ptr->update_state(new_state_ptr);
     
     // targets to be updated in the loop
-    Eigen::Matrix<double, 1, 3> target(1, 3);
-    Eigen::Matrix<double, 1, 3> intersection(1, 3);
+    Eigen::Matrix<double, 1, Eigen::Dynamic> target(1, 3);
+    Eigen::Matrix<double, 1, Eigen::Dynamic> intersection(1, 3);
     
     // save initial data to the HDF5 file
     save(hf, "truth_vertex", true_asteroid->get_verts());
@@ -122,6 +122,9 @@ int main(int argc, char* argv[])
         save(reconstructed_vertex_group, std::to_string(ii), rmesh_ptr->get_verts());
         save(reconstructed_weight_group, std::to_string(ii), rmesh_ptr->get_weights());
         save(state_group, std::to_string(ii), state_ptr->get_state());
+        save(targets_group, std::to_string(ii), target);
+        save(intersections_group, std::to_string(ii), intersection);
+
     }
     
     hf.close();
