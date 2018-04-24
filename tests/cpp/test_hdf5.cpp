@@ -5,6 +5,5 @@
 #include <iostream>
 
 TEST(TestHDF5Wrapper, CreateFile) {
-    /* HDF5::File hf_file("/tmp/test.hdf5"); */ 
-    std::cout << H5F_ACC_RDWR << std::endl;
+    HDF5::File hf_file("/tmp/test.hdf5", 1); 
 }
