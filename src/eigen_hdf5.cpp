@@ -7,21 +7,42 @@
 
 // class definitions for working with HDF5
 namespace HDF5 {
+    
+    Group::~Group( void ) {
+        group_ptr->close();
+    }
+    
+    Group::Group(const File* file, const std::string& group_name) {
+        H5::Group group;
+        group = file->file_ptr->createGroup(group_name);
+        group_ptr = std::make_shared<H5::Group>(group);
+    }
 
     File::~File ( void ) {
-        hf.close();
+        file_ptr->close();
     }
     
     File::File( const std::string& file_name , const int & open_flag ) {
+
+        H5::H5File file;
         // logic to open the file based on open_flag
         if (open_flag == 0) {
-            hf.openFile(file_name, H5F_ACC_RDONLY);
-        } else (open_flag == 1) {
-            hf.openFile(file_name, H5F_ACC_RDWR);
-        } else ( open_flag == 2) {
-            hf.openFile(file_name, H5F_ACC_TRUNC);
+            file.openFile(file_name, H5F_ACC_RDONLY);
+        } else if (open_flag == 1) {
+            file.openFile(file_name, H5F_ACC_RDWR);
+        } else if ( open_flag == 2) {
+            file.openFile(file_name, H5F_ACC_TRUNC);
+        } else if ( open_flag == 3 ) {
+            file.openFile(file_name, H5F_ACC_EXCL);
+        } else if ( open_flag == 4 ) {
+            file.openFile(file_name, H5F_ACC_CREAT);
         }
+        
+        file_ptr = std::make_shared<H5::H5File>(file);
+    }
 
+    Group File::create_group(const std::string& group_name) const {
+        return Group(this, group_name);
     }
 
 }

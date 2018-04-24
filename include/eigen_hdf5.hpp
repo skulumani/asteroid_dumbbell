@@ -14,11 +14,15 @@
 #include "H5Cpp.h"
 
 #include <stdexcept>
+#include <memory>
 
 // TODO Use H5::H5Object isntead of H5Location it has attribute member functions
 // TODO Turn on compression by default or maybe with a flag as well
 
 namespace HDF5 {
+    // Ahead of time declaration
+    class File;
+    class Group;
 /** @class HDF5Object
 
     @brief File/Group of HDF5 file
@@ -30,20 +34,29 @@ namespace HDF5 {
     @author Shankar Kulumani
     @version 24 April 2018
 */
-class Object {
+class Group {
     // create a new dataset inside the group
     // create attribute in the group
+    public:
+        Group( void );
+        virtual ~Group(void);
+
+        Group(const File* file, const std::string& group_name);
+        
+        /* template <typename Derived> */
+        /* int save(const Eigen::EigenBase<Derived> &mat); */
+
+        std::shared_ptr<H5::Group> group_ptr;
 };
 
-class File : public Object {
+class File {
     public: 
+        static const int ReadOnly = 0; /**< Read only access */
+        static const int ReadWrite = 1; /**< ReadWrite access */
+        static const int Truncate = 2; /**< Overwrite a file if it exists or create a new one */
+        static const int Excl = 3; /**< Only open if the file doesn't exist */
+        static const int Create = 4; /**< Create a new file */
 
-        static const int ReadOnly = H5F_ACC_RDONLY; /**< Read only access */
-        static const int ReadWrite = H5F_ACC_RDWR; /**< ReadWrite access */
-        static const int Truncate = H5F_ACC_TRUNC; /**< Overwrite a file if it exists or create a new one */
-        static const int Excl = H5F_ACC_EXCL; /**< Only open if the file doesn't exist */
-        static const int Debug = 0; /**< Open in debug mode */
-        static const int Create = H5F_ACC_CREAT; /**< Create a new file */
 
         File( void );
 
@@ -60,14 +73,17 @@ class File : public Object {
             @author Shankar Kulumani
             @version 23 April 2018
         */
-        File(const std::string& file_name, const int& open_flag);
+        File(const std::string& file_name, const int& open_flag = 0);
         
-        const std::string getName( void );
+        const std::string getName( void ) const;
+        
+        Group create_group(const std::string& group_name) const;
+
         // create a group inside this file and return HDF5Group
         // create a dataset and return HDF5DataSet
         // create attribute
         
-        H5::H5File hf;
+        std::shared_ptr<H5::H5File> file_ptr; /**< HDF5 file to save data */
 };
 
 }
