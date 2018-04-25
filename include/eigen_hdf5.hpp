@@ -104,6 +104,10 @@ class File {
         const std::string getName( void ) const;
         
         Group group(const std::string& group_name) const;
+        
+        DataSet dataset(const std::string& dataset_name) const;
+        template<typename Derived>
+        DataSet dataset(const std::string& name, const Eigen::EigenBase<Derived>& mat) const;
 
         // Open exisiting dataset
         DataSet open_dataset(const std::string& dataset_name) const;
