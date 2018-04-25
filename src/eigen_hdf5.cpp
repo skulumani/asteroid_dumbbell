@@ -77,6 +77,7 @@ namespace HDF5 {
     
     Group::Group(const File* file, const std::string& group_name) {
         try {
+            H5::Exception::dontPrint();
             group_ptr = std::make_shared<H5::Group>(file->file_ptr->openGroup(group_name)); 
         } catch(const H5::FileIException& err_does_not_exist) {
             group_ptr = std::make_shared<H5::Group>(file->file_ptr->createGroup(group_name));
@@ -128,7 +129,7 @@ namespace HDF5 {
         
     }
 
-    Group File::create_group(const std::string& group_name) const {
+    Group File::group(const std::string& group_name) const {
         return Group(this, group_name);
     }
     

@@ -115,8 +115,8 @@ class File {
         
         const std::string getName( void ) const;
         
-        Group create_group(const std::string& group_name) const;
-        
+        Group group(const std::string& group_name) const;
+
         // Open exisiting dataset
         DataSet open_dataset(const std::string& dataset_name) const;
 
