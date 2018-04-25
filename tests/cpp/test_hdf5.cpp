@@ -4,6 +4,22 @@
 
 #include <iostream>
 
+TEST(TestHDF5DataSet, OpenDataSetFromFile) {
+    // first create a file with a dataset
+    std::shared_ptr<HDF5::File> hf_file_ptr = std::make_shared<HDF5::File>("/tmp/test.hdf5", HDF5::File::Truncate);
+    Eigen::MatrixXd mat(1, 3), mat_load(1, 3);
+    mat = Eigen::MatrixXd::Random(1, 3);
+    hf_file_ptr->write("matrix", mat);
+    
+    // close the file by reset
+    hf_file_ptr.reset(new HDF5::File("/tmp/test.hdf5", HDF5::File::ReadOnly));
+
+    // now test dataset constructor
+    HDF5::DataSet hf_dataset(hf_file_ptr.get(), "matrix");
+}
+
+// TODO Start testing from DataSet(const Group* , ....)
+// TODO Test all the dataset constructors and member functions
 TEST(TestHDF5File, CreateFile) {
     HDF5::File hf_file("/tmp/test.hdf5", HDF5::File::Truncate); 
 }
