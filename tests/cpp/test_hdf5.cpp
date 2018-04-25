@@ -20,6 +20,22 @@ TEST(TestHDF5DataSet, OpenDataSetFromFile) {
 
 // TODO Start testing from DataSet(const Group* , ....)
 // TODO Test all the dataset constructors and member functions
+TEST(TestHDF5DataSet, OpenDataSetFromGroup) {
+    // first create a file with a dataset
+    std::shared_ptr<HDF5::File> hf_file_ptr = std::make_shared<HDF5::File>("/tmp/test.hdf5", HDF5::File::Truncate);
+    std::shared_ptr<HDF5::Group> hf_group_ptr = std::make_shared<HDF5::Group>(hf_file_ptr->create_group("group"));
+
+    Eigen::MatrixXd mat(1, 3), mat_load(1, 3);
+    mat = Eigen::MatrixXd::Random(1, 3);
+    hf_group_ptr->write("matrix", mat);
+    
+    // close the file by reset
+    hf_file_ptr.reset(new HDF5::File("/tmp/test.hdf5", HDF5::File::ReadOnly));
+    /* hf_group_ptr.reset(new HDF5::Group(hf_file_ptr.get(), "group")); */ 
+    // now test dataset constructor
+    /* HDF5::DataSet hf_dataset(hf_file_ptr.get(), "matrix"); */
+
+}
 TEST(TestHDF5File, CreateFile) {
     HDF5::File hf_file("/tmp/test.hdf5", HDF5::File::Truncate); 
 }
@@ -87,4 +103,18 @@ TEST(TestHDF5Group, GroupDataSet) {
 
     ASSERT_TRUE(mat.isApprox(mat_load));
 
+}
+
+TEST(TestHDF5Group, GroupConstructor) {
+    std::shared_ptr<HDF5::File> hf_file_ptr = std::make_shared<HDF5::File>("/tmp/test.hdf5", HDF5::File::Truncate);
+    std::shared_ptr<HDF5::Group> hf_group_ptr = std::make_shared<HDF5::Group>(hf_file_ptr.get(), "group");
+    
+    // write to group to check and make sure it's working
+    Eigen::MatrixXd mat(1, 3), mat_load(1, 3);
+    mat = Eigen::MatrixXd::Random(1, 3);
+    hf_group_ptr->write("matrix", mat);
+    
+    // close the file by reset
+    hf_file_ptr.reset(new HDF5::File("/tmp/test.hdf5", HDF5::File::ReadOnly));
+    hf_group_ptr.reset(new HDF5::Group(hf_file_ptr.get(), "group"));
 }
