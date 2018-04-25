@@ -8,7 +8,7 @@
 
 // class definitions for working with HDF5
 namespace HDF5 {
-    
+     
     DataSet::DataSet( void ) {
         dataset_ptr = NULL;
     }
@@ -124,9 +124,19 @@ namespace HDF5 {
     }
     
     DataSet File::open_dataset(const std::string& dataset_name) const {
-
+        return DataSet(this, dataset_name);
     }
     
+    template<typename Derived>
+    DataSet File::read_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat) const {
+        return DataSet(this, dataset_name, mat);
+    }
+    
+    template<typename Derived>
+    DataSet File::write_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat) const {
+        return DataSet(this, dataset_name, mat);
+    }
+
     template<typename Derived>
     int File::write(const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat) {
         // TODO Catch proper exceptions

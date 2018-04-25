@@ -26,35 +26,36 @@ namespace HDF5 {
     class DataSet;
     
     class DataSet {
-        DataSet( void );
-        virtual ~DataSet( void );
-        
-        // Simply open a dataset with another function to read
-        DataSet(const File* file, const std::string& dataset_name);
-        DataSet(const Group* group, const std::string& dataset_name);
+        public:
+            DataSet( void );
+            virtual ~DataSet( void );
 
-        // read an already opened dataset to a new variable
-        template<typename Derived>
-        int read(const Eigen::DenseBase<Derived>& mat);
-        
-        // open and read to variable
-        template<typename Derived>
-        DataSet(const File* file, const std::string& dataset_name, const Eigen::DenseBase<Derived>& mat);
-        template<typename Derived>
-        DataSet(const Group* group, const std::string& dataset_name, const Eigen::DenseBase<Derived>& mat);
+            // Simply open a dataset with another function to read
+            DataSet(const File* file, const std::string& dataset_name);
+            DataSet(const Group* group, const std::string& dataset_name);
+
+            // read an already opened dataset to a new variable
+            template<typename Derived>
+                int read(const Eigen::DenseBase<Derived>& mat);
+
+            // open and read to variable
+            template<typename Derived>
+                DataSet(const File* file, const std::string& dataset_name, const Eigen::DenseBase<Derived>& mat);
+            template<typename Derived>
+                DataSet(const Group* group, const std::string& dataset_name, const Eigen::DenseBase<Derived>& mat);
 
 
-        // create and write to new dataset
-        template<typename Derived>
-        DataSet(const File* file, const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat,
-                const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT);
-    
-        template<typename Derived>
-        DataSet(const Group* group, const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat,
-                const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT);
-        
+            // create and write to new dataset
+            template<typename Derived>
+                DataSet(const File* file, const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat,
+                        const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT);
 
-        std::shared_ptr<H5::DataSet> dataset_ptr;
+            template<typename Derived>
+                DataSet(const Group* group, const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat,
+                        const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT);
+
+
+            std::shared_ptr<H5::DataSet> dataset_ptr;
     };
 /** @class HDF5Object
 
