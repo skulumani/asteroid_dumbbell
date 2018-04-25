@@ -45,25 +45,27 @@ namespace HDF5 {
     }
     
     template<typename Derived>
-    DataSet::DataSet(const Group* group, const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat,
-            const H5::DSetCreatPropList &plist) {
-        // create a dataset and attach to the pointer
+    DataSet::DataSet(const Group* group, const std::string& dataset_name, const Eigen::DenseBase<Derived> &mat) {
+        // read data from dataset and attach to mat
         try {
-            save(*(group->group_ptr), dataset_name, mat, plist);
+            dataset_ptr = std::make_shared<H5::DataSet>(group->group_ptr->openDataSet(dataset_name));
+            internal::_load(*dataset_ptr, mat);
+            /* save(*(group->group_ptr), dataset_name, mat, plist); */
         } catch(...) {
-            std::cout << "Error saving: " << dataset_name << std::endl;
+            std::cout << "Error reading: " << dataset_name << std::endl;
         }
     }
     
     template<typename Derived>
-    DataSet::DataSet(const File* file, const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat,
-            const H5::DSetCreatPropList &plist) {
+    DataSet::DataSet(const File* file, const std::string& dataset_name, const Eigen::DenseBase<Derived> &mat) {
         try {
-            save(*(file->file_ptr), dataset_name, mat, plist);
+            dataset_ptr = std::make_shared<H5::DataSet>(file->file_ptr->openDataSet(dataset_name));
+            internal::_load(*dataset_ptr, mat);
         } catch(...) {
-            std::cout << "Error saving: " << dataset_name << std::endl;
+            std::cout << "Error reading: " << dataset_name << std::endl;
         }
     }
+    
 
     Group::~Group( void ) {
         group_ptr->close();
@@ -127,7 +129,7 @@ namespace HDF5 {
     }
     
     template<typename Derived>
-    DataSet File::read_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat) const {
+    DataSet File::read_dataset(const std::string& dataset_name, const Eigen::DenseBase<Derived> &mat) const {
         return DataSet(this, dataset_name, mat);
     }
     
@@ -493,6 +495,16 @@ template int HDF5::File::read<Eigen::Matrix<int, -1, -1> >(const std::string &na
 
 template int HDF5::File::read<Eigen::Matrix<double, 1, 18> >(const std::string &name, const Eigen::DenseBase<Eigen::Matrix<double, 1, 18> > &mat);
 template int HDF5::File::read<Eigen::Matrix<int, 1, 18> >(const std::string &name, const Eigen::DenseBase<Eigen::Matrix<int, 1, 18> > &mat);
+
+// File::read_dataset template
+template HDF5::DataSet HDF5::File::read_dataset<Eigen::Matrix<double, -1, 3> >(const std::string& name, const Eigen::DenseBase<Eigen::Matrix<double, -1, 3> >& mat) const;
+template HDF5::DataSet HDF5::File::read_dataset<Eigen::Matrix<int, -1, 3> >(const std::string& name, const Eigen::DenseBase<Eigen::Matrix<int, -1, 3> >& mat) const;
+
+template HDF5::DataSet HDF5::File::read_dataset<Eigen::Matrix<double, -1, -1> >(const std::string& name, const Eigen::DenseBase<Eigen::Matrix<double, -1, -1> >& mat) const;
+template HDF5::DataSet HDF5::File::read_dataset<Eigen::Matrix<int, -1, -1> >(const std::string& name, const Eigen::DenseBase<Eigen::Matrix<int, -1, -1> >& mat) const;
+
+template HDF5::DataSet HDF5::File::read_dataset<Eigen::Matrix<double, 1, 18> >(const std::string& name, const Eigen::DenseBase<Eigen::Matrix<double, 1, 18> >& mat) const;
+template HDF5::DataSet HDF5::File::read_dataset<Eigen::Matrix<int, 1, 18> >(const std::string& name, const Eigen::DenseBase<Eigen::Matrix<int, 1, 18> >& mat) const;
 
 // Group::write template specilization
 template int HDF5::Group::write<Eigen::Matrix<double, -1, 3> >(const std::string &name, const Eigen::EigenBase<Eigen::Matrix<double, -1, 3> > &mat);

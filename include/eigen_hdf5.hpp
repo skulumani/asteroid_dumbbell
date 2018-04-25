@@ -122,7 +122,7 @@ class File {
 
         // Open and read to variable an exisiting dataset
         template<typename Derived>
-        DataSet read_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat) const;
+        DataSet read_dataset(const std::string& dataset_name, const Eigen::DenseBase<Derived> &mat) const;
         
         // create and write to dataset
         template<typename Derived>
