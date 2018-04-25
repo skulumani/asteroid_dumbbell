@@ -9,8 +9,60 @@
 // class definitions for working with HDF5
 namespace HDF5 {
     
+    DataSet::DataSet( void ) {
+        dataset_ptr = NULL;
+    }
+
     DataSet::~DataSet( void ) {
         dataset_ptr->close();
+    }
+    
+    DataSet::DataSet(const File* file, const std::string& dataset_name) {
+        try {
+            dataset_ptr = std::make_shared<H5::DataSet>(file->file_ptr->openDataSet(dataset_name));
+        } catch ( const H5::FileIException& err_does_not_exist) {
+            std::cout << "DataSet: " << dataset_name << " does not exist" << std::endl;
+        }
+    }
+
+    DataSet::DataSet(const Group* group, const std::string& dataset_name) {
+        try {
+            dataset_ptr = std::make_shared<H5::DataSet>(group->group_ptr->openDataSet(dataset_name));
+        } catch ( const H5::FileIException& err_does_not_exist) {
+            std::cout << "DataSet: " << dataset_name << " does not exist" << std::endl;
+        }
+    }
+    
+    template<typename Derived>
+    int DataSet::read(const Eigen::DenseBase<Derived>& mat) {
+        try {
+            internal::_load(*dataset_ptr, mat);  
+            return 0;
+        } catch(...) {
+            std::cout << "Error reading dataset" << std::endl;
+            return 1;
+        }
+    }
+    
+    template<typename Derived>
+    DataSet::DataSet(const Group* group, const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat,
+            const H5::DSetCreatPropList &plist) {
+        // create a dataset and attach to the pointer
+        try {
+            save(*(group->group_ptr), dataset_name, mat, plist);
+        } catch(...) {
+            std::cout << "Error saving: " << dataset_name << std::endl;
+        }
+    }
+    
+    template<typename Derived>
+    DataSet::DataSet(const File* file, const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat,
+            const H5::DSetCreatPropList &plist) {
+        try {
+            save(*(file->file_ptr), dataset_name, mat, plist);
+        } catch(...) {
+            std::cout << "Error saving: " << dataset_name << std::endl;
+        }
     }
 
     Group::~Group( void ) {
@@ -70,7 +122,10 @@ namespace HDF5 {
     Group File::create_group(const std::string& group_name) const {
         return Group(this, group_name);
     }
+    
+    DataSet File::open_dataset(const std::string& dataset_name) const {
 
+    }
     
     template<typename Derived>
     int File::write(const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat) {

@@ -24,19 +24,35 @@ namespace HDF5 {
     class File;
     class Group;
     class DataSet;
-
+    
     class DataSet {
         DataSet( void );
         virtual ~DataSet( void );
-
+        
+        // Simply open a dataset with another function to read
         DataSet(const File* file, const std::string& dataset_name);
         DataSet(const Group* group, const std::string& dataset_name);
 
-        template<typename Derived>
-        int write(const Eigen::EigenBase<Derived>& mat);
-
+        // read an already opened dataset to a new variable
         template<typename Derived>
         int read(const Eigen::DenseBase<Derived>& mat);
+        
+        // open and read to variable
+        template<typename Derived>
+        DataSet(const File* file, const std::string& dataset_name, const Eigen::DenseBase<Derived>& mat);
+        template<typename Derived>
+        DataSet(const Group* group, const std::string& dataset_name, const Eigen::DenseBase<Derived>& mat);
+
+
+        // create and write to new dataset
+        template<typename Derived>
+        DataSet(const File* file, const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat,
+                const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT);
+    
+        template<typename Derived>
+        DataSet(const Group* group, const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat,
+                const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT);
+        
 
         std::shared_ptr<H5::DataSet> dataset_ptr;
     };
@@ -66,9 +82,7 @@ class Group {
         template<typename Derived>
         int read(const std::string& dataset_name, const Eigen::DenseBase<Derived>& mat);
 
-        /* template <typename Derived> */
-        /* int save(const Eigen::EigenBase<Derived> &mat); */
-
+        // TODO Create dataset method
         std::shared_ptr<H5::Group> group_ptr;
 };
 
@@ -101,7 +115,17 @@ class File {
         const std::string getName( void ) const;
         
         Group create_group(const std::string& group_name) const;
-        DataSet create_dataset(const std::string& dataset_name) const;
+        
+        // Open exisiting dataset
+        DataSet open_dataset(const std::string& dataset_name) const;
+
+        // Open and read to variable an exisiting dataset
+        template<typename Derived>
+        DataSet read_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat) const;
+        
+        // create and write to dataset
+        template<typename Derived>
+        DataSet write_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat) const;
 
         // TODO Add attribute saving
         // TODO Add saving scalar double, int, strings
