@@ -44,15 +44,8 @@ namespace HDF5 {
             // open and read to variable or create a dataset if not exisiting
             template<typename Derived>
             DataSet(const File* file, const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat);
-
-            DataSet(int );
-            /* template<typename Derived> */
-            /* DataSet(const Group* group, const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat); */
-
-            /* template<typename Derived> */
-            /* DataSet(const File* file, const std::string& dataset_name, const Eigen::DenseBase<Derived>& mat); */
-            /* template<typename Derived> */
-            /* DataSet(const Group* group, const std::string& dataset_name, const Eigen::DenseBase<Derived>& mat); */
+            template<typename Derived>
+            DataSet(const Group* group, const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat);
 
             std::shared_ptr<H5::DataSet> dataset_ptr;
     };
