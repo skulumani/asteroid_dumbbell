@@ -118,6 +118,13 @@ TEST(TestHDF5Group, GroupWrite) {
     int write_flag = hf_group.write("matrix", mat);
     ASSERT_EQ(write_flag, 0);
 }
+
+TEST(TestHDF5Group, GroupFromGroup) {
+    std::shared_ptr<HDF5::File> hf_file_ptr = std::make_shared<HDF5::File>("/tmp/test.hdf5", HDF5::File::Truncate);
+    std::shared_ptr<HDF5::Group> hf_group_ptr = std::make_shared<HDF5::Group>(hf_file_ptr.get(), "group");
+    std::shared_ptr<HDF5::Group> hf_subgroup_ptr = std::make_shared<HDF5::Group>(hf_group_ptr.get(), "subgroup");
+}
+
 TEST(TestEigenHDF5, SaveData) {
     H5::H5File hf_file("/tmp/test.hdf5", H5F_ACC_TRUNC);
     Eigen::MatrixXd mat(1, 3), mat_load(1, 3);

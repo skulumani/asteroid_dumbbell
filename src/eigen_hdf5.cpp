@@ -138,6 +138,15 @@ namespace HDF5 {
             group_ptr = std::make_shared<H5::Group>(file->file_ptr->createGroup(group_name));
         }	 
     }
+    
+    Group::Group(const Group* group, const std::string& group_name) {
+        try {
+            H5::Exception::dontPrint();
+            group_ptr = std::make_shared<H5::Group>(group->group_ptr->openGroup(group_name));
+        } catch(const H5::GroupIException err_does_not_exist) {
+            group_ptr = std::make_shared<H5::Group>(group->group_ptr->createGroup(group_name));
+        }
+    }
 
     template<typename Derived>
     int Group::write(const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat) {
