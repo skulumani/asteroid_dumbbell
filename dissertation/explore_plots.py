@@ -38,7 +38,34 @@ def exploration_generate_plots(data_path, img_path='/tmp/diss_explore',
         os.makedirs(img_path)
 
     with h5py.File(data_path, 'r') as hf:
-        pass
+        rv = hf['reconstructed_vertex']
+        rw = hf['reconstructed_weight']
+
+        # get all the keys
+        v_keys = np.array(utilities.sorted_nicely(list(rv.keys())))
+        w_keys = np.array(utilities.sorted_nicely(list(rw.keys())))
+
+        v_initial = hf['initial_vertex'][()]
+        f_initial = hf['initial_faces'][()]
+        w_initial = hf['initial_weight'][()]
+
+        """Partial images during the reconstruction"""
+        mfig = graphics.mayavi_figure(offscreen=False)
+        mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial)
+        ms = mesh.mlab_source
+        graphics.mayavi_axes(mfig, [-1, 1, -1, 1, -1, 1], line_width=5, color=(1, 0, 0))
+        graphics.mayavi_view(fig=mfig)
+
+        partial_index = np.array([0, v_keys.shape[0]*1/4, v_keys.shape[0]*1/2,
+                                  v_keys.shape[0]*3/4, v_keys.shape[0]*4/4-1],
+                                 dtype=np.int)
+        for img_index, vk in enumerate(partial_index):
+            filename = os.path.join(img_path, 'partial_' + str(vk) + '.jpg')
+            v = rv[str(vk)][()]
+            # generate an image and save it 
+            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:,2], triangles=f_initial)
+            graphics.mlab.savefig(filename, magnification=4)
+        
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate plots from explore",
