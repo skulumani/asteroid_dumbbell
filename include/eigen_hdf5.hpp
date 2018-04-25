@@ -49,17 +49,7 @@ namespace HDF5 {
 
             std::shared_ptr<H5::DataSet> dataset_ptr;
     };
-/** @class HDF5Object
 
-    @brief File/Group of HDF5 file
-    
-    This class is a wrapper for HDF5 groups/files. It has member functions to
-    ease the creation of datasets within the object. Already assumes an open 
-    file but will create new datasets, groups, or attributes as desired.
-
-    @author Shankar Kulumani
-    @version 24 April 2018
-*/
 class Group {
     // create a new dataset inside the group
     // create attribute in the group
