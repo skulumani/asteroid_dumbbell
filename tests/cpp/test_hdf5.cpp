@@ -24,14 +24,12 @@
 TEST(TestHDF5DataSet, OpenDataSetFromGroup) {
     // first create a file with a dataset
     std::shared_ptr<HDF5::File> hf_file_ptr = std::make_shared<HDF5::File>("/tmp/test.hdf5", HDF5::File::Truncate);
-    /* std::shared_ptr<HDF5::Group> hf_group_ptr = std::make_shared<HDF5::Group>(hf_file_ptr->group("group")); */
+    std::shared_ptr<HDF5::Group> hf_group_ptr = std::make_shared<HDF5::Group>(hf_file_ptr.get(), "group");
     
-    HDF5::Group hf_group(hf_file_ptr.get(), "group");
-
     Eigen::MatrixXd mat(1, 3), mat_load(1, 3);
     mat = Eigen::MatrixXd::Random(1, 3);
     /* hf_group_ptr->write("matrix", mat); */
-    hf_group.write("matrix", mat);
+    hf_group_ptr->write("matrix", mat);
     /* save(hf_file_ptr, "matrix", mat); */
     // close the file by reset
     /* hf_file_ptr.reset(new HDF5::File("/tmp/test.hdf5", HDF5::File::ReadOnly)); */
