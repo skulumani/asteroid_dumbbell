@@ -48,7 +48,17 @@ TEST(TestHDF5File, OpenAndReadDataSet) {
     // now open and read dataset directly
     HDF5::DataSet hf_dataset = hf_file_ptr->read_dataset("matrix", mat_load);
     ASSERT_TRUE(mat.isApprox(mat_load));
+}
 
+TEST(TestHDF5File, WriteDataSet) {
+    std::shared_ptr<HDF5::File> hf_file_ptr = std::make_shared<HDF5::File>("/tmp/test.hdf5", HDF5::File::Truncate);
+    Eigen::MatrixXd mat(1, 3), mat_load(1, 3);
+    mat = Eigen::MatrixXd::Random(1, 3);
+    
+    /* HDF5::DataSet hf_dataset(hf_file_ptr.get(), "matrix", mat); */
+    /* HDF5::DataSet hf_dataset = hf_file_ptr->write_dataset("matrix", mat); */
+    HDF5::DataSet hf_dataset();
+    /* save(*(hf_file_ptr->file_ptr), "matrix", mat); */
 }
 TEST(TestHDF5Group, GroupDataSet) {
     HDF5::File hf_file("/tmp/test.hdf5", HDF5::File::Truncate);

@@ -66,6 +66,10 @@ namespace HDF5 {
         }
     }
     
+    template<typename Derived>
+    DataSet::DataSet(const File* file, const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat, const H5::DSetCreatPropList &plist) {
+        std::cout << "Constructor" << std::endl;  
+    }
 
     Group::~Group( void ) {
         group_ptr->close();
@@ -134,8 +138,8 @@ namespace HDF5 {
     }
     
     template<typename Derived>
-    DataSet File::write_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat) const {
-        return DataSet(this, dataset_name, mat);
+    DataSet File::write_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived>& mat, const H5::DSetCreatPropList &plist) const {
+        return DataSet(this, dataset_name, mat, plist);
     }
 
     template<typename Derived>
@@ -505,6 +509,9 @@ template HDF5::DataSet HDF5::File::read_dataset<Eigen::Matrix<int, -1, -1> >(con
 
 template HDF5::DataSet HDF5::File::read_dataset<Eigen::Matrix<double, 1, 18> >(const std::string& name, const Eigen::DenseBase<Eigen::Matrix<double, 1, 18> >& mat) const;
 template HDF5::DataSet HDF5::File::read_dataset<Eigen::Matrix<int, 1, 18> >(const std::string& name, const Eigen::DenseBase<Eigen::Matrix<int, 1, 18> >& mat) const;
+
+// File::write_dataset template specialization
+template HDF5::DataSet HDF5::File::write_dataset<Eigen::Matrix<double, -1, -1> >(const std::string& name, const Eigen::EigenBase<Eigen::Matrix<double, -1, -1> > &,const H5::DSetCreatPropList & plist) const;
 
 // Group::write template specilization
 template int HDF5::Group::write<Eigen::Matrix<double, -1, 3> >(const std::string &name, const Eigen::EigenBase<Eigen::Matrix<double, -1, 3> > &mat);

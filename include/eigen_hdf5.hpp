@@ -126,7 +126,7 @@ class File {
         
         // create and write to dataset
         template<typename Derived>
-        DataSet write_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat) const;
+        DataSet write_dataset(const std::string& dataset_name, const Eigen::EigenBase<Derived> &mat, const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT) const;
 
         // TODO Add attribute saving
         // TODO Add saving scalar double, int, strings
