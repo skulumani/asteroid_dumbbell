@@ -16,9 +16,9 @@
 #include <stdexcept>
 #include <memory>
 
-// TODO Use H5::H5Object isntead of H5Location it has attribute member functions
 // TODO Turn on compression by default or maybe with a flag as well
-
+// TODO Add documentation
+// TODO Move Each class to it's own file
 namespace HDF5 {
     // Ahead of time declaration
     class File;
