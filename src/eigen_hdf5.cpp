@@ -537,3 +537,13 @@ template int HDF5::Group::read<Eigen::Matrix<int, -1, -1> >(const std::string &n
 
 template int HDF5::Group::read<Eigen::Matrix<double, 1, 18> >(const std::string &name, const Eigen::DenseBase<Eigen::Matrix<double, 1, 18> > &mat);
 template int HDF5::Group::read<Eigen::Matrix<int, 1, 18> >(const std::string &name, const Eigen::DenseBase<Eigen::Matrix<int, 1, 18> > &mat);
+
+// DataSet::read template specialization
+template int HDF5::DataSet::read<Eigen::Matrix<double, -1, 3> >(const Eigen::DenseBase<Eigen::Matrix<double, -1, 3> > &mat);
+template int HDF5::DataSet::read<Eigen::Matrix<int, -1, 3> >(const Eigen::DenseBase<Eigen::Matrix<int, -1, 3> > &mat);
+
+template int HDF5::DataSet::read<Eigen::Matrix<double, -1, -1> >(const Eigen::DenseBase<Eigen::Matrix<double, -1, -1> > &mat);
+template int HDF5::DataSet::read<Eigen::Matrix<int, -1, -1> >(const Eigen::DenseBase<Eigen::Matrix<int, -1, -1> > &mat);
+
+template int HDF5::DataSet::read<Eigen::Matrix<double, 1, 18> >(const Eigen::DenseBase<Eigen::Matrix<double, 1, 18> > &mat);
+template int HDF5::DataSet::read<Eigen::Matrix<int, 1, 18> >(const Eigen::DenseBase<Eigen::Matrix<int, 1, 18> > &mat);

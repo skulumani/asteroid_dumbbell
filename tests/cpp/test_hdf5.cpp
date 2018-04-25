@@ -28,19 +28,30 @@ TEST(TestHDF5DataSet, OpenDataSetFromGroup) {
     
     Eigen::MatrixXd mat(1, 3), mat_load(1, 3);
     mat = Eigen::MatrixXd::Random(1, 3);
-    /* hf_group_ptr->write("matrix", mat); */
     hf_group_ptr->write("matrix", mat);
+
     /* save(hf_file_ptr, "matrix", mat); */
     // close the file by reset
-    /* hf_file_ptr.reset(new HDF5::File("/tmp/test.hdf5", HDF5::File::ReadOnly)); */
-    /* hf_group_ptr.reset(new HDF5::Group(hf_file_ptr.get(), "group")); */ 
+    hf_file_ptr.reset(new HDF5::File("/tmp/test.hdf5", HDF5::File::ReadOnly));
+    hf_group_ptr.reset(new HDF5::Group(hf_file_ptr.get(), "group")); 
     // now test dataset constructor
-    /* HDF5::DataSet hf_dataset(hf_group_ptr.get(), "matrix"); */
-
+    HDF5::DataSet hf_dataset(hf_group_ptr.get(), "matrix");
+    
+    hf_dataset.read(mat_load);
+    ASSERT_TRUE(mat.isApprox(mat_load));
 }
 
 
 /* WORKING TESTS */
+/* TEST(TestHDF5Group, PointerGroupWrite) { */
+/*     std::shared_ptr<HDF5::File> hf_file_ptr = std::make_shared<HDF5::File>("/tmp/test.hdf5", HDF5::File::Truncate); */
+/*     std::shared_ptr<HDF5::Group> hf_group_ptr = std::make_shared<HDF5::Group>(hf_file_ptr.get(), "group"); */
+/*     Eigen::MatrixXd mat(1, 3), mat_load(1, 3); */
+/*     mat = Eigen::MatrixXd::Random(1, 3); */
+/*     int write_flag = hf_group_ptr->write("matrix", mat); */
+/*     ASSERT_EQ(write_flag, 0); */
+/* } */
+
 
 /* TEST(TestHDF5Group, GroupWrite) { */
 /*     std::shared_ptr<HDF5::File> hf_file_ptr = std::make_shared<HDF5::File>("/tmp/test.hdf5", HDF5::File::Truncate); */

@@ -36,7 +36,7 @@ namespace HDF5 {
 
             // read an already opened dataset to a new variable
             template<typename Derived>
-                int read(const Eigen::DenseBase<Derived>& mat);
+            int read(const Eigen::DenseBase<Derived>& mat);
 
             // open and read to variable
             template<typename Derived>
