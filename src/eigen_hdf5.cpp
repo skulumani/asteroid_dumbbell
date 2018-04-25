@@ -9,9 +9,9 @@
 // class definitions for working with HDF5
 namespace HDF5 {
      
-    DataSet::DataSet( void ) {
-        dataset_ptr = NULL;
-    }
+    /* DataSet::DataSet( void ) { */
+    /*     /1* dataset_ptr = NULL; *1/ */
+    /* } */
 
     DataSet::~DataSet( void ) {
         dataset_ptr->close();
