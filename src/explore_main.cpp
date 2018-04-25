@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
     save(hf, "initial_state", state_ptr->get_state());
 
     // LOOP HERE
-    for (int ii = 0; ii < 10; ++ii) {
+    for (int ii = 0; ii < 5; ++ii) {
         
         // compute targets for use in caster (point at the asteroid origin)
         target = sensor.define_target(state_ptr->get_pos(), state_ptr->get_att(), dist);    
