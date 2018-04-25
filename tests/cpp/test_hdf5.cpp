@@ -125,6 +125,17 @@ TEST(TestHDF5Group, GroupFromGroup) {
     std::shared_ptr<HDF5::Group> hf_subgroup_ptr = std::make_shared<HDF5::Group>(hf_group_ptr.get(), "subgroup");
 }
 
+TEST(TestHDF5Group, ReturnDataSetFromGroup) {
+    std::shared_ptr<HDF5::File> hf_file_ptr = std::make_shared<HDF5::File>("/tmp/test.hdf5", HDF5::File::Truncate);
+    std::shared_ptr<HDF5::Group> hf_group_ptr = std::make_shared<HDF5::Group>(hf_file_ptr.get(), "group");
+
+    // now make a dataset inside the group
+    Eigen::MatrixXd mat(1, 3);
+    mat = Eigen::MatrixXd::Random(1, 3);
+    HDF5::DataSet hf_dataset = hf_group_ptr->dataset("matrix", mat);
+
+}
+
 TEST(TestEigenHDF5, SaveData) {
     H5::H5File hf_file("/tmp/test.hdf5", H5F_ACC_TRUNC);
     Eigen::MatrixXd mat(1, 3), mat_load(1, 3);
