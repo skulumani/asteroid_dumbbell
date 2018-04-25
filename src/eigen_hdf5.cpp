@@ -122,7 +122,9 @@ namespace HDF5 {
                 }
     }
 
-    
+    Group::Group( void ) {
+        group_ptr = std::make_shared<H5::Group>();
+    }
 
     Group::~Group( void ) {
         group_ptr->close();
