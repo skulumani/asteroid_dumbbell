@@ -70,8 +70,7 @@ namespace HDF5 {
     }
     
     Group::Group(const File* file, const std::string& group_name) {
-        H5::Group group(file->file_ptr->createGroup(group_name));
-        group_ptr = std::make_shared<H5::Group>(group);
+        group_ptr = std::make_shared<H5::Group>(file->file_ptr->createGroup(group_name));
     }
 
     template<typename Derived>
