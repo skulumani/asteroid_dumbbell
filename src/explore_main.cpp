@@ -8,7 +8,7 @@
 #include "lidar.hpp"
 #include "controller.hpp"
 #include "state.hpp"
-#include "eigen_hdf5.hpp"
+#include "hdf5.hpp"
 
 #include "input_parser.hpp"
 
