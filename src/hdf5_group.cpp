@@ -1,11 +1,6 @@
-#include "eigen_hdf5.hpp"
+#include "hdf5.hpp"
 
-#include <Eigen/Dense>
-#include "H5Cpp.h"
-
-#include <stdexcept>
 #include <iostream>
-#include <memory>
 
 namespace HDF5 {
 

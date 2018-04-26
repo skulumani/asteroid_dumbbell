@@ -110,7 +110,7 @@ endif()
 ################################################################################
 # BUILD TARGETS
 ################################################################################
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # LIBRARIES
 # create some shared libraries for things
@@ -142,9 +142,10 @@ set(potential_src
 add_library(potential_cpp SHARED ${potential_src})
 
 set(eigen_hdf5_src 
-    ${PROJECT_SOURCE_DIR}/src/eigen_hdf5.cpp
+    ${PROJECT_SOURCE_DIR}/src/hdf5_eigen.cpp
     ${PROJECT_SOURCE_DIR}/src/hdf5_file.cpp
-    ${PROJECT_SOURCE_DIR}/src/hdf5_group.cpp)
+    ${PROJECT_SOURCE_DIR}/src/hdf5_group.cpp
+    ${PROJECT_SOURCE_DIR}/src/hdf5_dataset.cpp)
 add_library(eigen_hdf5 SHARED ${eigen_hdf5_src})
 target_link_libraries(eigen_hdf5 ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 

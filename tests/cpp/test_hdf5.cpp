@@ -1,4 +1,4 @@
-#include "eigen_hdf5.hpp"
+#include "hdf5.hpp"
 
 #include <gtest/gtest.h>
 

@@ -1,13 +1,9 @@
-#include "eigen_hdf5.hpp"
+#include "hdf5.hpp"
 
-#include <Eigen/Dense>
-#include "H5Cpp.h"
-
-#include <stdexcept>
 #include <iostream>
 
 namespace HDF5 {
-
+    
     File::~File ( void ) {
         file_ptr->close();
     }

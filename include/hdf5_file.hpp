@@ -7,7 +7,8 @@
 #include <memory>
 
 namespace HDF5 {
-
+    
+    class File;
     class Group;
     class DataSet;
 
