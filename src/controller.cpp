@@ -73,19 +73,32 @@ void TranslationController::inertial_fixed_state(std::shared_ptr<const State> de
 
 void TranslationController::minimize_uncertainty(std::shared_ptr<const State> state,
                                                  std::shared_ptr<const ReconstructMesh> rmesh) {
-    // find index of largest uncertainty (first one)
-    Eigen::MatrixXd::Index maxRow, maxCol;
-    rmesh->get_weights().maxCoeff(&maxRow, &maxCol);
     
-    Eigen::RowVector3d max_vertex;
-    max_vertex = rmesh->get_verts().row(maxRow);
+    double max_weight = rmesh->get_weights().maxCoeff();
+    
+    Eigen::Array<bool, Eigen::Dynamic, 1> weight_condition(rmesh->get_weights().rows());
+    
+    weight_condition = (rmesh->get_weights().array()  - max_weight).abs() < 1e-6;
+    Eigen::VectorXi weight_index = vector_find<Eigen::Array<bool, Eigen::Dynamic, 1> >(weight_condition);
+    
+    auto weight_count = weight_index.size();
+    // find the cos(angle) between all the vectors and current state
+    Eigen::VectorXd cos_angle(weight_count);
+    for (int ii = 0; ii < weight_count; ++ ii) {
+        cos_angle(ii) = rmesh->get_verts().row(weight_index(ii)).normalized().dot(state->get_pos().normalized());
+    }
+
+    Eigen::MatrixXd::Index min_angle;
+    cos_angle.minCoeff(&min_angle);
+
+    Eigen::RowVector3d des_vector;
+
+    des_vector = rmesh->get_verts().row(weight_index(min_angle));
     // pick out the corresponding vertex of the asteroid that should be viewed
-    // TODO Look at finding a vertex that is closest to the current state
-    //
     // use current norm of position and output a position with same radius but just above the minium point
     double current_radius = state->get_pos().norm();
 
-    mposd = max_vertex.normalized() * current_radius;
+    mposd = des_vector.normalized() * current_radius;
     mveld.setZero(3);
     macceld.setZero(3);
 }
