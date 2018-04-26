@@ -1,6 +1,7 @@
 #include "controller.hpp"
 #include "utilities.hpp"
 #include "reconstruct.hpp"
+#include "geodesic.hpp"
 
 #include <Eigen/Dense>
 
@@ -75,7 +76,13 @@ void TranslationController::minimize_uncertainty(std::shared_ptr<const State> st
                                                  std::shared_ptr<const ReconstructMesh> rmesh) {
     
     double max_weight = rmesh->get_weights().maxCoeff();
+    double max_sigma = kPI;
     
+    double alpha_1(1), alpha_2(0);
+    // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex
+    Eigen::VectorXd sigma = central_angle(state->get_pos().normalized(), rmesh->get_verts().rowwise().normalized());
+    Eigen::VectorXd cost = alpha_1 *rmesh->get_weights().array() / max_weight + alpha_2 * sigma.array() / max_sigma;
+    // now find min index of cost
     Eigen::Array<bool, Eigen::Dynamic, 1> weight_condition(rmesh->get_weights().rows());
     
     weight_condition = (rmesh->get_weights().array()  - max_weight).abs() < 1e-6;
