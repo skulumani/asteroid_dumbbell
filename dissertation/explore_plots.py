@@ -70,7 +70,6 @@ def exploration_generate_plots(data_path, img_path='/tmp/diss_explore',
         animation_path = os.path.join(img_path, 'animation')
         if not os.path.exists(animation_path):
             os.makedirs(animation_path)
-        pdb.set_trace() 
         ms.reset(x=v_initial[:, 0], y=v_initial[:, 1], z=v_initial[:, 2], triangles=f_initial,
                  scalars=w_initial)
         graphics.mayavi_view(mfig)
