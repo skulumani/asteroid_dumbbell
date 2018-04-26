@@ -16,12 +16,6 @@
 #include "hdf5_group.hpp"
 #include "hdf5_dataset.hpp"
 
-#include <Eigen/Dense>
-#include "H5Cpp.h"
-
-#include <stdexcept>
-#include <memory>
-
 // TODO Turn on compression by default or maybe with a flag as well
 // TODO Add documentation
 // TODO Move Each class to it's own file
