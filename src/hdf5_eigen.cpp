@@ -308,8 +308,20 @@ template bool internal::read_colmat<Eigen::Matrix<int, -1, 3> > (const Eigen::De
         const H5::DataType * const datatype,
         const H5::DataSet &dataset);
 
-template bool internal::write_rowmat<Eigen::Matrix<double, 1, -1> >(const Eigen::EigenBase<Eigen::Matrix<double, 1, -1> > &, H5::DataType const*, H5::DataSet*, H5::DataSpace const*);
+// internal::write_rowmat
+/* template bool internal::write_rowmat<Eigen::Matrix<double, -1, 3> >(const Eigen::EigenBase<Eigen::Matrix<double, -1, 3> > &, H5::DataType const*, H5::DataSet*, H5::DataSpace const*); */
+/* template bool internal::write_rowmat<Eigen::Matrix<int, -1, 3> >(const Eigen::EigenBase<Eigen::Matrix<int, -1, 3> > &, H5::DataType const*, H5::DataSet*, H5::DataSpace const*); */
 
+template bool internal::write_rowmat<Eigen::Matrix<double, -1, -1> >(const Eigen::EigenBase<Eigen::Matrix<double, -1, -1> > &, H5::DataType const*, H5::DataSet*, H5::DataSpace const*);
+template bool internal::write_rowmat<Eigen::Matrix<int, -1, -1> >(const Eigen::EigenBase<Eigen::Matrix<int, -1, -1> > &, H5::DataType const*, H5::DataSet*, H5::DataSpace const*);
+
+template bool internal::write_rowmat<Eigen::Matrix<double, 1, 18> >(const Eigen::EigenBase<Eigen::Matrix<double, 1, 18> > &, H5::DataType const*, H5::DataSet*, H5::DataSpace const*);
+template bool internal::write_rowmat<Eigen::Matrix<int, 1, 18> >(const Eigen::EigenBase<Eigen::Matrix<int, 1, 18> > &, H5::DataType const*, H5::DataSet*, H5::DataSpace const*);
+
+template bool internal::write_rowmat<Eigen::Matrix<double, 1, -1> >(const Eigen::EigenBase<Eigen::Matrix<double, 1, -1> > &, H5::DataType const*, H5::DataSet*, H5::DataSpace const*);
+template bool internal::write_rowmat<Eigen::Matrix<int, 1, -1> >(const Eigen::EigenBase<Eigen::Matrix<int, 1, -1> > &, H5::DataType const*, H5::DataSet*, H5::DataSpace const*);
+
+// internal::write_colmat
 template bool internal::write_colmat<Eigen::Matrix<double, -1, -1> >(const Eigen::EigenBase<Eigen::Matrix<double, -1, -1> > &, const H5::DataType *, H5::DataSet*, const H5::DataSpace *);
 
 template void internal::_load<Eigen::Matrix<double, 1, 18>, H5::DataSet>(const H5::DataSet &, const Eigen::DenseBase<Eigen::Matrix<double, 1, 18> > &);
