@@ -150,7 +150,7 @@ struct DatatypeSpecialization<char [N]> {
     }
 };
 
-/** @fn Load Eigen dataset from HDF5
+/** @fn void load(const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Derived> &mat)
         
     This will read from an HDF5 file/group and save the data into an eigen matrix. 
     One should have some idea about the eigen array before reading
@@ -165,6 +165,17 @@ struct DatatypeSpecialization<char [N]> {
 template <typename Derived>
 void load (const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Derived> &mat);
 
+/** @fn void save(H5::H5Location &h5group, const std::string &name, const Eigen::EigenBase<Derived> &mat, const H5::DSetCreatPropList &plist=H5::DSetCreatPropList::DEFAULT)
+        
+    This will write Eigen data to an HDF5 file or group
+
+    @param h5group The H5 group or file to write to
+    @param name string name of the dataset
+    @param mat Eigen variable to save data
+    @param plist The dataset property list
+    @author Shankar Kulumani
+    @version 26 April 2018
+*/
 template <typename Derived>
 void save (H5::H5Location &h5group, const std::string &name, 
         const Eigen::EigenBase<Derived> &mat,
@@ -173,6 +184,16 @@ void save (H5::H5Location &h5group, const std::string &name,
 
 namespace internal
 {
+    /** @fn H5::DataSpace create_dataspace(const Eigen::EigenBase<Derived> &mat)
+            
+        Create the dataspace required for the HDF5 dataset
+
+        @param mat Eigen matrix to write to the file
+        @returns H5::DataSpace Defines the space required to store mat
+
+        @author Shankar Kulumani
+        @version 26 April 2018
+    */
     template <typename Derived>
     H5::DataSpace create_dataspace (const Eigen::EigenBase<Derived> &mat);
 
