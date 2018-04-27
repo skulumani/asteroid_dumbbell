@@ -73,7 +73,7 @@ link_directories(${PYTHON_LIBRARY_DIRS})
 add_subdirectory(extern/pybind11)
 
 # libigl setup
-option(LIBIGL_USE_STATIC_LIBRARY "Use libigl as static library" OFF)
+option(LIBIGL_USE_STATIC_LIBRARY     "Use libigl as static library" OFF)
 option(LIBIGL_WITH_ANTTWEAKBAR       "Use AntTweakBar"    OFF)
 option(LIBIGL_WITH_CGAL              "Use CGAL"           OFF)
 option(LIBIGL_WITH_COMISO            "Use CoMiso"         OFF)
@@ -159,11 +159,6 @@ set(input_parser_src
     )
 add_library(input_parser_cpp SHARED ${input_parser_src})
 
-set(potential_src 
-    ${PROJECT_SOURCE_DIR}/src/potential.cpp
-    )
-add_library(potential_cpp SHARED ${potential_src})
-
 set(eigen_hdf5_src 
     ${PROJECT_SOURCE_DIR}/src/hdf5_eigen.cpp
     ${PROJECT_SOURCE_DIR}/src/hdf5_file.cpp
@@ -179,9 +174,9 @@ add_executable(mesh ${mesh_src})
 target_link_libraries(mesh cgal_cpp input_parser_cpp)
 
 # potential function
-set(potential_src src/potential_main.cpp)
+set(potential_src src/potential_main.cpp src/potential.cpp)
 add_executable(potential ${potential_src})
-target_link_libraries(potential potential_cpp)
+target_link_libraries(potential igl::core)
 
 # surface mesher
 set( surface_mesher_src src/surface_mesher_main.cpp )
@@ -202,8 +197,8 @@ target_link_libraries(explore cgal_cpp input_parser_cpp eigen_hdf5
 ################################################################################
 # PYTHON BINDING
 ################################################################################
-pybind11_add_module(polyhedron_potential MODULE
-src/potential.cpp src/potential_bindings.cpp)
+# pybind11_add_module(polyhedron_potential MODULE
+# src/potential.cpp src/potential_bindings.cpp)
 
 pybind11_add_module(surface_mesh MODULE
 src/surface_mesher.cpp src/surface_mesh_bindings.cpp)
@@ -247,10 +242,8 @@ set(test_all_src
 add_executable(test_all ${test_all_src})
 target_link_libraries(test_all gtest 
     cgal_cpp 
-    potential_cpp 
     eigen_hdf5
-    igl::core
-    )
+    igl::core)
 add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
@@ -265,6 +258,11 @@ add_executable(test_libigl tests/cpp/test_libigl.cpp tests/cpp/test_all.cpp)
 target_link_libraries(test_libigl gtest igl::core)
 add_test(NAME test_libigl COMMAND test_libigl
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+# add_executable(test_potential tests/cpp/test_potential.cpp tests/cpp/test_all.cpp src/potential.cpp)
+# target_link_libraries(test_potential gtest igl::core)
+# add_test(NAME test_potential COMMAND test_potential,
+#     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 # this will install to /usr/local by default
 # install(TARGETS read_obj DESTINATION bin)
