@@ -1,6 +1,7 @@
 #include <igl/dot_row.h>
 #include <igl/readOBJ.h>
 #include <igl/sort.h>
+#include <igl/unique_rows.h>
 
 #include "gtest/gtest.h"
 #include <Eigen/Dense>
@@ -32,6 +33,9 @@ TEST(TestLibigl, ReadOBJ) {
 }
 
 TEST(TestLibigl, SortRows) {
+    Eigen::MatrixXi e1_sorted_true(12, 2);
+    e1_sorted_true << 0, 6, 0, 2, 0, 3, 0, 1, 2, 7, 2, 3, 4, 6, 4, 7, 0, 4, 0, 5, 1, 5, 1, 7;
+
     // Define n x 2 array
     Eigen::MatrixXd V;
     Eigen::MatrixXi F;
@@ -42,9 +46,21 @@ TEST(TestLibigl, SortRows) {
     e1_vertex_map << Fb, Fa;
 
     Eigen::MatrixXi e1_sorted, e1_index;
-    igl::sort(e1_vertex_map, 1, true, e1_sorted, e1_index);
+    igl::sort(e1_vertex_map, 2, true, e1_sorted, e1_index);
 
-    std::cout << e1_vertex_map << std::endl << std::endl;
+    ASSERT_TRUE(e1_sorted.isApprox(e1_sorted_true));
+}
 
-    std::cout << e1_index << std::endl;
+TEST(TestLibigl, UniqueRow) {
+    Eigen::MatrixXi edge_unique_true(2, 2);
+    edge_unique_true << 1, 0, 1, 1;
+
+    Eigen::MatrixXi edges(3, 2);
+    edges << 1, 0, 1, 1, 1, 0;
+
+    // now find unique values using igl
+    Eigen::MatrixXi edge_unique, IA, IC;
+    igl::unique_rows(edges, edge_unique, IA, IC);
+
+    ASSERT_TRUE(edge_unique_true.isApprox(edge_unique));
 }
