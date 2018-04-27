@@ -78,29 +78,17 @@ void TranslationController::minimize_uncertainty(std::shared_ptr<const State> st
     double max_weight = rmesh->get_weights().maxCoeff();
     double max_sigma = kPI;
     
-    double alpha_1(1), alpha_2(0);
+    double alpha(0.5);
     // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex
     Eigen::VectorXd sigma = central_angle(state->get_pos().normalized(), rmesh->get_verts().rowwise().normalized());
-    Eigen::VectorXd cost = alpha_1 *rmesh->get_weights().array() / max_weight + alpha_2 * sigma.array() / max_sigma;
+    Eigen::VectorXd cost = - (1 - alpha) *rmesh->get_weights().array()/max_weight + alpha * sigma.array()/max_sigma ;
     // now find min index of cost
-    Eigen::Array<bool, Eigen::Dynamic, 1> weight_condition(rmesh->get_weights().rows());
-    
-    weight_condition = (rmesh->get_weights().array()  - max_weight).abs() < 1e-6;
-    Eigen::VectorXi weight_index = vector_find<Eigen::Array<bool, Eigen::Dynamic, 1> >(weight_condition);
-    
-    auto weight_count = weight_index.size();
-    // find the cos(angle) between all the vectors and current state
-    Eigen::VectorXd cos_angle(weight_count);
-    for (int ii = 0; ii < weight_count; ++ ii) {
-        cos_angle(ii) = rmesh->get_verts().row(weight_index(ii)).normalized().dot(state->get_pos().normalized());
-    }
-
-    Eigen::MatrixXd::Index min_angle;
-    cos_angle.minCoeff(&min_angle);
+    Eigen::MatrixXd::Index min_cost_index;
+    cost.minCoeff(&min_cost_index);
 
     Eigen::RowVector3d des_vector;
 
-    des_vector = rmesh->get_verts().row(weight_index(min_angle));
+    des_vector = rmesh->get_verts().row(min_cost_index);
     // pick out the corresponding vertex of the asteroid that should be viewed
     // use current norm of position and output a position with same radius but just above the minium point
     double current_radius = state->get_pos().norm();
