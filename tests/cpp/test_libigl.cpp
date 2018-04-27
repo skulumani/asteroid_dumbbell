@@ -1,5 +1,6 @@
 #include <igl/dot_row.h>
 #include <igl/readOBJ.h>
+#include <igl/sort.h>
 
 #include "gtest/gtest.h"
 #include <Eigen/Dense>
@@ -28,4 +29,22 @@ TEST(TestLibigl, ReadOBJ) {
     
     ASSERT_EQ(V.rows(), 8);
     ASSERT_EQ(F.rows(), 12);
+}
+
+TEST(TestLibigl, SortRows) {
+    // Define n x 2 array
+    Eigen::MatrixXd V;
+    Eigen::MatrixXi F;
+    igl::readOBJ("./integration/cube.obj", V, F);
+    
+    Eigen::MatrixXi Fa(F.col(0)), Fb(F.col(1)), Fc(F.col(2));
+    Eigen::MatrixXi e1_vertex_map(F.rows(), 2);
+    e1_vertex_map << Fb, Fa;
+
+    Eigen::MatrixXi e1_sorted, e1_index;
+    igl::sort(e1_vertex_map, 1, true, e1_sorted, e1_index);
+
+    std::cout << e1_vertex_map << std::endl << std::endl;
+
+    std::cout << e1_index << std::endl;
 }

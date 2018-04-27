@@ -241,6 +241,7 @@ set(test_all_src
     tests/cpp/test_controller.cpp
 	tests/cpp/test_utilities.cpp
     tests/cpp/test_hdf5.cpp
+    tests/cpp/test_libigl.cpp
     src/wavefront.cpp)
 
 add_executable(test_all ${test_all_src})
@@ -248,6 +249,7 @@ target_link_libraries(test_all gtest
     cgal_cpp 
     potential_cpp 
     eigen_hdf5
+    igl::core
     )
 add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
