@@ -1,3 +1,12 @@
+/**
+    All Eigen functionality to read/write to HDF5
+
+    Updated/corrected from the work of Jim Garrison
+    https://github.com/garrison/eigen3-hdf5
+
+    @author Shankar Kulumani
+    @version 26 April 2018
+*/
 #ifndef HDF5_EIGEN_H
 #define HDF5_EIGEN_H
 
@@ -6,6 +15,19 @@
 
 #include <stdexcept>
 
+/** @class DatatypeSpecialization
+
+    @brief Convert a C++ datatype to the equivalent in HDF5 land
+    
+    Each dataset must define the correct type in the HDF5. 
+    This template class handles that by automatially determining the HDF5 type
+    from a Eigen input.
+
+    Setup primiarly for Eigen types but needs to be extended.
+
+    @author Shankar Kulumani
+    @version 26 April 2018
+*/
 template <typename T>
 struct DatatypeSpecialization;
 
@@ -89,6 +111,7 @@ struct DatatypeSpecialization<unsigned long long> {
         return &H5::PredType::NATIVE_ULLONG;
     }
 };
+
 // string types, to be used mainly for attributes
 
 template <>
@@ -127,6 +150,18 @@ struct DatatypeSpecialization<char [N]> {
     }
 };
 
+/** @fn Load Eigen dataset from HDF5
+        
+    This will read from an HDF5 file/group and save the data into an eigen matrix. 
+    One should have some idea about the eigen array before reading
+
+    @param h5group H5 group or file to read from
+    @param name String name of the dataset
+    @param mat Eigen variable to save data
+
+    @author Shankar Kulumani
+    @version 26 April 2018
+*/
 template <typename Derived>
 void load (const H5::H5Location &h5group, const std::string &name, const Eigen::DenseBase<Derived> &mat);
 
