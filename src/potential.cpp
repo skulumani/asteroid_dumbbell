@@ -87,6 +87,7 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
 
     // build vertex face map
     std::vector<std::vector<int> > vf_map = vertex_face_map(V, F);
+    
 
     // TODO Need to searching to find matching edges (search_edge_vertex_map)
 }
@@ -97,9 +98,19 @@ std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::Mat
     // loop over faces in F array
     for (int ii = 0; ii < F.rows(); ++ii) {
         for (int jj = 0; jj < 3; ++jj) {
-            vf_map[jj].push_back(ii);
+            vf_map[F(ii,jj)].push_back(ii);
         }
     }
+    /* // iterate and print vf_map */
+    /* //assuming you have a "2D" vector vvi (vector of vector of int's) */
+    /* std::vector< std::vector<int> >::iterator row; */
+    /* std::vector<int>::iterator col; */
+    /* for (row = vf_map.begin(); row != vf_map.end(); ++row) { */
+    /*     for (col = row->begin(); col != row->end(); ++col) { */
+    /*         std::cout << *col; */
+    /*     } */
+    /*     std::cout << std::endl; */
+    /* } */
 
     return vf_map;
 }
