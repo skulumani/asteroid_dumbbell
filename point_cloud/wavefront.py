@@ -1048,7 +1048,7 @@ def polyhedron_parameters(V, F):
                                                    axis=1),
                                            axis=0,
                                            return_index=True)
-
+    
     # Normalize edge vectors
     # e1_norm=e1./repmat(sqrt(e1(:,1).^2+e1(:,2).^2+e1(:,3).^2),1,3);
     # e2_norm=e2./repmat(sqrt(e2(:,1).^2+e2(:,2).^2+e2(:,3).^2),1,3);
