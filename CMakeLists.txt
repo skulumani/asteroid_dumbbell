@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project( wavefront )
+project( asteroid_dumbell )
 
 ################################################################################
 # GLOBAL SETUP
@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # CGAL Setup
 set(ENV{CGAL_DIR} /usr/local/lib/CGAL)
@@ -70,6 +71,28 @@ link_libraries(${PYTHON_LIBRARIES})
 link_directories(${PYTHON_LIBRARY_DIRS})
 
 add_subdirectory(extern/pybind11)
+
+# libigl setup
+option(LIBIGL_USE_STATIC_LIBRARY "Use libigl as static library" OFF)
+option(LIBIGL_WITH_ANTTWEAKBAR       "Use AntTweakBar"    OFF)
+option(LIBIGL_WITH_CGAL              "Use CGAL"           OFF)
+option(LIBIGL_WITH_COMISO            "Use CoMiso"         OFF)
+option(LIBIGL_WITH_CORK              "Use Cork"           OFF)
+option(LIBIGL_WITH_EMBREE            "Use Embree"         OFF)
+option(LIBIGL_WITH_LIM               "Use LIM"            OFF)
+option(LIBIGL_WITH_MATLAB            "Use Matlab"         OFF)
+option(LIBIGL_WITH_MOSEK             "Use MOSEK"          OFF)
+option(LIBIGL_WITH_OPENGL            "Use OpenGL"         OFF)
+option(LIBIGL_WITH_OPENGL_GLFW       "Use GLFW"           OFF)
+option(LIBIGL_WITH_OPENGL_GLFW_IMGUI "Use ImGui"          OFF)
+option(LIBIGL_WITH_PNG               "Use PNG"            OFF)
+option(LIBIGL_WITH_PYTHON            "Use Python"         OFF)
+option(LIBIGL_WITH_TETGEN            "Use Tetgen"         OFF)
+option(LIBIGL_WITH_TRIANGLE          "Use Triangle"       OFF)
+option(LIBIGL_WITH_VIEWER            "Use OpenGL viewer"  OFF)
+option(LIBIGL_WITH_XML               "Use XML"            OFF)
+
+find_package(LIBIGL REQUIRED QUIET)
 
 
 ################################################################################
@@ -235,6 +258,12 @@ target_link_libraries(test_hdf5 gtest
     eigen_hdf5)
 add_test(NAME test_hdf5 COMMAND test_hdf5
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}) 
+
+add_executable(test_libigl tests/cpp/test_libigl.cpp tests/cpp/test_all.cpp)
+target_link_libraries(test_libigl gtest igl::core)
+add_test(NAME test_libigl COMMAND test_libigl
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
 # this will install to /usr/local by default
 # install(TARGETS read_obj DESTINATION bin)
 

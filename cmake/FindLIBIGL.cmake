@@ -23,7 +23,7 @@ find_path(LIBIGL_INCLUDE_DIR igl/readOBJ.h
 )
 
 include(FindPackageHandleStandardArgs)
-find_pack_handle_standard_args(LIBIGL
+find_package_handle_standard_args(LIBIGL
     "\nlibigl not found -- You can download it:\n\tgit clone --recursive https://github.com/libigl/libigl.git to a good location"
     LIBIGL_INCLUDE_DIR)
 mark_as_advanced(LIBIGL_INCLUDE_DIR)
