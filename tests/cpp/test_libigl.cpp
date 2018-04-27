@@ -8,21 +8,24 @@
 
 TEST(TestLibigl, RowDotProduct) {
     // define to matrices
-    Eigen::Matrix<double, 2, 3> a(2, 3), b(2, 3);
+    Eigen::MatrixXd a(2, 3), b(2, 3);
     a << 1, 1, 1,
         1, 0, 0;
     b << 1, 1, 1,
         0, 1, 0;
 
-    /* auto dot_prod = igl::dot_row(a, b); */
+    Eigen::MatrixXd dot_prod = igl::dot_row(a, b);
+    
+    ASSERT_EQ(dot_prod(0), 3);
+    ASSERT_EQ(dot_prod(1), 0);
 
-    std::cout << a << std::endl;
 }
 
 TEST(TestLibigl, ReadOBJ) {
 
     Eigen::MatrixXd V, F;
     igl::readOBJ("./integration/cube.obj", V, F);
-
-    std::cout << V << std::endl;
+    
+    ASSERT_EQ(V.rows(), 8);
+    ASSERT_EQ(F.rows(), 12);
 }
