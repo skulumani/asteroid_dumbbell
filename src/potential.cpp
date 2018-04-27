@@ -1,5 +1,10 @@
 #include "potential.hpp"
 
+#include <igl/sort.h>
+#include <igl/unique_rows.h>
+#include <igl/cross.h>
+#include <igl/slice.h>
+
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -19,28 +24,24 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     Fb = F.col(1);
     Fc = F.col(2);
 
-    Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
-    V1.resize(Fa.rows(),3 );
-    V2.resize(Fb.rows(),3 );
-    V3.resize(Fc.rows(),3 );
-    for (int ii = 0; ii < num_f; ++ii) {
-        V1.row(ii) << V(Fa(ii), 0), V(Fa(ii), 1), V(Fa(ii), 2);
-        V2.row(ii) << V(Fb(ii), 0), V(Fb(ii), 1), V(Fb(ii), 2);
-        V3.row(ii) << V(Fc(ii), 0), V(Fb(ii), 1), V(Fc(ii), 2);
-    }
+    Eigen::Matrix<double, Eigen::Dynamic, 3> V1(num_f, 3), V2(num_f, 3), V3(num_f, 3);
 
+    igl::slice(V, Fa, (Eigen::Vector3i() << 0, 1, 2).finished(), V1);
+    igl::slice(V, Fb, (Eigen::Vector3i() << 0, 1, 2).finished(), V2);
+    igl::slice(V, Fc, (Eigen::Vector3i() << 0, 1, 2).finished(), V3);
+    
     // compute the edge vectors
-    Eigen::Matrix<double, Eigen::Dynamic, 3> e1, e2, e3;
+    Eigen::Matrix<double, Eigen::Dynamic, 3> e1(num_f, 3), e2(num_f, 3), e3(num_f, 3);
     e1 = V2 - V1;
     e2 = V3 - V2;
     e3 = V1 - V3;
     
     // vertex map
-    Eigen::Matrix<int, Eigen::Dynamic, 2> e1_vertex_map, e2_vertex_map, e3_vertex_map, e_vertex_map;
-    e1_vertex_map.resize(Fa.rows(), 2);
-    e2_vertex_map.resize(Fb.rows(), 2);
-    e3_vertex_map.resize(Fc.rows(), 2);
-    e_vertex_map.resize(3*Fc.rows(), 2); 
+    Eigen::Matrix<int, Eigen::Dynamic, 2> e1_vertex_map(num_f, 2),
+                                          e2_vertex_map(num_f, 2), 
+                                          e3_vertex_map(num_f, 2),
+                                          e_vertex_map_stacked(3 * num_f, 2),
+                                          e_vertex_map_sorted(3 * num_f, 2);
 
     e1_vertex_map.col(0) = Fb;
     e1_vertex_map.col(1) = Fa;
@@ -51,33 +52,33 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     e3_vertex_map.col(0) = Fa;
     e3_vertex_map.col(1) = Fc;
     
-    e_vertex_map << e1_vertex_map, e2_vertex_map, e3_vertex_map;
+    e_vertex_map_stacked << e1_vertex_map, e2_vertex_map, e3_vertex_map;
     
-    // TODO Find unique edges
-    Eigen::Matrix<double, Eigen::Dynamic, 3> normal_face, e1_normal, e2_normal, e3_normal;
-    // compute the normal for every face and every edge
-    normal_face.resize(num_f, 3);
-    e1_normal.resize(num_f, 3);
-    e2_normal.resize(num_f, 3);
-    e3_normal.resize(num_f, 3);
+    Eigen::MatrixXi unique_index, IA, IC, e_vertex_map;
 
-    for (int ii = 0; ii < num_f; ++ii) {
-        normal_face.row(ii) = e1.row(ii).cross(e2.row(ii));         
-        normal_face.row(ii) = normal_face.row(ii) / normal_face.row(ii).norm();
+    igl::sort(e_vertex_map_stacked, 2, true, e_vertex_map_sorted, unique_index);
+    igl::unique_rows(e_vertex_map_sorted, e_vertex_map, unique_index, IC);
 
-        // normal vector to each set of edges
-        e1_normal.row(ii) = e1.row(ii).cross(normal_face.row(ii));
-        e1_normal.row(ii) = e1.row(ii) / e1.row(ii).norm();
 
-        e2_normal.row(ii) = e2.row(ii).cross(normal_face.row(ii));
-        e2_normal.row(ii) = e2.row(ii) / e2.row(ii).norm();
+    Eigen::Matrix<double, Eigen::Dynamic, 3> normal_face(num_f, 3),
+                                             e1_normal(num_f, 3),
+                                             e2_normal(num_f, 3),
+                                             e3_normal(num_f, 3);
 
-        e3_normal.row(ii) = e3.row(ii).cross(normal_face.row(ii));
-        e3_normal.row(ii) = e3.row(ii) / e3.row(ii).norm();
-    }
+    igl::cross(e1, e2, normal_face);
+    normal_face.rowwise().normalize();
+    
+    igl::cross(e1, normal_face, e1_normal);
+    e1_normal.rowwise().normalize();
 
+    igl::cross(e2, normal_face, e2_normal);
+    e2_normal.rowwise().normalize();
+
+    igl::cross(e3, normal_face, e3_normal);
+    e3_normal.rowwise().normalize();
+    
     // compute the centeroid of each face
-    Eigen::Matrix<double, Eigen::Dynamic, 3> center_face;
+    Eigen::Matrix<double, Eigen::Dynamic, 3> center_face(num_f, 3);
     center_face = 1.0 / 3 * (V1 + V2 + V3);
     
     // edge vertex map

@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-
 int main() {
     Eigen::Array<double, 8, 3> Ve_true;
     Eigen::Array<int, 12, 3> Fe_true;
@@ -80,18 +79,17 @@ int main() {
 
     polyhedron_parameters(Ve_true, Fe_true);
 
-    Eigen::Array<double, 1, 3> state;
-    state << 2, 0, 0;
-    Eigen::Array<double, Eigen::Dynamic, 3> r_v;
-    r_v = Ve_true.rowwise() - state;
-    Eigen::Array<double, 12, 1> w_face;
-    int lflag = laplacian_factor(r_v, Fa, Fb, Fc, w_face);
+    /* Eigen::Array<double, 1, 3> state; */
+    /* state << 2, 0, 0; */
+    /* Eigen::Array<double, Eigen::Dynamic, 3> r_v; */
+    /* r_v = Ve_true.rowwise() - state; */
+    /* Eigen::Array<double, 12, 1> w_face; */
+    /* int lflag = laplacian_factor(r_v, Fa, Fb, Fc, w_face); */
     
     // now try out the edge factor code
-    Eigen::Array<double, 12, 1> L1_edge, L2_edge, L3_edge;
-    int eflag = edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map,
-            L1_edge, L2_edge, L3_edge);
+    /* Eigen::Array<double, 12, 1> L1_edge, L2_edge, L3_edge; */
+    /* int eflag = edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map, */
+    /*         L1_edge, L2_edge, L3_edge); */
     
-    std::cout << L1_edge << std::endl;
     return 0;
 }
