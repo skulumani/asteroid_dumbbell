@@ -15,7 +15,7 @@ target = np.array([0, 0, 0])
 
 filename = './data/shape_model/ITOKAWA/itokawa_very_high.obj'
 polydata = wavefront.read_obj_to_polydata(filename)
-caster = raycaster.RayCaster(polydata, flag='obb')
+caster = raycaster.RayCaster(polydata, flag='bsp')
 intersection = caster.castray(pos, target)
 
 v, f = wavefront.read_obj(filename)
