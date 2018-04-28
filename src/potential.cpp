@@ -91,31 +91,31 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
 
     // build vertex face map
     std::vector<std::vector<int> > vf_map = vertex_face_map(V, F);
-    
 
     // TODO Need to searching to find matching edges (search_edge_vertex_map)
 
 
-    search_index(e1_vertex_map.col(0), e3_vertex_map.col(1));
+    std::tuple<Eigen::VectorXi, Eigen::VectorXi> inda1_indb1 = search_index(e1_vertex_map.col(0), e3_vertex_map.col(1));
     
 
-    /* int invalid = -1; */
-    /* Eigen::VectorXi index_map(e1_vertex_map.rows()); */
-    /* index_map.fill(invalid); */
+    int invalid = -1;
+    Eigen::VectorXi index_map(e1_vertex_map.rows());
+    index_map.fill(invalid);
 
     
-    /* Eigen::MatrixXi amap_inda1, bmap_indb1; */
+    Eigen::MatrixXi amap_inda1, bmap_indb1;
     
-    /* igl::slice(e1_vertex_map, std::get<0>(inda1_indb1), 1, amap_inda1); // want column 1 */
-    /* igl::slice(e1_vertex_map, std::get<1>(inda1_indb1), 1, bmap_indb1); // want column 1 */
+    igl::slice(e1_vertex_map, std::get<0>(inda1_indb1), 1, amap_inda1); // want column 1
+    igl::slice(e1_vertex_map, std::get<1>(inda1_indb1), 1, bmap_indb1); // want column 1
 
-    /* std::cout << amap_inda1.col(1).transpose() << std::endl; */
-    /* std::cout << bmap_indb1.col(1).transpose() << std::endl; */
+    std::cout << amap_inda1.col(1).transpose() << std::endl;
+    std::cout << bmap_indb1.col(1).transpose() << std::endl;
 
-    /* Eigen::Matrix<bool, Eigen::Dynamic, 1> index_match; */
-    /* index_match = amap_inda1.array().col(1) == bmap_indb1.array().col(0); */
-    /* Eigen::SparseMatrix<bool> sparse = index_match.sparseView(); */
-
+    Eigen::Matrix<bool, Eigen::Dynamic, 1> index_match;
+    index_match = amap_inda1.array().col(1) == bmap_indb1.array().col(1);
+    Eigen::SparseMatrix<bool> sparse = index_match.sparseView();
+    
+    std::cout << sparse.transpose() << std::endl;
     /* Eigen::VectorXi row, col, elements; */
     /* igl::find(sparse, row, col, elements); */
     
@@ -249,7 +249,7 @@ int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >
         return 0;
 }
 
-void search_index(const Eigen::Ref<const Eigen::VectorXi>& a, const Eigen::Ref<const Eigen::VectorXi>& b) {
+std::tuple<Eigen::VectorXi, Eigen::VectorXi> search_index(const Eigen::Ref<const Eigen::VectorXi>& a, const Eigen::Ref<const Eigen::VectorXi>& b) {
     std::size_t lena(a.size()), lenb(b.size());
 
     Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> ae(lena, lenb), be(lena, lenb);
@@ -258,28 +258,25 @@ void search_index(const Eigen::Ref<const Eigen::VectorXi>& a, const Eigen::Ref<c
     be = a.rowwise().replicate(lenb);
 
     Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> equal_mat = ae.array() == be.array();
-    std::cout << equal_mat << std::endl;
     Eigen::SparseMatrix<bool, Eigen::RowMajor> sparse = equal_mat.sparseView();
     
     std::vector<int> row, col;
     // iterate over the sparse matrix
     for (int ii=0; ii < sparse.outerSize(); ++ii) {
         for (Eigen::SparseMatrix<bool, Eigen::RowMajor>::InnerIterator it(sparse,ii); it; ++it) {
-            it.value();
-            it.row();   // row index
-            it.col();   // col index (here it is equal to k)
-            it.index(); // inner index, here it is equal to it.row()
+            /* it.value(); */
+            /* it.row();   // row index */
+            /* it.col();   // col index (here it is equal to k) */
+            /* it.index(); // inner index, here it is equal to it.row() */
             row.push_back(it.row());
-            std::cout << "(" << it.row() << ","; // row index
-            std::cout << it.col() << ")\n"; // col index (here it is equal to k)
+            col.push_back(it.col());
+            /* std::cout << "(" << it.row() << ","; // row index */
+            /* std::cout << it.col() << ")\n"; // col index (here it is equal to k) */
         }
     }
-
-    /* Eigen::VectorXi inda, indb; */
-    /* inda << 0, 0; */
-    /* indb << 0, 0; */
-    /* igl::find(sparse, inda, indb, elements); */
-
-    /* return std::make_tuple(inda, indb); */
+    Eigen::VectorXi inda1(row.size()), indb1(col.size());
+    inda1 = Eigen::Map<Eigen::VectorXi>(row.data(), row.size());
+    indb1 = Eigen::Map<Eigen::VectorXi>(col.data(), col.size());
+    return std::make_tuple(inda1, indb1);
 }
 
