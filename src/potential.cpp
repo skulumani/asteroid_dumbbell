@@ -96,19 +96,26 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     // TODO Need to searching to find matching edges (search_edge_vertex_map)
 
 
-    std::tuple<Eigen::VectorXi, Eigen::VectorXi> inda1_indb1 = search_index(e1_vertex_map.col(0), e1_vertex_map.col(1));
+    std::tuple<Eigen::VectorXi, Eigen::VectorXi> inda1_indb1 = search_index(e1_vertex_map.col(0), e3_vertex_map.col(1));
 
     int invalid = -1;
     Eigen::VectorXi index_map(e1_vertex_map.rows());
     index_map.fill(invalid);
+
     Eigen::Matrix<bool, Eigen::Dynamic, 1> index_match;
     
     Eigen::MatrixXi amap_inda1, bmap_indb1;
     
     igl::slice(e1_vertex_map, std::get<0>(inda1_indb1), 1, amap_inda1);
     igl::slice(e1_vertex_map, std::get<1>(inda1_indb1), 1, bmap_indb1);
-    index_match = amap_inda1.array().col(1) == bmap_indb1.array().col(0);
 
+    index_match = amap_inda1.array().col(1) == bmap_indb1.array().col(0);
+    Eigen::SparseMatrix<bool> sparse = index_match.sparseView();
+
+    Eigen::VectorXi row, col, elements;
+    igl::find(sparse, row, col, elements);
+    
+    
     std::cout << index_match << std::endl;
 }
 
