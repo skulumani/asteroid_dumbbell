@@ -96,7 +96,7 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     // TODO Need to searching to find matching edges (search_edge_vertex_map)
 
 
-    std::tuple<Eigen::VectorXi, Eigen::VectorXi> inda1_indb1 = search_index(e1_vertex_map.col(0), e3_vertex_map.col(1));
+    search_index(e1_vertex_map.col(0), e3_vertex_map.col(1));
     
 
     /* int invalid = -1; */
@@ -249,7 +249,7 @@ int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >
         return 0;
 }
 
-std::tuple<Eigen::VectorXi, Eigen::VectorXi> search_index(const Eigen::Ref<const Eigen::VectorXi>& a, const Eigen::Ref<const Eigen::VectorXi>& b) {
+void search_index(const Eigen::Ref<const Eigen::VectorXi>& a, const Eigen::Ref<const Eigen::VectorXi>& b) {
     std::size_t lena(a.size()), lenb(b.size());
 
     Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> ae(lena, lenb), be(lena, lenb);
@@ -261,25 +261,25 @@ std::tuple<Eigen::VectorXi, Eigen::VectorXi> search_index(const Eigen::Ref<const
     std::cout << equal_mat << std::endl;
     Eigen::SparseMatrix<bool, Eigen::RowMajor> sparse = equal_mat.sparseView();
     
-    /* std::vector<int> row, col; */
-    /* // iterate over the sparse matrix */
-    /* for (int ii=0; ii < sparse.outerSize(); ++ii) { */
-    /*     for (Eigen::SparseMatrix<bool>::InnerIterator it(sparse,ii); it; ++it) { */
-    /*         it.value(); */
-    /*         it.row();   // row index */
-    /*         it.col();   // col index (here it is equal to k) */
-    /*         it.index(); // inner index, here it is equal to it.row() */
-    /*         row.push_back(it.row()); */
-    /*         std::cout << "(" << it.row() << ","; // row index */
-    /*         std::cout << it.col() << ")\n"; // col index (here it is equal to k) */
-    /*     } */
-    /* } */
+    std::vector<int> row, col;
+    // iterate over the sparse matrix
+    for (int ii=0; ii < sparse.outerSize(); ++ii) {
+        for (Eigen::SparseMatrix<bool, Eigen::RowMajor>::InnerIterator it(sparse,ii); it; ++it) {
+            it.value();
+            it.row();   // row index
+            it.col();   // col index (here it is equal to k)
+            it.index(); // inner index, here it is equal to it.row()
+            row.push_back(it.row());
+            std::cout << "(" << it.row() << ","; // row index
+            std::cout << it.col() << ")\n"; // col index (here it is equal to k)
+        }
+    }
 
-    Eigen::VectorXi inda, indb;
-    inda << 0, 0;
-    indb << 0, 0;
+    /* Eigen::VectorXi inda, indb; */
+    /* inda << 0, 0; */
+    /* indb << 0, 0; */
     /* igl::find(sparse, inda, indb, elements); */
 
-    return std::make_tuple(inda, indb);
+    /* return std::make_tuple(inda, indb); */
 }
 
