@@ -96,22 +96,8 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     // TODO Need to searching to find matching edges (search_edge_vertex_map)
 
 
-    // replicate the columns of e1_vertex_map
-    std::size_t lena(e1_vertex_map.col(0).size()), lenb(e1_vertex_map.col(1).size());
-
-    Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> ae(lena, lenb), be(lena, lenb);
-
-    ae = e1_vertex_map.col(1).rowwise().replicate(lena).transpose();
-    be = e1_vertex_map.col(0).rowwise().replicate(lenb);
-    
-    Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> equal_mat = ae.array() == be.array();
-    Eigen::SparseMatrix<bool> sparse(lena, lenb);
-    sparse = equal_mat.sparseView();
-
-    Eigen::VectorXi I, J, index;
-    igl::find(sparse, I, J, index);
-
-    std::cout << index << std::endl;
+    std::tuple<Eigen::VectorXi, Eigen::VectorXi> index_match = search_index(e1_vertex_map.col(0), e1_vertex_map.col(1));
+    std::cout << std::get<0>(index_match) << std::endl;
 }
 
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
@@ -242,5 +228,18 @@ int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >
 
 std::tuple<Eigen::VectorXi, Eigen::VectorXi> search_index(const Eigen::Ref<const Eigen::VectorXi>& a, const Eigen::Ref<const Eigen::VectorXi>& b) {
     std::size_t lena(a.size()), lenb(b.size());
+
+    Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> ae(lena, lenb), be(lena, lenb);
+    
+    ae = b.rowwise().replicate(lena).transpose();
+    be = a.rowwise().replicate(lenb);
+
+    Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> equal_mat = ae.array() == be.array();
+    Eigen::SparseMatrix<bool> sparse= equal_mat.sparseView();
+
+    Eigen::VectorXi inda, indb, elements;
+    igl::find(sparse, inda, indb, elements);
+
+    return std::make_tuple(inda, indb);
 }
 
