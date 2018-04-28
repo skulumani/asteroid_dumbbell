@@ -97,26 +97,30 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
 
 
     std::tuple<Eigen::VectorXi, Eigen::VectorXi> inda1_indb1 = search_index(e1_vertex_map.col(0), e3_vertex_map.col(1));
-
-    int invalid = -1;
-    Eigen::VectorXi index_map(e1_vertex_map.rows());
-    index_map.fill(invalid);
-
-    Eigen::Matrix<bool, Eigen::Dynamic, 1> index_match;
     
-    Eigen::MatrixXi amap_inda1, bmap_indb1;
-    
-    igl::slice(e1_vertex_map, std::get<0>(inda1_indb1), 1, amap_inda1);
-    igl::slice(e1_vertex_map, std::get<1>(inda1_indb1), 1, bmap_indb1);
 
-    index_match = amap_inda1.array().col(1) == bmap_indb1.array().col(0);
-    Eigen::SparseMatrix<bool> sparse = index_match.sparseView();
+    /* int invalid = -1; */
+    /* Eigen::VectorXi index_map(e1_vertex_map.rows()); */
+    /* index_map.fill(invalid); */
 
-    Eigen::VectorXi row, col, elements;
-    igl::find(sparse, row, col, elements);
+    
+    /* Eigen::MatrixXi amap_inda1, bmap_indb1; */
+    
+    /* igl::slice(e1_vertex_map, std::get<0>(inda1_indb1), 1, amap_inda1); // want column 1 */
+    /* igl::slice(e1_vertex_map, std::get<1>(inda1_indb1), 1, bmap_indb1); // want column 1 */
+
+    /* std::cout << amap_inda1.col(1).transpose() << std::endl; */
+    /* std::cout << bmap_indb1.col(1).transpose() << std::endl; */
+
+    /* Eigen::Matrix<bool, Eigen::Dynamic, 1> index_match; */
+    /* index_match = amap_inda1.array().col(1) == bmap_indb1.array().col(0); */
+    /* Eigen::SparseMatrix<bool> sparse = index_match.sparseView(); */
+
+    /* Eigen::VectorXi row, col, elements; */
+    /* igl::find(sparse, row, col, elements); */
     
     
-    std::cout << index_match << std::endl;
+    /* std::cout << index_match << std::endl; */
 }
 
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
@@ -253,11 +257,28 @@ std::tuple<Eigen::VectorXi, Eigen::VectorXi> search_index(const Eigen::Ref<const
     ae = b.rowwise().replicate(lena).transpose();
     be = a.rowwise().replicate(lenb);
 
-    Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> equal_mat = ae.array() == be.array();
-    Eigen::SparseMatrix<bool> sparse= equal_mat.sparseView();
+    Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> equal_mat = ae.array() == be.array();
+    std::cout << equal_mat << std::endl;
+    Eigen::SparseMatrix<bool, Eigen::RowMajor> sparse = equal_mat.sparseView();
+    
+    /* std::vector<int> row, col; */
+    /* // iterate over the sparse matrix */
+    /* for (int ii=0; ii < sparse.outerSize(); ++ii) { */
+    /*     for (Eigen::SparseMatrix<bool>::InnerIterator it(sparse,ii); it; ++it) { */
+    /*         it.value(); */
+    /*         it.row();   // row index */
+    /*         it.col();   // col index (here it is equal to k) */
+    /*         it.index(); // inner index, here it is equal to it.row() */
+    /*         row.push_back(it.row()); */
+    /*         std::cout << "(" << it.row() << ","; // row index */
+    /*         std::cout << it.col() << ")\n"; // col index (here it is equal to k) */
+    /*     } */
+    /* } */
 
-    Eigen::VectorXi inda, indb, elements;
-    igl::find(sparse, inda, indb, elements);
+    Eigen::VectorXi inda, indb;
+    inda << 0, 0;
+    indb << 0, 0;
+    /* igl::find(sparse, inda, indb, elements); */
 
     return std::make_tuple(inda, indb);
 }
