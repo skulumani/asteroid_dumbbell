@@ -168,3 +168,21 @@ TEST_F(TestPotential, EdgeFactor) {
     EXPECT_TRUE(L2_edge.isApprox(L2_edge_true, 1e-7));
     EXPECT_TRUE(L3_edge.isApprox(L3_edge_true, 1e-7));
 }
+
+TEST_F(TestPotential, VertexFaceMap) {
+    std::vector< std::vector<int> > vf_map = vertex_face_map( Ve_true, Fe_true);
+    
+    // iterate and print vf_map
+    //assuming you have a "2D" vector vvi (vector of vector of int's)
+    /* std::vector< std::vector<int> >::iterator row; */
+    /* std::vector<int>::iterator col; */
+    /* for (row = vf_map.begin(); row != vf_map.end(); ++row) { */
+    /*     for (col = row->begin(); col != row->end(); ++col) { */
+    /*         std::cout << *col; */
+    /*     } */
+    /*     std::cout << std::endl; */
+    /* } */
+
+    ASSERT_EQ(vf_map[0][0], 0);
+    ASSERT_EQ(vf_map[0][5], 9);
+}
