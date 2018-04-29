@@ -37,4 +37,6 @@ std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::Mat
 
 std::tuple<Eigen::VectorXi, Eigen::VectorXi> search_index(const Eigen::Ref<const Eigen::VectorXi>& a, const Eigen::Ref<const Eigen::VectorXi>& b);
 
+Eigen::VectorXi vertex_map_search(const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& a_map,
+        const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& b_map);
 #endif

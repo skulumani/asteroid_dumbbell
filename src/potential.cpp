@@ -93,45 +93,9 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     std::vector<std::vector<int> > vf_map = vertex_face_map(V, F);
 
     // TODO Need to searching to find matching edges (search_edge_vertex_map)
+    Eigen::VectorXi index_map = vertex_map_search(e1_vertex_map, e3_vertex_map);
+    std::cout << index_map << std::endl;
 
-
-    std::tuple<Eigen::VectorXi, Eigen::VectorXi> inda1_indb1 = search_index(e1_vertex_map.col(0), e3_vertex_map.col(1));
-    
-    Eigen::VectorXi inda1, indb1;
-    inda1 = std::get<0>(inda1_indb1);
-    indb1 = std::get<1>(inda1_indb1);
-    
-    std::cout << inda1.transpose() << std::endl;
-    int invalid = -1;
-    Eigen::VectorXi index_map(e1_vertex_map.rows());
-    index_map.fill(invalid);
-
-    
-    Eigen::MatrixXi amap_inda1, bmap_indb1;
-    
-    igl::slice(e1_vertex_map, std::get<0>(inda1_indb1), 1, amap_inda1); // want column 1
-    igl::slice(e1_vertex_map, std::get<1>(inda1_indb1), 1, bmap_indb1); // want column 1
-
-    std::cout << amap_inda1.col(1).transpose() << std::endl;
-    std::cout << bmap_indb1.col(1).transpose() << std::endl;
-
-    Eigen::Matrix<bool, Eigen::Dynamic, 1> index_match;
-    index_match = amap_inda1.array().col(1) == bmap_indb1.array().col(1);
-    Eigen::SparseVector<bool> sparse = index_match.sparseView();
-    
-    std::cout << sparse.transpose() << std::endl;
-    std::vector<int> index_match_vec;
-    // iterate over the sparse vector again
-    for (Eigen::SparseVector<bool>::InnerIterator it(sparse); it; ++it){
-        index_match_vec.push_back(it.index());
-    }
-    Eigen::VectorXi index_match_map = Eigen::Map<Eigen::VectorXi>(index_match_vec.data(), index_match_vec.size());
-    std::cout << index_match_map.transpose() << std::endl;
-    
-    // now loop and create index_map vector
-    for (int ii=0; ii < index_match_map.size(); ++ii) {
-        index_map(inda1(index_match_map(ii))) = indb1(index_match_map(ii));
-    }
 }
 
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
@@ -291,3 +255,38 @@ std::tuple<Eigen::VectorXi, Eigen::VectorXi> search_index(const Eigen::Ref<const
     return std::make_tuple(inda1, indb1);
 }
 
+Eigen::VectorXi vertex_map_search(const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& a_map, 
+        const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& b_map) { 
+    std::tuple<Eigen::VectorXi, Eigen::VectorXi> inda1_indb1 = search_index(a_map.col(0), b_map.col(1));
+    
+    Eigen::VectorXi inda1, indb1;
+    inda1 = std::get<0>(inda1_indb1);
+    indb1 = std::get<1>(inda1_indb1);
+    
+    int invalid = -1;
+    Eigen::VectorXi index_map(a_map.rows());
+    index_map.fill(invalid);
+
+    Eigen::MatrixXi amap_inda1, bmap_indb1;
+    
+    igl::slice(a_map, std::get<0>(inda1_indb1), 1, amap_inda1); // want column 1
+    igl::slice(b_map, std::get<1>(inda1_indb1), 1, bmap_indb1); // want column 1
+    
+    Eigen::Matrix<bool, Eigen::Dynamic, 1> index_match;
+    index_match = amap_inda1.array().col(1) == bmap_indb1.array().col(0);
+    Eigen::SparseVector<bool> sparse = index_match.sparseView();
+    
+    std::vector<int> index_match_vec;
+    // iterate over the sparse vector again
+    for (Eigen::SparseVector<bool>::InnerIterator it(sparse); it; ++it){
+        index_match_vec.push_back(it.index());
+    }
+    Eigen::VectorXi index_match_map = Eigen::Map<Eigen::VectorXi>(index_match_vec.data(), index_match_vec.size());
+    
+    // now loop and create index_map vector
+    for (int ii=0; ii < index_match_map.size(); ++ii) {
+        index_map(inda1(index_match_map(ii))) = indb1(index_match_map(ii));
+    }
+    
+    return index_map;
+}
