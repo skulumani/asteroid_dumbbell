@@ -204,7 +204,86 @@ TEST_F(TestMeshParam, Vertices) {
 
 TEST_F(TestMeshParam, Edges) {
     Eigen::Matrix<double, 12, 3> e1, e2, e3; 
+    e1 << 1., 1., 0.,
+       0., 1., 0.,  
+       0., 1., 1.,  
+       0., 0., 1.,  
+       1., 0., 1.,  
+       0., 0., 1.,  
+       0., 1., 0.,  
+       0., 1., 1.,  
+       1., 0., 0.,  
+       1., 0., 1.,  
+       1., 0., 0.,  
+       1., 1., 0.;
+    e2 << 0., -1.,  0.,
+       1.,  0.,  0.,  
+       0.,  0., -1.,  
+       0.,  1.,  0.,  
+       0.,  0., -1.,  
+       1.,  0.,  0.,  
+       0.,  0.,  1.,  
+       0., -1.,  0.,  
+       0.,  0.,  1.,  
+       -1.,  0.,  0.,  
+       0.,  1.,  0.,  
+       -1.,  0.,  0 ;
+    e3 << -1.,  0.,  0.,
+       -1., -1.,  0.,  
+       0., -1.,  0.,  
+       0., -1., -1.,  
+       -1.,  0.,  0.,  
+       -1.,  0., -1.,  
+       0., -1., -1.,  
+       0.,  0., -1.,  
+       -1.,  0., -1.,  
+       0.,  0., -1.,  
+       -1., -1.,  0.,  
+       0., -1.,  0.;
+
+    ASSERT_TRUE(mesh_param.e1.isApprox(e1));
+    ASSERT_TRUE(mesh_param.e2.isApprox(e2));
+    ASSERT_TRUE(mesh_param.e3.isApprox(e3));
 }
+
+TEST_F(TestMeshParam, EdgeVertexMap) {
+    Eigen::Array<int, 12, 2> e1_vertex_map, e2_vertex_map, e3_vertex_map;
+    e1_vertex_map << 6, 0, 2, 0, 3, 0, 1, 0, 7, 2, 3, 2, 6, 4, 7, 4, 4,
+                  0, 5, 0, 5, 1, 7, 1;
+    e2_vertex_map << 4, 6, 6, 2, 2, 3, 3, 1, 6, 7, 7, 3, 7, 6, 5, 7, 5,
+                  4, 1, 5, 7, 5, 3, 7;
+    e3_vertex_map << 0, 4, 0, 6, 0, 2, 0, 3, 2, 6, 2, 7, 4, 7, 4, 5, 0,
+                  5, 0, 1, 1, 7, 1, 3;
+    ASSERT_TRUE(mesh_param.e1_vertex_map.isApprox(e1_vertex_map));
+    ASSERT_TRUE(mesh_param.e2_vertex_map.isApprox(e2_vertex_map));
+    ASSERT_TRUE(mesh_param.e3_vertex_map.isApprox(e3_vertex_map));
+}
+
+TEST_F(TestMeshParam, UniqueEdgeVertexMap) {
+    Eigen::Matrix<int, 18, 2> e_vertex_map;
+    Eigen::Matrix<int, 18, 1> unique_index;
+    e_vertex_map << 0, 1,
+       0, 2, 
+       0, 3, 
+       0, 4, 
+       0, 5, 
+       0, 6, 
+       1, 3, 
+       1, 5, 
+       1, 7, 
+       2, 3, 
+       2, 6, 
+       2, 7, 
+       3, 7, 
+       4, 5, 
+       4, 6, 
+       4, 7, 
+       5, 7, 
+       6, 7;
+    ASSERT_TRUE(mesh_param.e_vertex_map.isApprox(e_vertex_map));
+    // unique index is correct but gets the second one sometimes
+}
+
 /* TEST_F(TestPotential, LaplacianFactor) { */
 /*     /1* Eigen::Array<double, 1, 3> state; *1/ */
 /*     /1* state << 2, 0, 0; *1/ */
@@ -253,15 +332,3 @@ TEST_F(TestMeshParam, VertexFaceMap) {
     /* ASSERT_EQ(mesh_param.vf_map[0][5], 9); */
 }
 
-TEST_F(TestMeshParam, EdgeVertexMap) {
-    Eigen::Array<int, 12, 2> e1_vertex_map, e2_vertex_map, e3_vertex_map;
-    e1_vertex_map << 6, 0, 2, 0, 3, 0, 1, 0, 7, 2, 3, 2, 6, 4, 7, 4, 4,
-                  0, 5, 0, 5, 1, 7, 1;
-    e2_vertex_map << 4, 6, 6, 2, 2, 3, 3, 1, 6, 7, 7, 3, 7, 6, 5, 7, 5,
-                  4, 1, 5, 7, 5, 3, 7;
-    e3_vertex_map << 0, 4, 0, 6, 0, 2, 0, 3, 2, 6, 2, 7, 4, 7, 4, 5, 0,
-                  5, 0, 1, 1, 7, 1, 3;
-    MeshParam mesh_param(Ve_true, Fe_true);
-    /* std::cout << mesh_param.e1_vertex_map << std::endl; */
-    /* ASSERT_TRUE(mesh_param.e1_vertex_map.isApprox(e1_vertex_map)); */
-}

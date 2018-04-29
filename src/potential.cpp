@@ -44,6 +44,10 @@ void MeshParam::polyhedron_parameters( void ) {
     // vertex map
     Eigen::Matrix<int, Eigen::Dynamic, 2> e_vertex_map_stacked(3 * num_f, 2),
                                           e_vertex_map_sorted(3 * num_f, 2);
+    
+    e1_vertex_map.resize(num_f, Eigen::NoChange);
+    e2_vertex_map.resize(num_f, Eigen::NoChange);
+    e3_vertex_map.resize(num_f, Eigen::NoChange);
 
     e1_vertex_map.col(0) = Fb;
     e1_vertex_map.col(1) = Fa;
