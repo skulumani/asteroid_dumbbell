@@ -392,8 +392,78 @@ TEST_F(TestMeshParam, VertexFaceMap) {
 }
 
 TEST_F(TestMeshParam, EdgeIndexMap) {
+    Eigen::Matrix<int, 12, 1> e1_ind1b, e1_ind2b, e1_ind3b,
+                              e2_ind1b, e2_ind2b, e2_ind3b,
+                              e3_ind1b, e3_ind2b, e3_ind3b;
+    e1_ind1b << -1, -1, -1, -1, -1, -1, -1, -1, -1 , -1, -1, -1;
+    e1_ind2b << -1, -1, -1, -1, -1,  2,  0, -1, -1 , -1,  9, -1;
+    e1_ind3b <<1,  2,  3,  9,  5, -1, -1,  6,  0 ,  8, -1, 10;
+    
+    e2_ind1b << 6, -1,  5, -1, -1, -1, -1, -1, -1, 10, -1, -1; 
+    e2_ind2b << -1, -1, -1, -1,  6, 11,  4, 10, -1 , -1,  7,  5 ;
+    e2_ind3b << -1,  4, -1, 11, -1, -1, -1, -1,  7 , -1, -1, -1;
+    
+    e3_ind1b <<  8,  0,  1,  2, -1,  4,  7, -1,  9,  3, 11, -1;          
+    e3_ind2b << -1, -1, -1, -1,  1, -1, -1,  8, -1, -1, -1,  3;         
+    e3_ind3b << -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1; 
 
+    ASSERT_TRUE(mesh_param.e1_ind1b.isApprox(e1_ind1b));
+    ASSERT_TRUE(mesh_param.e1_ind2b.isApprox(e1_ind2b));
+    ASSERT_TRUE(mesh_param.e1_ind3b.isApprox(e1_ind3b));
+
+    ASSERT_TRUE(mesh_param.e2_ind1b.isApprox(e2_ind1b));
+    ASSERT_TRUE(mesh_param.e2_ind2b.isApprox(e2_ind2b));
+    ASSERT_TRUE(mesh_param.e2_ind3b.isApprox(e2_ind3b));
+
+    ASSERT_TRUE(mesh_param.e3_ind1b.isApprox(e3_ind1b));
+    ASSERT_TRUE(mesh_param.e3_ind2b.isApprox(e3_ind2b));
+    ASSERT_TRUE(mesh_param.e3_ind3b.isApprox(e3_ind3b));
 }
+
+TEST_F(TestMeshParam, EdgeFaceMap) {
+    Eigen::Matrix<int, 12, 4> e1_face_map, e2_face_map, e3_face_map;
+    e1_face_map << 0, -1, -1,  1,
+       1, -1, -1,  2, 
+       2, -1, -1,  3, 
+       3, -1, -1,  9, 
+       4, -1, -1,  5, 
+       5, -1,  2, -1, 
+       6, -1,  0, -1, 
+       7, -1, -1,  6, 
+       8, -1, -1,  0, 
+       9, -1, -1,  8, 
+       10, -1,  9, -1, 
+       11, -1, -1, 10; 
+    e2_face_map <<0,  6, -1, -1, 
+       1, -1, -1,  4, 
+       2,  5, -1, -1, 
+       3, -1, -1, 11, 
+       4, -1,  6, -1, 
+       5, -1, 11, -1, 
+       6, -1,  4, -1, 
+       7, -1, 10, -1, 
+       8, -1, -1,  7, 
+       9, 10, -1, -1, 
+       10, -1,  7, -1, 
+       11, -1,  5, -1; 
+    e3_face_map << 0,  8, -1, -1, 
+       1,  0, -1, -1, 
+       2,  1, -1, -1, 
+       3,  2, -1, -1, 
+       4, -1,  1, -1, 
+       5,  4, -1, -1, 
+       6,  7, -1, -1, 
+       7, -1,  8, -1, 
+       8,  9, -1, -1, 
+       9,  3, -1, -1, 
+       10, 11, -1, -1, 
+       11, -1,  3, -1; 
+
+    ASSERT_TRUE(mesh_param.e1_face_map.isApprox(e1_face_map));
+    ASSERT_TRUE(mesh_param.e2_face_map.isApprox(e2_face_map));
+    ASSERT_TRUE(mesh_param.e3_face_map.isApprox(e3_face_map));
+}
+
 /* TEST_F(TestPotential, LaplacianFactor) { */
 /*     /1* Eigen::Array<double, 1, 3> state; *1/ */
 /*     /1* state << 2, 0, 0; *1/ */

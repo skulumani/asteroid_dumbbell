@@ -42,8 +42,8 @@ void MeshParam::polyhedron_parameters( void ) {
     e3 = V1 - V3;
     
     // vertex map
-    Eigen::Matrix<int, Eigen::Dynamic, 2> e_vertex_map_stacked(3 * num_f, 2),
-                                          e_vertex_map_sorted(3 * num_f, 2);
+    e_vertex_map_stacked.resize(3 * num_f, 2);
+    e_vertex_map_sorted.resize(3 * num_f, 2);
     
     e1_vertex_map.resize(num_f, Eigen::NoChange);
     e2_vertex_map.resize(num_f, Eigen::NoChange);
@@ -57,12 +57,11 @@ void MeshParam::polyhedron_parameters( void ) {
 
     e3_vertex_map.col(0) = Fa;
     e3_vertex_map.col(1) = Fc;
-    
+
     e_vertex_map_stacked << e1_vertex_map, e2_vertex_map, e3_vertex_map;
     
-    Eigen::MatrixXi IA, IC;
-
-    igl::sort(e_vertex_map_stacked, 2, true, e_vertex_map_sorted, unique_index);
+    Eigen::MatrixXi IA, IC, sort_index;
+    igl::sort(e_vertex_map_stacked, 2, true, e_vertex_map_sorted, sort_index);
     igl::unique_rows(e_vertex_map_sorted, e_vertex_map, unique_index, IC);
 
     igl::cross(e1, e2, normal_face);
@@ -101,6 +100,10 @@ void MeshParam::polyhedron_parameters( void ) {
     
     Eigen::VectorXi faces_list(e1_ind1b.size());
     faces_list = Eigen::VectorXi::LinSpaced(e1_ind1b.size(), 0, e1_ind1b.size());
+    
+    e1_face_map.resize(num_f, 4);
+    e2_face_map.resize(num_f, 4);
+    e3_face_map.resize(num_f, 4);
 
     e1_face_map << faces_list, e1_ind1b, e1_ind2b, e1_ind3b;
     e2_face_map << faces_list, e2_ind1b, e2_ind2b, e2_ind3b;
