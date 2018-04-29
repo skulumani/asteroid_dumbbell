@@ -284,27 +284,86 @@ TEST_F(TestMeshParam, UniqueEdgeVertexMap) {
     // unique index is correct but gets the second one sometimes
 }
 
-/* TEST_F(TestPotential, LaplacianFactor) { */
-/*     /1* Eigen::Array<double, 1, 3> state; *1/ */
-/*     /1* state << 2, 0, 0; *1/ */
-/*     Eigen::Array<double, Eigen::Dynamic, 3> r_v; */
-/*     r_v = Ve_true.rowwise() - state; */
-/*     Eigen::Array<double, 12, 1> w_face; */
-/*     int flag = laplacian_factor(r_v, Fa, Fb, Fc, w_face); */
-/*     EXPECT_TRUE(w_face.isApprox(w_face_true, 1e-7)); */
-/* } */
+TEST_F(TestMeshParam, NormalFace) {
+    Eigen::Matrix<double, 12, 3> normal_face;
+    normal_face << 0.,  0., -1.,
+       0.,  0., -1.,  
+       -1.,  0.,  0.,  
+       -1.,  0.,  0.,  
+       -0.,  1.,  0.,  
+       0.,  1.,  0.,  
+       1.,  0.,  0.,  
+       1.,  0., -0.,  
+       0., -1.,  0.,  
+       0., -1.,  0.,  
+       0.,  0.,  1.,  
+       0., -0.,  1.;
+    ASSERT_TRUE(mesh_param.normal_face.isApprox(normal_face));
+}
 
-/* TEST_F(TestPotential, EdgeFactor) { */
-/*     Eigen::Array<double, Eigen::Dynamic, 3> r_v; */
-/*     r_v = Ve_true.rowwise() - state; */
-/*     Eigen::Array<double, 12, 1> L1_edge, L2_edge, L3_edge; */
-/*     int flag = edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map, */
-/*             L1_edge, L2_edge, L3_edge); */
-    
-/*     EXPECT_TRUE(L1_edge.isApprox(L1_edge_true, 1e-7)); */
-/*     EXPECT_TRUE(L2_edge.isApprox(L2_edge_true, 1e-7)); */
-/*     EXPECT_TRUE(L3_edge.isApprox(L3_edge_true, 1e-7)); */
-/* } */
+TEST_F(TestMeshParam, EdgeNormals) {
+    Eigen::Matrix<double, 12, 3> e1_normal, e2_normal, e3_normal;
+    e1_normal << -0.70710678,  0.70710678,  0.        ,
+       -1.        ,  0.        ,  0.,  
+       0.        , -0.70710678,  0.70710678,  
+       0.        , -1.        ,  0.,  
+       -0.70710678, -0.        ,  0.70710678,  
+       -1.        ,  0.        ,  0.,  
+       0.        ,  0.        , -1.,  
+       -0.        ,  0.70710678, -0.70710678,  
+       0.        ,  0.        , -1.,  
+       0.70710678,  0.        , -0.70710678,  
+       0.        , -1.        ,  0.,  
+       0.70710678, -0.70710678, -0.;
+    e2_normal << 1.,  0.,  0.,
+       -0.,  1.,  0.,  
+       0.,  1.,  0.,  
+       0., -0.,  1.,  
+       1.,  0.,  0.,  
+       0.,  0.,  1.,  
+       0.,  1.,  0.,  
+       0.,  0.,  1.,  
+       1.,  0., -0.,  
+       0.,  0.,  1.,  
+       1.,  0.,  0.,  
+       0.,  1.,  0.;
+    e3_normal << -0.        , -1.        , -0.        ,
+       0.70710678, -0.70710678,  0., 
+       -0.        , -0.        , -1., 
+       0.        ,  0.70710678, -0.70710678, 
+       0.        ,  0.        , -1., 
+       0.70710678,  0.        , -0.70710678, 
+       0.        , -0.70710678,  0.70710678, 
+       0.        , -1.        ,  0., 
+       -0.70710678,  0.        ,  0.70710678, 
+       -1.        , -0.        , -0., 
+       -0.70710678,  0.70710678,  0., 
+       -1.        ,  0.        ,  0.;
+
+
+    ASSERT_TRUE(mesh_param.e1_normal.isApprox(e1_normal, 1e-3));
+    ASSERT_TRUE(mesh_param.e2_normal.isApprox(e2_normal, 1e-3));
+    ASSERT_TRUE(mesh_param.e3_normal.isApprox(e3_normal, 1e-3));
+
+}
+
+TEST_F(TestMeshParam, CenterFace) {
+    Eigen::Matrix<double, 12, 3> center_face;
+    center_face << 0.16666667, -0.16666667, -0.5       ,
+       -0.16666667,  0.16666667, -0.5, 
+       -0.5       ,  0.16666667, -0.16666667, 
+       -0.5       , -0.16666667,  0.16666667, 
+       0.16666667,  0.5       , -0.16666667, 
+       -0.16666667,  0.5       ,  0.16666667, 
+       0.5       ,  0.16666667, -0.16666667, 
+       0.5       , -0.16666667,  0.16666667, 
+       0.16666667, -0.5       , -0.16666667, 
+       -0.16666667, -0.5       ,  0.16666667, 
+       0.16666667, -0.16666667,  0.5, 
+       -0.16666667,  0.16666667,  0.5;
+    ASSERT_TRUE(mesh_param.center_face.isApprox(center_face, 1e-3));
+ 
+}
 
 TEST_F(TestMeshParam, VertexFaceMap) {
     
@@ -328,7 +387,32 @@ TEST_F(TestMeshParam, VertexFaceMap) {
     /*     std::cout << std::endl; */
     /* } */
 
-    /* ASSERT_EQ(mesh_param.vf_map[0][0], 0); */
-    /* ASSERT_EQ(mesh_param.vf_map[0][5], 9); */
+    ASSERT_EQ(mesh_param.vf_map[0][0], 0);
+    ASSERT_EQ(mesh_param.vf_map[0][5], 9);
 }
+
+TEST_F(TestMeshParam, EdgeIndexMap) {
+
+}
+/* TEST_F(TestPotential, LaplacianFactor) { */
+/*     /1* Eigen::Array<double, 1, 3> state; *1/ */
+/*     /1* state << 2, 0, 0; *1/ */
+/*     Eigen::Array<double, Eigen::Dynamic, 3> r_v; */
+/*     r_v = Ve_true.rowwise() - state; */
+/*     Eigen::Array<double, 12, 1> w_face; */
+/*     int flag = laplacian_factor(r_v, Fa, Fb, Fc, w_face); */
+/*     EXPECT_TRUE(w_face.isApprox(w_face_true, 1e-7)); */
+/* } */
+
+/* TEST_F(TestPotential, EdgeFactor) { */
+/*     Eigen::Array<double, Eigen::Dynamic, 3> r_v; */
+/*     r_v = Ve_true.rowwise() - state; */
+/*     Eigen::Array<double, 12, 1> L1_edge, L2_edge, L3_edge; */
+/*     int flag = edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map, */
+/*             L1_edge, L2_edge, L3_edge); */
+    
+/*     EXPECT_TRUE(L1_edge.isApprox(L1_edge_true, 1e-7)); */
+/*     EXPECT_TRUE(L2_edge.isApprox(L2_edge_true, 1e-7)); */
+/*     EXPECT_TRUE(L3_edge.isApprox(L3_edge_true, 1e-7)); */
+/* } */
 

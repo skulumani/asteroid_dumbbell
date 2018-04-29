@@ -34,7 +34,8 @@ class MeshParam {
         Eigen::Matrix<int, Eigen::Dynamic, 2> e2_vertex_map;
         Eigen::Matrix<int, Eigen::Dynamic, 2> e3_vertex_map;
 
-        Eigen::MatrixXi unique_index, e_vertex_map;
+        Eigen::MatrixXi unique_index; /**< Unique indices of e_vertex_map_sorted */
+        Eigen::MatrixXi e_vertex_map, e_vertex_map_stacked, e_vertex_map_sorted;
 
         Eigen::Matrix<double, Eigen::Dynamic, 3> normal_face,
                                                  e1_normal,
