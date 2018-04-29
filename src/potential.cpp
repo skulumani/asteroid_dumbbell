@@ -22,6 +22,7 @@ MeshParam::MeshParam(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic,
     F = F_in;
     polyhedron_parameters();
     face_dyad();
+    edge_dyad();
 }
 
 void MeshParam::polyhedron_parameters( void ) {
@@ -121,6 +122,21 @@ void MeshParam::face_dyad( void ) {
     for (int ii = 0; ii < num_f; ++ii) {
         // outer product of normal_face vectors
         F_face.push_back(normal_face.row(ii).transpose() * normal_face.row(ii)); 
+    }
+
+}
+
+void MeshParam::edge_dyad( void ) {
+    // compute the edge dyad by looping
+
+    for (int ii = 0; ii < num_f; ++ii) {
+        // pick out the normals for the edges of the current face
+        Eigen::Matrix<double, Eigen::Dynamic, 3> nA1, nA2, nA3;
+        nA1 = e1_normal.row(e1_face_map(ii, 0));
+        nA2 = e2_normal.row(e2_face_map(ii, 0));
+        nA3 = e3_normal.row(e3_face_map(ii, 0));
+    
+        // TODO edge_dyad loop need to find adjacent faces using e1_face_map
     }
 
 }

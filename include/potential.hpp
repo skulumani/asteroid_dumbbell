@@ -13,6 +13,7 @@ class MeshParam {
     private:
         void polyhedron_parameters( void );
         void face_dyad( void );
+        void edge_dyad( void );
 
     public:
         MeshParam( void ) {};
@@ -59,6 +60,8 @@ class MeshParam {
                         e2_face_map,
                         e3_face_map;
         std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > > F_face;
+
+        std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> >  > E1_edge, E2_edge, E3_edge;
 
 };
 
