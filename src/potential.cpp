@@ -113,14 +113,18 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
 
     Eigen::Matrix<bool, Eigen::Dynamic, 1> index_match;
     index_match = amap_inda1.array().col(1) == bmap_indb1.array().col(1);
-    Eigen::SparseMatrix<bool> sparse = index_match.sparseView();
+    Eigen::SparseVector<bool> sparse = index_match.sparseView();
     
     std::cout << sparse.transpose() << std::endl;
-    /* Eigen::VectorXi row, col, elements; */
-    /* igl::find(sparse, row, col, elements); */
+    std::vector<int> index_match_vec;
+    // iterate over the sparse vector again
+    for (Eigen::SparseVector<bool>::InnerIterator it(sparse); it; ++it){
+        index_match_vec.push_back(it.index());
+    }
+    Eigen::VectorXi index_match_map = Eigen::Map<Eigen::VectorXi>(index_match_vec.data(), index_match_vec.size());
+    std::cout << index_match_map.transpose() << std::endl;
     
-    
-    /* std::cout << index_match << std::endl; */
+    // now loop and create index_map vector
 }
 
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
