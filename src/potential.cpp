@@ -97,7 +97,11 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
 
     std::tuple<Eigen::VectorXi, Eigen::VectorXi> inda1_indb1 = search_index(e1_vertex_map.col(0), e3_vertex_map.col(1));
     
-
+    Eigen::VectorXi inda1, indb1;
+    inda1 = std::get<0>(inda1_indb1);
+    indb1 = std::get<1>(inda1_indb1);
+    
+    std::cout << inda1.transpose() << std::endl;
     int invalid = -1;
     Eigen::VectorXi index_map(e1_vertex_map.rows());
     index_map.fill(invalid);
@@ -125,6 +129,9 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     std::cout << index_match_map.transpose() << std::endl;
     
     // now loop and create index_map vector
+    for (int ii=0; ii < index_match_map.size(); ++ii) {
+        index_map(inda1(index_match_map(ii))) = indb1(index_match_map(ii));
+    }
 }
 
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
