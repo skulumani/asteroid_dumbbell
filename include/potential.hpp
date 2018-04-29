@@ -18,6 +18,34 @@ class MeshParam {
     
         // define all the member variables
         Eigen::Matrix<int, Eigen::Dynamic, 1> Fa, Fb, Fc;
+        Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
+        Eigen::Matrix<double, Eigen::Dynamic, 3> e1, e2, e3;
+
+        Eigen::Matrix<int, Eigen::Dynamic, 2> e1_vertex_map;
+        Eigen::Matrix<int, Eigen::Dynamic, 2> e2_vertex_map;
+        Eigen::Matrix<int, Eigen::Dynamic, 2> e3_vertex_map;
+
+        Eigen::MatrixXi unique_index, e_vertex_map;
+
+        Eigen::Matrix<double, Eigen::Dynamic, 3> normal_face,
+                                                 e1_normal,
+                                                 e2_normal,
+                                                 e3_normal,
+                                                 center_face;
+        std::tuple<Eigen::Matrix<int, Eigen::Dynamic, 2>,
+                   Eigen::Matrix<int, Eigen::Dynamic, 2>,
+                   Eigen::Matrix<int, Eigen::Dynamic, 2> > edge_vertex_map;
+
+        std::vector<std::vector<int> > vertex_face_map;
+
+        Eigen::VectorXi e1_ind1b, e1_ind2b, e1_ind3b,
+                        e2_ind1b, e2_ind2b, e2_ind3b,
+                        e3_ind1b, e3_ind2b, e3_ind3;
+
+        std::tuple<Eigen::MatrixXi, Eigen::MatrixXi, Eigen::MatrixXi> edge_face_map;
+        Eigen::MatrixXi e1_face_map,
+                        e2_face_map,
+                        e3_face_map;
 
 };
 
