@@ -6,7 +6,9 @@
 #include <igl/slice.h>
 #include <igl/find.h>
 
+#include <Eigen/Dense>
 #include <Eigen/SparseCore>
+#include <Eigen/StdVector>
 
 #include <algorithm>
 #include <iostream>
@@ -19,6 +21,7 @@ MeshParam::MeshParam(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic,
     V = V_in;
     F = F_in;
     polyhedron_parameters();
+    face_dyad();
 }
 
 void MeshParam::polyhedron_parameters( void ) {
@@ -110,6 +113,16 @@ void MeshParam::polyhedron_parameters( void ) {
     e3_face_map << faces_list, e3_ind1b, e3_ind2b, e3_ind3b;
 
     edge_face_map = std::make_tuple(e1_face_map, e2_face_map, e3_face_map);
+}
+
+void MeshParam::face_dyad( void ) {
+    // compute the face dyad
+    
+    for (int ii = 0; ii < num_f; ++ii) {
+        // outer product of normal_face vectors
+        F_face.push_back(normal_face.row(ii).transpose() * normal_face.row(ii)); 
+    }
+
 }
 
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {

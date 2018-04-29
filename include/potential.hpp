@@ -2,6 +2,7 @@
 #define POTENTIAL_H
 
 #include <Eigen/Dense>
+#include <Eigen/StdVector>
 
 #include <vector>
 #include <tuple>
@@ -11,6 +12,7 @@
 class MeshParam {
     private:
         void polyhedron_parameters( void );
+        void face_dyad( void );
 
     public:
         MeshParam( void ) {};
@@ -56,10 +58,12 @@ class MeshParam {
         Eigen::MatrixXi e1_face_map,
                         e2_face_map,
                         e3_face_map;
+        std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > > F_face;
 
 };
 
 // declare some shit
+
 void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::MatrixXi F, 
         Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> F_face, Eigen::Matrix<double, Eigen::Dynamic, 1> w_face);
 
@@ -89,4 +93,5 @@ std::tuple<Eigen::VectorXi, Eigen::VectorXi> search_index(const Eigen::Ref<const
 
 Eigen::VectorXi vertex_map_search(const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& a_map,
         const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& b_map);
+
 #endif

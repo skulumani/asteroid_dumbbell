@@ -464,6 +464,13 @@ TEST_F(TestMeshParam, EdgeFaceMap) {
     ASSERT_TRUE(mesh_param.e3_face_map.isApprox(e3_face_map));
 }
 
+TEST_F(TestMeshParam, FaceDyad) {
+    Eigen::Matrix<double, 3, 3> F_face_zero, F_face_eleven;
+    F_face_zero << 0, 0, 0, 0, 0, 0, 0, 0, 1;
+    F_face_eleven << 0, 0, 0, 0, 0, 0, 0, 0, 1;
+    ASSERT_TRUE(mesh_param.F_face[0].isApprox(F_face_zero));
+    ASSERT_TRUE(mesh_param.F_face[11].isApprox(F_face_eleven));
+}
 /* TEST_F(TestPotential, LaplacianFactor) { */
 /*     /1* Eigen::Array<double, 1, 3> state; *1/ */
 /*     /1* state << 2, 0, 0; *1/ */
