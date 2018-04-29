@@ -9,17 +9,20 @@
 // Make a mesh parameter class to hold all the data computed from polyhedron parameters
 
 class MeshParam {
+    private:
+        void polyhedron_parameters( void );
+
     public:
-        MeshParam( void );
-        ~MeshParam( void );
+        MeshParam( void ) {};
+        virtual ~MeshParam( void ) {};
 
         MeshParam(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& V_in, 
                 const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F_in);
     
-        void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& V_in,
-                                   const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3>& F_in);
 
         // define all the member variables
+        std::size_t num_v, num_f, num_e;
+
         Eigen::Array<double, Eigen::Dynamic, 3> V;
         Eigen::Array<int, Eigen::Dynamic, 3> F;
 
@@ -42,11 +45,11 @@ class MeshParam {
                    Eigen::Matrix<int, Eigen::Dynamic, 2>,
                    Eigen::Matrix<int, Eigen::Dynamic, 2> > edge_vertex_map;
 
-        std::vector<std::vector<int> > vertex_face_map;
+        std::vector<std::vector<int> > vf_map;
 
         Eigen::VectorXi e1_ind1b, e1_ind2b, e1_ind3b,
                         e2_ind1b, e2_ind2b, e2_ind3b,
-                        e3_ind1b, e3_ind2b, e3_ind3;
+                        e3_ind1b, e3_ind2b, e3_ind3b;
 
         std::tuple<Eigen::MatrixXi, Eigen::MatrixXi, Eigen::MatrixXi> edge_face_map;
         Eigen::MatrixXi e1_face_map,

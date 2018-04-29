@@ -170,8 +170,8 @@ TEST_F(TestPotential, EdgeFactor) {
 }
 
 TEST_F(TestPotential, VertexFaceMap) {
-    std::vector< std::vector<int> > vf_map = vertex_face_map( Ve_true, Fe_true);
-    
+    MeshParam mesh_param(Ve_true, Fe_true);
+
     // iterate and print vf_map
     //assuming you have a "2D" vector vvi (vector of vector of int's)
     /* std::vector< std::vector<int> >::iterator row; */
@@ -183,6 +183,6 @@ TEST_F(TestPotential, VertexFaceMap) {
     /*     std::cout << std::endl; */
     /* } */
 
-    ASSERT_EQ(vf_map[0][0], 0);
-    ASSERT_EQ(vf_map[0][5], 9);
+    ASSERT_EQ(mesh_param.vf_map[0][0], 0);
+    ASSERT_EQ(mesh_param.vf_map[0][5], 9);
 }

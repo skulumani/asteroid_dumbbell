@@ -77,7 +77,7 @@ int main() {
                 0.03808065, 0.02361574, -0.20033484, -0.20033484,
                 0.03808065, 0.02361574, 0.03808065,0.02361574;
 
-    polyhedron_parameters(Ve_true, Fe_true);
+    MeshParam mesh_param(Ve_true, Fe_true);
 
     /* Eigen::Array<double, 1, 3> state; */
     /* state << 2, 0, 0; */

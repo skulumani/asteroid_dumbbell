@@ -18,39 +18,31 @@ MeshParam::MeshParam(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic,
                      const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F_in) {
     V = V_in;
     F = F_in;
-    polyhedron_parameters(V_in, F_in);
+    polyhedron_parameters();
 }
 
-void MeshParam::polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> > & V_in,
-        const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F_in) {
+void MeshParam::polyhedron_parameters( void ) {
     
     num_v = V.rows();
     num_f = F.rows();
     num_e = 3 * (num_v -2);
 
     // calculate all the edges zero based. This assumes it's already subtracted from the original OBJ for example
-    Eigen::Matrix<int, Eigen::Dynamic, 1> Fa, Fb, Fc;
     Fa = F.col(0);
     Fb = F.col(1);
     Fc = F.col(2);
-
-    Eigen::Matrix<double, Eigen::Dynamic, 3> V1(num_f, 3), V2(num_f, 3), V3(num_f, 3);
 
     igl::slice(V, Fa, (Eigen::Vector3i() << 0, 1, 2).finished(), V1);
     igl::slice(V, Fb, (Eigen::Vector3i() << 0, 1, 2).finished(), V2);
     igl::slice(V, Fc, (Eigen::Vector3i() << 0, 1, 2).finished(), V3);
     
     // compute the edge vectors
-    Eigen::Matrix<double, Eigen::Dynamic, 3> e1(num_f, 3), e2(num_f, 3), e3(num_f, 3);
     e1 = V2 - V1;
     e2 = V3 - V2;
     e3 = V1 - V3;
     
     // vertex map
-    Eigen::Matrix<int, Eigen::Dynamic, 2> e1_vertex_map(num_f, 2),
-                                          e2_vertex_map(num_f, 2), 
-                                          e3_vertex_map(num_f, 2),
-                                          e_vertex_map_stacked(3 * num_f, 2),
+    Eigen::Matrix<int, Eigen::Dynamic, 2> e_vertex_map_stacked(3 * num_f, 2),
                                           e_vertex_map_sorted(3 * num_f, 2);
 
     e1_vertex_map.col(0) = Fb;
@@ -64,16 +56,10 @@ void MeshParam::polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double
     
     e_vertex_map_stacked << e1_vertex_map, e2_vertex_map, e3_vertex_map;
     
-    Eigen::MatrixXi unique_index, IA, IC, e_vertex_map;
+    Eigen::MatrixXi IA, IC;
 
     igl::sort(e_vertex_map_stacked, 2, true, e_vertex_map_sorted, unique_index);
     igl::unique_rows(e_vertex_map_sorted, e_vertex_map, unique_index, IC);
-
-
-    Eigen::Matrix<double, Eigen::Dynamic, 3> normal_face(num_f, 3),
-                                             e1_normal(num_f, 3),
-                                             e2_normal(num_f, 3),
-                                             e3_normal(num_f, 3);
 
     igl::cross(e1, e2, normal_face);
     normal_face.rowwise().normalize();
@@ -88,43 +74,35 @@ void MeshParam::polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double
     e3_normal.rowwise().normalize();
     
     // compute the centeroid of each face
-    Eigen::Matrix<double, Eigen::Dynamic, 3> center_face(num_f, 3);
     center_face = 1.0 / 3 * (V1 + V2 + V3);
     
     // edge vertex map
-    std::tuple<Eigen::Matrix<int, Eigen::Dynamic, 2>, Eigen::Matrix<int, Eigen::Dynamic, 2>, Eigen::Matrix<int, Eigen::Dynamic, 2> > edge_vertex_map;
     edge_vertex_map = std::make_tuple(e1_vertex_map, e2_vertex_map, e3_vertex_map);
 
     // build vertex face map
-    std::vector<std::vector<int> > vf_map = vertex_face_map(V, F);
+    vf_map = vertex_face_map(V, F);
     
-    Eigen::VectorXi e1_ind1b = vertex_map_search(e1_vertex_map, e1_vertex_map);
-    Eigen::VectorXi e1_ind2b = vertex_map_search(e1_vertex_map, e2_vertex_map);
-    Eigen::VectorXi e1_ind3b = vertex_map_search(e1_vertex_map, e3_vertex_map);
+    e1_ind1b = vertex_map_search(e1_vertex_map, e1_vertex_map);
+    e1_ind2b = vertex_map_search(e1_vertex_map, e2_vertex_map);
+    e1_ind3b = vertex_map_search(e1_vertex_map, e3_vertex_map);
 
-    Eigen::VectorXi e2_ind1b = vertex_map_search(e2_vertex_map, e1_vertex_map);
-    Eigen::VectorXi e2_ind2b = vertex_map_search(e2_vertex_map, e2_vertex_map);
-    Eigen::VectorXi e2_ind3b = vertex_map_search(e2_vertex_map, e3_vertex_map);
+    e2_ind1b = vertex_map_search(e2_vertex_map, e1_vertex_map);
+    e2_ind2b = vertex_map_search(e2_vertex_map, e2_vertex_map);
+    e2_ind3b = vertex_map_search(e2_vertex_map, e3_vertex_map);
     
-    Eigen::VectorXi e3_ind1b = vertex_map_search(e3_vertex_map, e1_vertex_map);
-    Eigen::VectorXi e3_ind2b = vertex_map_search(e3_vertex_map, e2_vertex_map);
-    Eigen::VectorXi e3_ind3b = vertex_map_search(e3_vertex_map, e3_vertex_map);
+    e3_ind1b = vertex_map_search(e3_vertex_map, e1_vertex_map);
+    e3_ind2b = vertex_map_search(e3_vertex_map, e2_vertex_map);
+    e3_ind3b = vertex_map_search(e3_vertex_map, e3_vertex_map);
     // TODO make a vertex_map_inverse function
     
     Eigen::VectorXi faces_list(e1_ind1b.size());
     faces_list = Eigen::VectorXi::LinSpaced(e1_ind1b.size(), 0, e1_ind1b.size());
-    Eigen::MatrixXi e1_face_map(e1_ind1b.size(), 4),
-                   e2_face_map(e1_ind1b.size(), 4),
-                   e3_face_map(e1_ind1b.size(), 4);
 
     e1_face_map << faces_list, e1_ind1b, e1_ind2b, e1_ind3b;
     e2_face_map << faces_list, e2_ind1b, e2_ind2b, e2_ind3b;
     e3_face_map << faces_list, e3_ind1b, e3_ind2b, e3_ind3b;
 
-    std::tuple<Eigen::MatrixXi, Eigen::MatrixXi, Eigen::MatrixXi> edge_face_map = 
-        std::make_tuple(e1_face_map, e2_face_map, e3_face_map);
-    
-    std::cout <<  std::get<2>(edge_face_map) << std::endl;
+    edge_face_map = std::make_tuple(e1_face_map, e2_face_map, e3_face_map);
 }
 
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
