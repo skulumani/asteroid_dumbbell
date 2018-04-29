@@ -91,11 +91,34 @@ void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
 
     // build vertex face map
     std::vector<std::vector<int> > vf_map = vertex_face_map(V, F);
+    
+    Eigen::VectorXi e1_ind1b = vertex_map_search(e1_vertex_map, e1_vertex_map);
+    Eigen::VectorXi e1_ind2b = vertex_map_search(e1_vertex_map, e2_vertex_map);
+    Eigen::VectorXi e1_ind3b = vertex_map_search(e1_vertex_map, e3_vertex_map);
 
-    // TODO Need to searching to find matching edges (search_edge_vertex_map)
-    Eigen::VectorXi index_map = vertex_map_search(e1_vertex_map, e3_vertex_map);
-    std::cout << index_map << std::endl;
+    Eigen::VectorXi e2_ind1b = vertex_map_search(e2_vertex_map, e1_vertex_map);
+    Eigen::VectorXi e2_ind2b = vertex_map_search(e2_vertex_map, e2_vertex_map);
+    Eigen::VectorXi e2_ind3b = vertex_map_search(e2_vertex_map, e3_vertex_map);
+    
+    Eigen::VectorXi e3_ind1b = vertex_map_search(e3_vertex_map, e1_vertex_map);
+    Eigen::VectorXi e3_ind2b = vertex_map_search(e3_vertex_map, e2_vertex_map);
+    Eigen::VectorXi e3_ind3b = vertex_map_search(e3_vertex_map, e3_vertex_map);
+    // TODO make a vertex_map_inverse function
+    
+    Eigen::VectorXi faces_list(e1_ind1b.size());
+    faces_list = Eigen::VectorXi::LinSpaced(e1_ind1b.size(), 0, e1_ind1b.size());
+    Eigen::MatrixXi e1_face_map(e1_ind1b.size(), 4),
+                   e2_face_map(e1_ind1b.size(), 4),
+                   e3_face_map(e1_ind1b.size(), 4);
 
+    e1_face_map << faces_list, e1_ind1b, e1_ind2b, e1_ind3b;
+    e2_face_map << faces_list, e2_ind1b, e2_ind2b, e2_ind3b;
+    e3_face_map << faces_list, e3_ind1b, e3_ind2b, e3_ind3b;
+
+    std::tuple<Eigen::MatrixXi, Eigen::MatrixXi, Eigen::MatrixXi> edge_face_map = 
+        std::make_tuple(e1_face_map, e2_face_map, e3_face_map);
+    
+    std::cout <<  std::get<2>(edge_face_map) << std::endl;
 }
 
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {

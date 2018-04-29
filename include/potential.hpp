@@ -6,6 +6,21 @@
 #include <vector>
 #include <tuple>
 
+// Make a mesh parameter class to hold all the data computed from polyhedron parameters
+
+class MeshParam {
+    public:
+        MeshParam( void );
+        ~MeshParam( void );
+
+        MeshParam(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& V_in, 
+                const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F_in);
+    
+        // define all the member variables
+        Eigen::Matrix<int, Eigen::Dynamic, 1> Fa, Fb, Fc;
+
+};
+
 // declare some shit
 void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::MatrixXi F, 
         Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> F_face, Eigen::Matrix<double, Eigen::Dynamic, 1> w_face);
