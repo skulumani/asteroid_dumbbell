@@ -16,7 +16,13 @@ class MeshParam {
         MeshParam(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& V_in, 
                 const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F_in);
     
+        void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& V_in,
+                                   const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3>& F_in);
+
         // define all the member variables
+        Eigen::Array<double, Eigen::Dynamic, 3> V;
+        Eigen::Array<int, Eigen::Dynamic, 3> F;
+
         Eigen::Matrix<int, Eigen::Dynamic, 1> Fa, Fb, Fc;
         Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
         Eigen::Matrix<double, Eigen::Dynamic, 3> e1, e2, e3;
@@ -70,9 +76,6 @@ int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >
                 Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > L1_edge,
                 Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > L2_edge,
                 Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > L3_edge);
-
-void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& V,
-        const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F);
 
 
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> &V,

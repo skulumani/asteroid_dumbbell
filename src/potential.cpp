@@ -13,14 +13,20 @@
 #include <vector>
 #include <tuple>
 
+// MeshParam member functions
+MeshParam::MeshParam(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& V_in,
+                     const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F_in) {
+    V = V_in;
+    F = F_in;
+    polyhedron_parameters(V_in, F_in);
+}
 
-// TODO Need to make this function
-void polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> > & V,
-        const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F) {
+void MeshParam::polyhedron_parameters(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> > & V_in,
+        const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F_in) {
     
-    std::size_t num_v = V.rows();
-    std::size_t num_f = F.rows();
-    std::size_t num_e = 3 * (num_v -2);
+    num_v = V.rows();
+    num_f = F.rows();
+    num_e = 3 * (num_v -2);
 
     // calculate all the edges zero based. This assumes it's already subtracted from the original OBJ for example
     Eigen::Matrix<int, Eigen::Dynamic, 1> Fa, Fb, Fc;
