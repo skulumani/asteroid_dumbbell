@@ -186,15 +186,7 @@ void MeshParam::edge_dyad( void ) {
         }
 
         E3_edge.push_back(nA.transpose() * nA3 + nB.transpose() * nB3);
-        std::cout << E3_edge[ii] << std::endl << std::endl;
     }
-    // slice the last three columns of e1_face_map then compare
-    /* Eigen::VectorXi row_slice; */
-    /* igl::slice(e1_face_map.row(0), (Eigen::VectorXi() << 1, 2, 3).finished(), row_slice); */
-
-    /* Eigen::Matrix<bool, 1, 3> adj_face = e1_face_map.row(0).array() != invalid_row.array(); */
-    /* std::cout << adj_face << std::endl; */
-    /* std::cout << row_slice << std::endl; */
 }
 
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
