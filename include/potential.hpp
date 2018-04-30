@@ -21,8 +21,8 @@ class MeshParam {
 
         MeshParam(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& V_in, 
                 const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F_in);
-    
-
+        
+        // TODO Add constructor from a MeshData object as well
         // define all the member variables
         std::size_t num_v, num_f, num_e;
 
@@ -65,6 +65,19 @@ class MeshParam {
 
 };
 
+class Asteroid {
+    public:
+        Asteroid ( void ) {};
+        virtual ~Asteroid ( void ) {};
+        
+        void polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state);
+
+        // member variables to hold the potential
+        double U;
+        Eigen::Vector3d U_grad;
+        Eigen::Matrix3d U_grad_mat;
+        double U_laplace;
+}
 // declare some shit
 
 void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::MatrixXi F, 

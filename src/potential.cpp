@@ -189,6 +189,7 @@ void MeshParam::edge_dyad( void ) {
     }
 }
 
+
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
 
     std::vector<std::vector<int> > vf_map(V.rows());
