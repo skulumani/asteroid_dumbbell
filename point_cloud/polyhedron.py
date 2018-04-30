@@ -60,6 +60,7 @@ def edge_contribution(state, e_vertex_map, unique_index,
                       L1_edge, L2_edge, L3_edge):
     # unique vector from state to each vertex
     rv = V[e_vertex_map[:, 0], :] - np.tile(state, (e_vertex_map.shape[0],1))
+    # TODO The unique edges in E_all are defined for the stacked and sorted edges
     E_all = np.concatenate((E1_edge, E2_edge, E3_edge), axis=2)
     L_all = np.concatenate((L1_edge, L2_edge, L3_edge), axis=0)
 

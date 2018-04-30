@@ -33,8 +33,8 @@ def potential(point, axes=np.array([1, 1, 1])):
     y0 = point[1]
     z0 = point[2]
 
-    G = 6.67408e-20 # km^3 / (kg * s ^2)
-    rho = 1e6 # kg / km^3
+    G = 6.673e-20 # km^3 / (kg * s ^2)
+    rho = 1 # kg / km^3
 
     potential = G * rho *( w(a - x0, b - y0, c - z0) + w(b - y0, c - z0, a - x0) + w(c - z0, a - x0, b - y0) 
                           - w(-a - x0, -b - y0, -c - z0) - w(-b -y0, -c - z0, -a - x0) - w(-c - z0, -a - x0, -b - y0))

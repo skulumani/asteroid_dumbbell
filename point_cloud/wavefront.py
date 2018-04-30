@@ -1041,7 +1041,8 @@ def polyhedron_parameters(V, F):
     e1_vertex_map = np.vstack((Fb, Fa)).T
     e2_vertex_map = np.vstack((Fc, Fb)).T
     e3_vertex_map = np.vstack((Fa, Fc)).T
-     
+    
+    # TODO Use argsort to get indices of sort, and then indices of unique
     e_vertex_map, unique_index = np.unique(np.sort(np.vstack((e1_vertex_map,
                                                               e2_vertex_map,
                                                               e3_vertex_map)),
@@ -1049,6 +1050,7 @@ def polyhedron_parameters(V, F):
                                            axis=0,
                                            return_index=True)
     
+    pdb.set_trace()
     # Normalize edge vectors
     # e1_norm=e1./repmat(sqrt(e1(:,1).^2+e1(:,2).^2+e1(:,3).^2),1,3);
     # e2_norm=e2./repmat(sqrt(e2(:,1).^2+e2(:,2).^2+e2(:,3).^2),1,3);
