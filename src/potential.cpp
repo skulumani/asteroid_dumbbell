@@ -128,17 +128,36 @@ void MeshParam::face_dyad( void ) {
 
 void MeshParam::edge_dyad( void ) {
     // compute the edge dyad by looping
+    Eigen::Matrix<double, Eigen::Dynamic, 3> nA1, nA2, nA3, nB1, nB2, nB3;
+    Eigen::Matrix<int, 1, 3> invalid_row(3);
+    invalid_row.fill(-1);
 
     for (int ii = 0; ii < num_f; ++ii) {
         // pick out the normals for the edges of the current face
-        Eigen::Matrix<double, Eigen::Dynamic, 3> nA1, nA2, nA3;
         nA1 = e1_normal.row(e1_face_map(ii, 0));
         nA2 = e2_normal.row(e2_face_map(ii, 0));
         nA3 = e3_normal.row(e3_face_map(ii, 0));
     
         // TODO edge_dyad loop need to find adjacent faces using e1_face_map
+        // find the adjacent face for edge 1
+        if (e1_face_map(ii, 1) != -1) { // adjacent face is also edge 1
+            nB1 = e1_normal.row(e1_face_map(ii, 1)); 
+        } else if( e1_face_map(ii, 2) != -1) { // adjacent face is edge 2
+            nB1 = e2_normal.row(e1_face_map(ii, 2));
+        } else if( e1_face_map(ii, 3) != -1) { // adjacent face is edge 3
+            nB1 = e3_normal.row(e1_face_map(ii, 3));
+        }
+        
+        std::cout << nB1 << std::endl;
     }
+    std::cout << e1_face_map << std::endl;
+    // slice the last three columns of e1_face_map then compare
+    /* Eigen::VectorXi row_slice; */
+    /* igl::slice(e1_face_map.row(0), (Eigen::VectorXi() << 1, 2, 3).finished(), row_slice); */
 
+    /* Eigen::Matrix<bool, 1, 3> adj_face = e1_face_map.row(0).array() != invalid_row.array(); */
+    /* std::cout << adj_face << std::endl; */
+    /* std::cout << row_slice << std::endl; */
 }
 
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
