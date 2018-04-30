@@ -128,12 +128,16 @@ void MeshParam::face_dyad( void ) {
 
 void MeshParam::edge_dyad( void ) {
     // compute the edge dyad by looping
-    Eigen::Matrix<double, Eigen::Dynamic, 3> nA1, nA2, nA3, nB1, nB2, nB3;
+    Eigen::Matrix<double, 1, 3> nA1, nA2, nA3, nB1, nB2, nB3;
+    Eigen::Matrix<double, 1, 3> nA, nB;
+
     Eigen::Matrix<int, 1, 3> invalid_row(3);
     invalid_row.fill(-1);
 
     for (int ii = 0; ii < num_f; ++ii) {
         // pick out the normals for the edges of the current face
+        nA = normal_face.row(ii);
+
         nA1 = e1_normal.row(e1_face_map(ii, 0));
         nA2 = e2_normal.row(e2_face_map(ii, 0));
         nA3 = e3_normal.row(e3_face_map(ii, 0));
@@ -142,15 +146,48 @@ void MeshParam::edge_dyad( void ) {
         // find the adjacent face for edge 1
         if (e1_face_map(ii, 1) != -1) { // adjacent face is also edge 1
             nB1 = e1_normal.row(e1_face_map(ii, 1)); 
+            nB = normal_face.row(e1_face_map(ii, 1));
         } else if( e1_face_map(ii, 2) != -1) { // adjacent face is edge 2
             nB1 = e2_normal.row(e1_face_map(ii, 2));
+            nB = normal_face.row(e1_face_map(ii, 2));
         } else if( e1_face_map(ii, 3) != -1) { // adjacent face is edge 3
             nB1 = e3_normal.row(e1_face_map(ii, 3));
+            nB = normal_face.row(e1_face_map(ii, 3));
         }
         
-        std::cout << nB1 << std::endl;
+        // compute the edge dyad
+        E1_edge.push_back(nA.transpose() * nA1 + nB.transpose() * nB1);
+
+        // find adjacent edge for edge 2
+        if (e2_face_map(ii, 1) != -1 ){
+            nB2 = e1_normal.row(e2_face_map(ii, 1));
+            nB = normal_face.row(e2_face_map(ii, 1));
+        } else if(e2_face_map(ii, 2) != -1) {
+            nB2 = e2_normal.row(e2_face_map(ii, 2));
+            nB = normal_face.row(e2_face_map(ii, 2));
+        } else if (e2_face_map(ii, 3) != -1) {
+            nB2 = e3_normal.row(e2_face_map(ii, 3));
+            nB = normal_face.row(e2_face_map(ii, 3));
+        }
+        
+        // second edge dyad
+        E2_edge.push_back(nA.transpose() * nA2 + nB.transpose() * nB2);
+        
+        // find the adjacent edge for edge 3
+        if (e3_face_map(ii, 1) != -1 ) {
+            nB3 = e1_normal.row(e3_face_map(ii, 1));
+            nB = normal_face.row(e3_face_map(ii, 1));
+        } else if (e3_face_map(ii, 2) != -1 ) {
+            nB3 = e2_normal.row(e3_face_map(ii, 2));
+            nB = normal_face.row(e3_face_map(ii, 2));
+        } else if (e3_face_map(ii, 3) != -1 ) {
+            nB3 = e3_normal.row(e3_face_map(ii, 3));
+            nB = normal_face.row(e3_face_map(ii, 3));
+        }
+
+        E3_edge.push_back(nA.transpose() * nA3 + nB.transpose() * nB3);
+        std::cout << E3_edge[ii] << std::endl << std::endl;
     }
-    std::cout << e1_face_map << std::endl;
     // slice the last three columns of e1_face_map then compare
     /* Eigen::VectorXi row_slice; */
     /* igl::slice(e1_face_map.row(0), (Eigen::VectorXi() << 1, 2, 3).finished(), row_slice); */
