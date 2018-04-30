@@ -21,6 +21,8 @@ def w(x, y, z):
 def potential(point, axes=np.array([1, 1, 1])):
     """Compute the potential at the point for a cube with side lengths
     axes = (2a, 2b, 2c)
+
+    Distance in km, mass in kg
     """
 
     a = axes[0]/2
@@ -31,7 +33,7 @@ def potential(point, axes=np.array([1, 1, 1])):
     y0 = point[1]
     z0 = point[2]
 
-    G = 6.67408e-11 # km^3 / (kg * s ^2)
+    G = 6.67408e-20 # km^3 / (kg * s ^2)
     rho = 1e6 # kg / km^3
 
     potential = G * rho *( w(a - x0, b - y0, c - z0) + w(b - y0, c - z0, a - x0) + w(c - z0, a - x0, b - y0) 
