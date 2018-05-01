@@ -279,18 +279,15 @@ Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const
 }
 
 // This is slower than numpy
-int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& r_v, 
+std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& r_v, 
                 const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& e1,
                 const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& e2,
                 const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& e3,
                 const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 2> >& e1_vertex_map,
                 const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 2> >& e2_vertex_map,
-                const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 2> >& e3_vertex_map,
-                Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > L1_edge,
-                Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > L2_edge,
-                Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > L3_edge) {
-    
-        Eigen::Array<double, Eigen::Dynamic, 3> r1i, r1j, r2i, r2j, r3i, r3j;
+                const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 2> >& e3_vertex_map) {
+
+            Eigen::Ref<Eigen::Array<double, Eigen::Dynam        Eigen::Array<double, Eigen::Dynamic, 3> r1i, r1j, r2i, r2j, r3i, r3j;
         r1i.resize(e1_vertex_map.rows(), 3);
         r1j.resize(e1_vertex_map.rows(), 3);
 
@@ -327,8 +324,8 @@ int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >
         r3j_norm = r3j.matrix().rowwise().norm();
         e3_norm  = e3.matrix().rowwise().norm();
         L3_edge = Eigen::log((r3i_norm + r3j_norm + e3_norm) / (r3i_norm + r3j_norm - e3_norm));
-
-        return 0;
+    
+        return std::make_tuple(L1_edge, L2_edge, L3_edge);
 }
 
 std::tuple<Eigen::VectorXi, Eigen::VectorXi> search_index(const Eigen::Ref<const Eigen::VectorXi>& a, const Eigen::Ref<const Eigen::VectorXi>& b) {
