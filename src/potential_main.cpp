@@ -84,19 +84,8 @@ int main() {
     state << 1, 2, 3;
 
     ast.polyhedron_potential(state);
-    Eigen::Matrix<double, Eigen::Dynamic, 1> w_face;
-    w_face = laplacian_factor((mesh_param->V.rowwise() - state.transpose()), mesh_param->Fa, mesh_param->Fb, mesh_param->Fc);
-    /* Eigen::Array<double, 1, 3> state; */
-    /* state << 2, 0, 0; */
-    /* Eigen::Array<double, Eigen::Dynamic, 3> r_v; */
-    /* r_v = Ve_true.rowwise() - state; */
-    /* Eigen::Array<double, 12, 1> w_face; */
-    /* int lflag = laplacian_factor(r_v, Fa, Fb, Fc, w_face); */
     
-    // now try out the edge factor code
-    /* Eigen::Array<double, 12, 1> L1_edge, L2_edge, L3_edge; */
-    /* int eflag = edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map, */
-    /*         L1_edge, L2_edge, L3_edge); */
-    
+    // test out the edge factor function
+    //
     return 0;
 }

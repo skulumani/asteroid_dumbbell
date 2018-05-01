@@ -15,6 +15,8 @@
 #include <iostream>
 #include <vector>
 #include <tuple>
+#include <cassert>
+#include <cmath>
 
 // MeshParam member functions
 MeshParam::MeshParam(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
@@ -200,12 +202,16 @@ Asteroid::Asteroid(std::shared_ptr<MeshParam> mesh_param_in) {
 }
 
 void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state) {
+
     Eigen::Matrix<double, Eigen::Dynamic, 3> r_v = mesh_param->V.matrix().rowwise() - state.transpose();
     
     // Compute w_face using laplacian_factor
-     
-    // TODO assert that is is close to zero (outside the body)
-    // TODO Compute all the edge factors L1_edge
+    Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v, mesh_param->Fa, mesh_param->Fb, mesh_param->Fc);
+
+    if (std::abs(w_face.sum()) < 1e-10) {
+        // TODO Compute all the edge factors L1_edge
+    } else {
+    }
     // loop over the faces and face dyads
     //
     // loop over edges and edge dyads
