@@ -77,8 +77,10 @@ int main() {
                 0.03808065, 0.02361574, -0.20033484, -0.20033484,
                 0.03808065, 0.02361574, 0.03808065,0.02361574;
 
-    MeshParam mesh_param(Ve_true, Fe_true);
-    
+    std::shared_ptr<MeshParam> mesh_param = std::make_shared<MeshParam>(Ve_true, Fe_true);
+     
+    Asteroid ast(mesh_param);
+
     /* Eigen::Array<double, 1, 3> state; */
     /* state << 2, 0, 0; */
     /* Eigen::Array<double, Eigen::Dynamic, 3> r_v; */

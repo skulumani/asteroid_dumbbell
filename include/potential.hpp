@@ -77,6 +77,8 @@ class Asteroid {
         void polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state);
 
         // member variables to hold the potential
+        const double G = 6.6573e-20; /**< Gravitational constant - km^3/kg/sec^2 */
+        const double sigma = 1; /**< Density - kg/km^3 */
         double U;
         Eigen::Vector3d U_grad;
         Eigen::Matrix3d U_grad_mat;

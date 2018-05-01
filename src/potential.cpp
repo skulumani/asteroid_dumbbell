@@ -190,8 +190,19 @@ void MeshParam::edge_dyad( void ) {
 }
 
 // Asteroid class
+Asteroid::Asteroid(MeshParam& mesh_param_in) {
+    mesh_param = std::make_shared<MeshParam>(mesh_param_in);
+}
+
+Asteroid::Asteroid(std::shared_ptr<MeshParam> mesh_param_in) {
+    mesh_param = mesh_param_in;
+}
+
 void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state) {
-    // TODO Compute w_face using laplacian_factor
+    Eigen::Matrix<double, Eigen::Dynamic, 3> r_v = mesh_param->V.matrix().rowwise() - state.transpose();
+
+    // Compute w_face using laplacian_factor
+     
     // TODO assert that is is close to zero (outside the body)
     // TODO Compute all the edge factors L1_edge
     // loop over the faces and face dyads
