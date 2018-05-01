@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <tuple>
+#include <memory>
 
 // Make a mesh parameter class to hold all the data computed from polyhedron parameters
 
@@ -70,6 +71,9 @@ class Asteroid {
         Asteroid ( void ) {};
         virtual ~Asteroid ( void ) {};
         
+        Asteroid( MeshParam& mesh_param);
+        Asteroid( std::shared_ptr<MeshParam> mesh_param);
+
         void polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state);
 
         // member variables to hold the potential
@@ -77,7 +81,9 @@ class Asteroid {
         Eigen::Vector3d U_grad;
         Eigen::Matrix3d U_grad_mat;
         double U_laplace;
-}
+
+        std::shared_ptr<MeshParam> mesh_param;
+};
 // declare some shit
 
 void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::MatrixXi F, 
