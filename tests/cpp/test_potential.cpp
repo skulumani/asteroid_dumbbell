@@ -69,9 +69,6 @@ class TestMeshParam: public ::testing::Test {
             /*    -1.,    -1., 0., */
             /*    0.,     -1., 0.; */
 
-            /* w_face_true << 0.03808065, 0.02361574, 0.07694205, 0.07694205, */
-            /*             0.03808065, 0.02361574, -0.20033484, -0.20033484, */
-            /*             0.03808065, 0.02361574, 0.03808065,0.02361574; */
 
             /* L1_edge_true << 0.6907257, */                    
             /*              0.38976051, */                    
@@ -135,7 +132,6 @@ class TestMeshParam: public ::testing::Test {
         MeshParam mesh_param;
         /* Eigen::Array<int, 12, 1> Fa, Fb, Fc; */
         /* Eigen::Array<double, 12, 3> e1, e2, e3; */
-        /* Eigen::Array<double, 12, 1> w_face_true; */
         /* Eigen::Array<double, 12, 1> L1_edge_true, L2_edge_true, L3_edge_true; */
     
         /* Eigen::Array<double, 1, 3> state; */
@@ -472,15 +468,21 @@ TEST_F(TestMeshParam, FaceDyad) {
     ASSERT_TRUE(mesh_param.F_face[11].isApprox(F_face_eleven));
 }
 
-/* TEST(TestPotential, LaplacianFactor) { */
-/*     Eigen::Matrix<double, 1, 3> state; */
-/*     state << 1, 0, 0; */
-/*     Eigen::Matrix<double, Eigen::Dynamic, 3> r_v; */
-/*     r_v = Ve_true.rowwise() - state; */
-/*     Eigen::Matrix<double, 12, 1> w_face; */
-/*     int flag = laplacian_factor(r_v, Fa, Fb, Fc, w_face); */
-/*     EXPECT_TRUE(w_face.isApprox(w_face_true, 1e-7)); */
-/* } */
+TEST_F(TestMeshParam, LaplacianFactor) {
+    Eigen::Matrix<double, 1, 3> state;
+    state << 1, 0, 0;
+    Eigen::Matrix<double, Eigen::Dynamic, 3> r_v;
+    r_v = mesh_param.V.rowwise() - state;
+    Eigen::Matrix<double, 12, 1> w_face;
+    w_face = laplacian_factor(r_v, mesh_param.Fa, mesh_param.Fb, mesh_param.Fc);
+
+    Eigen::Matrix<double, 12, 1> w_face_true;
+    w_face_true << 0.03808065, 0.02361574, 0.07694205, 0.07694205,
+                0.03808065, 0.02361574, -0.20033484, -0.20033484,
+                0.03808065, 0.02361574, 0.03808065,0.02361574;
+
+    EXPECT_TRUE(w_face.isApprox(w_face_true, 1e-7));
+}
 
 /* TEST_F(TestPotential, EdgeFactor) { */
 /*     Eigen::Array<double, Eigen::Dynamic, 3> r_v; */

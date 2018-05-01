@@ -231,11 +231,10 @@ void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::Matr
     std::cout << r_v << std::endl;
 }
 
-int laplacian_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& r_v,
-                     const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 1> >& Fa,
-                     const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 1> >& Fb,
-                     const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 1> >& Fc,
-                     Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > w_face) {
+Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
+                     const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fa,
+                     const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fb,
+                     const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fc) {
     // form the ri, rj, rk arrays
     Eigen::Array<double, Eigen::Dynamic, 3> ri, rj, rk, rjrk_cross;
 
@@ -277,10 +276,11 @@ int laplacian_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic,
     
     /* w_face.resize(num.rows(), 1); */
     // return by reference
+    Eigen::Matrix<double, Eigen::Dynamic, 1> w_face(Fa.rows(), 1);
     w_face = 2.0 * num.binaryExpr(den, [] (double a, double b) { return std::atan2(a,b);} );
     /* w_face = 2.0 * num.binaryExpr(den, std::ptr_fun(::atan2)); */
 
-    return 0;
+    return w_face;
     
 }
 
