@@ -470,18 +470,19 @@ TEST_F(TestMeshParam, FaceDyad) {
 
 TEST_F(TestMeshParam, LaplacianFactor) {
     Eigen::Matrix<double, 1, 3> state;
-    state << 1, 0, 0;
+    state << 1, 2, 3;
     Eigen::Matrix<double, Eigen::Dynamic, 3> r_v;
     r_v = mesh_param.V.rowwise() - state;
     Eigen::Matrix<double, 12, 1> w_face;
     w_face = laplacian_factor(r_v, mesh_param.Fa, mesh_param.Fb, mesh_param.Fc);
 
     Eigen::Matrix<double, 12, 1> w_face_true;
-    w_face_true << 0.03808065, 0.02361574, 0.07694205, 0.07694205,
-                0.03808065, 0.02361574, -0.20033484, -0.20033484,
-                0.03808065, 0.02361574, 0.03808065,0.02361574;
-
-    EXPECT_TRUE(w_face.isApprox(w_face_true, 1e-7));
+    w_face_true << 0.02362863, 0.02502464, 0.01241267, 0.01325258, -0.01641329,
+           -0.01932066, -0.00512972, -0.00553228, 0.01806088, 0.02041505,
+           -0.03174127, -0.03465722;
+    
+    std::cout << w_face.transpose() << std::endl;
+    EXPECT_TRUE(w_face.isApprox(w_face_true, 1e-4));
 }
 
 /* TEST_F(TestPotential, EdgeFactor) { */

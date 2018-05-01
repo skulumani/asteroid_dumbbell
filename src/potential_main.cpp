@@ -81,9 +81,11 @@ int main() {
      
     Asteroid ast(mesh_param);
     Eigen::Vector3d state; 
-    state << 1, 1, 1;
+    state << 1, 2, 3;
 
     ast.polyhedron_potential(state);
+    Eigen::Matrix<double, Eigen::Dynamic, 1> w_face;
+    w_face = laplacian_factor((mesh_param->V.rowwise() - state.transpose()), mesh_param->Fa, mesh_param->Fb, mesh_param->Fc);
     /* Eigen::Array<double, 1, 3> state; */
     /* state << 2, 0, 0; */
     /* Eigen::Array<double, Eigen::Dynamic, 3> r_v; */

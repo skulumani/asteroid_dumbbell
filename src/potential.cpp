@@ -5,6 +5,7 @@
 #include <igl/cross.h>
 #include <igl/slice.h>
 #include <igl/find.h>
+#include <igl/dot_row.h>
 
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
@@ -236,45 +237,32 @@ Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const
                      const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fb,
                      const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fc) {
     // form the ri, rj, rk arrays
-    Eigen::Array<double, Eigen::Dynamic, 3> ri, rj, rk, rjrk_cross;
-
-    ri.resize(Fa.rows(), 3);
-    rj.resize(Fb.rows(), 3);
-    rk.resize(Fc.rows(), 3);
-    rjrk_cross.resize(Fa.rows(), 3);
+    Eigen::MatrixXd ri(Fa.rows(), 3), rj(Fa.rows(), 3), rk(Fa.rows(), 3), rjrk_cross(Fa.rows(), 3);
     
-    Eigen::Array<double, 1, 3> ra, rb, rc;
+    igl::slice(r_v, Fa, (Eigen::Vector3d() << 0, 1, 2).finished(), ri);
+    igl::slice(r_v, Fb, (Eigen::Vector3d() << 0, 1, 2).finished(), rj);
+    igl::slice(r_v, Fc, (Eigen::Vector3d() << 0, 1, 2).finished(), rk);
+    
+    igl::cross(rj, rk, rjrk_cross);
+    
+    Eigen::Matrix<double, Eigen::Dynamic, 1> ri_norm(Fa.rows(), 1), rj_norm(Fa.rows(), 1), rk_norm(Fa.rows(), 1);
 
-    for (int ii = 0; ii < Fa.rows(); ++ii) {
-        ra = r_v.row(Fa(ii));
-        rb = r_v.row(Fb(ii));
-        rc = r_v.row(Fc(ii));
-
-        ri.row(ii) = ra;
-        rj.row(ii) = rb;
-        rk.row(ii) = rc;
-
-        rjrk_cross.row(ii) = rj.row(ii).matrix().cross(rk.row(ii).matrix());
-
-    }
-
-    Eigen::Array<double, Eigen::Dynamic, 1> ri_norm, rj_norm, rk_norm;
-    ri_norm = ri.pow(2).rowwise().sum().sqrt();
-    rj_norm = rj.pow(2).rowwise().sum().sqrt();
-    rk_norm = rk.pow(2).rowwise().sum().sqrt();
-
+    ri_norm = ri.rowwise().norm();
+    rj_norm = rj.rowwise().norm();
+    rk_norm = rk.rowwise().norm();
+    
     // dot product terms
-    Eigen::Array<double, Eigen::Dynamic, 1> rjrk_dot, rkri_dot, rirj_dot;
-    rjrk_dot = (rj * rk).rowwise().sum();
-    rkri_dot = (rk * ri).rowwise().sum();
-    rirj_dot = (ri * rj).rowwise().sum();
+    Eigen::MatrixXd rjrk_dot(Fa.rows(), 1), rkri_dot(Fa.rows(), 1), rirj_dot(Fa.rows(), 1);
 
-    // numerator and denonminator of atan2
-    Eigen::Array<double, Eigen::Dynamic, 1> num, den;
-    num = (ri * rjrk_cross).rowwise().sum();
-    den = ri_norm * rj_norm * rk_norm + ri_norm * rjrk_dot + rj_norm * rkri_dot + rk_norm * rirj_dot;
+    rjrk_dot = igl::dot_row(rj, rk);
+    rkri_dot = igl::dot_row(rk, ri);
+    rirj_dot = igl::dot_row(ri, rj);
     
-    /* w_face.resize(num.rows(), 1); */
+    // numerator and denonminator of atan2
+    Eigen::Matrix<double, Eigen::Dynamic, 1> num(Fa.rows(), 1), den(Fa.rows(), 1);
+    num = (ri.array() * rjrk_cross.array()).rowwise().sum();
+    den = ri_norm.array() * rj_norm.array() * rk_norm.array() + ri_norm.array() * rjrk_dot.array() + rj_norm.array() * rkri_dot.array() + rk_norm.array() * rirj_dot.array();
+    
     // return by reference
     Eigen::Matrix<double, Eigen::Dynamic, 1> w_face(Fa.rows(), 1);
     w_face = 2.0 * num.binaryExpr(den, [] (double a, double b) { return std::atan2(a,b);} );
