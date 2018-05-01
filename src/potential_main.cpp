@@ -80,7 +80,10 @@ int main() {
     std::shared_ptr<MeshParam> mesh_param = std::make_shared<MeshParam>(Ve_true, Fe_true);
      
     Asteroid ast(mesh_param);
+    Eigen::Vector3d state; 
+    state << 1, 1, 1;
 
+    ast.polyhedron_potential(state);
     /* Eigen::Array<double, 1, 3> state; */
     /* state << 2, 0, 0; */
     /* Eigen::Array<double, Eigen::Dynamic, 3> r_v; */

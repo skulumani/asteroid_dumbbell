@@ -471,12 +471,13 @@ TEST_F(TestMeshParam, FaceDyad) {
     ASSERT_TRUE(mesh_param.F_face[0].isApprox(F_face_zero));
     ASSERT_TRUE(mesh_param.F_face[11].isApprox(F_face_eleven));
 }
-/* TEST_F(TestPotential, LaplacianFactor) { */
-/*     /1* Eigen::Array<double, 1, 3> state; *1/ */
-/*     /1* state << 2, 0, 0; *1/ */
-/*     Eigen::Array<double, Eigen::Dynamic, 3> r_v; */
+
+/* TEST(TestPotential, LaplacianFactor) { */
+/*     Eigen::Matrix<double, 1, 3> state; */
+/*     state << 1, 0, 0; */
+/*     Eigen::Matrix<double, Eigen::Dynamic, 3> r_v; */
 /*     r_v = Ve_true.rowwise() - state; */
-/*     Eigen::Array<double, 12, 1> w_face; */
+/*     Eigen::Matrix<double, 12, 1> w_face; */
 /*     int flag = laplacian_factor(r_v, Fa, Fb, Fc, w_face); */
 /*     EXPECT_TRUE(w_face.isApprox(w_face_true, 1e-7)); */
 /* } */

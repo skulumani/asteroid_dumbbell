@@ -20,15 +20,15 @@ class MeshParam {
         MeshParam( void ) {};
         virtual ~MeshParam( void ) {};
 
-        MeshParam(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& V_in, 
-                const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 3> >& F_in);
+        MeshParam(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in, 
+                const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in);
         
         // TODO Add constructor from a MeshData object as well
         // define all the member variables
         std::size_t num_v, num_f, num_e;
 
-        Eigen::Array<double, Eigen::Dynamic, 3> V;
-        Eigen::Array<int, Eigen::Dynamic, 3> F;
+        Eigen::Matrix<double, Eigen::Dynamic, 3> V;
+        Eigen::Matrix<int, Eigen::Dynamic, 3> F;
 
         Eigen::Matrix<int, Eigen::Dynamic, 1> Fa, Fb, Fc;
         Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
@@ -92,11 +92,10 @@ void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::Matr
         Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> F_face, Eigen::Matrix<double, Eigen::Dynamic, 1> w_face);
 
 
-int laplacian_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& r_v,
-                     const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 1> >& Fa,
-                     const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 1> >& Fb,
-                     const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 1> >& Fc,
-                     Eigen::Ref<Eigen::Array<double, Eigen::Dynamic, 1> > w_face);
+Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
+                     const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fa,
+                     const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fb,
+                     const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fc);
 
 int edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& r_v, 
                 const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& e1,
