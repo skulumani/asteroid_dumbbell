@@ -189,7 +189,17 @@ void MeshParam::edge_dyad( void ) {
     }
 }
 
-
+// Asteroid class
+void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state) {
+    // TODO Compute w_face using laplacian_factor
+    // TODO assert that is is close to zero (outside the body)
+    // TODO Compute all the edge factors L1_edge
+    // loop over the faces and face dyads
+    //
+    // loop over edges and edge dyads
+    // use unique_index to slice out the edge dyads we need
+    // TODO
+}
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
 
     std::vector<std::vector<int> > vf_map(V.rows());
