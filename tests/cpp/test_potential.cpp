@@ -511,3 +511,28 @@ TEST_F(TestMeshParam, EdgeFactor) {
 
 }
 
+TEST_F(TestMeshParam, FaceContribution) {
+    Eigen::Matrix<double, 1, 3> state;
+    state << 1, 2, 3;
+
+    Eigen::Matrix<double, Eigen::Dynamic, 3> r_v;
+    r_v = mesh_param.V.rowwise() - state;
+    
+    Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v, mesh_param.Fa, mesh_param.Fb, mesh_param.Fc);
+
+    std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav = 
+        face_contribution(r_v, mesh_param.Fa, mesh_param.F_face, w_face);
+    
+    const double U_face_true = 0.3961664586681945;
+    Eigen::Matrix<double, 3, 1> U_grad_face_true;
+    U_grad_face_true << -0.03316686, -0.0425889 , -0.00429022;
+    Eigen::Matrix<double, 3, 3> U_grad_mat_face_true;
+    U_grad_mat_face_true << 0.01500324,  0.        ,  0.,
+                        0.        ,  0.00274198,  0.        ,
+                            0.        ,  0.        , -0.01774522;
+ 
+    ASSERT_NEAR(std::get<0>(face_grav), U_face_true, 1e-6);
+    EXPECT_TRUE(std::get<1>(face_grav).isApprox(U_grad_face_true, 1e-6));
+    EXPECT_TRUE(std::get<2>(face_grav).isApprox(U_grad_mat_face_true, 1e-6));
+
+}
