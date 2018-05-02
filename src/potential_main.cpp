@@ -85,7 +85,5 @@ int main() {
 
     ast.polyhedron_potential(state);
     
-    // test out the edge factor function
-    //
     return 0;
 }

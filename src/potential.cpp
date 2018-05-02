@@ -209,7 +209,9 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
     Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v, mesh_param->Fa, mesh_param->Fb, mesh_param->Fc);
 
     if (std::abs(w_face.sum()) < 1e-10) {
-        // TODO Compute all the edge factors L1_edge
+        // TODO Compute all the edge factors
+        std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all = edge_factor(r_v, mesh_param->e1, mesh_param->e2, mesh_param->e3, mesh_param->e1_vertex_map, mesh_param->e2_vertex_map, mesh_param->e3_vertex_map);
+
     } else {
     }
     // loop over the faces and face dyads
@@ -279,53 +281,51 @@ Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const
 }
 
 // This is slower than numpy
-std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> edge_factor(const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& r_v, 
-                const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& e1,
-                const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& e2,
-                const Eigen::Ref<const Eigen::Array<double, Eigen::Dynamic, 3> >& e3,
-                const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 2> >& e1_vertex_map,
-                const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 2> >& e2_vertex_map,
-                const Eigen::Ref<const Eigen::Array<int, Eigen::Dynamic, 2> >& e3_vertex_map) {
-
-            Eigen::Ref<Eigen::Array<double, Eigen::Dynam        Eigen::Array<double, Eigen::Dynamic, 3> r1i, r1j, r2i, r2j, r3i, r3j;
-        r1i.resize(e1_vertex_map.rows(), 3);
-        r1j.resize(e1_vertex_map.rows(), 3);
-
-        r2i.resize(e2_vertex_map.rows(), 3);
-        r2j.resize(e2_vertex_map.rows(), 3);
-
-        r3i.resize(e3_vertex_map.rows(), 3);
-        r3j.resize(e3_vertex_map.rows(), 3);
-        for (int ii = 0; ii < e1_vertex_map.rows(); ++ii) {
-            r1i.row(ii) = r_v.row(e1_vertex_map(ii, 0));
-            r1j.row(ii) = r_v.row(e1_vertex_map(ii, 1));
-
-            r2i.row(ii) = r_v.row(e2_vertex_map(ii, 0));
-            r2j.row(ii) = r_v.row(e2_vertex_map(ii, 1));
-
-            r3i.row(ii) = r_v.row(e3_vertex_map(ii, 0));
-            r3j.row(ii) = r_v.row(e3_vertex_map(ii, 1));
-        }
-
-        Eigen::Array<double, Eigen::Dynamic, 1> r1i_norm, r1j_norm, e1_norm;
-        r1i_norm = r1i.matrix().rowwise().norm();
-        r1j_norm = r1j.matrix().rowwise().norm();
-        e1_norm  = e1.matrix().rowwise().norm();
-        L1_edge = Eigen::log((r1i_norm + r1j_norm + e1_norm) / (r1i_norm + r1j_norm - e1_norm));
-
-        Eigen::Array<double, Eigen::Dynamic, 1> r2i_norm, r2j_norm, e2_norm;
-        r2i_norm = r2i.matrix().rowwise().norm();
-        r2j_norm = r2j.matrix().rowwise().norm();
-        e2_norm  = e2.matrix().rowwise().norm();
-        L2_edge = Eigen::log((r2i_norm + r2j_norm + e2_norm) / (r2i_norm + r2j_norm - e2_norm));
-
-        Eigen::Array<double, Eigen::Dynamic, 1> r3i_norm, r3j_norm, e3_norm;
-        r3i_norm = r3i.matrix().rowwise().norm();
-        r3j_norm = r3j.matrix().rowwise().norm();
-        e3_norm  = e3.matrix().rowwise().norm();
-        L3_edge = Eigen::log((r3i_norm + r3j_norm + e3_norm) / (r3i_norm + r3j_norm - e3_norm));
+std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> edge_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v, 
+                const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& e1,
+                const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& e2,
+                const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& e3,
+                const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& e1_vertex_map,
+                const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& e2_vertex_map,
+                const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& e3_vertex_map) {
     
-        return std::make_tuple(L1_edge, L2_edge, L3_edge);
+    const int num_f = e1_vertex_map.rows();
+
+    Eigen::MatrixXd r1i(num_f, 3), r1j(num_f, 3),
+                    r2i(num_f, 3), r2j(num_f, 3),
+                    r3i(num_f, 3), r3j(num_f, 3);
+    
+    igl::slice(r_v, e1_vertex_map.col(0), 1, r1i);
+    igl::slice(r_v, e1_vertex_map.col(1), 1, r1j);
+    
+    igl::slice(r_v, e2_vertex_map.col(0), 1, r2i);
+    igl::slice(r_v, e2_vertex_map.col(1), 1, r2j);
+
+    igl::slice(r_v, e3_vertex_map.col(0), 1, r3i);
+    igl::slice(r_v, e3_vertex_map.col(1), 1, r3j);
+    
+    Eigen::VectorXd L1_edge(num_f), L2_edge(num_f), L3_edge(num_f);
+
+    Eigen::VectorXd r1i_norm(num_f), r1j_norm(num_f), e1_norm(num_f);
+
+    r1i_norm = r1i.rowwise().norm();
+    r1j_norm = r1j.rowwise().norm();
+    e1_norm  = e1.rowwise().norm();
+    L1_edge = Eigen::log((r1i_norm.array() + r1j_norm.array() + e1_norm.array()) / (r1i_norm.array() + r1j_norm.array() - e1_norm.array()));
+
+    Eigen::Matrix<double, Eigen::Dynamic, 1> r2i_norm(num_f), r2j_norm(num_f), e2_norm(num_f);
+    r2i_norm = r2i.rowwise().norm();
+    r2j_norm = r2j.rowwise().norm();
+    e2_norm  = e2.rowwise().norm();
+    L2_edge = Eigen::log((r2i_norm.array() + r2j_norm.array() + e2_norm.array()) / (r2i_norm.array() + r2j_norm.array() - e2_norm.array()));
+
+    Eigen::Matrix<double, Eigen::Dynamic, 1> r3i_norm(num_f), r3j_norm(num_f), e3_norm(num_f);
+    r3i_norm = r3i.matrix().rowwise().norm();
+    r3j_norm = r3j.matrix().rowwise().norm();
+    e3_norm  = e3.matrix().rowwise().norm();
+    L3_edge = Eigen::log((r3i_norm.array() + r3j_norm.array() + e3_norm.array()) / (r3i_norm.array() + r3j_norm.array() - e3_norm.array()));
+
+    return std::make_tuple(L1_edge, L2_edge, L3_edge);
 }
 
 std::tuple<Eigen::VectorXi, Eigen::VectorXi> search_index(const Eigen::Ref<const Eigen::VectorXi>& a, const Eigen::Ref<const Eigen::VectorXi>& b) {
