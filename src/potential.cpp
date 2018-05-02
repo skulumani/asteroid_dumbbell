@@ -207,6 +207,12 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
     
     // Compute w_face using laplacian_factor
     Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v, mesh_param->Fa, mesh_param->Fb, mesh_param->Fc);
+    
+    // Total potential variables
+    double U;
+    Eigen::Matrix<double, 3, 1> U_grad;
+    Eigen::Matrix<double, 3, 3> U_grad_mat;
+    double Ulaplace;
 
     if (std::abs(w_face.sum()) < 1e-10) {
         std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all =
@@ -221,10 +227,22 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
         std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_grav = edge_contribution(r_v, mesh_param->e_vertex_map, mesh_param->unique_index,
                 mesh_param->E1_edge, mesh_param->E2_edge, mesh_param->E3_edge,
                 L_all);
+        
+        // combine them both
+        U = 1.0 / 2.0 * G * sigma * (std::get<0>(edge_grav) - std::get<0>(face_grav));
+        U_grad = G * sigma * (-std::get<1>(edge_grav) + std::get<1>(face_grav));
+        U_grad_mat = G * sigma * (std::get<2>(edge_grav) - std::get<2>(face_grav));
+        Ulaplace = -G * sigma * w_face.sum();
 
     } else {
-        // set everything to zero
+        std::cout << "inside body" << std::endl;
+        U = 0;
+        U_grad.setZero();
+        U_grad_mat.setZero();
+        Ulaplace = 0;
     }
+
+    std::cout << U << std::endl;
 }
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
 
