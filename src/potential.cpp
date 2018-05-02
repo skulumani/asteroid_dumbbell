@@ -216,16 +216,15 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
             
             // face contribution
         std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav = face_contribution(r_v, mesh_param->Fa, mesh_param->F_face, w_face);
+        
+        // edge contribution
+        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_grav = edge_contribution(r_v, mesh_param->e_vertex_map, mesh_param->unique_index,
+                mesh_param->E1_edge, mesh_param->E2_edge, mesh_param->E3_edge,
+                L_all);
 
-            // edge contribution
     } else {
         // set everything to zero
     }
-    // loop over the faces and face dyads
-    //
-    // loop over edges and edge dyads
-    // use unique_index to slice out the edge dyads we need
-    // TODO
 }
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
 
@@ -264,6 +263,44 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > fa
     }
     
     return std::make_tuple(U_face, U_grad_face, U_grad_mat_face);
+}
+
+std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
+        const Eigen::Ref<const Eigen::MatrixXi>& e_vertex_map,
+        const Eigen::Ref<const Eigen::MatrixXi>& unique_index,
+        const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E1_edge,
+        const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E2_edge,
+        const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E3_edge,
+        const std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd>& L_tuple) {
+    // edge contribution
+    // combine all the Ei and Li into big vectors then pick out the unique ones
+    std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > > E_all;
+    E_all = E1_edge;
+    E_all.insert(E_all.end(), E2_edge.begin(), E2_edge.end());
+    E_all.insert(E_all.end(), E3_edge.begin(), E3_edge.end());
+    
+    Eigen::VectorXd L_all(E_all.size());
+    L_all << std::get<0>(L_tuple), std::get<1>(L_tuple), std::get<2>(L_tuple);
+        
+    Eigen::Matrix<double, Eigen::Dynamic, 3> re(e_vertex_map.rows(), 3);
+    igl::slice(r_v, e_vertex_map.col(0), 1, re);
+
+    double U_edge = 0;
+    Eigen::Matrix<double, 3, 1> U_grad_edge;
+    U_grad_edge.setZero();
+    Eigen::Matrix<double, 3, 3> U_grad_mat_edge;
+    U_grad_mat_edge.setZero();
+    
+    int index = unique_index(0, 0);
+    // loop over the unique edges now
+    for (int ii = 0; ii < unique_index.size(); ++ii) {
+        index = unique_index(ii,0);
+        U_edge = U_edge + (re.row(ii) * E_all[index] * re.row(ii).transpose() * L_all( index )).value();
+        U_grad_edge = U_grad_edge + E_all[index] * re.row(ii).transpose() * L_all(index);
+        U_grad_mat_edge = U_grad_mat_edge + E_all[index] * L_all(index);
+    }
+    
+    return std::make_tuple(U_edge, U_grad_edge, U_grad_mat_edge);
 }
 
 Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,

@@ -536,3 +536,32 @@ TEST_F(TestMeshParam, FaceContribution) {
     EXPECT_TRUE(std::get<2>(face_grav).isApprox(U_grad_mat_face_true, 1e-6));
 
 }
+
+TEST_F(TestMeshParam, EdgeContribution) {
+    Eigen::Matrix<double, 1, 3> state;
+    state << 1, 2, 3;
+
+    Eigen::Matrix<double, Eigen::Dynamic, 3> r_v;
+    r_v = mesh_param.V.rowwise() - state;
+    
+    std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all = 
+        edge_factor(r_v, mesh_param.e1, mesh_param.e2, mesh_param.e3,
+                mesh_param.e1_vertex_map, mesh_param.e2_vertex_map, mesh_param.e3_vertex_map);
+
+    std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_grav = 
+        edge_contribution(r_v, mesh_param.e_vertex_map, mesh_param.unique_index,
+                mesh_param.E1_edge, mesh_param.E2_edge, mesh_param.E3_edge,
+                L_all);
+
+    const double U_edge_true = 0.9306988514415746;
+    Eigen::Matrix<double, 3, 1> U_grad_edge_true;
+    U_grad_edge_true << -0.01408135, -0.00441122,  0.05299148;
+    Eigen::Matrix<double, 3, 3> U_grad_mat_edge_true;
+    U_grad_mat_edge_true << 0.        , 0.00817342, 0.01226954,
+        0.00817342, 0.        , 0.02455199,
+        0.01226954, 0.02455199, 0.;
+    
+    ASSERT_NEAR(std::get<0>(edge_grav), U_edge_true, 1e-6);
+    EXPECT_TRUE(std::get<1>(edge_grav).isApprox(U_grad_edge_true, 1e-6));
+    EXPECT_TRUE(std::get<2>(edge_grav).isApprox(U_grad_mat_edge_true, 1e-6));
+}
