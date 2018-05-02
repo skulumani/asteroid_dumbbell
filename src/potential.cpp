@@ -215,7 +215,8 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
                     mesh_param->e3_vertex_map);
             
             // face contribution
-            //
+            face_contribution(r_v, mesh_param->Fa, mesh_param->F_face, w_face);
+
             // edge contribution
     } else {
         // set everything to zero
@@ -240,9 +241,27 @@ std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::Mat
 }
 
 // Start of polyhedron potential function code 
-void face_contribution(const Eigen::Ref<) {
+void face_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
+        const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fa,
+        const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& F_face,
+        const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> >& w_face) {
     
-    std::cout << r_v << std::endl;
+    const int num_f = Fa.rows();
+
+    Eigen::Matrix<double, Eigen::Dynamic, 3> ra(num_f, 3);
+    igl::slice(r_v, Fa, 1, ra);
+    // find ra dot with F_face
+    double U_face = 0;
+    Eigen::Matrix<double, 3, 1> U_grad_face(3);
+    U_grad_face.setZero();
+    Eigen::Matrix<double, 3, 3> U_grad_mat_face(3, 3);
+    U_grad_mat_face.setZero();
+    
+    for (int ii = 0; ii < num_f; ++ii) {
+        U_face = U_face + (ra.row(ii) * F_face[ii] * ra.row(ii).transpose() * w_face(ii)).value(); 
+    }
+
+    std::cout << U_face << std::endl;
 }
 
 Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
