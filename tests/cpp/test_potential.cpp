@@ -481,19 +481,33 @@ TEST_F(TestMeshParam, LaplacianFactor) {
            -0.01932066, -0.00512972, -0.00553228, 0.01806088, 0.02041505,
            -0.03174127, -0.03465722;
     
-    std::cout << w_face.transpose() << std::endl;
     EXPECT_TRUE(w_face.isApprox(w_face_true, 1e-4));
 }
 
-/* TEST_F(TestPotential, EdgeFactor) { */
-/*     Eigen::Array<double, Eigen::Dynamic, 3> r_v; */
-/*     r_v = Ve_true.rowwise() - state; */
-/*     Eigen::Array<double, 12, 1> L1_edge, L2_edge, L3_edge; */
-/*     int flag = edge_factor(r_v, e1, e2, e3, e1_vertex_map, e2_vertex_map, e3_vertex_map, */
-/*             L1_edge, L2_edge, L3_edge); */
+TEST_F(TestMeshParam, EdgeFactor) {
+    Eigen::Matrix<double, 1, 3> state;
+    state << 1, 2, 3;
+    Eigen::Matrix<double, Eigen::Dynamic, 3> r_v;
+    r_v = mesh_param.V.rowwise() - state;
     
-/*     EXPECT_TRUE(L1_edge.isApprox(L1_edge_true, 1e-7)); */
-/*     EXPECT_TRUE(L2_edge.isApprox(L2_edge_true, 1e-7)); */
-/*     EXPECT_TRUE(L3_edge.isApprox(L3_edge_true, 1e-7)); */
-/* } */
+    Eigen::VectorXd L1_edge(12), L2_edge(12), L3_edge(12);
+    
+    L1_edge << 0.340128, 0.232309, 0.365049, 0.239351, 0.406668, 0.273002,
+            0.24601, 0.393069, 0.226047, 0.351654, 0.271514, 0.422191 ;
+    L2_edge << 0.24601034,  0.25345162,  0.27300207,  0.28279655,  0.29632716,
+            0.32347065,  0.29632716,  0.30876708,  0.25450247,  0.27151446,
+            0.30876708,  0.32347065;
+    L3_edge << 0.22604741, 0.34012791, 0.23230936, 0.3650486, 0.25345162,
+            0.40666794, 0.39306872, 0.25450247, 0.35165377, 0.23935081,
+            0.42219138, 0.28279655;
+ 
+    std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all = edge_factor(r_v,
+            mesh_param.e1, mesh_param.e2, mesh_param.e3,
+            mesh_param.e1_vertex_map, mesh_param.e2_vertex_map, mesh_param.e3_vertex_map);
+    
+    EXPECT_TRUE(std::get<0>(L_all).isApprox(L1_edge, 1e-5));
+    EXPECT_TRUE(std::get<1>(L_all).isApprox(L2_edge, 1e-5));
+    EXPECT_TRUE(std::get<2>(L_all).isApprox(L3_edge, 1e-5));
+
+}
 
