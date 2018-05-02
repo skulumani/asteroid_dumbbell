@@ -209,10 +209,16 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
     Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v, mesh_param->Fa, mesh_param->Fb, mesh_param->Fc);
 
     if (std::abs(w_face.sum()) < 1e-10) {
-        // TODO Compute all the edge factors
-        std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all = edge_factor(r_v, mesh_param->e1, mesh_param->e2, mesh_param->e3, mesh_param->e1_vertex_map, mesh_param->e2_vertex_map, mesh_param->e3_vertex_map);
-
+        std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all =
+            edge_factor(r_v, mesh_param->e1, mesh_param->e2, mesh_param->e3,
+                    mesh_param->e1_vertex_map, mesh_param->e2_vertex_map,
+                    mesh_param->e3_vertex_map);
+            
+            // face contribution
+            //
+            // edge contribution
     } else {
+        // set everything to zero
     }
     // loop over the faces and face dyads
     //
@@ -234,8 +240,7 @@ std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::Mat
 }
 
 // Start of polyhedron potential function code 
-void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::MatrixXi F, 
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> F_face, Eigen::Matrix<double, Eigen::Dynamic, 1> w_face) {
+void face_contribution(const Eigen::Ref<) {
     
     std::cout << r_v << std::endl;
 }

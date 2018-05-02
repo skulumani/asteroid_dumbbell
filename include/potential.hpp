@@ -88,8 +88,10 @@ class Asteroid {
 };
 // declare some shit
 
-void face_contribution_loop(Eigen::Vector3d r_v,  Eigen::MatrixXd V, Eigen::MatrixXi F, 
-        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> F_face, Eigen::Matrix<double, Eigen::Dynamic, 1> w_face);
+void face_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
+        const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fa,
+        const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& F_face,
+        const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> >& w_face);
 
 
 Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
