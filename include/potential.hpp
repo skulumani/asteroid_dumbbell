@@ -1,5 +1,13 @@
+/**
+    Polyhedron Potential model for an asteroid
+
+    @author Shankar Kulumani
+    @version 3 May 2018
+*/
 #ifndef POTENTIAL_H
 #define POTENTIAL_H
+
+#include "mesh.hpp"
 
 #include <Eigen/Dense>
 #include <Eigen/StdVector>
@@ -8,8 +16,17 @@
 #include <tuple>
 #include <memory>
 
-// Make a mesh parameter class to hold all the data computed from polyhedron parameters
+/** @class MeshParam
 
+    @brief Asteroid parameters required for the polyhedron potential function
+    
+    This class computes and contains all the parameters required by the 
+    polyhedron potential function. It precomputes lots of data that is then used
+    in Asteroid class.
+
+    @author Shankar Kulumani
+    @version 3 May 2018
+*/
 class MeshParam {
     private:
         void polyhedron_parameters( void );
@@ -23,7 +40,8 @@ class MeshParam {
         MeshParam(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in, 
                 const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in);
         
-        // TODO Add constructor from a MeshData object as well
+        MeshParam( std::shared_ptr<MeshData> mesh_in);
+
         // define all the member variables
         std::size_t num_v, num_f, num_e;
 

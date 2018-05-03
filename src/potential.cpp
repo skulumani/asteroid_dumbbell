@@ -1,4 +1,5 @@
 #include "potential.hpp"
+#include "mesh.hpp"
 
 #include <igl/sort.h>
 #include <igl/unique_rows.h>
@@ -18,11 +19,20 @@
 #include <cassert>
 #include <cmath>
 
-// MeshParam member functions
+// ***************** MeshParam ***************************************
+// Constructors
 MeshParam::MeshParam(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
                      const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in) {
     V = V_in;
     F = F_in;
+    polyhedron_parameters();
+    face_dyad();
+    edge_dyad();
+}
+
+MeshParam::MeshParam(std::shared_ptr<MeshData> mesh_in) {
+    V = mesh_in->get_verts();
+    F = mesh_in->get_faces();
     polyhedron_parameters();
     face_dyad();
     edge_dyad();
