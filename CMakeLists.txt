@@ -197,9 +197,9 @@ target_link_libraries(explore cgal_cpp input_parser_cpp eigen_hdf5
 ################################################################################
 # PYTHON BINDING
 ################################################################################
-pybind11_add_module(polyhedron_potential MODULE
+pybind11_add_module(asteroid MODULE
 src/potential.cpp src/potential_bindings.cpp)
-target_link_libraries(polyhedron_potential PRIVATE igl::core)
+target_link_libraries(asteroid PRIVATE igl::core)
 
 pybind11_add_module(surface_mesh MODULE
 src/surface_mesher.cpp src/surface_mesh_bindings.cpp)

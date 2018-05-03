@@ -30,8 +30,31 @@
 */
 class MeshParam {
     private:
+        /** @fn void polyhedron_parameters( void )
+                
+            Compute all the polyhedron parameters
+
+            @author Shankar Kulumani
+            @version 3 May 2018
+        */
         void polyhedron_parameters( void );
+
+        /** @fn void face_dyad( void )
+                
+            Compute the face dyad F_face
+
+            @author Shankar Kulumani
+            @version 3 May 2018
+        */
         void face_dyad( void );
+
+        /** @fn void edge_dyad( void )
+                
+            Compute the edge dyad E_edge
+
+            @author Shankar Kulumani
+            @version 3 May 2018
+        */
         void edge_dyad( void );
 
     public:
@@ -110,7 +133,17 @@ class Asteroid {
         
         Asteroid(const std::string& name_in, MeshParam& mesh_param);
         Asteroid(const std::string& name_in, std::shared_ptr<MeshParam> mesh_param);
+    
+        /** @fn void polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state)
+                
+            Compute the polyhedron potential at the given state
 
+            @param state Eigen Vector3d defining the state in the asteroid body fixed frame in km
+            @returns None
+
+            @author Shankar Kulumani
+            @version 3 May 2018
+        */
         void polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state);
 
         // Getters for the potential variables
