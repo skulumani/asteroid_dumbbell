@@ -18,7 +18,7 @@ import pytest
 from point_cloud import wavefront
 cgal = pytest.importorskip('lib.cgal')
 mesh_data = pytest.importorskip('lib.mesh_data')
-polyhedron_potential = pytest.importorskip('lib.polyhedron_potential')
+asteroid = pytest.importorskip('lib.asteroid')
 surface_mesh = pytest.importorskip('lib.surface_mesh')
 reconstruct = pytest.importorskip('lib.reconstruct')
 geodesic = pytest.importorskip('lib.geodesic')
@@ -137,3 +137,17 @@ class TestGeodesic:
         csigma = geodesic.central_angle(self.pt, self.v)
         psigma = wavefront.spherical_distance(self.pt, self.v)
         np.testing.assert_allclose(csigma, psigma)
+
+class TestAsteroid:
+    v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj')
+    state = np.array([1, 2, 3])
+
+    def test_mesh_param(self):
+        mesh_param = asteroid.MeshParam(self.v, self.f);
+        np.testing.assert_allclose(1, 1);
+
+    def test_asteroid_potential(self):
+        mesh_param = asteroid.MeshParam(self.v, self.f);
+        ast = asteroid.Asteroid('castalia', mesh_param)
+        ast.polyhedron_potential(self.state)
+        np.testing.assert_allclose(ast.get_potential(), 2.4923324e-08, 1e-4)
