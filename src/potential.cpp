@@ -221,24 +221,24 @@ void Asteroid::init_asteroid( void ) {
     const double kPI = 3.141592653589793;
 
     // construct some of the data for the asteroid
-    if (name.compare("castalia")) {
+    if (name.compare("castalia") == 0) {
         sigma = 2.1;
         axes << 1.6130, 0.9810, 0.8260;
         axes = axes.array() / 2.0;
         omega = 2 * kPI / 4.07 / 3600.0;
         M = 1.4091e12;
-    } else if (name.compare("itokawa")) {
+    } else if (name.compare("itokawa") == 0) {
         M = 3.51e10;
         sigma = 1.9;
         axes << 535, 294, 209;
         axes = axes.array() / 2.0 / 1.0e3;
         omega = 2 * kPI / 12.132 / 3600.0;
-    } else if (name.compare("eros")) {
+    } else if (name.compare("eros") == 0) {
         M = 4.463e-4 / G;
         sigma = 2.67;
         axes << 34.4, 11.7, 11.7;
         omega = 2 * kPI / 5.27 / 3600;
-    } else if (name.compare("cube")) {
+    } else if (name.compare("cube") == 0) {
         M = 1;
         sigma = 1;
         axes << 1, 1, 1;
@@ -279,7 +279,6 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
         Ulaplace = -G * sigma * w_face.sum();
 
     } else {
-        std::cout << "inside body" << std::endl;
         U = 0;
         U_grad.setZero();
         U_grad_mat.setZero();

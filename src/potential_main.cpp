@@ -84,7 +84,8 @@ int main() {
     state << 1, 2, 3;
 
     ast.polyhedron_potential(state);
-    
-    std::cout << ast.get_potential() << std::endl;
+    std::cout << "U : " << ast.get_potential() << std::endl; 
+    std::cout << "U_grad : " << ast.get_acceleration() << std::endl;
+    std::cout << "U_grad_mat : " << ast.get_gradient_mat() << std::endl;
     return 0;
 }
