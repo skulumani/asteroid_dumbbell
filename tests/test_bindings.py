@@ -151,3 +151,23 @@ class TestAsteroid:
         ast = asteroid.Asteroid('castalia', mesh_param)
         ast.polyhedron_potential(self.state)
         np.testing.assert_allclose(ast.get_potential(), 2.4923324e-08, 1e-4)
+
+    def test_ensure_asteroid_potential_matching(self):
+        # some random numbers for the state
+        from dynamics import asteroid as asteroid_python
+
+        ast_python = asteroid_python.Asteroid('castalia', 0, 'obj')
+
+        mesh_param = asteroid.MeshParam(self.v, self.f)
+        ast_cpp = asteroid.Asteroid('castalia', mesh_param)
+    
+        for ii in range(10):
+            x = np.random.rand()
+            state = np.array([x, 1, 1])
+
+            Up, _ , _ ,_ = ast_python.polyhedron_potential(state)
+            ast_cpp.polyhedron_potential(state)
+
+            np.testing.assert_allclose(ast_cpp.get_potential(), Up, 1e-6)
+
+
