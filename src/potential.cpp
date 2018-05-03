@@ -18,6 +18,8 @@
 #include <tuple>
 #include <cassert>
 #include <cmath>
+#include <string>
+#include <stdexcept>
 
 // ***************** MeshParam ***************************************
 // Constructors
@@ -202,13 +204,51 @@ void MeshParam::edge_dyad( void ) {
     }
 }
 
-// Asteroid class
-Asteroid::Asteroid(MeshParam& mesh_param_in) {
+// ************************ Asteroid class ************************************
+Asteroid::Asteroid(const std::string& name_in, MeshParam& mesh_param_in) {
     mesh_param = std::make_shared<MeshParam>(mesh_param_in);
+    name = name_in;
+    init_asteroid();
 }
 
-Asteroid::Asteroid(std::shared_ptr<MeshParam> mesh_param_in) {
+Asteroid::Asteroid(const std::string& name_in, std::shared_ptr<MeshParam> mesh_param_in) {
     mesh_param = mesh_param_in;
+    name = name_in;
+    init_asteroid();
+}
+
+void Asteroid::init_asteroid( void ) {
+    const double kPI = 3.141592653589793;
+
+    // construct some of the data for the asteroid
+    if (name.compare("castalia")) {
+        sigma = 2.1;
+        axes << 1.6130, 0.9810, 0.8260;
+        axes = axes.array() / 2.0;
+        omega = 2 * kPI / 4.07 / 3600.0;
+        M = 1.4091e12;
+    } else if (name.compare("itokawa")) {
+        M = 3.51e10;
+        sigma = 1.9;
+        axes << 535, 294, 209;
+        axes = axes.array() / 2.0 / 1.0e3;
+        omega = 2 * kPI / 12.132 / 3600.0;
+    } else if (name.compare("eros")) {
+        M = 4.463e-4 / G;
+        sigma = 2.67;
+        axes << 34.4, 11.7, 11.7;
+        omega = 2 * kPI / 5.27 / 3600;
+    } else if (name.compare("cube")) {
+        M = 1;
+        sigma = 1;
+        axes << 1, 1, 1;
+        omega = 1;
+    } else {
+        throw std::invalid_argument( "Invalid asteroid name" );
+    }
+    
+    // convert density to kg/km^3
+    sigma = sigma / 1000.0 * pow(100.0, 3) * pow(1000.0, 3);
 }
 
 void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state) {
@@ -218,12 +258,6 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
     // Compute w_face using laplacian_factor
     Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v, mesh_param->Fa, mesh_param->Fb, mesh_param->Fc);
     
-    // Total potential variables
-    double U;
-    Eigen::Matrix<double, 3, 1> U_grad;
-    Eigen::Matrix<double, 3, 3> U_grad_mat;
-    double Ulaplace;
-
     if (std::abs(w_face.sum()) < 1e-10) {
         std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all =
             edge_factor(r_v, mesh_param->e1, mesh_param->e2, mesh_param->e3,
@@ -252,8 +286,8 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
         Ulaplace = 0;
     }
 
-    std::cout << U << std::endl;
 }
+
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
 
     std::vector<std::vector<int> > vf_map(V.rows());

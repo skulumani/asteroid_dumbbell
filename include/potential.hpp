@@ -15,6 +15,7 @@
 #include <vector>
 #include <tuple>
 #include <memory>
+#include <string>
 
 /** @class MeshParam
 
@@ -85,24 +86,38 @@ class MeshParam {
 };
 
 class Asteroid {
+    private: 
+        // member variables to hold the potential
+        const double G = 6.673e-20; /**< Gravitational constant - km^3/kg/sec^2 */
+        double sigma; /**< Density - kg/km^3 */
+        std::string name; /**< Asteroid name - string */
+        double M; /**< Mass - kg */
+        Eigen::Vector3d axes; /**< Semi-major axes - km */
+        double omega; /**< Rotation rate - rad/sec */
+
+        std::shared_ptr<MeshParam> mesh_param;
+
+        double U; 
+        Eigen::Vector3d U_grad;
+        Eigen::Matrix3d U_grad_mat;
+        double Ulaplace;
+
+        void init_asteroid( void );
+
     public:
         Asteroid ( void ) {};
         virtual ~Asteroid ( void ) {};
         
-        Asteroid( MeshParam& mesh_param);
-        Asteroid( std::shared_ptr<MeshParam> mesh_param);
+        Asteroid(const std::string& name_in, MeshParam& mesh_param);
+        Asteroid(const std::string& name_in, std::shared_ptr<MeshParam> mesh_param);
 
         void polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state);
 
-        // member variables to hold the potential
-        const double G = 6.673e-20; /**< Gravitational constant - km^3/kg/sec^2 */
-        const double sigma = 1 / 1000.0 * pow(100.0, 3) * pow(1000.0, 3); /**< Density - kg/km^3 */
-        /* double U; */
-        /* Eigen::Vector3d U_grad; */
-        /* Eigen::Matrix3d U_grad_mat; */
-        /* double U_laplace; */
-
-        std::shared_ptr<MeshParam> mesh_param;
+        // Getters for the potential variables
+        double get_potential( void ) { return U; }
+        Eigen::Vector3d get_acceleration( void ) { return U_grad; }
+        Eigen::Matrix3d get_gradient_mat( void ) { return U_grad_mat; }
+        double get_laplace( void ) { return Ulaplace; }
 };
 // declare some shit
 

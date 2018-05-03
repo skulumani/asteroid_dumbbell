@@ -79,11 +79,12 @@ int main() {
 
     std::shared_ptr<MeshParam> mesh_param = std::make_shared<MeshParam>(Ve_true, Fe_true);
      
-    Asteroid ast(mesh_param);
+    Asteroid ast("cube", mesh_param);
     Eigen::Vector3d state; 
     state << 1, 2, 3;
 
     ast.polyhedron_potential(state);
     
+    std::cout << ast.get_potential() << std::endl;
     return 0;
 }
