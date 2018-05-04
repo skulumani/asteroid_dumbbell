@@ -156,6 +156,38 @@ void TranslationController::minimize_uncertainty(std::shared_ptr<const State> st
     macceld.setZero(3);
 }
 
+void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+        std::shared_ptr<const ReconstructMesh> rmesh) {
+    
+    double max_weight = rmesh->get_weights().maxCoeff();
+    double max_sigma = kPI;
+
+    double alpha(0.5); /**< Weighting factor between distance and ucnertainty */
+    
+    Eigen::Vector3d pos(3);
+    pos(0) = state(0);
+    pos(1) = state(1);
+    pos(2) = state(2);
+
+    // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex
+    Eigen::VectorXd sigma = central_angle(pos.normalized(), rmesh->get_verts().rowwise().normalized());
+    Eigen::VectorXd cost = - (1 - alpha) *rmesh->get_weights().array()/max_weight + alpha * sigma.array()/max_sigma ;
+    // now find min index of cost
+    Eigen::MatrixXd::Index min_cost_index;
+    cost.minCoeff(&min_cost_index);
+
+    Eigen::RowVector3d des_vector;
+
+    des_vector = rmesh->get_verts().row(min_cost_index);
+    // pick out the corresponding vertex of the asteroid that should be viewed
+    // use current norm of position and output a position with same radius but just above the minium point
+    double current_radius = pos.norm();
+
+    mposd = des_vector.normalized() * current_radius;
+    mveld.setZero(3);
+    macceld.setZero(3);
+}
+
 Eigen::Matrix<double, 3, 1> TranslationController::get_posd( void ) const {
     return mposd;
 }

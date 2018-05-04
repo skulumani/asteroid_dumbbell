@@ -80,6 +80,8 @@ class TranslationController {
         */
         void minimize_uncertainty(std::shared_ptr<const State> state,
                                   std::shared_ptr<const ReconstructMesh> rmesh);
+        void minimize_uncertainty(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+                                  std::shared_ptr<const ReconstructMesh> rmesh);
 
         Eigen::Matrix<double, 3, 1> get_posd( void ) const;
         Eigen::Matrix<double, 3, 1> get_veld( void ) const;

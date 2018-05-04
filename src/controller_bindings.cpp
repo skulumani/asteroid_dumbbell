@@ -5,6 +5,7 @@
     @version 4 May 2018
 */
 #include "controller.hpp"
+#include "reconstruct.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
@@ -28,5 +29,11 @@ PYBIND11_MODULE(controller, m) {
                         const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >&,
                         const Eigen::Ref<const Eigen::Matrix<double, 1, 3> >&)) &TranslationController::inertial_fixed_state,
                 "Inertially fixed state")
-        .def("get_posd", &TranslationController::get_posd, "Get the desired position");
+        .def("get_posd", &TranslationController::get_posd, "Get the desired position")
+        .def("get_veld", &TranslationController::get_veld, "Get the desired velocity")
+        .def("get_acceld", &TranslationController::get_acceld, "Get the desired acceleration")
+        .def("minimize_uncertainty", (void (TranslationController::*)(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >&,
+                        std::shared_ptr<const ReconstructMesh>)) &TranslationController::minimize_uncertainty,
+                "Find position to minimize uncertainty",
+                pybind11::arg("state"), pybind11::arg("rmesh shared_ptr"));
 }

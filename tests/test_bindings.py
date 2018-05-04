@@ -200,4 +200,16 @@ class TestController:
         np.testing.assert_allclose(att_cont.get_Rd_dot(), Rd_dot)
         np.testing.assert_allclose(att_cont.get_ang_vel_d(), ang_vel_d)
         np.testing.assert_allclose(att_cont.get_ang_vel_d_dot(), ang_vel_d_dot)
-        
+    
+    def test_translation_controller_minimum_uncertainty(self):
+        v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj') 
+        # create a mesh
+        mesh = mesh_data.MeshData(v, f)
+        rmesh = reconstruct.ReconstructMesh(mesh)
+
+        tran_cont = controller.TranslationController()
+        tran_cont.minimize_uncertainty(self.state, rmesh)
+
+        np.testing.assert_allclose(tran_cont.get_posd().shape, (3,)) 
+        np.testing.assert_allclose(tran_cont.get_veld(), np.zeros(3))
+        np.testing.assert_allclose(tran_cont.get_acceld(), np.zeros(3))
