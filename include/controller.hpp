@@ -62,7 +62,9 @@ class TranslationController {
         virtual ~TranslationController( void ) {};
         
         void inertial_fixed_state(std::shared_ptr<const State> des_state);
-    
+        void inertial_fixed_state(const double& time, 
+                const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_in,
+                const Eigen::Ref<const Eigen::Matrix<double, 1, 3> >& des_pos);
         /** @fn Compute desired translation state to minimize uncertainty
                 
             Given the current state and the reconstructed mesh this will

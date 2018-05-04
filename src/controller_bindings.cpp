@@ -22,4 +22,11 @@ PYBIND11_MODULE(controller, m) {
         .def("get_ang_vel_d", &AttitudeController::get_ang_vel_d, "Get the angular velocity")
         .def("get_ang_vel_d_dot", &AttitudeController::get_ang_vel_d, "Get the angular velocity derivative");
 
+    pybind11::class_<TranslationController, std::shared_ptr<TranslationController>>(m, "TranslationController")
+        .def(pybind11::init<>(), "Translation Controller constructor")
+        .def("inertial_fixed_state", (void (TranslationController::*)(const double&,
+                        const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >&,
+                        const Eigen::Ref<const Eigen::Matrix<double, 1, 3> >&)) &TranslationController::inertial_fixed_state,
+                "Inertially fixed state")
+        .def("get_posd", &TranslationController::get_posd, "Get the desired position");
 }

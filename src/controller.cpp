@@ -120,6 +120,16 @@ void TranslationController::inertial_fixed_state(std::shared_ptr<const State> de
     macceld.setZero(3);
 }
 
+void TranslationController::inertial_fixed_state(const double& time,
+        const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_in,
+        const Eigen::Ref<const Eigen::Matrix<double, 1, 3> >& des_pos) {
+    
+    mposd = des_pos.transpose();
+    mveld.setZero(3);
+    macceld.setZero(3);
+
+}
+
 void TranslationController::minimize_uncertainty(std::shared_ptr<const State> state,
                                                  std::shared_ptr<const ReconstructMesh> rmesh) {
     
