@@ -36,4 +36,8 @@ PYBIND11_MODULE(controller, m) {
                         std::shared_ptr<const ReconstructMesh>)) &TranslationController::minimize_uncertainty,
                 "Find position to minimize uncertainty",
                 pybind11::arg("state"), pybind11::arg("rmesh shared_ptr"));
+
+    pybind11::class_<Controller, AttitudeController, TranslationController, std::shared_ptr<Controller>>(m, "Controller")
+        .def(pybind11::init<>(), "Combinded controller constructor");
+        
 }
