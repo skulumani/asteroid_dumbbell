@@ -225,6 +225,8 @@ pybind11_add_module(reconstruct MODULE
 pybind11_add_module(geodesic MODULE
    src/geodesic.cpp src/geodesic_bindings.cpp)
 
+pybind11_add_module(controller MODULE
+    src/controller.cpp src/controller_bindings.cpp)
 ################################################################################
 # Testing example
 ################################################################################

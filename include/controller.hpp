@@ -14,9 +14,33 @@ class AttitudeController {
     public:
         AttitudeController( void );
         virtual ~AttitudeController( void ) {};
-    
+        
+        /** @fn void body_fixed_pointing_attitude(std::shared_ptr<const State> state_in)
+                
+            Find desired attitude states to point at the body
+
+            @param state_in State shared pointer
+            @returns None
+
+            @author Shankar Kulumani
+            @version 4 May 2018
+        */
         void body_fixed_pointing_attitude(std::shared_ptr<const State> state_in);
         
+        /** @fn void body_fixed_pointing_attitude(const double& time, const Eigen::Ref<const Eigen::VectorXd>& state_in)
+                
+            Overload to find attitude states to point at body
+
+            @param time Current simulation time
+            @param state_in 1x18 vector for the current state
+            @returns None
+
+            @author Shankar Kulumani
+            @version 4 May 2018
+        */
+        void body_fixed_pointing_attitude(const double& time, 
+                const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_in);
+
         // getters for the desired attitude state
         Eigen::Matrix<double, 3, 3> get_Rd() const;
         Eigen::Matrix<double, 3, 3> get_Rd_dot() const;
@@ -24,10 +48,10 @@ class AttitudeController {
         Eigen::Matrix<double, 3, 1> get_ang_vel_d_dot() const;
 
     protected:
-        Eigen::Matrix<double, 3, 3> mRd;
-        Eigen::Matrix<double, 3, 3> mRd_dot;
-        Eigen::Matrix<double, 3, 1> mang_vel_d;
-        Eigen::Matrix<double, 3, 1> mang_vel_d_dot;
+        Eigen::Matrix<double, 3, 3> mRd; /**< Desired rotation matrix - body to inertial frame */
+        Eigen::Matrix<double, 3, 3> mRd_dot; /**< Desired rotation matrix derivative - body to inertial frame */
+        Eigen::Matrix<double, 3, 1> mang_vel_d; /**< Desired angular velocity */
+        Eigen::Matrix<double, 3, 1> mang_vel_d_dot; /**< Desired angular velocity derivative */ 
 };
 
 class TranslationController {

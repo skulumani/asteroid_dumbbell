@@ -60,6 +60,54 @@ void AttitudeController::body_fixed_pointing_attitude(std::shared_ptr<const Stat
     assert(assert_SO3(mRd));
 }
 
+void AttitudeController::body_fixed_pointing_attitude(const double& time, 
+        const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_in) {
+    
+    // transform the state vector into individual elements
+    Eigen::Vector3d pos, vel, ang_vel;
+    Eigen::Matrix<double, 3, 3> R(3, 3);
+    
+    pos(0) = state_in(0);
+    pos(1) = state_in(1);
+    pos(2) = state_in(2);
+    
+    vel(0) = state_in(3);
+    vel(1) = state_in(4);
+    vel(2) = state_in(5);
+
+    R(0, 0) = state_in(6);
+    R(0, 1) = state_in(7);
+    R(0, 2) = state_in(8);
+
+    R(1, 0) = state_in(9);
+    R(1, 1) = state_in(10);
+    R(1, 2) = state_in(11);
+
+    R(2, 0) = state_in(12);
+    R(2, 1) = state_in(13);
+    R(2, 2) = state_in(14);
+
+    ang_vel(0) = state_in(15);
+    ang_vel(1) = state_in(16);
+    ang_vel(2) = state_in(17);
+
+    // desired attitude such that b1 points to origin/asteroid
+    Eigen::Matrix<double, 3, 1> b1_des(3), b2_des(3), b3_des(3), z_axis(0, 0, 1);
+
+    b1_des = - pos.normalized();
+    b3_des = z_axis - (z_axis.dot(b1_des) * b1_des) ;
+    b3_des = b3_des.normalized();
+    b2_des = b3_des.cross(b1_des);
+    
+    // set the output to the class
+    mRd << b1_des, b2_des, b3_des;
+    mRd_dot.setZero(3, 3);
+    mang_vel_d.setZero(3, 1);
+    mang_vel_d_dot.setZero(3, 1);
+    
+    assert(assert_SO3(mRd));
+}
+
 TranslationController::TranslationController( void ) {
     mposd.setZero(3);
     mveld.setZero(3);
