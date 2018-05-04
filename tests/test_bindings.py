@@ -14,14 +14,18 @@ Shankar Kulumani		GWU		skulumani@gwu.edu
 
 import numpy as np
 import pytest
+import pdb
 
 from point_cloud import wavefront
+from kinematics import attitude
+
 cgal = pytest.importorskip('lib.cgal')
 mesh_data = pytest.importorskip('lib.mesh_data')
 asteroid = pytest.importorskip('lib.asteroid')
 surface_mesh = pytest.importorskip('lib.surface_mesh')
 reconstruct = pytest.importorskip('lib.reconstruct')
 geodesic = pytest.importorskip('lib.geodesic')
+controller = pytest.importorskip('lib.controller')
 
 class TestMeshData:
     v, f = wavefront.read_obj('./integration/cube.obj')
@@ -170,4 +174,30 @@ class TestAsteroid:
 
             np.testing.assert_allclose(ast_cpp.get_potential(), Up, 1e-6)
 
+class TestController:
+    
+    angle = ( 2 * np.pi - 0) * np.random.rand(1) + 0
+    
+    # generate a random initial state that is outside the asteroid
+    pos = np.random.rand(3) + np.array([2, 2, 2])
+    R = attitude.rot1(angle).reshape(9)
+    vel = np.random.rand(3)
+    ang_vel = np.random.rand(3)
+    t = np.random.rand() * 100
 
+    state = np.hstack((pos, vel, R, ang_vel))
+
+    def test_body_fixed_pointing_attitude_matches_python(self):
+        from dynamics import controller as controller_python
+
+        (Rd, Rd_dot, ang_vel_d, ang_vel_d_dot) = controller_python.body_fixed_pointing_attitude(1, self.state)
+
+        # now for the C++ version
+        att_cont = controller.AttitudeController()
+        att_cont.body_fixed_pointing_attitude(1, self.state)
+        
+        np.testing.assert_allclose(att_cont.get_Rd(), Rd)
+        np.testing.assert_allclose(att_cont.get_Rd_dot(), Rd_dot)
+        np.testing.assert_allclose(att_cont.get_ang_vel_d(), ang_vel_d)
+        np.testing.assert_allclose(att_cont.get_ang_vel_d_dot(), ang_vel_d_dot)
+        
