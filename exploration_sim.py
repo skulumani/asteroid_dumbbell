@@ -30,7 +30,9 @@ def initialize():
     ast_param = asteroid.MeshParam(v, f)
     ast = asteroid.Asteroid('castalia', ast_param)
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
-    des_att_func = controller.random_sweep_attitude
+
+    # controller functions 
+    att_controller = controller.AttitudeController()
     des_tran_func = controller.inertial_fixed_state
     AbsTol = 1e-9
     RelTol = 1e-9

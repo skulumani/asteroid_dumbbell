@@ -39,5 +39,6 @@ PYBIND11_MODULE(controller, m) {
 
     pybind11::class_<Controller, AttitudeController, TranslationController, std::shared_ptr<Controller>>(m, "Controller")
         .def(pybind11::init<>(), "Combinded controller constructor");
-        
+    
+    // TODO Add overload for explore asteroid function then add here as well
 }
