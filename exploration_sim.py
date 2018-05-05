@@ -38,3 +38,8 @@ def initialize():
 
     return ast, dum, complete_controller, AbsTol, RelTol
 
+def simulate():
+    """Actually run the simulation around the asteroid
+    """
+    
+    pass
