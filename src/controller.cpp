@@ -218,6 +218,19 @@ void Controller::explore_asteroid(std::shared_ptr<const State> state_ptr,
     
 }
 
+void Controller::explore_asteroid(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+        std::shared_ptr<const ReconstructMesh> rmesh_ptr) {
+    
+    // choose a position to minimize the uncertainty
+    minimize_uncertainty(state, rmesh_ptr);
+
+    // build a new state_ptr with the current desired state
+    std::shared_ptr<State> new_state = get_desired_state();
+
+    // now look at the asteroid
+    body_fixed_pointing_attitude(new_state);
+}
+
 std::shared_ptr<State> Controller::get_desired_state() {
     
     std::shared_ptr<State> state_ptr = std::make_shared<State>();

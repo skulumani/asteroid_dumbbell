@@ -213,3 +213,14 @@ class TestController:
         np.testing.assert_allclose(tran_cont.get_posd().shape, (3,)) 
         np.testing.assert_allclose(tran_cont.get_veld(), np.zeros(3))
         np.testing.assert_allclose(tran_cont.get_acceld(), np.zeros(3))
+
+    def test_complete_controller(self):
+        v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj')
+
+        mesh = mesh_data.MeshData(v, f)
+        rmesh = reconstruct.ReconstructMesh(mesh)
+
+        cont = controller.Controller()
+        cont.explore_asteroid(self.state, rmesh)
+        print(cont.get_posd())
+

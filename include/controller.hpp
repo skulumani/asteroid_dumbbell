@@ -99,6 +99,9 @@ class Controller: public TranslationController, public AttitudeController {
 
        void explore_asteroid(std::shared_ptr<const State> state, 
                 std::shared_ptr<const ReconstructMesh> rmesh);
+       void explore_asteroid(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+               std::shared_ptr<const ReconstructMesh> rmesh);
+
         /** @fn Output a state object with the desired state
                 
             Output a state object with the desired state

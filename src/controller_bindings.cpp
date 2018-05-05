@@ -38,7 +38,11 @@ PYBIND11_MODULE(controller, m) {
                 pybind11::arg("state"), pybind11::arg("rmesh shared_ptr"));
 
     pybind11::class_<Controller, AttitudeController, TranslationController, std::shared_ptr<Controller>>(m, "Controller")
-        .def(pybind11::init<>(), "Combinded controller constructor");
+        .def(pybind11::init<>(), "Combinded controller constructor")
+        .def("explore_asteroid", (void (Controller::*)(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >&,
+                        std::shared_ptr<const ReconstructMesh>)) &Controller::explore_asteroid,
+                "Explore an asteroid by minimizing uncertainty",
+                pybind11::arg("state"), pybind11::arg("rmesh shared_ptr"));
     
     // TODO Add overload for explore asteroid function then add here as well
 }
