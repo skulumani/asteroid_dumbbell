@@ -32,10 +32,9 @@ def initialize():
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
 
     # controller functions 
-    att_controller = controller.AttitudeController()
-    des_tran_func = controller.inertial_fixed_state
+    complete_controller = controller.Controller()
     AbsTol = 1e-9
     RelTol = 1e-9
 
-    return ast, dum, des_att_func, des_tran_func, AbsTol, RelTol
+    return ast, dum, complete_controller, AbsTol, RelTol
 
