@@ -46,7 +46,9 @@ PYBIND11_MODULE(cgal, m) {
                 pybind11::arg("fov"),
                 pybind11::arg("sigma"),
                 pybind11::arg("dist"),
-                pybind11::arg("numbr of steps"));
+                pybind11::arg("numbr of steps"))
+        .def("rotate_fov", &Lidar::rotate_fov, "Rotate teh FOV by a R",
+                pybind11::arg("R_body2frame"));
     // TODO add all the LIDAR member function bindings
         
 }
