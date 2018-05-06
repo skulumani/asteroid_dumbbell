@@ -47,6 +47,7 @@ PYBIND11_MODULE(cgal, m) {
                 pybind11::arg("sigma"),
                 pybind11::arg("dist"),
                 pybind11::arg("numbr of steps"));
+    // TODO add all the LIDAR member function bindings
         
 }
 
