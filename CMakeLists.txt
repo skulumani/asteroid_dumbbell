@@ -216,7 +216,7 @@ pybind11_add_module(mesh_data MODULE
 src/mesh.cpp src/polyhedron.cpp src/mesh_bindings.cpp)
 
 pybind11_add_module(cgal MODULE
-   src/cgal.cpp src/cgal_bindings.cpp src/mesh.cpp)
+   src/cgal.cpp src/cgal_bindings.cpp src/mesh.cpp src/lidar.cpp)
 
 pybind11_add_module(reconstruct MODULE
    src/reconstruct.cpp src/reconstruct_bindings.cpp src/mesh.cpp
@@ -228,6 +228,8 @@ pybind11_add_module(geodesic MODULE
 pybind11_add_module(controller MODULE
     src/controller.cpp src/controller_bindings.cpp src/reconstruct.cpp 
     src/geodesic.cpp src/state.cpp)
+
+
 ################################################################################
 # Testing example
 ################################################################################

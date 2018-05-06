@@ -6,6 +6,7 @@
 */
 
 #include "cgal.hpp"
+#include "lidar.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
@@ -31,6 +32,21 @@ PYBIND11_MODULE(cgal, m) {
                 pybind11::arg("pt"))
         .def("castarray", &RayCaster::castarray, "Cast many rays to the targets",
                 pybind11::arg("psource"), pybind11::arg("targets"));
+
+    pybind11::class_<Lidar, std::shared_ptr<Lidar>>(m, "Lidar")
+        .def(pybind11::init<>(), "Lidar constructor")
+        .def(pybind11::init<const Eigen::Ref<const Eigen::Vector3d>&,
+                            const Eigen::Ref<const Eigen::Vector3d>&,
+                            const Eigen::Ref<const Eigen::Vector2d>&,
+                            const double&,
+                            const double&,
+                            const int&>(), "Eigen constructor",
+                pybind11::arg("view axis"), 
+                pybind11::arg("up axis"),
+                pybind11::arg("fov"),
+                pybind11::arg("sigma"),
+                pybind11::arg("dist"),
+                pybind11::arg("numbr of steps"));
         
 }
 
