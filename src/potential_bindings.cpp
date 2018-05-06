@@ -27,7 +27,8 @@ PYBIND11_MODULE(asteroid, m) {
         .def("get_gradient_mat", &Asteroid::get_gradient_mat, "Get the gradient matrix")
         .def("get_laplace", &Asteroid::get_laplace, "Get the laplacian")
         .def("polyhedron_potential", &Asteroid::polyhedron_potential, "Compute polyhedron potential",
-                pybind11::arg("state"));
+                pybind11::arg("state"))
+        .def("get_axes", &Asteroid::get_axes, "Return axes of asteroid");
 
     // Some other member functions
     m.def("face_contribution", &face_contribution);
