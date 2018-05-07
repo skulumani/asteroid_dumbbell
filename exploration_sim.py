@@ -76,7 +76,8 @@ def initialize(output_file):
     caster = cgal.RayCaster(true_ast_meshdata)
 
     return (true_ast_meshdata, true_ast, complete_controller, est_ast_meshdata, 
-            est_ast_rmesh, lidar, caster, AbsTol, RelTol)
+            est_ast_rmesh, lidar, caster, max_angle, 
+            dum, AbsTol, RelTol)
 
 def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     """Actually run the simulation around the asteroid
@@ -100,12 +101,14 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
 
         # initialize the simulation objects
         (true_ast_meshdata, true_ast, complete_controller,
-         est_ast_meshdata, est_ast_rmesh, lidar, caster, AbsTol, RelTol) = initialize(hf)
+         est_ast_meshdata, est_ast_rmesh, lidar, caster, max_angle, dum,
+         AbsTol, RelTol) = initialize(hf)
         
         # initialize the ODE function
         system = integrate.ode(eoms.eoms_controlled_inertial_pybind)
         system.set_integrator("lsoda", atol=AbsTol, rtol=RelTol, nsteps=num_steps)
         system.set_initial_value(initial_state, t0)
+        pdb.set_trace()
         system.set_f_params(true_ast, dum, complete_controller, est_ast_rmesh)
         
         point_cloud = defaultdict(list)
@@ -140,8 +143,23 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
                 intersections = caster.castarray(state[ii, 0:3], targets)
 
                 # reconstruct the mesh with new measurements
+                # convert the intersections to the asteroid frame
+                ast_ints = []
+                for pt in intersections:
+                    if np.linalg.norm(pt) < 1e-9:
+                        logger.info("No intersection for this point")
+                        pt_ast = np.array([np.nan, np.nan, np.nan])
+                    else:
+                        pt_ast = Ra.T.dot(pt)
 
+                    ast_ints.append(pt_ast)
+                
+                ast_ints = np.array(ast_ints)
 
+                est_ast_rmesh.update(ast_ints, max_angle)
+
+                # save data to HDF5
+            ii += 1
 
 if __name__ == "__main__":
     logging_file = tempfile.mkstemp(suffix='.txt.')[1]
