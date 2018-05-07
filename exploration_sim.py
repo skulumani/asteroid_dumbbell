@@ -55,6 +55,7 @@ def initialize():
     complete_controller = controller.Controller()
     
     # lidar object
+    lidar = cgal.Lidar().view_axis(np.array([1, 0, 0])).up_axis(np.array([0, 0, 1]).fov(np.deg2rad(np.array([7, 7]))).dist(2).num_steps(3)
 
     # raycaster from c++
     caster = cgal.RayCaster(true_ast_meshdata) 
@@ -96,6 +97,10 @@ if __name__ == "__main__":
     
     parser.add_argument("-o", "--reconstruct_data",
                         help="Filename to store the reconstruction data")
+    parser.add_argument("-i", "--point_cloud_data",
+                        help="Save the simulation data using HDF5")
+
     
+                                                                
 
 
