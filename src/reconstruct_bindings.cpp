@@ -20,7 +20,7 @@ PYBIND11_MODULE(reconstruct, m) {
                             const Eigen::Ref<const Eigen::MatrixXd> &>(),
                             "ReconstructMesh constructor from eigen/numpy arrays",
                             pybind11::arg("vertices"), pybind11::arg("faces"), pybind11::arg("weights"))
-        .def("update", &ReconstructMesh::update, "Update the mesh by incorporating the pt into the mesh",
+        .def("single_update", &ReconstructMesh::single_update, "Update the mesh by incorporating the pt into the mesh",
                 pybind11::arg("pt"), pybind11::arg("max_angle"))
         .def("get_verts", &ReconstructMesh::get_verts, "Get the vertices")
         .def("get_faces", &ReconstructMesh::get_faces, "Get the faces")

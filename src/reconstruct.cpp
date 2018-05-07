@@ -60,7 +60,7 @@ Eigen::VectorXi vector_find(const Eigen::Ref<const T> &logical_vec) {
     return index;
 }
 
-void ReconstructMesh::update(const Eigen::Ref<const Eigen::Vector3d> &pt,
+void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &pt,
                                     const double &max_angle) {
     
     double pt_radius = pt.norm();
@@ -103,6 +103,15 @@ void ReconstructMesh::update(const Eigen::Ref<const Eigen::Vector3d> &pt,
         this->weights(region_index(ii)) = weight_new(ii);
     }
 
+}
+
+void ReconstructMesh::update(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
+        const double& max_angle) {
+    std::size_t num_pts(pts.rows());
+    
+    for (int ii = 0; ii < num_pts; ++ii) {
+        single_update(pts.row(ii), max_angle);
+    }
 }
 
 void ReconstructMesh::update_meshdata( void ) {

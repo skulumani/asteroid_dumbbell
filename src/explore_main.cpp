@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
         intersection = caster.castray(state_ptr->get_pos(), target);
 
         // use this measurement to update rmesh (inside holds teh mesh estimate)
-        rmesh_ptr->update(intersection, max_angle);
+        rmesh_ptr->single_update(intersection, max_angle);
         // use the updated weight to find a new positoin to move to
         controller.explore_asteroid(state_ptr, rmesh_ptr);
         new_state_ptr = controller.get_desired_state();

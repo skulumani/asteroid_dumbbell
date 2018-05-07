@@ -21,8 +21,11 @@ class ReconstructMesh {
                         const Eigen::Ref<const Eigen::MatrixXi> &f_in);
 
         // Modify the vertices/weights with a new point
-        void update(const Eigen::Ref<const Eigen::Vector3d> &pt_in,
+        void single_update(const Eigen::Ref<const Eigen::RowVector3d> &pt_in,
                         const double &max_angle);
+        // now update given many points in an array
+        void update(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
+                const double& max_angle);
 
         // functions to access the private members
         Eigen::MatrixXd get_verts( void ) const;
