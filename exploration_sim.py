@@ -55,10 +55,13 @@ def initialize():
     complete_controller = controller.Controller()
     
     # lidar object
-    lidar = cgal.Lidar().view_axis(np.array([1, 0, 0])).up_axis(np.array([0, 0, 1]).fov(np.deg2rad(np.array([7, 7]))).dist(2).num_steps(3)
+    lidar = cgal.Lidar()
+    lidar = lidar.view_axis(np.array([1, 0, 0]))
+    lidar = lidar.up_axis(np.array([0, 0, 1]))
+    lidar = lidar.fov(np.deg2rad(np.array([7, 7]))).dist(2).num_steps(3)
 
     # raycaster from c++
-    caster = cgal.RayCaster(true_ast_meshdata) 
+    caster = cgal.RayCaster(true_ast_meshdata)
 
     return ast, dum, complete_controller, AbsTol, RelTol
 
@@ -92,7 +95,7 @@ if __name__ == "__main__":
                         datefmt='%Y-%m-%d %H:%M:%S')
     print("Logging to {}".format(logging_file))
 
-    parser = argparse.ArgumeentParser(description="Exploration and asteroid reconstruction simulation",
+    parser = argparse.ArgumentParser(description="Exploration and asteroid reconstruction simulation",
                                       formatter_class=argparse.RawTextHelpFormatter)
     
     parser.add_argument("-o", "--reconstruct_data",
@@ -100,7 +103,11 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--point_cloud_data",
                         help="Save the simulation data using HDF5")
 
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-s", "--simulate", help="Run the exploration simulation",
+                       action="store_true")
     
+    args = parser.parse_args()
                                                                 
 
 
