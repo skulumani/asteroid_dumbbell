@@ -145,6 +145,8 @@ class Asteroid {
             @version 3 May 2018
         */
         void polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state);
+        
+        Eigen::Matrix<double, Eigen::Dynamic, 3> rotate_vertices(const double& time) const;
 
         // Getters for the potential variables
         double get_potential( void ) { return U; }

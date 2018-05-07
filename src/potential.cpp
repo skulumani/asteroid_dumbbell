@@ -287,6 +287,19 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
 
 }
 
+Eigen::Matrix<double, Eigen::Dynamic, 3> Asteroid::rotate_vertices(const double& time) const {
+    
+    // define the rotation matrix Ra
+    Eigen::Matrix<double, 3, 3> Ra;
+    Ra = Eigen::AngleAxis<double>(omega * time, (Eigen::Vector3d() << 0, 0, 1).finished());
+    
+    // multiply times all the vertices
+    Eigen::Matrix<double, Eigen::Dynamic, 3> nv(mesh_param->num_v, 3);
+    nv = (Ra * mesh_param->V.transpose()).transpose();
+
+    return nv;
+}
+
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
 
     std::vector<std::vector<int> > vf_map(V.rows());
