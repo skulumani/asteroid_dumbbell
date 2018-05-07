@@ -102,7 +102,9 @@ void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &
         this->vertices.row(region_index(ii)) = radius_new(ii) * vert_uvec.row(region_index(ii));
         this->weights(region_index(ii)) = weight_new(ii);
     }
-
+    
+    // update the mesh pointer with the new vertices
+    mesh->update_mesh(vertices, faces); 
 }
 
 void ReconstructMesh::update(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
