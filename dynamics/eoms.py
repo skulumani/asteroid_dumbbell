@@ -547,6 +547,42 @@ def eoms_controlled_inertial_pybind(t, state, ast, dum, complete_controller):
     dum : dumbbell object (from Python)
     complete_controller : controller object (from C++)
     """ 
+    # unpack the state
+    pos = state[0:3] # location of the center of mass in the inertial frame
+    vel = state[3:6] # vel of com in inertial frame
+    R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+    ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
+
+    Ra = attitude.rot3(ast.omega*t, 'c') # asteroid body frame to inertial frame
+
+    # unpack parameters for the dumbbell
+    J = dum.J
+
+    rho1 = dum.zeta1
+    rho2 = dum.zeta2
+
+    # position of each mass in the asteroid frame
+    z1 = Ra.T.dot(pos + R.dot(rho1))
+    z2 = Ra.T.dot(pos + R.dot(rho2))
+
+    z = Ra.T.dot(pos) # position of COM in asteroid frame
+
+    # gradient and potential at this state
+    ast.polyhedron_potential(z1)
+    U1 = ast.get_potential()
+    U1_grad = ast.get_acceleration()
+
+    ast.polyhedron_potential(z2)
+    U2 = ast.get_potential()
+    U2_grad = ast.get_acceleration()
+
+    F1 = dum.m1 * Ra.dot(U1_grad)
+    F2 = dum.m2 * Ra.dot(U2_grad)
+
+    M1 = dum.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
+    M2 = dum.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
+
+    # complete the desired states for exploration
 def eoms_controlled_blender_traverse_then_land(t, state, dum, ast):
     """Inertial dumbbell equations of motion about an asteroid 
     
