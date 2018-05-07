@@ -522,7 +522,31 @@ def eoms_controlled_inertial(t, state, ast, dum, des_att_func, des_tran_func):
 
     return statedot
 
+def eoms_controlled_inertial_pybind(t, state, ast, dum, complete_controller):
+    """Inertial dumbbell equations of motion around an asteroid using C++ bindings
 
+    This function must be used with scipy.integrate.ode class instead of the 
+    more convienent scipe.integrate.odeint. In addition, we can control the 
+    dumbbell given full state feedback. This uses several C++ functions which 
+    are exposed to Python using PyBind11
+    
+    Arguments
+    ---------
+    t : current simulation time step
+    state : (18, ) numpy array of the state
+        pos - (3,) position of the dumbbell with respect to the
+        asteroid center of mass and expressed in the inertial frame
+        vel - (3,) velocity of the dumbbell with respect to the
+        asteroid center of mass and expressed in the inertial frame
+        R - (9,) attitude of the dumbbell with defines the
+        transformation of a vector in the dumbbell frame to the
+        inertial frame ang_vel - (3,) angular velocity of the dumbbell
+        with respect to the inertial frame and represented in the
+        dumbbell frame
+    ast : asteroid object (from C++ bindings)
+    dum : dumbbell object (from Python)
+    complete_controller : controller object (from C++)
+    """ 
 def eoms_controlled_blender_traverse_then_land(t, state, dum, ast):
     """Inertial dumbbell equations of motion about an asteroid 
     
