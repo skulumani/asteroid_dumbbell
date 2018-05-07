@@ -74,7 +74,7 @@ def initialize(output_file):
     # raycaster from c++
     caster = cgal.RayCaster(true_ast_meshdata)
 
-    return true_ast_meshdata
+    return true_ast_meshdata, true_ast, complete_controller AbsTol, RelTol
 
 def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     """Actually run the simulation around the asteroid
@@ -96,10 +96,14 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     with h5py.File(output_filename, 'w') as hf:
         hf.create_dataset('time', data=time)
 
-        # initialize the simulation
-        true_ast_meshdata = initialize(hf)
-    
-
+        # initialize the simulation objects
+        true_ast_meshdata, true_ast, complete_controller, AbsTol, RelTol = initialize(hf)
+        
+        # initialize the ODE function
+        system = integrate.ode(eoms.eoms_controlled_inertial_pybind)
+        system.set_integrator("lsoda", atol=AbsTol, rtol=RelTol, nsteps=num_steps)
+        system.set_initial_value(initial_state, t0)
+        system.set_f_params(true_ast, dum, complete_controller)
 if __name__ == "__main__":
     logging_file = tempfile.mkstemp(suffix='.txt.')[1]
 
