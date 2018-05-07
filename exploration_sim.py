@@ -16,6 +16,7 @@ import logging
 import os
 import tempfile
 import argparse
+from collections import defaultdict
 
 import h5py
 import numpy as np
@@ -74,7 +75,8 @@ def initialize(output_file):
     # raycaster from c++
     caster = cgal.RayCaster(true_ast_meshdata)
 
-    return true_ast_meshdata, true_ast, complete_controller AbsTol, RelTol
+    return (true_ast_meshdata, true_ast, complete_controller, est_ast_meshdata, 
+            est_ast_rmesh, lidar, caster, AbsTol, RelTol)
 
 def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     """Actually run the simulation around the asteroid
@@ -97,13 +99,50 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
         hf.create_dataset('time', data=time)
 
         # initialize the simulation objects
-        true_ast_meshdata, true_ast, complete_controller, AbsTol, RelTol = initialize(hf)
+        (true_ast_meshdata, true_ast, complete_controller,
+         est_ast_meshdata, est_ast_rmesh, lidar, caster, AbsTol, RelTol) = initialize(hf)
         
         # initialize the ODE function
         system = integrate.ode(eoms.eoms_controlled_inertial_pybind)
         system.set_integrator("lsoda", atol=AbsTol, rtol=RelTol, nsteps=num_steps)
         system.set_initial_value(initial_state, t0)
-        system.set_f_params(true_ast, dum, complete_controller)
+        system.set_f_params(true_ast, dum, complete_controller, est_ast_rmesh)
+        
+        point_cloud = defaultdict(list)
+        
+        state = np.zeros((num_steps + 1, 18))
+        t = np.zeros(num_steps + 1)
+        int_array = []
+        state[0, :] = initial_state
+
+        ii = 1
+        while system.successful() and system.t < tf:
+            # integrate the system
+            t[ii] = (system.t + dt)
+            state[ii, :] = system.integrate(system.t + dt)
+
+            logger.info("Step: {} Time: {}".format(ii, t[ii]))
+
+            if not (np.floor(t[ii]) % 1):
+                logger.info("RayCasting at t: {}".format(t[ii]))
+
+                targets = lidar.define_targets(state[ii, 0:3],
+                                               state[ii, 6:15].reshape((3, 3)),
+                                               np.linalg.norm(state[ii, 0:3]))
+                # update the asteroid inside the caster
+                nv = true_ast.rotate_vertices(t[ii])
+                Ra = true_ast.rot_ast2int(t[ii])
+                
+                true_ast_meshdata.update_mesh(nv, true_ast_meshdata.get_faces())
+                caster.update_mesh(true_ast_meshdata)
+
+                # do the raycasting
+                intersections = caster.castarray(state[ii, 0:3], targets)
+
+                # reconstruct the mesh with new measurements
+
+
+
 if __name__ == "__main__":
     logging_file = tempfile.mkstemp(suffix='.txt.')[1]
 
