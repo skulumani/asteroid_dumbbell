@@ -21,15 +21,19 @@ import h5py
 import numpy as np
 from scipy import integrate
 
-from lib import asteroid, surface_mesh, cgal, controller, mesh_data, reconstruct
+from lib import asteroid, surface_mesh, cgal, mesh_data, reconstruct
 from lib import surface_mesh
+from lib import controller as controller_cpp
 
 from dynamics import dumbbell, eoms, controller
 from point_cloud import wavefront
 from kinematics import attitude
 
-def initialize():
+def initialize(output_file):
     """Initialize all the things for the simulation
+
+    Output_file : the actual HDF5 file to save the data/parameters to
+
     """
     logger = logging.getLogger(__name__)
     logger.info('Initialize asteroid and dumbbell objects')
@@ -41,18 +45,25 @@ def initialize():
     v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj')
 
     true_ast_meshdata = mesh_data.MeshData(v, f)
-    true_ast_meshparam = asteroid.MeshParam(true_ast)
-    true_ast = asteroid.Asteroid('castalia', ast_param)
+    true_ast_meshparam = asteroid.MeshParam(true_ast_meshdata)
+    true_ast = asteroid.Asteroid('castalia', true_ast_meshparam)
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
     
     # estimated asteroid (starting as an ellipse)
-    ellipsoid = surface_mesh.SurfMesh(ast.get_axes[0], ast.get_axes[1], ast.get_axes[2])
+    surf_area = 0.01
+    max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
+    min_angle = 10
+    max_distance = 0.5
+    max_radius = 0.03
 
-    est_ast_meshdata = mesh_data.MeshData(ellipsoid.get_verts(), ellipsoid.get_faces())
+    ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0], true_ast.get_axes()[1], true_ast.get_axes()[2],
+                                      min_angle, max_radius, max_distance)
+
+    est_ast_meshdata = mesh_data.MeshData(ellipsoid.verts(), ellipsoid.faces())
     est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
 
     # controller functions 
-    complete_controller = controller.Controller()
+    complete_controller = controller_cpp.Controller()
     
     # lidar object
     lidar = cgal.Lidar()
@@ -63,9 +74,9 @@ def initialize():
     # raycaster from c++
     caster = cgal.RayCaster(true_ast_meshdata)
 
-    return ast, dum, complete_controller, AbsTol, RelTol
+    return true_ast_meshdata
 
-def simulate():
+def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     """Actually run the simulation around the asteroid
     """
     logger = logging.getLogger(__name__)
@@ -82,12 +93,15 @@ def simulate():
     initial_w = np.array([0, 0, 0])
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
     
-    # initialize the simulation
-    ast, dum, complete_controller, AbsTol, RelTol = initalize()
+    with h5py.File(output_filename, 'w') as hf:
+        hf.create_dataset('time', data=time)
+
+        # initialize the simulation
+        true_ast_meshdata = initialize(hf)
+    
 
 if __name__ == "__main__":
     logging_file = tempfile.mkstemp(suffix='.txt.')[1]
-    output_path = tempfile.mkdtemp()
 
     logging.basicConfig(filename=logging_file,
                         filemode='w', level=logging.INFO,
@@ -98,10 +112,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Exploration and asteroid reconstruction simulation",
                                       formatter_class=argparse.RawTextHelpFormatter)
     
-    parser.add_argument("-o", "--reconstruct_data",
+    parser.add_argument("simulation_data",
+                        help="Filename to store the simulation data")
+    parser.add_argument("reconstruct_data",
                         help="Filename to store the reconstruction data")
-    parser.add_argument("-i", "--point_cloud_data",
-                        help="Save the simulation data using HDF5")
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--simulate", help="Run the exploration simulation",
@@ -109,5 +123,10 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
                                                                 
+    if args.simulate:
+        simulate(args.simulation_data)
+    elif args.reconstruct:
+        output_path = tempfile.mkdtemp()
+
 
 
