@@ -553,7 +553,7 @@ def eoms_controlled_inertial_pybind(t, state, ast, dum, complete_controller, est
     R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
     ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
 
-    Ra = attitude.rot3(ast.omega*t, 'c') # asteroid body frame to inertial frame
+    Ra = ast.rot_ast2int(t) # asteroid body frame to inertial frame
 
     # unpack parameters for the dumbbell
     J = dum.J

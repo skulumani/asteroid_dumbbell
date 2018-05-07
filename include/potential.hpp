@@ -155,6 +155,7 @@ class Asteroid {
         Eigen::Vector3d get_acceleration( void ) { return U_grad; }
         Eigen::Matrix3d get_gradient_mat( void ) { return U_grad_mat; }
         double get_laplace( void ) { return Ulaplace; }
+        double get_omega( void) const { return omega; }
 
         // member variables
         Eigen::Vector3d get_axes( void ) const { return axes; }
