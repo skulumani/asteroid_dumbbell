@@ -522,7 +522,7 @@ def eoms_controlled_inertial(t, state, ast, dum, des_att_func, des_tran_func):
 
     return statedot
 
-def eoms_controlled_inertial_pybind(t, state, ast, dum, complete_controller):
+def eoms_controlled_inertial_pybind(t, state, ast, dum, complete_controller, est_ast_rmesh):
     """Inertial dumbbell equations of motion around an asteroid using C++ bindings
 
     This function must be used with scipy.integrate.ode class instead of the 
@@ -583,7 +583,24 @@ def eoms_controlled_inertial_pybind(t, state, ast, dum, complete_controller):
     M2 = dum.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
 
     # compute the desired states for exploration
-    complete_controller.
+    complete_controller.explore_asteroid(state, est_ast_rmesh)
+
+    des_att_tuple = (complete_controller.get_Rd(), complete_controller.get_Rd_dot(),
+                     complete_controller.get_ang_vel_d(), complete_controller.get_ang_vel_d_dot())
+    des_tran_tuple = (complete_controller.get_posd(), complete_controller.get_veld(),
+                      complete_controller.get_acceld())
+    u_m = controller.attitude_controller(t, state, M1 + M2, dum, ast, des_att_tuple)
+    u_f = controller.translation_controller(t, state, F1 + F2, dum, ast, des_tran_tuple)
+
+    pos_dot = vel
+    vel_dot = 1 / (dum.m1 + dum.m2) * (F1 + F2 + u_f)
+    R_dot = R.dot(attitude.hat_map(ang_vel)).reshape(9)
+    ang_vel_dot = np.linalg.inv(J).dot(-np.cross(ang_vel, J.dot(ang_vel)) + M1 + M2 + u_m)
+
+    state_dot = np.hstack((pos_dot, vel_dot, R_dot, ang_vel_dot))
+
+    return state_dot
+
 def eoms_controlled_blender_traverse_then_land(t, state, dum, ast):
     """Inertial dumbbell equations of motion about an asteroid 
     
