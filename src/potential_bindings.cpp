@@ -30,6 +30,8 @@ PYBIND11_MODULE(asteroid, m) {
                 pybind11::arg("state"))
         .def("get_axes", &Asteroid::get_axes, "Return axes of asteroid")
         .def("rotate_vertices", &Asteroid::rotate_vertices, "Rotate teh asteroid vertices by ROT3",
+                pybind11::arg("time"))
+        .def("rot_ast2int", &Asteroid::rot_ast2int, "Return the asteroid rotation asteroid to inertial",
                 pybind11::arg("time"));
 
     // Some other member functions

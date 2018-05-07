@@ -148,6 +148,8 @@ class Asteroid {
         
         Eigen::Matrix<double, Eigen::Dynamic, 3> rotate_vertices(const double& time) const;
 
+        Eigen::Matrix<double, 3, 3> rot_ast2int(const double& time);
+
         // Getters for the potential variables
         double get_potential( void ) { return U; }
         Eigen::Vector3d get_acceleration( void ) { return U_grad; }

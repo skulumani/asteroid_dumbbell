@@ -300,6 +300,13 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> Asteroid::rotate_vertices(const double&
     return nv;
 }
 
+Eigen::Matrix<double, 3, 3> Asteroid::rot_ast2int(const double& time) {
+    Eigen::Matrix<double, 3, 3> Ra;
+    Ra = Eigen::AngleAxis<double>(omega * time, (Eigen::Vector3d() << 0 ,0, 1).finished());
+
+    return Ra;
+}
+
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
 
     std::vector<std::vector<int> > vf_map(V.rows());
