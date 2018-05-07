@@ -582,7 +582,8 @@ def eoms_controlled_inertial_pybind(t, state, ast, dum, complete_controller):
     M1 = dum.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
     M2 = dum.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
 
-    # complete the desired states for exploration
+    # compute the desired states for exploration
+    complete_controller.
 def eoms_controlled_blender_traverse_then_land(t, state, dum, ast):
     """Inertial dumbbell equations of motion about an asteroid 
     
