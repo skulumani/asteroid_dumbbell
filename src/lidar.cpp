@@ -1,7 +1,8 @@
 #include "lidar.hpp"
 
-#include <cmath>
+#include <Eigen/Dense>
 
+#include <cmath>
 #include <iostream>
 
 Lidar::Lidar( void ) {

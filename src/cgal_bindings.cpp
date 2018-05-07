@@ -35,21 +35,29 @@ PYBIND11_MODULE(cgal, m) {
 
     pybind11::class_<Lidar, std::shared_ptr<Lidar>>(m, "Lidar")
         .def(pybind11::init<>(), "Lidar constructor")
-        .def(pybind11::init<const Eigen::Ref<const Eigen::Vector3d>&,
-                            const Eigen::Ref<const Eigen::Vector3d>&,
-                            const Eigen::Ref<const Eigen::Vector2d>&,
-                            const double&,
-                            const double&,
-                            const int&>(), "Eigen constructor",
-                pybind11::arg("view axis"), 
-                pybind11::arg("up axis"),
-                pybind11::arg("fov"),
-                pybind11::arg("sigma"),
-                pybind11::arg("dist"),
-                pybind11::arg("numbr of steps"))
+        .def("view_axis", &Lidar::view_axis, "Set the view axis",
+                pybind11::arg("View axis in body frame"))
+        .def("up_axis", &Lidar::up_axis, "Set the up axis",
+                pybind11::arg("Up axis in the body frame"))
+        .def("fov", &Lidar::fov, "Set the fov in horizontal and vertical directions",
+                pybind11::arg("FOV of the sensor"))
+        .def("right_axis", &Lidar::right_axis, "Set the right axis of the camera frame",
+                pybind11::arg("Right axis of the sensor"))
+        .def("sigma", &Lidar::sigma, "Set teh sigma value",
+                pybind11::arg("Sigma of the sensor"))
+        .def("dist", &Lidar::dist, "Set the distance for the sensor target",
+                pybind11::arg("Distance for the raycasting"))
+        .def("num_steps", &Lidar::num_steps, "Set the number of steps for FOV",
+                pybind11::arg("num_steps"))
         .def("rotate_fov", &Lidar::rotate_fov, "Rotate teh FOV by a R",
-                pybind11::arg("R_body2frame"));
-    // TODO add all the LIDAR member function bindings
+                pybind11::arg("R_body2frame"))
+        .def("define_targets", &Lidar::define_targets, "Define the targets for the LIDAR",
+                pybind11::arg("pos"), pybind11::arg("R_b2f"), pybind11::arg("dist"))
+        .def("define_target", &Lidar::define_target, "Define the target for the LIDAR",
+                pybind11::arg("pos"), pybind11::arg("R_b2f"), pybind11::arg("dist"))
+        .def("get_view_axis", &Lidar::get_view_axis, "Return the view axis")
+        .def("get_up_axis", &Lidar::get_up_axis, "Return the up axis")
+        .def("get_lidar_array", &Lidar::get_lidar_array, "Return teh LIDAR array");
         
 }
 
