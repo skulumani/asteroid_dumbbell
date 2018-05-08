@@ -160,6 +160,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
                 # save data to HDF5
             ii += 1
 
+# TODO Add plotting functions from raycasting_sim.py
 if __name__ == "__main__":
     logging_file = tempfile.mkstemp(suffix='.txt.')[1]
 
