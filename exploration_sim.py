@@ -30,7 +30,7 @@ from dynamics import dumbbell, eoms, controller
 from point_cloud import wavefront
 from kinematics import attitude
 
-def initialize(output_file):
+def initialize(hf):
     """Initialize all the things for the simulation
 
     Output_file : the actual HDF5 file to save the data/parameters to
@@ -154,10 +154,11 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
 
         ii = 1
         while system.successful() and system.t < tf:
-            logger.info("Step: {} Time: {}".format(ii, t[ii]))
             # integrate the system
             t = (system.t + dt)
             state = system.integrate(system.t + dt)
+
+            logger.info("Step: {} Time: {}".format(ii, t))
             
             if not (np.floor(t) % 1):
                 logger.info("RayCasting at t: {}".format(t))
@@ -207,7 +208,8 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
 
 # TODO Add plotting functions from raycasting_sim.py
 if __name__ == "__main__":
-    logging_file = tempfile.mkstemp(suffix='.txt.')[1]
+    # logging_file = tempfile.mkstemp(suffix='.txt.')[1]
+    logging_file = "/tmp/exploration_log.txt"
 
     logging.basicConfig(filename=logging_file,
                         filemode='w', level=logging.INFO,
