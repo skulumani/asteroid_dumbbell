@@ -129,6 +129,15 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     with h5py.File(output_filename, 'w') as hf:
         hf.create_dataset('time', data=time)
         hf.create_dataset("initial_state", data=initial_state)
+        
+        v_group = hf.create_group("reconstructed_vertex")
+        f_group = hf.create_group("reconstructed_face")
+        w_group = hf.create_group("reconstructed_weight")
+        state_group = hf.create_group("state")
+        targets_group = hf.create_group("targets")
+        Ra_group = hf.create_group("Ra")
+        inertial_intersections_group = hf.create_group("inertial_intersections")
+        asteroid_intersections_group = hf.create_group("asteroid_intersections")
 
         # initialize the simulation objects
         (true_ast_meshdata, true_ast, complete_controller,
@@ -142,34 +151,29 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
         system.set_f_params(true_ast, dum, complete_controller, est_ast_rmesh)
         
         point_cloud = defaultdict(list)
-        
-        state = np.zeros((num_steps + 1, 18))
-        t = np.zeros(num_steps + 1)
-        int_array = []
-        state[0, :] = initial_state
 
         ii = 1
         while system.successful() and system.t < tf:
             logger.info("Step: {} Time: {}".format(ii, t[ii]))
             # integrate the system
-            t[ii] = (system.t + dt)
-            state[ii, :] = system.integrate(system.t + dt)
+            t = (system.t + dt)
+            state = system.integrate(system.t + dt)
+            
+            if not (np.floor(t) % 1):
+                logger.info("RayCasting at t: {}".format(t))
 
-            if not (np.floor(t[ii]) % 1):
-                logger.info("RayCasting at t: {}".format(t[ii]))
-
-                targets = lidar.define_targets(state[ii, 0:3],
-                                               state[ii, 6:15].reshape((3, 3)),
-                                               np.linalg.norm(state[ii, 0:3]))
+                targets = lidar.define_targets(state[0:3],
+                                               state[6:15].reshape((3, 3)),
+                                               np.linalg.norm(state[0:3]))
                 # update the asteroid inside the caster
-                nv = true_ast.rotate_vertices(t[ii])
-                Ra = true_ast.rot_ast2int(t[ii])
+                nv = true_ast.rotate_vertices(t)
+                Ra = true_ast.rot_ast2int(t)
                 
                 true_ast_meshdata.update_mesh(nv, true_ast_meshdata.get_faces())
                 caster.update_mesh(true_ast_meshdata)
 
                 # do the raycasting
-                intersections = caster.castarray(state[ii, 0:3], targets)
+                intersections = caster.castarray(state[0:3], targets)
 
                 # reconstruct the mesh with new measurements
                 # convert the intersections to the asteroid frame
@@ -188,6 +192,17 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
                 est_ast_rmesh.update(ast_ints, max_angle)
 
                 # save data to HDF5
+
+            v_group.create_dataset(str(t), data=est_ast_rmesh.get_verts())
+            f_group.create_dataset(str(t), data=est_ast_rmesh.get_faces())
+            w_group.create_dataset(str(t), data=est_ast_rmesh.get_weights())
+
+            state_group.create_dataset(str(t), data=state)
+            targets_group.create_dataset(str(t), data=targets)
+            Ra_group.create_dataset(str(t), data=Ra)
+            inertial_intersections_group.create_dataset(str(t), data=intersections)
+            asteroid_intersections_group.create_dataset(str(t), data=ast_ints)
+
             ii += 1
 
 # TODO Add plotting functions from raycasting_sim.py
