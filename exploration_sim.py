@@ -96,8 +96,14 @@ def initialize(output_file):
     est_ast_group['min_angle'] = min_angle
     est_ast_group['max_distance'] = max_distance
     est_ast_group['max_radius'] = max_radius
+    est_ast_group.create_dataset('initial_vertices', data=ellipsoid.verts())
+    est_ast_group.create_dataset("initial_faces", data=ellipsoid.faces())
 
-
+    lidar_group = sim_group.create_group("lidar")
+    lidar_group.create_dataset("view_axis", data=lidar.get_view_axis())
+    lidar_group.create_dataset("up_axis", data=lidar.get_up_axis())
+    lidar_group.create_dataset("fov", data=lidar.get_fov())
+    
     return (true_ast_meshdata, true_ast, complete_controller, est_ast_meshdata, 
             est_ast_rmesh, lidar, caster, max_angle, 
             dum, AbsTol, RelTol)
