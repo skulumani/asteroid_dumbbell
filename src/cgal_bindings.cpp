@@ -57,7 +57,8 @@ PYBIND11_MODULE(cgal, m) {
                 pybind11::arg("pos"), pybind11::arg("R_b2f"), pybind11::arg("dist"))
         .def("get_view_axis", &Lidar::get_view_axis, "Return the view axis")
         .def("get_up_axis", &Lidar::get_up_axis, "Return the up axis")
-        .def("get_lidar_array", &Lidar::get_lidar_array, "Return teh LIDAR array");
+        .def("get_lidar_array", &Lidar::get_lidar_array, "Return teh LIDAR array")
+        .def("get_fov", &Lidar::get_fov, "Return the FOV");
         
 }
 

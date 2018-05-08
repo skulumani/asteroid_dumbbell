@@ -69,14 +69,18 @@ Eigen::RowVector3d Lidar::define_target(const Eigen::Ref<const Eigen::RowVector3
     return target;
 }
 
-Eigen::Vector3d Lidar::get_view_axis() {
+Eigen::Vector3d Lidar::get_view_axis( void ) const {
     return mview_axis;
 }
 
-Eigen::Matrix<double, Eigen::Dynamic, 3> Lidar::get_lidar_array() {
+Eigen::Matrix<double, Eigen::Dynamic, 3> Lidar::get_lidar_array( void ) const {
     return mlidar_array;
 }
 
-Eigen::Vector3d Lidar::get_up_axis() {
+Eigen::Vector3d Lidar::get_up_axis( void ) const {
     return mup_axis;
+}
+
+Eigen::Vector2d Lidar::get_fov( void ) const {
+    return mfov;
 }
