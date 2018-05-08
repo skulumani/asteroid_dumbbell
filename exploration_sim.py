@@ -48,6 +48,7 @@ def initialize(output_file):
     true_ast_meshdata = mesh_data.MeshData(v, f)
     true_ast_meshparam = asteroid.MeshParam(true_ast_meshdata)
     true_ast = asteroid.Asteroid('castalia', true_ast_meshparam)
+
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
     
     # estimated asteroid (starting as an ellipse)
@@ -74,6 +75,28 @@ def initialize(output_file):
 
     # raycaster from c++
     caster = cgal.RayCaster(true_ast_meshdata)
+    
+    # save a bunch of parameters to the HDF5 file
+    sim_group = hf.create_group("simulation_parameters")
+    sim_group['AbsTol'] = AbsTol
+    sim_group['RelTol'] = RelTol
+    dumbbell_group = sim_group.create_group("dumbbell")
+    dumbbell_group["m1"] = 500
+    dumbbell_group["m2"] = 500
+    dumbbell_group['l'] = 0.003
+    
+    true_ast_group = sim_group.create_group("true_asteroid")
+    true_ast_group.create_dataset("vertices", data=v)
+    true_ast_group.create_dataset("faces", data=f)
+    true_ast_group['name'] = 'castalia.obj'
+    
+    est_ast_group = sim_group.create_group("estimate_asteroid")
+    est_ast_group['surf_area'] = surf_area
+    est_ast_group['max_angle'] = max_angle
+    est_ast_group['min_angle'] = min_angle
+    est_ast_group['max_distance'] = max_distance
+    est_ast_group['max_radius'] = max_radius
+
 
     return (true_ast_meshdata, true_ast, complete_controller, est_ast_meshdata, 
             est_ast_rmesh, lidar, caster, max_angle, 
@@ -99,6 +122,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     
     with h5py.File(output_filename, 'w') as hf:
         hf.create_dataset('time', data=time)
+        hf.create_dataset("initial_state", data=initial_state)
 
         # initialize the simulation objects
         (true_ast_meshdata, true_ast, complete_controller,
