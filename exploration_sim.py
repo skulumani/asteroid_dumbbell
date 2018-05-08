@@ -29,6 +29,8 @@ from lib import controller as controller_cpp
 from dynamics import dumbbell, eoms, controller
 from point_cloud import wavefront
 from kinematics import attitude
+import utilities
+from visualization import graphics
 
 def initialize(hf):
     """Initialize all the things for the simulation
@@ -208,6 +210,18 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
 def animate(filename):
     """Given a HDF5 file from simulate this will animate teh motion
     """
+    with h5py.File(filename, 'r') as hf:
+        # get the inertial state and asteroid mesh object
+        time = hf['time'][()]
+        state_group = hf['state']
+        state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
+        
+        # get the true asteroid from the HDF5 file
+        true_vertices = hf['true_asteroid/vertices'][()]
+        true_faces = hf['true_asteroid/faces'][()]
+        true_name = hf['true_asteroid'].attrs['name'][()]
+        
+        mfig = graphics.mayavi_figure(size=(800,600))
 
 # TODO Add plotting functions from raycasting_sim.py
 if __name__ == "__main__":
