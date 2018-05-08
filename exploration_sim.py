@@ -205,6 +205,9 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
             asteroid_intersections_group.create_dataset(str(t), data=ast_ints)
 
             ii += 1
+def animate(filename):
+    """Given a HDF5 file from simulate this will animate teh motion
+    """
 
 # TODO Add plotting functions from raycasting_sim.py
 if __name__ == "__main__":
