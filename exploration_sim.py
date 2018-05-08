@@ -79,6 +79,7 @@ def initialize(output_file):
             est_ast_rmesh, lidar, caster, max_angle, 
             dum, AbsTol, RelTol)
 
+# TODO Need to save data to HDF5 file
 def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     """Actually run the simulation around the asteroid
     """
@@ -108,7 +109,6 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
         system = integrate.ode(eoms.eoms_controlled_inertial_pybind)
         system.set_integrator("lsoda", atol=AbsTol, rtol=RelTol, nsteps=num_steps)
         system.set_initial_value(initial_state, t0)
-        pdb.set_trace()
         system.set_f_params(true_ast, dum, complete_controller, est_ast_rmesh)
         
         point_cloud = defaultdict(list)
@@ -120,11 +120,10 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
 
         ii = 1
         while system.successful() and system.t < tf:
+            logger.info("Step: {} Time: {}".format(ii, t[ii]))
             # integrate the system
             t[ii] = (system.t + dt)
             state[ii, :] = system.integrate(system.t + dt)
-
-            logger.info("Step: {} Time: {}".format(ii, t[ii]))
 
             if not (np.floor(t[ii]) % 1):
                 logger.info("RayCasting at t: {}".format(t[ii]))
