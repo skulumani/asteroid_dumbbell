@@ -163,7 +163,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
             logger.info("Step: {} Time: {}".format(ii, t))
             
             if not (np.floor(t) % 1):
-                logger.info("RayCasting at t: {}".format(t))
+                # logger.info("RayCasting at t: {}".format(t))
 
                 targets = lidar.define_targets(state[0:3],
                                                state[6:15].reshape((3, 3)),
@@ -207,6 +207,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
             asteroid_intersections_group.create_dataset(str(t), data=ast_ints)
 
             ii += 1
+
 def animate(filename):
     """Given a HDF5 file from simulate this will animate teh motion
     """
@@ -227,9 +228,9 @@ def animate(filename):
             inertial_intersections.append(intersections_group[key][()])
 
         # get the true asteroid from the HDF5 file
-        true_vertices = hf['true_asteroid/vertices'][()]
-        true_faces = hf['true_asteroid/faces'][()]
-        true_name = hf['true_asteroid'].attrs['name'][()]
+        true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
+        true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
+        true_name = hf['simulation_parameters/true_asteroid'].attrs['name'][()]
         
         mfig = graphics.mayavi_figure(size=(800,600))
         mesh, ast_axes = graphics.draw_polyhedron_mayavi(true_vertices, true_faces, mfig)
@@ -273,19 +274,24 @@ if __name__ == "__main__":
     
     parser.add_argument("simulation_data",
                         help="Filename to store the simulation data")
-    parser.add_argument("reconstruct_data",
-                        help="Filename to store the reconstruction data")
+    # parser.add_argument("reconstruct_data",
+    #                     help="Filename to store the reconstruction data")
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--simulate", help="Run the exploration simulation",
                        action="store_true")
-    
+    group.add_argument("-a", "--animate", help="Animate the data from the exploration sim",
+                       action="store_true")
+    group.add_argument("-r", "--reconstruct", help="Generate images for the reconstruction",
+                       action="store_true")
+
     args = parser.parse_args()
                                                                 
     if args.simulate:
         simulate(args.simulation_data)
     elif args.reconstruct:
         output_path = tempfile.mkdtemp()
-
+    elif args.animate:
+        animate(args.simulation_data)
 
 
