@@ -210,6 +210,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
 def animate(filename):
     """Given a HDF5 file from simulate this will animate teh motion
     """
+    # TODO Animate the changing of the mesh itself as a function of time
     with h5py.File(filename, 'r') as hf:
         # get the inertial state and asteroid mesh object
         time = hf['time'][()]
@@ -249,6 +250,12 @@ def animate(filename):
 
         graphics.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
                                                   ast, dum, mayavi_objects)
+
+def reconstruct_images(filename):
+    """Read teh HDF5 data and generate a bunch of images of the reconstructing 
+    asteroid
+    """
+    logger = logging.getLogger(__name__)
 
 # TODO Add plotting functions from raycasting_sim.py
 if __name__ == "__main__":
