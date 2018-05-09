@@ -233,8 +233,11 @@ def animate(filename):
         true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
         true_name = hf['simulation_parameters/true_asteroid/name'][()]
         
+        est_initial_vertices = hf['simulation_parameters/estimate_asteroid/initial_vertices'][()]
+        est_initial_faces = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
+
         mfig = graphics.mayavi_figure(size=(800,600))
-        mesh, ast_axes = graphics.draw_polyhedron_mayavi(true_vertices, true_faces, mfig)
+        mesh, ast_axes = graphics.draw_polyhedron_mayavi(est_initial_vertices, est_initial_faces, mfig)
 
         # initialize a dumbbell object
         dum = dumbbell.Dumbbell(hf['simulation_parameters/dumbbell/m1'][()], 
