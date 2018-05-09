@@ -30,7 +30,7 @@ from dynamics import dumbbell, eoms, controller
 from point_cloud import wavefront
 from kinematics import attitude
 import utilities
-from visualization import graphics
+from visualization import graphics, animation
 
 def initialize(hf):
     """Initialize all the things for the simulation
@@ -226,31 +226,33 @@ def animate(filename):
         for key in state_keys:
             state.append(state_group[key][()])
             inertial_intersections.append(intersections_group[key][()])
-
+        
+        state = np.array(state)
         # get the true asteroid from the HDF5 file
         true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
         true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
-        true_name = hf['simulation_parameters/true_asteroid'].attrs['name'][()]
+        true_name = hf['simulation_parameters/true_asteroid/name'][()]
         
         mfig = graphics.mayavi_figure(size=(800,600))
         mesh, ast_axes = graphics.draw_polyhedron_mayavi(true_vertices, true_faces, mfig)
 
         # initialize a dumbbell object
-        dum = dumbbell.Dumbbell(hf['dumbbell'].attrs['m1'][()], hf['dumbbell'].attrs['m2'][()],
-                                hf['dumbbell'].attrs['l'][()])
+        dum = dumbbell.Dumbbell(hf['simulation_parameters/dumbbell/m1'][()], 
+                                hf['simulation_parameters/dumbbell/m2'][()],
+                                hf['simulation_parameters/dumbbell/l'][()])
         com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
 
         pc_lines = [graphics.mayavi_addLine(mfig, state[0, 0:3], p)
                     for p in inertial_intersections[0]]
         
         ast_meshdata = mesh_data.MeshData(true_vertices, true_faces)
-        ast_meshparam = asteroid.MeshParam(true_ast_meshdata)
+        ast_meshparam = asteroid.MeshParam(ast_meshdata)
         ast = asteroid.Asteroid('castalia', ast_meshparam)
         
         mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
 
-        graphics.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
-                                                  ast, dum, mayavi_objects)
+        animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
+                                                   ast, dum, mayavi_objects)
 
 def reconstruct_images(filename):
     """Read teh HDF5 data and generate a bunch of images of the reconstructing 
