@@ -95,7 +95,7 @@ def draw_polyhedron_mayavi(vertices, faces, fig):
     z = vertices[:, 2]
     scalars = np.tile(0.5, x.shape)
     mesh = mlab.triangular_mesh(x, y, z, faces, color=(0.5, 0.5, 0.5), figure=fig,
-                                representation='wireframe')
+                                representation='surface')
     
     # draw the body axes of the asteroid
     xaxis = mayavi_addLine(fig, np.array([0, 0, 0]), np.array([2, 0, 0]), color=(1, 0, 0)) 
