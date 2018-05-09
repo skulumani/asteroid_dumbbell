@@ -216,12 +216,39 @@ def animate(filename):
         state_group = hf['state']
         state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
         
+        intersections_group = hf['inertial_intersections']
+
+        # extract out the entire state and intersections
+        state = []
+        inertial_intersections = []
+        for key in state_keys:
+            state.append(state_group[key][()])
+            inertial_intersections.append(intersections_group[key][()])
+
         # get the true asteroid from the HDF5 file
         true_vertices = hf['true_asteroid/vertices'][()]
         true_faces = hf['true_asteroid/faces'][()]
         true_name = hf['true_asteroid'].attrs['name'][()]
         
         mfig = graphics.mayavi_figure(size=(800,600))
+        mesh, ast_axes = graphics.draw_polyhedron_mayavi(true_vertices, true_faces, mfig)
+
+        # initialize a dumbbell object
+        dum = dumbbell.Dumbbell(hf['dumbbell'].attrs['m1'][()], hf['dumbbell'].attrs['m2'][()],
+                                hf['dumbbell'].attrs['l'][()])
+        com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
+
+        pc_lines = [graphics.mayavi_addLine(mfig, state[0, 0:3], p)
+                    for p in inertial_intersections[0]]
+        
+        ast_meshdata = mesh_data.MeshData(true_vertices, true_faces)
+        ast_meshparam = asteroid.MeshParam(true_ast_meshdata)
+        ast = asteroid.Asteroid('castalia', ast_meshparam)
+        
+        mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
+
+        graphics.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
+                                                  ast, dum, mayavi_objects)
 
 # TODO Add plotting functions from raycasting_sim.py
 if __name__ == "__main__":
