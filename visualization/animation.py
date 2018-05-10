@@ -1,11 +1,16 @@
 # Visualize using Mayavi
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from mayavi import mlab
+import h5py
 import numpy as np 
+import pdb
+
 import dynamics.asteroid as asteroid
 from kinematics import attitude
 from visualization import graphics
-import pdb
+import utilities
+
 
 def test_asteroid():
     # plot the asteroid as a triangular mesh
@@ -138,13 +143,15 @@ def inertial_asteroid_trajectory(time, state, ast, dum, point_cloud,
         yield
 
 @mlab.animate()
-def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
-                                     ast, dum, mayavi_objects):
+def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections, ast,
+                                     dum, hdf5_file, mayavi_objects):
     """Animate the rotation of an asteroid and the motion of SC
 
     This assumes an asteroid object from C++ and using the exploration sim
     """
     mesh, ast_axes, com, dum_axes, pc_lines = mayavi_objects
+    
+    # get all the keys for the reconstructed vertices and faces
 
     # animate the rotation fo the asteroid
     ms = mesh.mlab_source
@@ -159,36 +166,45 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
     dum_zs = dum_axes[2].mlab_source
     
     pc_sources = [line.mlab_source for line in pc_lines]
-
-    for (t, pos, Rb2i, ints) in zip(time, state[:, 0:3], state[:, 6:15],
-                                             inertial_intersections):
-        # rotate teh asteroid
-        Ra = ast.rot_ast2int(t)
-        Rb2i = Rb2i.reshape((3,3))
-        # parse out the vertices x, y, z
-        new_vertices = ast.rotate_vertices(t)
-    
-        # update asteroid
-        ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1], z=new_vertices[:,2])
-        # update the satellite
-        ts.set(x=pos[0], y=pos[1], z=pos[2])
+    with h5py.File(hdf5_file, 'r') as hf:
+        rv_group = hf['reconstructed_vertex']
+        rf_group = hf['reconstructed_face']
+        rv_keys = np.array(utilities.sorted_nicely(list(rv_group.keys())))
         
-        # update the asteroid axes
-        ast_xs.reset(x=[0, Ra[0,0]], y=[0,Ra[1,0]], z=[0, Ra[2,0]])
-        ast_ys.reset(x=[0, Ra[0,1]], y=[0, Ra[1,1]], z=[0, Ra[2,1]])
-        ast_zs.reset(x=[0, Ra[0,2]], y=[0, Ra[1,2]], z=[0, Ra[2,2]])
+        for (t, pos, Rb2i, ints, key) in zip(time, state[:, 0:3], state[:, 6:15],
+                                            inertial_intersections,
+                                            rv_keys):
+            # rotate teh asteroid
+            Ra = ast.rot_ast2int(t)
+            Rb2i = Rb2i.reshape((3,3))
+            # parse out the vertices x, y, z
+            new_vertices = rv_group[key][()]
+            new_faces = rf_group[key][()]
+            
+            # rotate the asteroid
 
-        dum_xs.reset(x=[pos[0], pos[0]+Rb2i[0,0]], y=[pos[1], pos[1]+Rb2i[1,0]],
-                     z=[pos[2], pos[2]+Rb2i[2,0]])
-        dum_ys.reset(x=[pos[0], pos[0]+Rb2i[0,1]], y=[pos[1], pos[1]+Rb2i[1,1]],
-                     z=[pos[2], pos[2]+Rb2i[2,1]])
-        dum_zs.reset(x=[pos[0], pos[0]+Rb2i[0,2]], y=[pos[1], pos[1]+Rb2i[1,2]],
-                     z=[pos[2], pos[2]+Rb2i[2,2]])
-        
-        for pcs, inter in zip(pc_sources, ints):
-            # check if intersection is empty
-            if inter.size > 2:
-                pcs.reset(x=[pos[0], inter[0]], y=[pos[1], inter[1]], z=[pos[2], inter[2]])
-            else:
-                pcs.reset(x=[pos[0], pos[0]+0.01], y=[pos[1], pos[1]+0.01], z=[pos[2], pos[2]+0.01])
-        yield
+            # update asteroid
+            ms.reset(x=new_vertices[:, 0],y=new_vertices[:, 1], z=new_vertices[:,2],
+                    triangles=new_faces)
+            # update the satellite
+            ts.set(x=pos[0], y=pos[1], z=pos[2])
+            
+            # update the asteroid axes
+            ast_xs.reset(x=[0, Ra[0,0]], y=[0,Ra[1,0]], z=[0, Ra[2,0]])
+            ast_ys.reset(x=[0, Ra[0,1]], y=[0, Ra[1,1]], z=[0, Ra[2,1]])
+            ast_zs.reset(x=[0, Ra[0,2]], y=[0, Ra[1,2]], z=[0, Ra[2,2]])
+
+            dum_xs.reset(x=[pos[0], pos[0]+Rb2i[0,0]], y=[pos[1], pos[1]+Rb2i[1,0]],
+                        z=[pos[2], pos[2]+Rb2i[2,0]])
+            dum_ys.reset(x=[pos[0], pos[0]+Rb2i[0,1]], y=[pos[1], pos[1]+Rb2i[1,1]],
+                        z=[pos[2], pos[2]+Rb2i[2,1]])
+            dum_zs.reset(x=[pos[0], pos[0]+Rb2i[0,2]], y=[pos[1], pos[1]+Rb2i[1,2]],
+                        z=[pos[2], pos[2]+Rb2i[2,2]])
+            
+            for pcs, inter in zip(pc_sources, ints):
+                # check if intersection is empty
+                if inter.size > 2:
+                    pcs.reset(x=[pos[0], inter[0]], y=[pos[1], inter[1]], z=[pos[2], inter[2]])
+                else:
+                    pcs.reset(x=[pos[0], pos[0]+0.01], y=[pos[1], pos[1]+0.01], z=[pos[2], pos[2]+0.01])
+            yield
