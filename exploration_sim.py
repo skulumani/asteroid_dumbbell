@@ -272,12 +272,11 @@ def animate(filename):
         # reconstructed vertices/faces groups
         rv_group = hf['reconstructed_vertex']
         rf_group = hf['reconstructed_face']
-        rv_keys = np.array(utilities.sorted_nicely(list(rv_group.keys())))
         
         mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
 
     animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
-                                                ast, dum,hdf5_file, ayavi_objects)
+                                                ast, dum,filename, mayavi_objects)
 
 def reconstruct_images(filename):
     """Read teh HDF5 data and generate a bunch of images of the reconstructing 
