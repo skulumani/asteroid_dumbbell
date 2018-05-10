@@ -103,7 +103,6 @@ void MeshParam::polyhedron_parameters( void ) {
 
     // build vertex face map
     vf_map = vertex_face_map(V, F);
-    
     e1_ind1b = vertex_map_search(e1_vertex_map, e1_vertex_map);
     e1_ind2b = vertex_map_search(e1_vertex_map, e2_vertex_map);
     e1_ind3b = vertex_map_search(e1_vertex_map, e3_vertex_map);
@@ -154,7 +153,8 @@ void MeshParam::edge_dyad( void ) {
 	E1_edge.reserve(num_f);
 	E2_edge.reserve(num_f);
 	E3_edge.reserve(num_f);	
-		
+    
+    #pragma omp parallel for
     for (int ii = 0; ii < num_f; ++ii) {
         // pick out the normals for the edges of the current face
         nA = normal_face.row(ii);
@@ -177,7 +177,7 @@ void MeshParam::edge_dyad( void ) {
         }
         
         // compute the edge dyad
-        E1_edge.push_back(nA.transpose() * nA1 + nB.transpose() * nB1);
+        E1_edge[ii] = nA.transpose() * nA1 + nB.transpose() * nB1;
 
         // find adjacent edge for edge 2
         if (e2_face_map(ii, 1) != -1 ){
@@ -192,7 +192,7 @@ void MeshParam::edge_dyad( void ) {
         }
         
         // second edge dyad
-        E2_edge.push_back(nA.transpose() * nA2 + nB.transpose() * nB2);
+        E2_edge[ii] = nA.transpose() * nA2 + nB.transpose() * nB2;
         
         // find the adjacent edge for edge 3
         if (e3_face_map(ii, 1) != -1 ) {
@@ -206,7 +206,7 @@ void MeshParam::edge_dyad( void ) {
             nB = normal_face.row(e3_face_map(ii, 3));
         }
 
-        E3_edge.push_back(nA.transpose() * nA3 + nB.transpose() * nB3);
+        E3_edge[ii] = nA.transpose() * nA3 + nB.transpose() * nB3;
     }
 }
 
