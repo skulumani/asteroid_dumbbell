@@ -117,13 +117,12 @@ def initialize(hf):
             est_ast_rmesh, lidar, caster, max_angle, 
             dum, AbsTol, RelTol)
 
-# TODO Need to save data to HDF5 file
 def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     """Actually run the simulation around the asteroid
     """
     logger = logging.getLogger(__name__)
 
-    num_steps = int(1e4)
+    num_steps = int(5000)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -222,7 +221,8 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
                                                         compression_opts=compression_opts)
             asteroid_intersections_group.create_dataset(str(ii), data=ast_ints, compression=compression,
                                                         compression_opts=compression_opts)
-
+            
+            hf.flush()
             ii += 1
 
 def animate(filename):
