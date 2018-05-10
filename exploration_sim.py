@@ -123,8 +123,8 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     """
     logger = logging.getLogger(__name__)
 
-    num_steps = int(1e3)
-    time = np.linspace(0, num_steps, num_steps)
+    num_steps = int(1e4)
+    time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
 
