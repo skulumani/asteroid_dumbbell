@@ -133,13 +133,13 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     initial_R = attitude.rot3(np.pi / 2).reshape(-1)
     initial_w = np.array([0, 0, 0])
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
-    
+
     with h5py.File(output_filename, 'w') as hf:
         hf.create_dataset('time', data=time, compression=compression,
                           compression_opts=compression_opts)
         hf.create_dataset("initial_state", data=initial_state, compression=compression,
                           compression_opts=compression_opts)
-        
+
         v_group = hf.create_group("reconstructed_vertex")
         f_group = hf.create_group("reconstructed_face")
         w_group = hf.create_group("reconstructed_weight")
