@@ -36,7 +36,7 @@ class ReconstructMesh {
     private:
         Eigen::MatrixXd vertices;
         Eigen::MatrixXi faces;
-        Eigen::MatrixXd weights;
+        Eigen::VectorXd weights;
 
         std::shared_ptr<MeshData> mesh;
 };

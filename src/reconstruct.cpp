@@ -13,6 +13,9 @@ ReconstructMesh::ReconstructMesh( const Eigen::Ref<const Eigen::MatrixXd> &v_in,
     this->vertices = v_in;
     this->faces = f_in;
     this->weights = w_in;
+
+    // need to initialize the meshdata shared_ptr
+    this->mesh = std::make_shared<MeshData>(vertices, faces);
 }
 
 // build object with only v and f
@@ -26,6 +29,9 @@ ReconstructMesh::ReconstructMesh( const Eigen::Ref<const Eigen::MatrixXd> &v_in,
     // now define the weights
     this->weights.resize(this->vertices.rows(), 1);
     this->weights << initial_weight(this->vertices);
+
+    // need to initialize the meshdata shared_ptr
+    this->mesh = std::make_shared<MeshData>(vertices, faces);
 }
 
 ReconstructMesh::ReconstructMesh(std::shared_ptr<MeshData> mesh_in) {

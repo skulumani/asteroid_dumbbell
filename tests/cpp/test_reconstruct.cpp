@@ -93,10 +93,11 @@ TEST_F(TestReconstruct, UpdateMeshVertices) {
 
 TEST_F(TestReconstruct, UpdateMeshWeight) {
     ReconstructMesh reconstruct_mesh(Ve_true, Fe_true, W_true);
-    Eigen::Vector3d pt(1, 1, 1);
+    Eigen::MatrixXd pts(2, 3);
+    pts << 1, 1, 1, -1, -1, -1;
     double max_angle(1);
-
-    reconstruct_mesh.update(pt, max_angle);
+    
+    reconstruct_mesh.update(pts, max_angle);
     ASSERT_NE(reconstruct_mesh.get_weights()(7), 1);
 
 }
