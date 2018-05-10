@@ -143,8 +143,8 @@ def inertial_asteroid_trajectory(time, state, ast, dum, point_cloud,
         yield
 
 @mlab.animate()
-def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections, ast,
-                                     dum, hdf5_file, mayavi_objects):
+def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
+                                     hdf5_file, mayavi_objects):
     """Animate the rotation of an asteroid and the motion of SC
 
     This assumes an asteroid object from C++ and using the exploration sim
@@ -169,20 +169,22 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections, ast,
     with h5py.File(hdf5_file, 'r') as hf:
         rv_group = hf['reconstructed_vertex']
         rf_group = hf['reconstructed_face']
+        Ra_group = hf['Ra']
+
         rv_keys = np.array(utilities.sorted_nicely(list(rv_group.keys())))
         
         for (t, pos, Rb2i, ints, key) in zip(time, state[:, 0:3], state[:, 6:15],
                                             inertial_intersections,
                                             rv_keys):
             # rotate teh asteroid
-            Ra = ast.rot_ast2int(t)
+            # Ra = ast.rot_ast2int(t)
+            Ra = Ra_group[key][()]
             Rb2i = Rb2i.reshape((3,3))
             # parse out the vertices x, y, z
-            new_vertices = rv_group[key][()]
+            # rotate the asteroid
+            new_vertices = Ra.dot(rv_group[key][()].T).T
             new_faces = rf_group[key][()]
             
-            # rotate the asteroid
-
             # update asteroid
             ms.reset(x=new_vertices[:, 0],y=new_vertices[:, 1], z=new_vertices[:,2],
                     triangles=new_faces)

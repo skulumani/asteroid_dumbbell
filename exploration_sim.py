@@ -276,7 +276,7 @@ def animate(filename):
         mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
 
     animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
-                                                ast, dum,filename, mayavi_objects)
+                                               filename, mayavi_objects)
 
 def reconstruct_images(filename):
     """Read teh HDF5 data and generate a bunch of images of the reconstructing 
