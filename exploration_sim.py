@@ -122,7 +122,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     """
     logger = logging.getLogger(__name__)
 
-    num_steps = int(5000)
+    num_steps = int(10)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -156,7 +156,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
         
         # initialize the ODE function
         system = integrate.ode(eoms.eoms_controlled_inertial_pybind)
-        system.set_integrator("lsoda", atol=AbsTol, rtol=RelTol, nsteps=num_steps)
+        system.set_integrator("lsoda", atol=AbsTol, rtol=RelTol)
         system.set_initial_value(initial_state, t0)
         system.set_f_params(true_ast, dum, complete_controller, est_ast_rmesh)
         
@@ -222,7 +222,6 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
             asteroid_intersections_group.create_dataset(str(ii), data=ast_ints, compression=compression,
                                                         compression_opts=compression_opts)
             
-            hf.flush()
             ii += 1
 
 def animate(filename):
