@@ -11,4 +11,5 @@ endif()
 
 add_executable(hello_world src/hello_world.cpp)
 add_executable(hello src/hello.cpp)
-
+add_executable(parallel_for src/parallel_loop.cpp)
+add_executable(vector src/vector.cpp)
