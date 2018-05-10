@@ -133,10 +133,12 @@ void MeshParam::polyhedron_parameters( void ) {
 
 void MeshParam::face_dyad( void ) {
     // compute the face dyad
+   	F_face.reserve(num_f);
     
+    #pragma omp parallel for
     for (int ii = 0; ii < num_f; ++ii) {
         // outer product of normal_face vectors
-        F_face.push_back(normal_face.row(ii).transpose() * normal_face.row(ii)); 
+        F_face[ii] = normal_face.row(ii).transpose() * normal_face.row(ii);
     }
 
 }
@@ -148,7 +150,11 @@ void MeshParam::edge_dyad( void ) {
 
     Eigen::Matrix<int, 1, 3> invalid_row(3);
     invalid_row.fill(-1);
-
+	
+	E1_edge.reserve(num_f);
+	E2_edge.reserve(num_f);
+	E3_edge.reserve(num_f);	
+		
     for (int ii = 0; ii < num_f; ++ii) {
         // pick out the normals for the edges of the current face
         nA = normal_face.row(ii);
