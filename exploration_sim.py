@@ -32,6 +32,9 @@ from kinematics import attitude
 import utilities
 from visualization import graphics, animation
 
+compression = 'gzip'
+compression_opts = 4
+
 def initialize(hf):
     """Initialize all the things for the simulation
 
@@ -88,8 +91,10 @@ def initialize(hf):
     dumbbell_group['l'] = 0.003
     
     true_ast_group = sim_group.create_group("true_asteroid")
-    true_ast_group.create_dataset("vertices", data=v)
-    true_ast_group.create_dataset("faces", data=f)
+    true_ast_group.create_dataset("vertices", data=v, compression=compression,
+                                  compression_opts=compression_opts)
+    true_ast_group.create_dataset("faces", data=f, compression=compression,
+                                  compression_opts=compression_opts)
     true_ast_group['name'] = 'castalia.obj'
     
     est_ast_group = sim_group.create_group("estimate_asteroid")
@@ -98,8 +103,10 @@ def initialize(hf):
     est_ast_group['min_angle'] = min_angle
     est_ast_group['max_distance'] = max_distance
     est_ast_group['max_radius'] = max_radius
-    est_ast_group.create_dataset('initial_vertices', data=ellipsoid.verts())
-    est_ast_group.create_dataset("initial_faces", data=ellipsoid.faces())
+    est_ast_group.create_dataset('initial_vertices', data=ellipsoid.verts(), compression=compression,
+                                 compression_opts=compression_opts)
+    est_ast_group.create_dataset("initial_faces", data=ellipsoid.faces(), compression=compression,
+                                 compression_opts=compression_opts)
 
     lidar_group = sim_group.create_group("lidar")
     lidar_group.create_dataset("view_axis", data=lidar.get_view_axis())
@@ -129,8 +136,10 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
     
     with h5py.File(output_filename, 'w') as hf:
-        hf.create_dataset('time', data=time)
-        hf.create_dataset("initial_state", data=initial_state)
+        hf.create_dataset('time', data=time, compression=compression,
+                          compression_opts=compression_opts)
+        hf.create_dataset("initial_state", data=initial_state, compression=compression,
+                          compression_opts=compression_opts)
         
         v_group = hf.create_group("reconstructed_vertex")
         f_group = hf.create_group("reconstructed_face")
@@ -196,15 +205,23 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
 
                 # save data to HDF5
 
-            v_group.create_dataset(str(t), data=est_ast_rmesh.get_verts())
-            f_group.create_dataset(str(t), data=est_ast_rmesh.get_faces())
-            w_group.create_dataset(str(t), data=est_ast_rmesh.get_weights())
+            v_group.create_dataset(str(ii), data=est_ast_rmesh.get_verts(), compression=compression,
+                                   compression_opts=compression_opts)
+            f_group.create_dataset(str(ii), data=est_ast_rmesh.get_faces(), compression=compression,
+                                   compression_opts=compression_opts)
+            w_group.create_dataset(str(ii), data=est_ast_rmesh.get_weights(), compression=compression,
+                                   compression_opts=compression_opts)
 
-            state_group.create_dataset(str(t), data=state)
-            targets_group.create_dataset(str(t), data=targets)
-            Ra_group.create_dataset(str(t), data=Ra)
-            inertial_intersections_group.create_dataset(str(t), data=intersections)
-            asteroid_intersections_group.create_dataset(str(t), data=ast_ints)
+            state_group.create_dataset(str(ii), data=state, compression=compression,
+                                       compression_opts=compression_opts)
+            targets_group.create_dataset(str(ii), data=targets, compression=compression,
+                                         compression_opts=compression_opts)
+            Ra_group.create_dataset(str(ii), data=Ra, compression=compression,
+                                    compression_opts=compression_opts)
+            inertial_intersections_group.create_dataset(str(ii), data=intersections, compression=compression,
+                                                        compression_opts=compression_opts)
+            asteroid_intersections_group.create_dataset(str(ii), data=ast_ints, compression=compression,
+                                                        compression_opts=compression_opts)
 
             ii += 1
 
@@ -237,7 +254,7 @@ def animate(filename):
         est_initial_faces = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
 
         mfig = graphics.mayavi_figure(size=(800,600))
-        mesh, ast_axes = graphics.draw_polyhedron_mayavi(est_initial_vertices, est_initial_faces, mfig)
+        mesh, ast_axes = graphics.draw_polyhedron_mayavi(true_vertices, true_faces, mfig)
 
         # initialize a dumbbell object
         dum = dumbbell.Dumbbell(hf['simulation_parameters/dumbbell/m1'][()], 
@@ -252,10 +269,15 @@ def animate(filename):
         ast_meshparam = asteroid.MeshParam(ast_meshdata)
         ast = asteroid.Asteroid('castalia', ast_meshparam)
         
+        # reconstructed vertices/faces groups
+        rv_group = hf['reconstructed_vertex']
+        rf_group = hf['reconstructed_face']
+        rv_keys = np.array(utilities.sorted_nicely(list(rv_group.keys())))
+        
         mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
 
-        animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
-                                                   ast, dum, mayavi_objects)
+    animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
+                                                ast, dum,hdf5_file, ayavi_objects)
 
 def reconstruct_images(filename):
     """Read teh HDF5 data and generate a bunch of images of the reconstructing 
