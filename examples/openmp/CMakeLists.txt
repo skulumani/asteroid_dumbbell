@@ -10,4 +10,5 @@ if (OPENMP_FOUND)
 endif()
 
 add_executable(hello_world src/hello_world.cpp)
+add_executable(hello src/hello.cpp)
 
