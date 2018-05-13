@@ -71,18 +71,22 @@ class MeshParam {
 
         Eigen::Matrix<double, Eigen::Dynamic, 3> V;
         Eigen::Matrix<int, Eigen::Dynamic, 3> F;
-
+        
+        // can probably remove and just index instead
         Eigen::Matrix<int, Eigen::Dynamic, 1> Fa, Fb, Fc;
         Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
         Eigen::Matrix<double, Eigen::Dynamic, 3> e1, e2, e3;
-
+        
+        // required
         Eigen::Matrix<int, Eigen::Dynamic, 2> e1_vertex_map;
         Eigen::Matrix<int, Eigen::Dynamic, 2> e2_vertex_map;
         Eigen::Matrix<int, Eigen::Dynamic, 2> e3_vertex_map;
-
+        
+        // required
         Eigen::MatrixXi unique_index; /**< Unique indices of e_vertex_map_sorted */
         Eigen::MatrixXi e_vertex_map, e_vertex_map_stacked, e_vertex_map_sorted;
-
+        
+        // required
         Eigen::Matrix<double, Eigen::Dynamic, 3> normal_face,
                                                  e1_normal,
                                                  e2_normal,
