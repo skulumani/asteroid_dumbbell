@@ -471,10 +471,9 @@ TEST_F(TestMeshParam, FaceDyad) {
 TEST_F(TestMeshParam, LaplacianFactor) {
     Eigen::Matrix<double, 1, 3> state;
     state << 1, 2, 3;
-    Eigen::Matrix<double, Eigen::Dynamic, 3> r_v;
-    r_v = mesh_param.mesh->get_verts().rowwise() - state;
-    Eigen::Matrix<double, 12, 1> w_face;
-    w_face = laplacian_factor(r_v, mesh_param.Fa, mesh_param.Fb, mesh_param.Fc);
+    Asteroid ast("cube", mesh_param);
+    Eigen::Matrix<double, Eigen::Dynamic, 3> r_v = mesh_param.mesh->get_verts().rowwise() - state;
+    Eigen::Matrix<double, 12, 1> w_face = ast.laplacian_factor(r_v);
 
     Eigen::Matrix<double, 12, 1> w_face_true;
     w_face_true << 0.02362863, 0.02502464, 0.01241267, 0.01325258, -0.01641329,
@@ -518,7 +517,8 @@ TEST_F(TestMeshParam, FaceContribution) {
     Eigen::Matrix<double, Eigen::Dynamic, 3> r_v;
     r_v = mesh_param.mesh->get_verts().rowwise() - state;
     
-    Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v, mesh_param.Fa, mesh_param.Fb, mesh_param.Fc);
+    Asteroid ast("cube", mesh_param);
+    Eigen::Matrix<double, 12, 1> w_face = ast.laplacian_factor(r_v);
 
     std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav = 
         face_contribution(r_v, mesh_param.Fa, mesh_param.F_face, w_face);

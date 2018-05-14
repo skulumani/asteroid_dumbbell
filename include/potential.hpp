@@ -137,7 +137,10 @@ class Asteroid {
         
         Asteroid(const std::string& name_in, MeshParam& mesh_param);
         Asteroid(const std::string& name_in, std::shared_ptr<MeshParam> mesh_param);
-    
+        
+        // Functions to compute the potential
+        Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v);
+
         /** @fn void polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state)
                 
             Compute the polyhedron potential at the given state
@@ -181,10 +184,6 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > ed
         const std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd>& L_tuple);
 
 
-Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
-                     const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fa,
-                     const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fb,
-                     const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fc);
 
 std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> edge_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v, 
                 const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& e1,

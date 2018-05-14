@@ -35,8 +35,4 @@ PYBIND11_MODULE(asteroid, m) {
         .def("rot_ast2int", &Asteroid::rot_ast2int, "Return the asteroid rotation asteroid to inertial",
                 pybind11::arg("time"));
 
-    // Some other member functions
-    m.def("face_contribution", &face_contribution);
-    m.def("laplacian_factor", &laplacian_factor);
-    m.def("edge_factor", &edge_factor);
 }

@@ -295,7 +295,7 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
     Eigen::Matrix<double, Eigen::Dynamic, 3> r_v = mesh_param->mesh->get_verts().rowwise() - state.transpose();
     
     // Compute w_face using laplacian_factor
-    Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v, mesh_param->Fa, mesh_param->Fb, mesh_param->Fc);
+    Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v);
     
     if (std::abs(w_face.sum()) < 1e-10) {
         std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all =
@@ -423,10 +423,11 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > ed
     return std::make_tuple(U_edge, U_grad_edge, U_grad_mat_edge);
 }
 
-Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
-                     const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fa,
-                     const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fb,
-                     const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fc) {
+Eigen::Matrix<double, Eigen::Dynamic, 1> Asteroid::laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v) {
+    const Eigen::Matrix<int, Eigen::Dynamic, 1>& Fa = mesh_param->Fa;
+    const Eigen::Matrix<int, Eigen::Dynamic, 1>& Fb = mesh_param->Fb;
+    const Eigen::Matrix<int, Eigen::Dynamic, 1>& Fc = mesh_param->Fc;
+
     // form the ri, rj, rk arrays
     Eigen::MatrixXd ri(Fa.rows(), 3), rj(Fa.rows(), 3), rk(Fa.rows(), 3), rjrk_cross(Fa.rows(), 3);
     
