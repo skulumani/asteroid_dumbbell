@@ -36,7 +36,7 @@ PYBIND11_MODULE(asteroid, m) {
                 pybind11::arg("time"));
 
     // Some other member functions
-    m.def("face_contribution", &face_contribution);
-    m.def("laplacian_factor", &laplacian_factor);
-    m.def("edge_factor", &edge_factor);
+    /* m.def("face_contribution", &face_contribution); */
+    /* m.def("laplacian_factor", &laplacian_factor); */
+    /* m.def("edge_factor", &edge_factor); */
 }

@@ -212,7 +212,7 @@ add_executable(memory_tester ${memory_tester_src})
 ################################################################################
 pybind11_add_module(asteroid MODULE
 src/potential.cpp src/potential_bindings.cpp)
-target_link_libraries(asteroid PRIVATE igl::core)
+target_link_libraries(asteroid PRIVATE igl::core cgal_cpp)
 
 pybind11_add_module(surface_mesh MODULE
 src/surface_mesher.cpp src/surface_mesh_bindings.cpp)
