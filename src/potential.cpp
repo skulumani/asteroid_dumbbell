@@ -25,19 +25,13 @@
 // Constructors
 MeshParam::MeshParam(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
                      const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in) {
-    V = V_in;
-    F = F_in;
     mesh = std::make_shared<MeshData>(V_in, F_in);
-
     polyhedron_parameters();
     face_dyad();
     edge_dyad();
 }
 
 MeshParam::MeshParam(std::shared_ptr<MeshData> mesh_in) {
-    V = mesh_in->get_verts();
-    F = mesh_in->get_faces();
-    
     mesh = mesh_in;
     polyhedron_parameters();
     face_dyad();
@@ -46,6 +40,9 @@ MeshParam::MeshParam(std::shared_ptr<MeshData> mesh_in) {
 
 void MeshParam::polyhedron_parameters( void ) {
     
+    const Eigen::MatrixXd& V = mesh->get_verts();
+    const Eigen::MatrixXi& F = mesh->get_faces();
+
     num_v = V.rows();
     num_f = F.rows();
     num_e = 3 * (num_v -2);
@@ -262,7 +259,7 @@ void Asteroid::init_asteroid( void ) {
 
 void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state) {
 
-    Eigen::Matrix<double, Eigen::Dynamic, 3> r_v = mesh_param->V.matrix().rowwise() - state.transpose();
+    Eigen::Matrix<double, Eigen::Dynamic, 3> r_v = mesh_param->mesh->get_verts().matrix().rowwise() - state.transpose();
     // Compute w_face using laplacian_factor
     Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v, mesh_param->Fa, mesh_param->Fb, mesh_param->Fc);
     
@@ -303,7 +300,7 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> Asteroid::rotate_vertices(const double&
     
     // multiply times all the vertices
     Eigen::Matrix<double, Eigen::Dynamic, 3> nv(mesh_param->num_v, 3);
-    nv = (Ra * mesh_param->V.transpose()).transpose();
+    nv = (Ra * mesh_param->mesh->get_verts().transpose()).transpose();
 
     return nv;
 }

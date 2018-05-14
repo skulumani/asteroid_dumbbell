@@ -472,7 +472,7 @@ TEST_F(TestMeshParam, LaplacianFactor) {
     Eigen::Matrix<double, 1, 3> state;
     state << 1, 2, 3;
     Eigen::Matrix<double, Eigen::Dynamic, 3> r_v;
-    r_v = mesh_param.V.rowwise() - state;
+    r_v = mesh_param.mesh->get_verts().rowwise() - state;
     Eigen::Matrix<double, 12, 1> w_face;
     w_face = laplacian_factor(r_v, mesh_param.Fa, mesh_param.Fb, mesh_param.Fc);
 
@@ -488,7 +488,7 @@ TEST_F(TestMeshParam, EdgeFactor) {
     Eigen::Matrix<double, 1, 3> state;
     state << 1, 2, 3;
     Eigen::Matrix<double, Eigen::Dynamic, 3> r_v;
-    r_v = mesh_param.V.rowwise() - state;
+    r_v = mesh_param.mesh->get_verts().rowwise() - state;
     
     Eigen::VectorXd L1_edge(12), L2_edge(12), L3_edge(12);
     
@@ -516,7 +516,7 @@ TEST_F(TestMeshParam, FaceContribution) {
     state << 1, 2, 3;
 
     Eigen::Matrix<double, Eigen::Dynamic, 3> r_v;
-    r_v = mesh_param.V.rowwise() - state;
+    r_v = mesh_param.mesh->get_verts().rowwise() - state;
     
     Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v, mesh_param.Fa, mesh_param.Fb, mesh_param.Fc);
 
@@ -542,7 +542,7 @@ TEST_F(TestMeshParam, EdgeContribution) {
     state << 1, 2, 3;
 
     Eigen::Matrix<double, Eigen::Dynamic, 3> r_v;
-    r_v = mesh_param.V.rowwise() - state;
+    r_v = mesh_param.mesh->get_verts().rowwise() - state;
     
     std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all = 
         edge_factor(r_v, mesh_param.e1, mesh_param.e2, mesh_param.e3,
