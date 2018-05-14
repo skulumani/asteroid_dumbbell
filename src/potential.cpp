@@ -158,10 +158,10 @@ void MeshParam::edge_dyad( void ) {
 	E2_edge.resize(num_f);
 	E3_edge.resize(num_f);	
     
-    #pragma omp parallel sections private(nA, nA1, nA2, nA3, nB1, nB2, nB3, nB)
+    #pragma omp parallel private(nA, nA1, nA2, nA3, nB1, nB2, nB3, nB)
     {
     // E1_edge
-    #pragma omp section
+    #pragma omp task
     {
     for (int ii = 0; ii < num_f; ++ii) {
         // pick out the normals for the edges of the current face
@@ -187,7 +187,7 @@ void MeshParam::edge_dyad( void ) {
     }
     }
     
-    #pragma omp section
+    #pragma omp task
     {
     for (int ii = 0; ii < num_f; ++ii) {
         // pick out the normals for the edges of the current face
@@ -213,7 +213,7 @@ void MeshParam::edge_dyad( void ) {
     }
     }
 
-    #pragma omp section
+    #pragma omp task
     {
     for (int ii = 0; ii < num_f; ++ii) {
         // pick out the normals for the edges of the current face
