@@ -27,6 +27,9 @@ MeshParam::MeshParam(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic
                      const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in) {
     V = V_in;
     F = F_in;
+	
+	mesh = std::make_shared<MeshData>(V_in, F_in);
+
     polyhedron_parameters();
     face_dyad();
     edge_dyad();
@@ -35,6 +38,9 @@ MeshParam::MeshParam(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic
 MeshParam::MeshParam(std::shared_ptr<MeshData> mesh_in) {
     V = mesh_in->get_verts();
     F = mesh_in->get_faces();
+
+	mesh = mesh_in;
+
     polyhedron_parameters();
     face_dyad();
     edge_dyad();

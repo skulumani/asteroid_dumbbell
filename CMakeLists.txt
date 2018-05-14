@@ -14,6 +14,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 
 # Find OpenMP
+set(ENV{OMP_NUM_THREADS} 8)
 find_package(OpenMP)
 if (OPENMP_FOUND)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -185,7 +186,7 @@ target_link_libraries(mesh cgal_cpp input_parser_cpp)
 # potential function
 set(potential_src src/potential_main.cpp src/potential.cpp)
 add_executable(potential ${potential_src})
-target_link_libraries(potential igl::core)
+target_link_libraries(potential igl::core cgal_cpp)
 
 # surface mesher
 set( surface_mesher_src src/surface_mesher_main.cpp )
@@ -203,12 +204,16 @@ add_executable(explore ${explore_src})
 target_link_libraries(explore cgal_cpp input_parser_cpp eigen_hdf5
     ${HDF5_CXX_LIBRARIES} )
 
+# memory tester 
+set(memory_tester_src src/memory_tester.cpp src/loader.cpp src/mesh.cpp src/polyhedron.cpp)
+add_executable(memory_tester ${memory_tester_src})
+
 ################################################################################
 # PYTHON BINDING
 ################################################################################
 pybind11_add_module(asteroid MODULE
 src/potential.cpp src/potential_bindings.cpp)
-target_link_libraries(asteroid PRIVATE igl::core)
+target_link_libraries(asteroid PRIVATE igl::core cgal_cpp)
 
 pybind11_add_module(surface_mesh MODULE
 src/surface_mesher.cpp src/surface_mesh_bindings.cpp)
@@ -275,7 +280,7 @@ add_test(NAME test_libigl COMMAND test_libigl
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 add_executable(test_potential tests/cpp/test_potential.cpp tests/cpp/test_all.cpp src/potential.cpp)
-target_link_libraries(test_potential gtest igl::core)
+target_link_libraries(test_potential gtest igl::core cgal_cpp)
 add_test(NAME test_potential COMMAND test_potential,
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 

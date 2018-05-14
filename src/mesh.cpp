@@ -2,7 +2,7 @@
 #include "polyhedron.hpp"
 
 // Member methods
-MeshData::MeshData(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
+MeshData::MeshData(const Eigen::Ref<const Eigen::MatrixXd> &V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
     this->vertices = V;
     this->faces = F;
 

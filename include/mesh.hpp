@@ -15,7 +15,7 @@ class MeshData {
         virtual ~MeshData( void ) {}
 
         // other constructors
-        MeshData(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
+        MeshData(const Eigen::Ref<const Eigen::MatrixXd> &V, const Eigen::Ref<const Eigen::MatrixXi> &F);
         // get and set the data here
        
         // member functions
