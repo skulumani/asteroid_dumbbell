@@ -136,7 +136,7 @@ void MeshParam::polyhedron_parameters( void ) {
 
 void MeshParam::face_dyad( void ) {
     // compute the face dyad
-   	F_face.reserve(num_f);
+   	F_face.resize(num_f);
     
     #pragma omp parallel for
     for (int ii = 0; ii < num_f; ++ii) {
@@ -154,11 +154,15 @@ void MeshParam::edge_dyad( void ) {
     Eigen::Matrix<int, 1, 3> invalid_row(3);
     invalid_row.fill(-1);
 	
-	E1_edge.reserve(num_f);
-	E2_edge.reserve(num_f);
-	E3_edge.reserve(num_f);	
+	E1_edge.resize(num_f);
+	E2_edge.resize(num_f);
+	E3_edge.resize(num_f);	
     
+    #pragma omp parallel sections private(nA, nA1, nA2, nA3, nB1, nB2, nB3, nB)
+    {
     // E1_edge
+    #pragma omp section
+    {
     for (int ii = 0; ii < num_f; ++ii) {
         // pick out the normals for the edges of the current face
         nA = normal_face.row(ii);
@@ -178,10 +182,13 @@ void MeshParam::edge_dyad( void ) {
         }
         
         // compute the edge dyad
-        E1_edge.push_back(nA.transpose() * nA1 + nB.transpose() * nB1);
+        E1_edge[ii] = nA.transpose() * nA1 + nB.transpose() * nB1;
 
     }
-
+    }
+    
+    #pragma omp section
+    {
     for (int ii = 0; ii < num_f; ++ii) {
         // pick out the normals for the edges of the current face
         nA = normal_face.row(ii);
@@ -201,9 +208,13 @@ void MeshParam::edge_dyad( void ) {
         }
         
         // second edge dyad
-        E2_edge.push_back(nA.transpose() * nA2 + nB.transpose() * nB2);
+        E2_edge[ii] = nA.transpose() * nA2 + nB.transpose() * nB2;
 
     }
+    }
+
+    #pragma omp section
+    {
     for (int ii = 0; ii < num_f; ++ii) {
         // pick out the normals for the edges of the current face
         nA = normal_face.row(ii);
@@ -222,7 +233,10 @@ void MeshParam::edge_dyad( void ) {
             nB = normal_face.row(e3_face_map(ii, 3));
         }
 
-        E3_edge.push_back(nA.transpose() * nA3 + nB.transpose() * nB3);
+        E3_edge[ii] = nA.transpose() * nA3 + nB.transpose() * nB3;
+    }
+    }
+
     }
 }
 
