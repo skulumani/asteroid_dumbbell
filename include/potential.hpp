@@ -71,9 +71,6 @@ class MeshParam {
         // define all the member variables
         std::size_t num_v, num_f, num_e;
 
-        Eigen::Matrix<double, Eigen::Dynamic, 3> V;
-        Eigen::Matrix<int, Eigen::Dynamic, 3> F;
-
         Eigen::Matrix<int, Eigen::Dynamic, 1> Fa, Fb, Fc;
         Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
         Eigen::Matrix<double, Eigen::Dynamic, 3> e1, e2, e3;
