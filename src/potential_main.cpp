@@ -78,7 +78,7 @@ int main() {
                 0.03808065, 0.02361574, 0.03808065,0.02361574;
 
     std::shared_ptr<MeshParam> mesh_param = std::make_shared<MeshParam>(Ve_true, Fe_true);
-     
+    
     Asteroid ast("cube", mesh_param);
     Eigen::Vector3d state; 
     state << 1, 2, 3;
