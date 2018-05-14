@@ -196,7 +196,7 @@ class TestController:
         att_cont = controller.AttitudeController()
         att_cont.body_fixed_pointing_attitude(1, self.state)
         
-        np.testing.assert_allclose(att_cont.get_Rd(), Rd)
+        np.testing.assert_allclose(att_cont.get_Rd(), Rd, 1e-4)
         np.testing.assert_allclose(att_cont.get_Rd_dot(), Rd_dot)
         np.testing.assert_allclose(att_cont.get_ang_vel_d(), ang_vel_d)
         np.testing.assert_allclose(att_cont.get_ang_vel_d_dot(), ang_vel_d_dot)
