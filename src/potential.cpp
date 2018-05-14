@@ -299,9 +299,7 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
     
     if (std::abs(w_face.sum()) < 1e-10) {
         std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all =
-            edge_factor(r_v, mesh_param->e1, mesh_param->e2, mesh_param->e3,
-                    mesh_param->e1_vertex_map, mesh_param->e2_vertex_map,
-                    mesh_param->e3_vertex_map);
+            edge_factor(r_v);
             
             // face contribution
         std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav = face_contribution(r_v, mesh_param->Fa, mesh_param->F_face, w_face);
@@ -465,13 +463,15 @@ Eigen::Matrix<double, Eigen::Dynamic, 1> Asteroid::laplacian_factor(const Eigen:
 }
 
 // This is slower than numpy
-std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> edge_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v, 
-                const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& e1,
-                const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& e2,
-                const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& e3,
-                const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& e1_vertex_map,
-                const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& e2_vertex_map,
-                const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& e3_vertex_map) {
+std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> Asteroid::edge_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v) {
+    
+    const Eigen::Matrix<double, Eigen::Dynamic, 3>& e1 = mesh_param->e1;
+    const Eigen::Matrix<double, Eigen::Dynamic, 3>& e2 = mesh_param->e2;
+    const Eigen::Matrix<double, Eigen::Dynamic, 3>& e3 = mesh_param->e3;
+    
+    const Eigen::Matrix<int, Eigen::Dynamic, 2>& e1_vertex_map = mesh_param->e1_vertex_map;
+    const Eigen::Matrix<int, Eigen::Dynamic, 2>& e2_vertex_map = mesh_param->e2_vertex_map;
+    const Eigen::Matrix<int, Eigen::Dynamic, 2>& e3_vertex_map = mesh_param->e3_vertex_map;
     
     const int num_f = e1_vertex_map.rows();
 

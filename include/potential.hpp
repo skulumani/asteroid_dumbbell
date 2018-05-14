@@ -141,6 +141,8 @@ class Asteroid {
         // Functions to compute the potential
         Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v);
 
+        std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> edge_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v);
+
         /** @fn void polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state)
                 
             Compute the polyhedron potential at the given state
@@ -185,13 +187,6 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > ed
 
 
 
-std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> edge_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v, 
-                const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& e1,
-                const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& e2,
-                const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& e3,
-                const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& e1_vertex_map,
-                const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& e2_vertex_map,
-                const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 2> >& e3_vertex_map);
 
 
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> &V,

@@ -488,6 +488,7 @@ TEST_F(TestMeshParam, EdgeFactor) {
     state << 1, 2, 3;
     Eigen::Matrix<double, Eigen::Dynamic, 3> r_v;
     r_v = mesh_param.mesh->get_verts().rowwise() - state;
+    Asteroid ast("cube", mesh_param);
     
     Eigen::VectorXd L1_edge(12), L2_edge(12), L3_edge(12);
     
@@ -500,9 +501,7 @@ TEST_F(TestMeshParam, EdgeFactor) {
             0.40666794, 0.39306872, 0.25450247, 0.35165377, 0.23935081,
             0.42219138, 0.28279655;
  
-    std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all = edge_factor(r_v,
-            mesh_param.e1, mesh_param.e2, mesh_param.e3,
-            mesh_param.e1_vertex_map, mesh_param.e2_vertex_map, mesh_param.e3_vertex_map);
+    std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all = ast.edge_factor(r_v);
     
     EXPECT_TRUE(std::get<0>(L_all).isApprox(L1_edge, 1e-5));
     EXPECT_TRUE(std::get<1>(L_all).isApprox(L2_edge, 1e-5));
@@ -543,10 +542,10 @@ TEST_F(TestMeshParam, EdgeContribution) {
 
     Eigen::Matrix<double, Eigen::Dynamic, 3> r_v;
     r_v = mesh_param.mesh->get_verts().rowwise() - state;
+    Asteroid ast("cube", mesh_param);
     
     std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all = 
-        edge_factor(r_v, mesh_param.e1, mesh_param.e2, mesh_param.e3,
-                mesh_param.e1_vertex_map, mesh_param.e2_vertex_map, mesh_param.e3_vertex_map);
+        ast.edge_factor(r_v);
 
     std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_grav = 
         edge_contribution(r_v, mesh_param.e_vertex_map, mesh_param.unique_index,
