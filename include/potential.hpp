@@ -65,6 +65,8 @@ class MeshParam {
                 const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in);
         
         MeshParam( std::shared_ptr<MeshData> mesh_in);
+        
+        std::shared_ptr<MeshData> mesh;
 
         // define all the member variables
         std::size_t num_v, num_f, num_e;
