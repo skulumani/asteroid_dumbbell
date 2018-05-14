@@ -157,14 +157,13 @@ void MeshParam::edge_dyad( void ) {
 	E1_edge.reserve(num_f);
 	E2_edge.reserve(num_f);
 	E3_edge.reserve(num_f);	
-		
+    
+    // E1_edge
     for (int ii = 0; ii < num_f; ++ii) {
         // pick out the normals for the edges of the current face
         nA = normal_face.row(ii);
 
         nA1 = e1_normal.row(e1_face_map(ii, 0));
-        nA2 = e2_normal.row(e2_face_map(ii, 0));
-        nA3 = e3_normal.row(e3_face_map(ii, 0));
     
         // find the adjacent face for edge 1
         if (e1_face_map(ii, 1) != -1) { // adjacent face is also edge 1
@@ -181,6 +180,14 @@ void MeshParam::edge_dyad( void ) {
         // compute the edge dyad
         E1_edge.push_back(nA.transpose() * nA1 + nB.transpose() * nB1);
 
+    }
+
+    for (int ii = 0; ii < num_f; ++ii) {
+        // pick out the normals for the edges of the current face
+        nA = normal_face.row(ii);
+
+        nA2 = e2_normal.row(e2_face_map(ii, 0));
+
         // find adjacent edge for edge 2
         if (e2_face_map(ii, 1) != -1 ){
             nB2 = e1_normal.row(e2_face_map(ii, 1));
@@ -195,7 +202,14 @@ void MeshParam::edge_dyad( void ) {
         
         // second edge dyad
         E2_edge.push_back(nA.transpose() * nA2 + nB.transpose() * nB2);
-        
+
+    }
+    for (int ii = 0; ii < num_f; ++ii) {
+        // pick out the normals for the edges of the current face
+        nA = normal_face.row(ii);
+
+        nA3 = e3_normal.row(e3_face_map(ii, 0));
+    
         // find the adjacent edge for edge 3
         if (e3_face_map(ii, 1) != -1 ) {
             nB3 = e1_normal.row(e3_face_map(ii, 1));
@@ -363,12 +377,12 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > ed
         const std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd>& L_tuple) {
     // edge contribution
     // combine all the Ei and Li into big vectors then pick out the unique ones
-    std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > > E_all;
-    E_all = E1_edge;
+    std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > > E_all(3 * std::get<0>(L_tuple).rows());
+    E_all.assign(E1_edge.begin(), E1_edge.end());
     E_all.insert(E_all.end(), E2_edge.begin(), E2_edge.end());
     E_all.insert(E_all.end(), E3_edge.begin(), E3_edge.end());
     
-    Eigen::VectorXd L_all(E_all.size());
+    Eigen::VectorXd L_all(3 * std::get<0>(L_tuple).rows());
     L_all << std::get<0>(L_tuple), std::get<1>(L_tuple), std::get<2>(L_tuple);
         
     Eigen::Matrix<double, Eigen::Dynamic, 3> re(e_vertex_map.rows(), 3);
