@@ -10,9 +10,8 @@ void eigen_reference_class(const Eigen::Ref<const Eigen::Array<double, Eigen::Dy
     b = 2 * a;
 }
 
-void eigen_reference(const Eigen::Ref<const Eigen::Array<double, 1, 3> >& a, Eigen::Ref<Eigen::Array<double, 1, 3> > b) {
+void eigen_reference(const Eigen::Array<double, 1, 3>& a, Eigen::Array<double, 1, 3>& b) {
     b = 2*a;
-    eigen_reference_class(b, b);
 }
 
 template<typename Derived> 

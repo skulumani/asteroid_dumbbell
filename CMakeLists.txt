@@ -12,8 +12,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+
 # Find OpenMP
-	
 set(ENV{OMP_NUM_THREADS} 8)
 find_package(OpenMP)
 if (OPENMP_FOUND)
@@ -207,6 +207,7 @@ target_link_libraries(explore cgal_cpp input_parser_cpp eigen_hdf5
 # memory tester 
 set(memory_tester_src src/memory_tester.cpp src/loader.cpp src/mesh.cpp src/polyhedron.cpp)
 add_executable(memory_tester ${memory_tester_src})
+
 ################################################################################
 # PYTHON BINDING
 ################################################################################

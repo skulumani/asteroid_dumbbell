@@ -25,14 +25,16 @@
 // Constructors
 MeshParam::MeshParam(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
                      const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in) {
-    mesh = std::make_shared<MeshData>(V_in, F_in);
+	mesh = std::make_shared<MeshData>(V_in, F_in);
+
     polyhedron_parameters();
     face_dyad();
     edge_dyad();
 }
 
 MeshParam::MeshParam(std::shared_ptr<MeshData> mesh_in) {
-    mesh = mesh_in;
+	mesh = mesh_in;
+
     polyhedron_parameters();
     face_dyad();
     edge_dyad();
@@ -104,6 +106,7 @@ void MeshParam::polyhedron_parameters( void ) {
 
     // build vertex face map
     vf_map = vertex_face_map(V, F);
+    
     e1_ind1b = vertex_map_search(e1_vertex_map, e1_vertex_map);
     e1_ind2b = vertex_map_search(e1_vertex_map, e2_vertex_map);
     e1_ind3b = vertex_map_search(e1_vertex_map, e3_vertex_map);
@@ -155,14 +158,12 @@ void MeshParam::edge_dyad( void ) {
 	E2_edge.reserve(num_f);
 	E3_edge.reserve(num_f);	
     
-    #pragma omp parallel for
+    // E1_edge
     for (int ii = 0; ii < num_f; ++ii) {
         // pick out the normals for the edges of the current face
         nA = normal_face.row(ii);
 
         nA1 = e1_normal.row(e1_face_map(ii, 0));
-        nA2 = e2_normal.row(e2_face_map(ii, 0));
-        nA3 = e3_normal.row(e3_face_map(ii, 0));
     
         // find the adjacent face for edge 1
         if (e1_face_map(ii, 1) != -1) { // adjacent face is also edge 1
@@ -177,7 +178,15 @@ void MeshParam::edge_dyad( void ) {
         }
         
         // compute the edge dyad
-        E1_edge[ii] = nA.transpose() * nA1 + nB.transpose() * nB1;
+        E1_edge.push_back(nA.transpose() * nA1 + nB.transpose() * nB1);
+
+    }
+
+    for (int ii = 0; ii < num_f; ++ii) {
+        // pick out the normals for the edges of the current face
+        nA = normal_face.row(ii);
+
+        nA2 = e2_normal.row(e2_face_map(ii, 0));
 
         // find adjacent edge for edge 2
         if (e2_face_map(ii, 1) != -1 ){
@@ -192,8 +201,15 @@ void MeshParam::edge_dyad( void ) {
         }
         
         // second edge dyad
-        E2_edge[ii] = nA.transpose() * nA2 + nB.transpose() * nB2;
-        
+        E2_edge.push_back(nA.transpose() * nA2 + nB.transpose() * nB2);
+
+    }
+    for (int ii = 0; ii < num_f; ++ii) {
+        // pick out the normals for the edges of the current face
+        nA = normal_face.row(ii);
+
+        nA3 = e3_normal.row(e3_face_map(ii, 0));
+    
         // find the adjacent edge for edge 3
         if (e3_face_map(ii, 1) != -1 ) {
             nB3 = e1_normal.row(e3_face_map(ii, 1));
@@ -206,7 +222,7 @@ void MeshParam::edge_dyad( void ) {
             nB = normal_face.row(e3_face_map(ii, 3));
         }
 
-        E3_edge[ii] = nA.transpose() * nA3 + nB.transpose() * nB3;
+        E3_edge.push_back(nA.transpose() * nA3 + nB.transpose() * nB3);
     }
 }
 
@@ -259,7 +275,8 @@ void Asteroid::init_asteroid( void ) {
 
 void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state) {
 
-    Eigen::Matrix<double, Eigen::Dynamic, 3> r_v = mesh_param->mesh->get_verts().matrix().rowwise() - state.transpose();
+    Eigen::Matrix<double, Eigen::Dynamic, 3> r_v = mesh_param->mesh->get_verts().rowwise() - state.transpose();
+    
     // Compute w_face using laplacian_factor
     Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v, mesh_param->Fa, mesh_param->Fb, mesh_param->Fc);
     
@@ -268,8 +285,8 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
             edge_factor(r_v, mesh_param->e1, mesh_param->e2, mesh_param->e3,
                     mesh_param->e1_vertex_map, mesh_param->e2_vertex_map,
                     mesh_param->e3_vertex_map);
-        
-        // face contribution
+            
+            // face contribution
         std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav = face_contribution(r_v, mesh_param->Fa, mesh_param->F_face, w_face);
         
         // edge contribution
@@ -358,17 +375,16 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > ed
         const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E2_edge,
         const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E3_edge,
         const std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd>& L_tuple) {
-        
     // edge contribution
     // combine all the Ei and Li into big vectors then pick out the unique ones
     std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > > E_all(3 * std::get<0>(L_tuple).rows());
-    E_all = E1_edge;
+    E_all.assign(E1_edge.begin(), E1_edge.end());
     E_all.insert(E_all.end(), E2_edge.begin(), E2_edge.end());
     E_all.insert(E_all.end(), E3_edge.begin(), E3_edge.end());
     
-    Eigen::VectorXd L_all(std::get<0>(L_tuple).rows() * 3, 1);
+    Eigen::VectorXd L_all(3 * std::get<0>(L_tuple).rows());
     L_all << std::get<0>(L_tuple), std::get<1>(L_tuple), std::get<2>(L_tuple);
-    
+        
     Eigen::Matrix<double, Eigen::Dynamic, 3> re(e_vertex_map.rows(), 3);
     igl::slice(r_v, e_vertex_map.col(0), 1, re);
 
