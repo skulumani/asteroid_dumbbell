@@ -302,7 +302,7 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
             edge_factor(r_v);
             
             // face contribution
-        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav = face_contribution(r_v, mesh_param->Fa, mesh_param->F_face, w_face);
+        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav = face_contribution(r_v, w_face);
         
         // edge contribution
         std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_grav = edge_contribution(r_v, mesh_param->e_vertex_map, mesh_param->unique_index,
@@ -359,10 +359,11 @@ std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::Mat
 
 // Start of polyhedron potential function code 
 std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > Asteroid::face_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
-        const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 1> >& Fa,
-        const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& F_face,
         const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> >& w_face) {
     
+    const Eigen::Matrix<int, Eigen::Dynamic, 1>& Fa = mesh_param->Fa;
+    const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& F_face = mesh_param->F_face;
+
     const int num_f = Fa.rows();
 
     Eigen::Matrix<double, Eigen::Dynamic, 3> ra(num_f, 3);
@@ -374,10 +375,14 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > As
     Eigen::Matrix<double, 3, 3> U_grad_mat_face(3, 3);
     U_grad_mat_face.setZero();
     
+    #pragma omp declare reduction (merge_vec : Eigen::Matrix<double, 3, 1> : omp_out += omp_in)
+    #pragma omp declare reduction (merge_mat : Eigen::Matrix<double, 3, 3> : omp_out += omp_in)
+
+    #pragma omp parallel for reduction(+:U_face) reduction(merge_vec:U_grad_face) reduction(merge_mat:U_grad_mat_face)
     for (int ii = 0; ii < num_f; ++ii) {
-        U_face = U_face + (ra.row(ii) * F_face[ii] * ra.row(ii).transpose() * w_face(ii)).value(); 
-        U_grad_face = U_grad_face + F_face[ii] * ra.row(ii).transpose() * w_face(ii); 
-        U_grad_mat_face = U_grad_mat_face + F_face[ii] * w_face(ii);
+        U_face += (ra.row(ii) * F_face[ii] * ra.row(ii).transpose() * w_face(ii)).value(); 
+        U_grad_face += F_face[ii] * ra.row(ii).transpose() * w_face(ii); 
+        U_grad_mat_face += F_face[ii] * w_face(ii);
     }
     
     return std::make_tuple(U_face, U_grad_face, U_grad_mat_face);

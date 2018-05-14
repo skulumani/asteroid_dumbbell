@@ -520,7 +520,7 @@ TEST_F(TestMeshParam, FaceContribution) {
     Eigen::Matrix<double, 12, 1> w_face = ast.laplacian_factor(r_v);
 
     std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav = 
-        ast.face_contribution(r_v, mesh_param.Fa, mesh_param.F_face, w_face);
+        ast.face_contribution(r_v, w_face);
     
     const double U_face_true = 0.3961664586681945;
     Eigen::Matrix<double, 3, 1> U_grad_face_true;
