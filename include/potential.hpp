@@ -70,15 +70,18 @@ class MeshParam {
 
         // define all the member variables
         std::size_t num_v, num_f, num_e;
-
+        
+        // Try to get rid of and use indexing instead
         Eigen::Matrix<int, Eigen::Dynamic, 1> Fa, Fb, Fc;
         Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
         Eigen::Matrix<double, Eigen::Dynamic, 3> e1, e2, e3;
-
+        
+        // required
         Eigen::Matrix<int, Eigen::Dynamic, 2> e1_vertex_map;
         Eigen::Matrix<int, Eigen::Dynamic, 2> e2_vertex_map;
         Eigen::Matrix<int, Eigen::Dynamic, 2> e3_vertex_map;
-
+        
+        // required unique_index, e_vertex_map
         Eigen::MatrixXi unique_index; /**< Unique indices of e_vertex_map_sorted */
         Eigen::MatrixXi e_vertex_map, e_vertex_map_stacked, e_vertex_map_sorted;
 
@@ -90,19 +93,21 @@ class MeshParam {
         std::tuple<Eigen::Matrix<int, Eigen::Dynamic, 2>,
                    Eigen::Matrix<int, Eigen::Dynamic, 2>,
                    Eigen::Matrix<int, Eigen::Dynamic, 2> > edge_vertex_map;
-
+        // not required
         std::vector<std::vector<int> > vf_map;
-
+        
+        // not required
         Eigen::VectorXi e1_ind1b, e1_ind2b, e1_ind3b,
                         e2_ind1b, e2_ind2b, e2_ind3b,
                         e3_ind1b, e3_ind2b, e3_ind3b;
 
+        // required
         std::tuple<Eigen::MatrixXi, Eigen::MatrixXi, Eigen::MatrixXi> edge_face_map;
         Eigen::MatrixXi e1_face_map,
                         e2_face_map,
                         e3_face_map;
+        // required
         std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > > F_face;
-
         std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> >  > E1_edge, E2_edge, E3_edge;
 
 };
