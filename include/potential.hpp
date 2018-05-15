@@ -73,7 +73,6 @@ class MeshParam {
         
         // Try to get rid of and use indexing instead
         Eigen::Matrix<int, Eigen::Dynamic, 1> Fa, Fb, Fc;
-        Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
         Eigen::Matrix<double, Eigen::Dynamic, 3> e1, e2, e3;
         
         // required

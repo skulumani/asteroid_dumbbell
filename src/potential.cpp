@@ -21,6 +21,7 @@
 #include <string>
 #include <stdexcept>
 
+// **********************Forward declaration************************
 // ***************** MeshParam ***************************************
 // Constructors
 MeshParam::MeshParam(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
@@ -53,7 +54,8 @@ void MeshParam::polyhedron_parameters( void ) {
     Fa = F.col(0);
     Fb = F.col(1);
     Fc = F.col(2);
-
+    
+    Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
     igl::slice(V, Fa, (Eigen::Vector3i() << 0, 1, 2).finished(), V1);
     igl::slice(V, Fb, (Eigen::Vector3i() << 0, 1, 2).finished(), V2);
     igl::slice(V, Fc, (Eigen::Vector3i() << 0, 1, 2).finished(), V3);
@@ -369,7 +371,8 @@ std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::Mat
 std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > Asteroid::face_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
         const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> >& w_face) {
     
-    const Eigen::Matrix<int, Eigen::Dynamic, 1>& Fa = mesh_param->Fa;
+    const Eigen::Matrix<int, Eigen::Dynamic, 1>& Fa = mesh_param->mesh->get_faces().col(0);
+
     const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& F_face = mesh_param->F_face;
 
     const int num_f = Fa.rows();
@@ -479,24 +482,34 @@ Eigen::Matrix<double, Eigen::Dynamic, 1> Asteroid::laplacian_factor(const Eigen:
     
 }
 
-// This is slower than numpy
-std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> Asteroid::edge_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v) {
-    
-    const Eigen::MatrixXd& V = mesh_param->mesh->get_verts();
-    const Eigen::MatrixXi& F = mesh_param->mesh->get_faces();
+std::tuple<Eigen::Matrix<double, Eigen::Dynamic, 3>, 
+           Eigen::Matrix<double, Eigen::Dynamic, 3>,
+           Eigen::Matrix<double, Eigen::Dynamic, 3> > mesh_edges(const Eigen::Ref<const Eigen::MatrixXd>& V, 
+                                                                 const Eigen::Ref<const Eigen::MatrixXi>& F) {
 
-    const Eigen::Matrix<int, Eigen::Dynamic, 1> Fa = F.col(0);
-    const Eigen::Matrix<int, Eigen::Dynamic, 1> Fb = F.col(1);
-    const Eigen::Matrix<int, Eigen::Dynamic, 1> Fc = F.col(2);
     
     Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
-    igl::slice(V, Fa, (Eigen::Vector3i() << 0, 1, 2).finished(), V1);
-    igl::slice(V, Fb, (Eigen::Vector3i() << 0, 1, 2).finished(), V2);
-    igl::slice(V, Fc, (Eigen::Vector3i() << 0, 1, 2).finished(), V3);
+    igl::slice(V, F.col(0), (Eigen::Vector3i() << 0, 1, 2).finished(), V1);
+    igl::slice(V, F.col(1), (Eigen::Vector3i() << 0, 1, 2).finished(), V2);
+    igl::slice(V, F.col(2), (Eigen::Vector3i() << 0, 1, 2).finished(), V3);
 
     const Eigen::Matrix<double, Eigen::Dynamic, 3> e1 = V2 - V1;
     const Eigen::Matrix<double, Eigen::Dynamic, 3> e2 = V3 - V2;
     const Eigen::Matrix<double, Eigen::Dynamic, 3> e3 = V1 - V3;
+
+    return std::make_tuple(e1, e2, e3);
+}
+
+// This is slower than numpy
+std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> Asteroid::edge_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v) {
+    
+    std::tuple<Eigen::Matrix<double, Eigen::Dynamic, 3>,
+               Eigen::Matrix<double, Eigen::Dynamic, 3>,
+               Eigen::Matrix<double, Eigen::Dynamic, 3> > edges = mesh_edges(mesh_param->mesh->get_verts(), mesh_param->mesh->get_faces());
+    
+    const Eigen::Matrix<double, Eigen::Dynamic, 3>& e1 = std::get<0>(edges);
+    const Eigen::Matrix<double, Eigen::Dynamic, 3>& e2 = std::get<1>(edges);
+    const Eigen::Matrix<double, Eigen::Dynamic, 3>& e3 = std::get<2>(edges);
 
     const Eigen::Matrix<int, Eigen::Dynamic, 2>& e1_vertex_map = mesh_param->e1_vertex_map;
     const Eigen::Matrix<int, Eigen::Dynamic, 2>& e2_vertex_map = mesh_param->e2_vertex_map;
