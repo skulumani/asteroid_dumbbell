@@ -85,7 +85,8 @@ int main() {
 
     ast.polyhedron_potential(state);
     std::cout << "U : " << ast.get_potential() << std::endl; 
-    std::cout << "U_grad : " << ast.get_acceleration() << std::endl;
-    std::cout << "U_grad_mat : " << ast.get_gradient_mat() << std::endl;
+    std::cout << "U_grad : " << ast.get_acceleration().transpose() << std::endl;
+    std::cout << "U_grad_mat : \n" << ast.get_gradient_mat() << std::endl;
+    std::cout << "U_laplace : \n" << ast.get_laplace() << std::endl;
     return 0;
 }

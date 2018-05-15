@@ -300,12 +300,22 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
     if (std::abs(w_face.sum()) < 1e-10) {
         std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all =
             edge_factor(r_v);
-            
-            // face contribution
-        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav = face_contribution(r_v, w_face);
         
-        // edge contribution
-        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_grav = edge_contribution(r_v, L_all);
+        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav, edge_grav;
+
+        #pragma omp parallel shared(r_v)
+        {
+            #pragma omp task
+            {
+                // face contribution
+                face_grav = face_contribution(r_v, w_face);
+            }
+            #pragma omp task
+            {
+            // edge contribution
+            edge_grav = edge_contribution(r_v, L_all);
+            }
+        }
         
         // combine them both
         U = 1.0 / 2.0 * G * sigma * (std::get<0>(edge_grav) - std::get<0>(face_grav));
@@ -373,10 +383,6 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > As
     Eigen::Matrix<double, 3, 3> U_grad_mat_face(3, 3);
     U_grad_mat_face.setZero();
     
-    #pragma omp declare reduction (merge_vec : Eigen::Matrix<double, 3, 1> : omp_out += omp_in)
-    #pragma omp declare reduction (merge_mat : Eigen::Matrix<double, 3, 3> : omp_out += omp_in)
-
-    #pragma omp parallel for reduction(+:U_face) reduction(merge_vec:U_grad_face) reduction(merge_mat:U_grad_mat_face)
     for (int ii = 0; ii < num_f; ++ii) {
         U_face += (ra.row(ii) * F_face[ii] * ra.row(ii).transpose() * w_face(ii)).value(); 
         U_grad_face += F_face[ii] * ra.row(ii).transpose() * w_face(ii); 
@@ -417,10 +423,7 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > As
     
     int index = unique_index(0, 0);
 
-    #pragma omp declare reduction (merge_vec : Eigen::Matrix<double, 3, 1> : omp_out += omp_in)
-    #pragma omp declare reduction (merge_mat : Eigen::Matrix<double, 3, 3> : omp_out += omp_in)
     // loop over the unique edges now
-    #pragma omp parallel for reduction(+:U_edge) reduction(merge_vec:U_grad_edge) reduction(merge_mat:U_grad_mat_edge)
     for (int ii = 0; ii < unique_index.size(); ++ii) {
         index = unique_index(ii,0);
         U_edge += (re.row(ii) * E_all[index] * re.row(ii).transpose() * L_all( index )).value();
