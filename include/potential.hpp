@@ -89,9 +89,9 @@ class MeshParam {
                                                  e2_normal,
                                                  e3_normal,
                                                  center_face;
-        std::tuple<Eigen::Matrix<int, Eigen::Dynamic, 2>,
-                   Eigen::Matrix<int, Eigen::Dynamic, 2>,
-                   Eigen::Matrix<int, Eigen::Dynamic, 2> > edge_vertex_map;
+        /* std::tuple<Eigen::Matrix<int, Eigen::Dynamic, 2>, */
+        /*            Eigen::Matrix<int, Eigen::Dynamic, 2>, */
+        /*            Eigen::Matrix<int, Eigen::Dynamic, 2> > edge_vertex_map; */
         // not required
         std::vector<std::vector<int> > vf_map;
         
@@ -101,7 +101,6 @@ class MeshParam {
                         e3_ind1b, e3_ind2b, e3_ind3b;
 
         // required
-        std::tuple<Eigen::MatrixXi, Eigen::MatrixXi, Eigen::MatrixXi> edge_face_map;
         Eigen::MatrixXi e1_face_map,
                         e2_face_map,
                         e3_face_map;

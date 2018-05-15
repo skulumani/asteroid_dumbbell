@@ -109,7 +109,7 @@ void MeshParam::polyhedron_parameters( void ) {
     center_face = 1.0 / 3 * (V1 + V2 + V3);
     
     // edge vertex map
-    edge_vertex_map = std::make_tuple(e1_vertex_map, e2_vertex_map, e3_vertex_map);
+    /* edge_vertex_map = std::make_tuple(e1_vertex_map, e2_vertex_map, e3_vertex_map); */
 
     // build vertex face map
     vf_map = vertex_face_map(V, F);
@@ -138,7 +138,6 @@ void MeshParam::polyhedron_parameters( void ) {
     e2_face_map << faces_list, e2_ind1b, e2_ind2b, e2_ind3b;
     e3_face_map << faces_list, e3_ind1b, e3_ind2b, e3_ind3b;
 
-    edge_face_map = std::make_tuple(e1_face_map, e2_face_map, e3_face_map);
 }
 
 void MeshParam::face_dyad( void ) {
