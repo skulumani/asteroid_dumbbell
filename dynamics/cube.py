@@ -34,7 +34,7 @@ def potential(point, axes=np.array([1, 1, 1])):
     z0 = point[2]
 
     G = 6.673e-20 # km^3 / (kg * s ^2)
-    rho = 1 # kg / km^3
+    rho = 1 / 1000 * 100**3 * 1000**3 # kg / km^3
 
     potential = G * rho *( w(a - x0, b - y0, c - z0) + w(b - y0, c - z0, a - x0) + w(c - z0, a - x0, b - y0) 
                           - w(-a - x0, -b - y0, -c - z0) - w(-b -y0, -c - z0, -a - x0) - w(-c - z0, -a - x0, -b - y0))
