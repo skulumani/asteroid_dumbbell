@@ -22,6 +22,11 @@
 #include <stdexcept>
 
 // **********************Forward declaration************************
+std::tuple<Eigen::Matrix<double, Eigen::Dynamic, 3>, 
+           Eigen::Matrix<double, Eigen::Dynamic, 3>,
+           Eigen::Matrix<double, Eigen::Dynamic, 3> > mesh_edges(const Eigen::Ref<const Eigen::MatrixXd>& V, 
+                                                                 const Eigen::Ref<const Eigen::MatrixXi>& F);
+
 // ***************** MeshParam ***************************************
 // Constructors
 MeshParam::MeshParam(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
@@ -441,40 +446,38 @@ Eigen::Matrix<double, Eigen::Dynamic, 1> Asteroid::laplacian_factor(const Eigen:
 
     const Eigen::MatrixXd& V = mesh_param->mesh->get_verts();
     const Eigen::MatrixXi& F = mesh_param->mesh->get_faces();
-
-    const Eigen::Matrix<int, Eigen::Dynamic, 1> Fa = F.col(0);
-    const Eigen::Matrix<int, Eigen::Dynamic, 1> Fb = F.col(1);
-    const Eigen::Matrix<int, Eigen::Dynamic, 1> Fc = F.col(2);
+    
+    const int num_f = F.rows();
 
     // form the ri, rj, rk arrays
-    Eigen::MatrixXd ri(Fa.rows(), 3), rj(Fa.rows(), 3), rk(Fa.rows(), 3), rjrk_cross(Fa.rows(), 3);
+    Eigen::MatrixXd ri(num_f, 3), rj(num_f, 3), rk(num_f, 3), rjrk_cross(num_f, 3);
     
-    igl::slice(r_v, Fa, (Eigen::Vector3d() << 0, 1, 2).finished(), ri);
-    igl::slice(r_v, Fb, (Eigen::Vector3d() << 0, 1, 2).finished(), rj);
-    igl::slice(r_v, Fc, (Eigen::Vector3d() << 0, 1, 2).finished(), rk);
+    igl::slice(r_v, F.col(0), (Eigen::Vector3d() << 0, 1, 2).finished(), ri);
+    igl::slice(r_v, F.col(1), (Eigen::Vector3d() << 0, 1, 2).finished(), rj);
+    igl::slice(r_v, F.col(2), (Eigen::Vector3d() << 0, 1, 2).finished(), rk);
     
     igl::cross(rj, rk, rjrk_cross);
     
-    Eigen::Matrix<double, Eigen::Dynamic, 1> ri_norm(Fa.rows(), 1), rj_norm(Fa.rows(), 1), rk_norm(Fa.rows(), 1);
+    Eigen::Matrix<double, Eigen::Dynamic, 1> ri_norm(num_f, 1), rj_norm(num_f, 1), rk_norm(num_f, 1);
 
     ri_norm = ri.rowwise().norm();
     rj_norm = rj.rowwise().norm();
     rk_norm = rk.rowwise().norm();
     
     // dot product terms
-    Eigen::MatrixXd rjrk_dot(Fa.rows(), 1), rkri_dot(Fa.rows(), 1), rirj_dot(Fa.rows(), 1);
+    Eigen::MatrixXd rjrk_dot(num_f, 1), rkri_dot(num_f, 1), rirj_dot(num_f, 1);
 
     rjrk_dot = igl::dot_row(rj, rk);
     rkri_dot = igl::dot_row(rk, ri);
     rirj_dot = igl::dot_row(ri, rj);
     
     // numerator and denonminator of atan2
-    Eigen::Matrix<double, Eigen::Dynamic, 1> num(Fa.rows(), 1), den(Fa.rows(), 1);
+    Eigen::Matrix<double, Eigen::Dynamic, 1> num(num_f, 1), den(num_f, 1);
     num = (ri.array() * rjrk_cross.array()).rowwise().sum();
     den = ri_norm.array() * rj_norm.array() * rk_norm.array() + ri_norm.array() * rjrk_dot.array() + rj_norm.array() * rkri_dot.array() + rk_norm.array() * rirj_dot.array();
     
     // return by reference
-    Eigen::Matrix<double, Eigen::Dynamic, 1> w_face(Fa.rows(), 1);
+    Eigen::Matrix<double, Eigen::Dynamic, 1> w_face(num_f, 1);
     w_face = 2.0 * num.binaryExpr(den, [] (double a, double b) { return std::atan2(a,b);} );
     /* w_face = 2.0 * num.binaryExpr(den, std::ptr_fun(::atan2)); */
 
@@ -482,23 +485,6 @@ Eigen::Matrix<double, Eigen::Dynamic, 1> Asteroid::laplacian_factor(const Eigen:
     
 }
 
-std::tuple<Eigen::Matrix<double, Eigen::Dynamic, 3>, 
-           Eigen::Matrix<double, Eigen::Dynamic, 3>,
-           Eigen::Matrix<double, Eigen::Dynamic, 3> > mesh_edges(const Eigen::Ref<const Eigen::MatrixXd>& V, 
-                                                                 const Eigen::Ref<const Eigen::MatrixXi>& F) {
-
-    
-    Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
-    igl::slice(V, F.col(0), (Eigen::Vector3i() << 0, 1, 2).finished(), V1);
-    igl::slice(V, F.col(1), (Eigen::Vector3i() << 0, 1, 2).finished(), V2);
-    igl::slice(V, F.col(2), (Eigen::Vector3i() << 0, 1, 2).finished(), V3);
-
-    const Eigen::Matrix<double, Eigen::Dynamic, 3> e1 = V2 - V1;
-    const Eigen::Matrix<double, Eigen::Dynamic, 3> e2 = V3 - V2;
-    const Eigen::Matrix<double, Eigen::Dynamic, 3> e3 = V1 - V3;
-
-    return std::make_tuple(e1, e2, e3);
-}
 
 // This is slower than numpy
 std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> Asteroid::edge_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v) {
@@ -619,4 +605,23 @@ Eigen::VectorXi vertex_map_search(const Eigen::Ref<const Eigen::Matrix<int, Eige
     }
     
     return index_map;
+}
+
+// ************************* HELPER FUNCTIONS ******************************
+std::tuple<Eigen::Matrix<double, Eigen::Dynamic, 3>, 
+           Eigen::Matrix<double, Eigen::Dynamic, 3>,
+           Eigen::Matrix<double, Eigen::Dynamic, 3> > mesh_edges(const Eigen::Ref<const Eigen::MatrixXd>& V, 
+                                                                 const Eigen::Ref<const Eigen::MatrixXi>& F) {
+
+    
+    Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
+    igl::slice(V, F.col(0), (Eigen::Vector3i() << 0, 1, 2).finished(), V1);
+    igl::slice(V, F.col(1), (Eigen::Vector3i() << 0, 1, 2).finished(), V2);
+    igl::slice(V, F.col(2), (Eigen::Vector3i() << 0, 1, 2).finished(), V3);
+
+    const Eigen::Matrix<double, Eigen::Dynamic, 3> e1 = V2 - V1;
+    const Eigen::Matrix<double, Eigen::Dynamic, 3> e2 = V3 - V2;
+    const Eigen::Matrix<double, Eigen::Dynamic, 3> e3 = V1 - V3;
+
+    return std::make_tuple(e1, e2, e3);
 }
