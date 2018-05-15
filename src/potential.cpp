@@ -435,9 +435,13 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > As
 }
 
 Eigen::Matrix<double, Eigen::Dynamic, 1> Asteroid::laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v) {
-    const Eigen::Matrix<int, Eigen::Dynamic, 1>& Fa = mesh_param->Fa;
-    const Eigen::Matrix<int, Eigen::Dynamic, 1>& Fb = mesh_param->Fb;
-    const Eigen::Matrix<int, Eigen::Dynamic, 1>& Fc = mesh_param->Fc;
+
+    const Eigen::MatrixXd& V = mesh_param->mesh->get_verts();
+    const Eigen::MatrixXi& F = mesh_param->mesh->get_faces();
+
+    const Eigen::Matrix<int, Eigen::Dynamic, 1> Fa = F.col(0);
+    const Eigen::Matrix<int, Eigen::Dynamic, 1> Fb = F.col(1);
+    const Eigen::Matrix<int, Eigen::Dynamic, 1> Fc = F.col(2);
 
     // form the ri, rj, rk arrays
     Eigen::MatrixXd ri(Fa.rows(), 3), rj(Fa.rows(), 3), rk(Fa.rows(), 3), rjrk_cross(Fa.rows(), 3);
@@ -478,10 +482,22 @@ Eigen::Matrix<double, Eigen::Dynamic, 1> Asteroid::laplacian_factor(const Eigen:
 // This is slower than numpy
 std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> Asteroid::edge_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v) {
     
-    const Eigen::Matrix<double, Eigen::Dynamic, 3>& e1 = mesh_param->e1;
-    const Eigen::Matrix<double, Eigen::Dynamic, 3>& e2 = mesh_param->e2;
-    const Eigen::Matrix<double, Eigen::Dynamic, 3>& e3 = mesh_param->e3;
+    const Eigen::MatrixXd& V = mesh_param->mesh->get_verts();
+    const Eigen::MatrixXi& F = mesh_param->mesh->get_faces();
+
+    const Eigen::Matrix<int, Eigen::Dynamic, 1> Fa = F.col(0);
+    const Eigen::Matrix<int, Eigen::Dynamic, 1> Fb = F.col(1);
+    const Eigen::Matrix<int, Eigen::Dynamic, 1> Fc = F.col(2);
     
+    Eigen::Matrix<double, Eigen::Dynamic, 3> V1, V2, V3;
+    igl::slice(V, Fa, (Eigen::Vector3i() << 0, 1, 2).finished(), V1);
+    igl::slice(V, Fb, (Eigen::Vector3i() << 0, 1, 2).finished(), V2);
+    igl::slice(V, Fc, (Eigen::Vector3i() << 0, 1, 2).finished(), V3);
+
+    const Eigen::Matrix<double, Eigen::Dynamic, 3> e1 = V2 - V1;
+    const Eigen::Matrix<double, Eigen::Dynamic, 3> e2 = V3 - V2;
+    const Eigen::Matrix<double, Eigen::Dynamic, 3> e3 = V1 - V3;
+
     const Eigen::Matrix<int, Eigen::Dynamic, 2>& e1_vertex_map = mesh_param->e1_vertex_map;
     const Eigen::Matrix<int, Eigen::Dynamic, 2>& e2_vertex_map = mesh_param->e2_vertex_map;
     const Eigen::Matrix<int, Eigen::Dynamic, 2>& e3_vertex_map = mesh_param->e3_vertex_map;
