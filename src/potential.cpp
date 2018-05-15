@@ -109,11 +109,7 @@ void MeshParam::polyhedron_parameters( void ) {
     center_face = 1.0 / 3 * (V1 + V2 + V3);
     
     // edge vertex map
-    /* edge_vertex_map = std::make_tuple(e1_vertex_map, e2_vertex_map, e3_vertex_map); */
 
-    // build vertex face map
-    vf_map = vertex_face_map(V, F);
-    
     e1_ind1b = vertex_map_search(e1_vertex_map, e1_vertex_map);
     e1_ind2b = vertex_map_search(e1_vertex_map, e2_vertex_map);
     e1_ind3b = vertex_map_search(e1_vertex_map, e3_vertex_map);
@@ -164,6 +160,8 @@ void MeshParam::edge_dyad( void ) {
 	E2_edge.resize(num_f);
 	E3_edge.resize(num_f);	
     
+    // generate the edge face/vertex maps
+
     #pragma omp parallel private(nA, nA1, nA2, nA3, nB1, nB2, nB3, nB)
     {
     // E1_edge

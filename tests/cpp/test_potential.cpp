@@ -361,7 +361,7 @@ TEST_F(TestMeshParam, CenterFace) {
  
 }
 
-TEST_F(TestMeshParam, VertexFaceMap) {
+/* TEST_F(TestMeshParam, VertexFaceMap) { */
     
     /* [[0, 1, 2, 3, 8, 9], */   
  /* [3, 9, 10, 11], */       
@@ -383,9 +383,9 @@ TEST_F(TestMeshParam, VertexFaceMap) {
     /*     std::cout << std::endl; */
     /* } */
 
-    ASSERT_EQ(mesh_param.vf_map[0][0], 0);
-    ASSERT_EQ(mesh_param.vf_map[0][5], 9);
-}
+    /* ASSERT_EQ(mesh_param.vf_map[0][0], 0); */
+    /* ASSERT_EQ(mesh_param.vf_map[0][5], 9); */
+/* } */
 
 TEST_F(TestMeshParam, EdgeIndexMap) {
     Eigen::Matrix<int, 12, 1> e1_ind1b, e1_ind2b, e1_ind3b,
