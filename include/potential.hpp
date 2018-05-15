@@ -146,6 +146,9 @@ class Asteroid {
         std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
                 const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> >& w_face);
 
+        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
+                const std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd>& L_tuple);
+
         /** @fn void polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state)
                 
             Compute the polyhedron potential at the given state
@@ -176,13 +179,6 @@ class Asteroid {
 // declare some shit
 
 
-std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
-        const Eigen::Ref<const Eigen::MatrixXi>& e_vertex_map,
-        const Eigen::Ref<const Eigen::MatrixXi>& unique_index,
-        const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E1_edge,
-        const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E2_edge,
-        const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E3_edge,
-        const std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd>& L_tuple);
 
 
 

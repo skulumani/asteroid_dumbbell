@@ -548,9 +548,7 @@ TEST_F(TestMeshParam, EdgeContribution) {
         ast.edge_factor(r_v);
 
     std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_grav = 
-        edge_contribution(r_v, mesh_param.e_vertex_map, mesh_param.unique_index,
-                mesh_param.E1_edge, mesh_param.E2_edge, mesh_param.E3_edge,
-                L_all);
+        ast.edge_contribution(r_v,L_all);
 
     const double U_edge_true = 0.9306988514415746;
     Eigen::Matrix<double, 3, 1> U_grad_edge_true;

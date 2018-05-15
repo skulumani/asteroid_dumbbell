@@ -305,9 +305,7 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
         std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav = face_contribution(r_v, w_face);
         
         // edge contribution
-        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_grav = edge_contribution(r_v, mesh_param->e_vertex_map, mesh_param->unique_index,
-                mesh_param->E1_edge, mesh_param->E2_edge, mesh_param->E3_edge,
-                L_all);
+        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_grav = edge_contribution(r_v, L_all);
         
         // combine them both
         U = 1.0 / 2.0 * G * sigma * (std::get<0>(edge_grav) - std::get<0>(face_grav));
@@ -388,13 +386,16 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > As
     return std::make_tuple(U_face, U_grad_face, U_grad_mat_face);
 }
 
-std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
-        const Eigen::Ref<const Eigen::MatrixXi>& e_vertex_map,
-        const Eigen::Ref<const Eigen::MatrixXi>& unique_index,
-        const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E1_edge,
-        const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E2_edge,
-        const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E3_edge,
+std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > Asteroid::edge_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
         const std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd>& L_tuple) {
+
+    // redefine some variables for local use
+    const Eigen::MatrixXi& e_vertex_map = mesh_param->e_vertex_map;
+    const Eigen::MatrixXi& unique_index = mesh_param->unique_index;
+    const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E1_edge = mesh_param->E1_edge;
+    const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E2_edge = mesh_param->E2_edge;
+    const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E3_edge = mesh_param->E3_edge;
+
     // edge contribution
     // combine all the Ei and Li into big vectors then pick out the unique ones
     std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > > E_all(3 * std::get<0>(L_tuple).rows());
@@ -415,12 +416,16 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > ed
     U_grad_mat_edge.setZero();
     
     int index = unique_index(0, 0);
+
+    #pragma omp declare reduction (merge_vec : Eigen::Matrix<double, 3, 1> : omp_out += omp_in)
+    #pragma omp declare reduction (merge_mat : Eigen::Matrix<double, 3, 3> : omp_out += omp_in)
     // loop over the unique edges now
+    #pragma omp parallel for reduction(+:U_edge) reduction(merge_vec:U_grad_edge) reduction(merge_mat:U_grad_mat_edge)
     for (int ii = 0; ii < unique_index.size(); ++ii) {
         index = unique_index(ii,0);
-        U_edge = U_edge + (re.row(ii) * E_all[index] * re.row(ii).transpose() * L_all( index )).value();
-        U_grad_edge = U_grad_edge + E_all[index] * re.row(ii).transpose() * L_all(index);
-        U_grad_mat_edge = U_grad_mat_edge + E_all[index] * L_all(index);
+        U_edge += (re.row(ii) * E_all[index] * re.row(ii).transpose() * L_all( index )).value();
+        U_grad_edge += E_all[index] * re.row(ii).transpose() * L_all(index);
+        U_grad_mat_edge += E_all[index] * L_all(index);
     }
     
     return std::make_tuple(U_edge, U_grad_edge, U_grad_mat_edge);
