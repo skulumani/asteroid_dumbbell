@@ -142,7 +142,8 @@ void MeshParam::edge_dyad( void ) {
     Eigen::MatrixXi e1_face_map,
                     e2_face_map,
                     e3_face_map;
-
+    
+    // TODO Use depend(IN:variable or OUT:variable) to define dependcies between tasks
     e1_ind1b = vertex_map_search(e1_vertex_map, e1_vertex_map);
     e1_ind2b = vertex_map_search(e1_vertex_map, e2_vertex_map);
     e1_ind3b = vertex_map_search(e1_vertex_map, e3_vertex_map);
@@ -155,7 +156,7 @@ void MeshParam::edge_dyad( void ) {
     e3_ind2b = vertex_map_search(e3_vertex_map, e2_vertex_map);
     e3_ind3b = vertex_map_search(e3_vertex_map, e3_vertex_map);
     
-    Eigen::VectorXi faces_list(e1_ind1b.size());
+    Eigen::VectorXi faces_list(num_f);
     faces_list = Eigen::VectorXi::LinSpaced(e1_ind1b.size(), 0, e1_ind1b.size());
     
     e1_face_map.resize(num_f, 4);
