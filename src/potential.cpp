@@ -108,32 +108,6 @@ void MeshParam::polyhedron_parameters( void ) {
     // compute the centeroid of each face
     center_face = 1.0 / 3 * (V1 + V2 + V3);
     
-    // edge vertex map
-
-    e1_ind1b = vertex_map_search(e1_vertex_map, e1_vertex_map);
-    e1_ind2b = vertex_map_search(e1_vertex_map, e2_vertex_map);
-    e1_ind3b = vertex_map_search(e1_vertex_map, e3_vertex_map);
-
-    e2_ind1b = vertex_map_search(e2_vertex_map, e1_vertex_map);
-    e2_ind2b = vertex_map_search(e2_vertex_map, e2_vertex_map);
-    e2_ind3b = vertex_map_search(e2_vertex_map, e3_vertex_map);
-    
-    e3_ind1b = vertex_map_search(e3_vertex_map, e1_vertex_map);
-    e3_ind2b = vertex_map_search(e3_vertex_map, e2_vertex_map);
-    e3_ind3b = vertex_map_search(e3_vertex_map, e3_vertex_map);
-    // TODO make a vertex_map_inverse function
-    
-    Eigen::VectorXi faces_list(e1_ind1b.size());
-    faces_list = Eigen::VectorXi::LinSpaced(e1_ind1b.size(), 0, e1_ind1b.size());
-    
-    e1_face_map.resize(num_f, 4);
-    e2_face_map.resize(num_f, 4);
-    e3_face_map.resize(num_f, 4);
-
-    e1_face_map << faces_list, e1_ind1b, e1_ind2b, e1_ind3b;
-    e2_face_map << faces_list, e2_ind1b, e2_ind2b, e2_ind3b;
-    e3_face_map << faces_list, e3_ind1b, e3_ind2b, e3_ind3b;
-
 }
 
 void MeshParam::face_dyad( void ) {
@@ -161,6 +135,36 @@ void MeshParam::edge_dyad( void ) {
 	E3_edge.resize(num_f);	
     
     // generate the edge face/vertex maps
+    Eigen::VectorXi e1_ind1b, e1_ind2b, e1_ind3b,
+                    e2_ind1b, e2_ind2b, e2_ind3b,
+                    e3_ind1b, e3_ind2b, e3_ind3b;
+
+    Eigen::MatrixXi e1_face_map,
+                    e2_face_map,
+                    e3_face_map;
+
+    e1_ind1b = vertex_map_search(e1_vertex_map, e1_vertex_map);
+    e1_ind2b = vertex_map_search(e1_vertex_map, e2_vertex_map);
+    e1_ind3b = vertex_map_search(e1_vertex_map, e3_vertex_map);
+
+    e2_ind1b = vertex_map_search(e2_vertex_map, e1_vertex_map);
+    e2_ind2b = vertex_map_search(e2_vertex_map, e2_vertex_map);
+    e2_ind3b = vertex_map_search(e2_vertex_map, e3_vertex_map);
+    
+    e3_ind1b = vertex_map_search(e3_vertex_map, e1_vertex_map);
+    e3_ind2b = vertex_map_search(e3_vertex_map, e2_vertex_map);
+    e3_ind3b = vertex_map_search(e3_vertex_map, e3_vertex_map);
+    
+    Eigen::VectorXi faces_list(e1_ind1b.size());
+    faces_list = Eigen::VectorXi::LinSpaced(e1_ind1b.size(), 0, e1_ind1b.size());
+    
+    e1_face_map.resize(num_f, 4);
+    e2_face_map.resize(num_f, 4);
+    e3_face_map.resize(num_f, 4);
+
+    e1_face_map << faces_list, e1_ind1b, e1_ind2b, e1_ind3b;
+    e2_face_map << faces_list, e2_ind1b, e2_ind2b, e2_ind3b;
+    e3_face_map << faces_list, e3_ind1b, e3_ind2b, e3_ind3b;
 
     #pragma omp parallel private(nA, nA1, nA2, nA3, nB1, nB2, nB3, nB)
     {

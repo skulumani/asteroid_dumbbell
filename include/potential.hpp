@@ -90,15 +90,6 @@ class MeshParam {
                                                  e3_normal,
                                                  center_face;
         
-        // not required
-        Eigen::VectorXi e1_ind1b, e1_ind2b, e1_ind3b,
-                        e2_ind1b, e2_ind2b, e2_ind3b,
-                        e3_ind1b, e3_ind2b, e3_ind3b;
-
-        // required
-        Eigen::MatrixXi e1_face_map,
-                        e2_face_map,
-                        e3_face_map;
         // required
         std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > > F_face;
         std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> >  > E1_edge, E2_edge, E3_edge;
