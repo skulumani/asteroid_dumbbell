@@ -14,7 +14,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 
 # Find OpenMP
-set(ENV{OMP_NUM_THREADS} 8)
+set(ENV{OMP_NUM_THREADS} 4)
+set(ENV{OMP_NESTED} TRUE)
 find_package(OpenMP)
 if (OPENMP_FOUND)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")

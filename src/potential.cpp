@@ -434,6 +434,10 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > As
     Eigen::Matrix<double, 3, 3> U_grad_mat_face(3, 3);
     U_grad_mat_face.setZero();
     
+    #pragma omp declare reduction (merge : Eigen::Matrix<double, 3, 1> : omp_out += omp_in)
+    #pragma omp declare reduction (merge : Eigen::Matrix<double, 3, 3> : omp_out += omp_in)
+
+    #pragma omp parallel for reduction(+: U_face) reduction(merge: U_grad_face) reduction(merge: U_grad_mat_face)
     for (int ii = 0; ii < num_f; ++ii) {
         U_face += (ra.row(ii) * F_face[ii] * ra.row(ii).transpose() * w_face(ii)).value(); 
         U_grad_face += F_face[ii] * ra.row(ii).transpose() * w_face(ii); 
@@ -473,8 +477,10 @@ std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > As
     U_grad_mat_edge.setZero();
     
     int index = unique_index(0, 0);
+    #pragma omp declare reduction (merge : Eigen::Matrix<double, 3, 1> : omp_out += omp_in)
+    #pragma omp declare reduction (merge : Eigen::Matrix<double, 3, 3> : omp_out += omp_in)
 
-    // loop over the unique edges now
+    #pragma omp parallel for reduction(+: U_edge) reduction(merge: U_grad_edge) reduction(merge: U_grad_mat_edge)
     for (int ii = 0; ii < unique_index.size(); ++ii) {
         index = unique_index(ii,0);
         U_edge += (re.row(ii) * E_all[index] * re.row(ii).transpose() * L_all( index )).value();
