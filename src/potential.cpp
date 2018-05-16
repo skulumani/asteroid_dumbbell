@@ -141,15 +141,9 @@ void MeshParam::edge_dyad( void ) {
 
     Eigen::MatrixXi e1_face_map(num_f, 4), e2_face_map(num_f, 4), e3_face_map(num_f, 4);
 
-    e3_ind1b = vertex_map_search(e3_vertex_map, e1_vertex_map);
-    e3_ind2b = vertex_map_search(e3_vertex_map, e2_vertex_map);
-    e3_ind3b = vertex_map_search(e3_vertex_map, e3_vertex_map);
-    
     Eigen::VectorXi faces_list(num_f);
     faces_list = Eigen::VectorXi::LinSpaced(e1_ind1b.size(), 0, e1_ind1b.size());
     
-    e3_face_map << faces_list, e3_ind1b, e3_ind2b, e3_ind3b;
-
     #pragma omp parallel private(nA, nA1, nA2, nA3, nB1, nB2, nB3, nB) 
     #pragma omp single
     {
@@ -194,10 +188,30 @@ void MeshParam::edge_dyad( void ) {
             e2_face_map << faces_list, e2_ind1b, e2_ind2b, e2_ind3b;
         }
 
+        #pragma omp task depend(out:e3_ind1b)
+        {
+            e3_ind1b = vertex_map_search(e3_vertex_map, e1_vertex_map);
+        }
+
+        #pragma omp task depend(out:e3_ind2b)
+        {
+            e3_ind2b = vertex_map_search(e3_vertex_map, e2_vertex_map);
+        }
+
+        #pragma omp task depend(out:e3_ind3b)
+        {
+            e3_ind3b = vertex_map_search(e3_vertex_map, e3_vertex_map);
+        }
+
+        #pragma omp task depend(out:e3_face_map) depend(in:e3_ind1b) depend(in:e3_ind2b) depend(in:e3_ind3b)
+        {
+            e3_face_map << faces_list, e3_ind1b, e3_ind2b, e3_ind3b;
+        }
+
     // E1_edge
     #pragma omp task depend(in:e1_face_map)
     {
-        /* #pragma omp parallel for */
+        #pragma omp parallel for
         for (int ii = 0; ii < num_f; ++ii) {
             // pick out the normals for the edges of the current face
             nA = normal_face.row(ii);
@@ -224,7 +238,7 @@ void MeshParam::edge_dyad( void ) {
     
     #pragma omp task depend(in:e2_face_map)
     {
-        /* #pragma omp parallel for */
+        #pragma omp parallel for
         for (int ii = 0; ii < num_f; ++ii) {
             // pick out the normals for the edges of the current face
             nA = normal_face.row(ii);
@@ -249,9 +263,9 @@ void MeshParam::edge_dyad( void ) {
         }
     }
 
-    #pragma omp task
+    #pragma omp task depend(in:e3_face_map)
     {
-        /* #pragma omp parallel for */
+        #pragma omp parallel for
         for (int ii = 0; ii < num_f; ++ii) {
             // pick out the normals for the edges of the current face
             nA = normal_face.row(ii);
