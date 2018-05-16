@@ -21,6 +21,8 @@
 #include <string>
 #include <stdexcept>
 
+#include <omp.h>
+
 // **********************Forward declaration************************
 std::tuple<Eigen::Matrix<double, Eigen::Dynamic, 3>, 
            Eigen::Matrix<double, Eigen::Dynamic, 3>,
