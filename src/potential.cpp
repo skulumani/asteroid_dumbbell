@@ -135,9 +135,9 @@ void MeshParam::edge_dyad( void ) {
 	E3_edge.resize(num_f);	
     
     // generate the edge face/vertex maps
-    Eigen::VectorXi e1_ind1b(num_f), e1_ind2b(num_f), e1_ind3b,
-                    e2_ind1b, e2_ind2b, e2_ind3b,
-                    e3_ind1b, e3_ind2b, e3_ind3b;
+    Eigen::VectorXi e1_ind1b(num_f), e1_ind2b(num_f), e1_ind3b(num_f),
+                    e2_ind1b(num_f), e2_ind2b(num_f), e2_ind3b(num_f),
+                    e3_ind1b(num_f), e3_ind2b(num_f), e3_ind3b(num_f);
 
     Eigen::MatrixXi e1_face_map(num_f, 4), e2_face_map(num_f, 4), e3_face_map(num_f, 4);
     
