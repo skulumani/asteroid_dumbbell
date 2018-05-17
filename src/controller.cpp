@@ -2,6 +2,7 @@
 #include "utilities.hpp"
 #include "reconstruct.hpp"
 #include "geodesic.hpp"
+#include "potential.hpp"
 
 #include <Eigen/Dense>
 
@@ -156,11 +157,46 @@ void TranslationController::minimize_uncertainty(std::shared_ptr<const State> st
     macceld.setZero(3);
 }
 
+double control_cost(const double& t,
+                    const Eigen::Ref<const Eigen::Matrix<double, 1, 3> >& pos_des, 
+                    const std::shared_ptr<Asteroid> ast_est,
+                    const double& m1=500, const double& m2=500,
+                    const double& max_potential=1) {
+
+    Eigen::Matrix<double, 3, 3> Ra = ast_est->rot_ast2int(t);
+    
+    // position of COM in asteroid frame
+    Eigen::Matrix<double, 1, 3> z = (Ra * pos_des.transpose()).transpose();
+
+    ast_est->polyhedron_potential(z);
+
+    Eigen::Matrix<double, 3, 1> control = -(Ra * ast_est->get_acceleration()) * (m1 + m2);
+
+    double cost = (1.0 / max_potential) * control.transpose() * control;
+
+    return cost;
+}
+
+double integrate_control_cost(const double& t,
+                              const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& waypoints,
+                              const std::shared_ptr<Asteroid> ast_est,
+                              const Eigen::Ref<const Eigen::Matrix<double, 3, 1> >& pos,
+                              const Eigen::Ref<const Eigen::Matrix<double, 3, 1> >& vertex) {
+    
+    const double initial_angle = 0;
+    const double final_angle = acos(pos.dot(vertex)) / pos.norm() / vertex.norm();
+    
+    const int num_points = waypoints.rows();
+
+    return 0;
+    
+}
 void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
         std::shared_ptr<const ReconstructMesh> rmesh) {
     
     double max_weight = rmesh->get_weights().maxCoeff();
     double max_sigma = kPI;
+    double max_accel; // TODO maximum possible value for U_grad
 
     double alpha(0.5); /**< Weighting factor between distance and ucnertainty */
     
@@ -168,10 +204,18 @@ void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::M
     pos(0) = state(0);
     pos(1) = state(1);
     pos(2) = state(2);
+    
+    // TODO Compute geodesic waypoints (n) between pos and each vertex
+    const int num_waypoints = 5;
+    Eigen::Matrix<double, num_waypoints, 3> pos_d = sphere_waypoint(pos, rmesh->get_verts().row(1));
 
+    // TODO Given all the waypoints find the integral of u^T R u where u = -F_1(pos_d) - F_2(pos_d)
+    // TODO Use simpsons rule for the numerical integration
     // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex
     Eigen::VectorXd sigma = central_angle(pos.normalized(), rmesh->get_verts().rowwise().normalized());
     Eigen::VectorXd cost = - (1 - alpha) *rmesh->get_weights().array()/max_weight + alpha * sigma.array()/max_sigma ;
+
+
     // now find min index of cost
     Eigen::MatrixXd::Index min_cost_index;
     cost.minCoeff(&min_cost_index);
