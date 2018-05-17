@@ -31,6 +31,8 @@ class ReconstructMesh {
         Eigen::MatrixXd get_verts( void ) const;
         Eigen::MatrixXi get_faces( void ) const;
         Eigen::MatrixXd get_weights( void ) const;
+
+        std::shared_ptr<MeshData> get_mesh( void ) const { return mesh; }
         
         void update_meshdata( void );
     private:

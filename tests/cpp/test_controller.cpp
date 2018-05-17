@@ -5,6 +5,7 @@
 #include "mesh.hpp"
 #include "loader.hpp"
 #include "reconstruct.hpp"
+#include "potential.hpp"
 
 #include <gtest/gtest.h>
 
@@ -132,6 +133,16 @@ TEST(TestController, MinimumUncertaintyCube) {
 
 }
 
+TEST(TestController, ControlCost) {
+    std::shared_ptr<MeshData> mesh_ptr;
+    mesh_ptr = Loader::load("./integration/cube.obj");
+    std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(mesh_ptr);
+
+    // need an asteroid object constructed from the reconstructed mesh object
+    /* Asteroid ast("cube", mesh_param); */
+    Controller controller;
+    
+}
 TEST(TestController, ExploreCube) {
     std::shared_ptr<MeshData> mesh_ptr;
     mesh_ptr = Loader::load("./integration/cube.obj");

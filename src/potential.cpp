@@ -1,5 +1,6 @@
 #include "potential.hpp"
 #include "mesh.hpp"
+#include "reconstruct.hpp"
 
 #include <igl/sort.h>
 #include <igl/unique_rows.h>
@@ -20,6 +21,7 @@
 #include <cmath>
 #include <string>
 #include <stdexcept>
+#include <memory>
 
 #include <omp.h>
 
@@ -302,6 +304,20 @@ Asteroid::Asteroid(const std::string& name_in, MeshParam& mesh_param_in) {
 
 Asteroid::Asteroid(const std::string& name_in, std::shared_ptr<MeshParam> mesh_param_in) {
     mesh_param = mesh_param_in;
+    name = name_in;
+    init_asteroid();
+}
+
+Asteroid::Asteroid(const std::string& name_in, 
+                   std::shared_ptr<ReconstructMesh> rmesh_in) {
+    mesh_param = std::make_shared<MeshParam>(rmesh_in->get_mesh());
+    name = name_in;
+    init_asteroid();
+}
+
+Asteroid::Asteroid(const std::string& name_in,
+                   std::shared_ptr<Mesh> mesh_in) {
+    mesh_param = std::make_shared<MeshParam>(mesh_in);
     name = name_in;
     init_asteroid();
 }

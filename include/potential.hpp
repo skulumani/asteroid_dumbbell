@@ -8,6 +8,7 @@
 #define POTENTIAL_H
 
 #include "mesh.hpp"
+#include "reconstruct.hpp"
 
 #include <Eigen/Dense>
 #include <Eigen/StdVector>
@@ -121,7 +122,11 @@ class Asteroid {
         
         Asteroid(const std::string& name_in, MeshParam& mesh_param);
         Asteroid(const std::string& name_in, std::shared_ptr<MeshParam> mesh_param);
-        
+
+        Asteroid(const std::string& name_in, std::shared_ptr<ReconstructMesh> rmesh_in);
+
+        Asteroid(const std::string& name_in, std::shared_ptr<Mesh> mesh_in);
+
         // Functions to compute the potential
         Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v);
 
