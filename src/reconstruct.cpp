@@ -10,8 +10,6 @@ ReconstructMesh::ReconstructMesh( const Eigen::Ref<const Eigen::MatrixXd> &v_in,
                                   const Eigen::Ref<const Eigen::MatrixXi> &f_in,
                                   const Eigen::Ref<const Eigen::MatrixXd> &w_in) {
 
-    this->vertices = v_in;
-    this->faces = f_in;
     this->weights = w_in;
 
     // need to initialize the meshdata shared_ptr
@@ -22,36 +20,30 @@ ReconstructMesh::ReconstructMesh( const Eigen::Ref<const Eigen::MatrixXd> &v_in,
 ReconstructMesh::ReconstructMesh( const Eigen::Ref<const Eigen::MatrixXd> &v_in,
                                  const Eigen::Ref<const Eigen::MatrixXi> &f_in) {
 
-    // need to save vectors to the object
-    this->vertices = v_in;
-    this->faces = f_in;
     
     // now define the weights
-    this->weights.resize(this->vertices.rows(), 1);
-    this->weights << initial_weight(this->vertices);
+    this->weights.resize(v_in.rows(), 1);
+    this->weights << initial_weight(v_in);
 
     // need to initialize the meshdata shared_ptr
-    this->mesh = std::make_shared<MeshData>(vertices, faces);
+    this->mesh = std::make_shared<MeshData>(v_in, f_in);
 }
 
 ReconstructMesh::ReconstructMesh(std::shared_ptr<MeshData> mesh_in) {
     
     // save another ptr to object
     this->mesh = mesh_in;
-    this->vertices = mesh_in->vertices;
-    this->faces = mesh_in->faces;
-    
     // set the weight to the maximum norm length of all vertices
-    this->weights.resize(this->vertices.rows(), 1);
-    this->weights << initial_weight(this->vertices);
+    this->weights.resize(this->mesh->get_verts().rows(), 1);
+    this->weights << initial_weight(mesh->get_verts());
 }
 
 Eigen::MatrixXd ReconstructMesh::get_verts( void ) const {
-    return this->vertices;
+    return this->mesh->get_verts();
 }
 
 Eigen::MatrixXi ReconstructMesh::get_faces( void ) const {
-    return this->faces;
+    return this->mesh->get_faces();
 }
 
 Eigen::MatrixXd ReconstructMesh::get_weights( void ) const {
@@ -70,17 +62,17 @@ void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &
                                     const double &max_angle) {
     
     double pt_radius = pt.norm();
-    Eigen::VectorXd vert_radius = this->vertices.rowwise().norm();
+    Eigen::VectorXd vert_radius = this->mesh->vertices.rowwise().norm();
 
     Eigen::Vector3d pt_uvec = pt.normalized();
-    Eigen::Matrix<double, Eigen::Dynamic, 3> vert_uvec(this->vertices.rows(), 3);
-    vert_uvec = this->vertices.rowwise().normalized();
+    Eigen::Matrix<double, Eigen::Dynamic, 3> vert_uvec(this->mesh->vertices.rows(), 3);
+    vert_uvec = this->mesh->vertices.rowwise().normalized();
     
     // compute the angular distance between the pt and each vertex
     Eigen::Matrix<double, Eigen::Dynamic, 1> delta_sigma(vert_uvec.rows(), 1);
     delta_sigma = central_angle(pt_uvec, vert_uvec);
 
-    Eigen::Array<bool, Eigen::Dynamic, 1> region_condition(this->vertices.rows());
+    Eigen::Array<bool, Eigen::Dynamic, 1> region_condition(this->mesh->vertices.rows());
     region_condition = delta_sigma.array() < max_angle;
     
     Eigen::VectorXi region_index = vector_find<Eigen::Array<bool, Eigen::Dynamic, 1> >(region_condition);
@@ -96,21 +88,21 @@ void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &
 
     for (int ii = 0; ii < region_index.size(); ++ii) {
         weight(ii) = pow(delta_sigma(region_index(ii)) * pt_radius, 2);
-        mesh_region.row(ii) = this->vertices.row(region_index(ii));
+        mesh_region.row(ii) = this->mesh->vertices.row(region_index(ii));
         weight_old(ii) = this->weights(region_index(ii));
         radius_old(ii) = vert_radius(region_index(ii));
     }
 
     radius_new = (radius_old.array() * weight.array() + radius_meas * weight_old.array()) / (weight_old.array() + weight.array());
     weight_new = (weight_old.array() * weight.array()) / (weight_old.array() + weight.array());
-    // Now update the vertices of the object/self
+    // Now update the mesh->vertices of the object/self
     for (int ii = 0; ii < region_index.size(); ++ii) {
-        this->vertices.row(region_index(ii)) = radius_new(ii) * vert_uvec.row(region_index(ii));
+        this->mesh->vertices.row(region_index(ii)) = radius_new(ii) * vert_uvec.row(region_index(ii));
         this->weights(region_index(ii)) = weight_new(ii);
     }
     
     // update the mesh pointer with the new vertices
-    mesh->update_mesh(vertices, faces); 
+    /* mesh->update_mesh(vertices, faces); */ 
 }
 
 void ReconstructMesh::update(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
@@ -124,7 +116,7 @@ void ReconstructMesh::update(const Eigen::Ref<const Eigen::Matrix<double, Eigen:
 
 void ReconstructMesh::update_meshdata( void ) {
     // update the data inside the mesh_ptr
-    this->mesh->update_mesh(this->vertices, this->faces);
+    /* this->mesh->update_mesh(this->vertices, this->faces); */
 }
 
 // compute the initial weighting matrix given the vertices

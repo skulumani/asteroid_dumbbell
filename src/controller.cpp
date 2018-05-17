@@ -214,7 +214,7 @@ void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::M
     
     // TODO Compute geodesic waypoints (n) between pos and each vertex
     const int num_waypoints = 5;
-    for (int ii = 0; ii < rmesh->get_verts().rows(): ++ii) { 
+    for (int ii = 0; ii < rmesh->get_verts().rows(); ++ii) { 
     Eigen::Matrix<double, num_waypoints, 3> pos_d = sphere_waypoint(pos, rmesh->get_verts().row(1), num_waypoints);
 
     // TODO Given all the waypoints find the integral of u^T R u where u = -F_1(pos_d) - F_2(pos_d)
