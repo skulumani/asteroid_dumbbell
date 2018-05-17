@@ -316,7 +316,7 @@ Asteroid::Asteroid(const std::string& name_in,
 }
 
 Asteroid::Asteroid(const std::string& name_in,
-                   std::shared_ptr<Mesh> mesh_in) {
+                   std::shared_ptr<MeshData> mesh_in) {
     mesh_param = std::make_shared<MeshParam>(mesh_in);
     name = name_in;
     init_asteroid();
