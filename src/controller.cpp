@@ -185,10 +185,17 @@ double integrate_control_cost(const double& t,
     
     const double initial_angle = 0;
     const double final_angle = acos(pos.dot(vertex)) / pos.norm() / vertex.norm();
-    
     const int num_points = waypoints.rows();
+    const double delta_angle = final_angle / num_points;
+    
+    double total_cost = control_cost(t, waypoints.row(0), ast_est);
 
-    return 0;
+    for (int ii = 1; ii < num_points - 1; ++ii) {
+        total_cost += 2 * control_cost(t, waypoints.row(ii), ast_est); 
+    }
+    total_cost = delta_angle / 2 * (total_cost + control_cost(t, waypoints.row(num_points), ast_est));
+
+    return total_cost;
     
 }
 void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
@@ -207,10 +214,11 @@ void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::M
     
     // TODO Compute geodesic waypoints (n) between pos and each vertex
     const int num_waypoints = 5;
-    Eigen::Matrix<double, num_waypoints, 3> pos_d = sphere_waypoint(pos, rmesh->get_verts().row(1));
+    for (int ii = 0; ii < rmesh->get_verts().rows(): ++ii) { 
+    Eigen::Matrix<double, num_waypoints, 3> pos_d = sphere_waypoint(pos, rmesh->get_verts().row(1), num_waypoints);
 
     // TODO Given all the waypoints find the integral of u^T R u where u = -F_1(pos_d) - F_2(pos_d)
-    // TODO Use simpsons rule for the numerical integration
+    }
     // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex
     Eigen::VectorXd sigma = central_angle(pos.normalized(), rmesh->get_verts().rowwise().normalized());
     Eigen::VectorXd cost = - (1 - alpha) *rmesh->get_weights().array()/max_weight + alpha * sigma.array()/max_sigma ;
