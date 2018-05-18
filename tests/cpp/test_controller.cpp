@@ -139,7 +139,7 @@ TEST(TestController, ControlCost) {
     std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(mesh_ptr);
 
     // need an asteroid object constructed from the reconstructed mesh object
-    /* Asteroid ast("cube", mesh_param); */
+    Asteroid ast("cube", rmesh_ptr);
     Controller controller;
     
 }
