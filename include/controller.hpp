@@ -57,6 +57,8 @@ class AttitudeController {
 
 class TranslationController {
     friend class Controller; 
+    
+    private:
 
     public:
         TranslationController( void );

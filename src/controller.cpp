@@ -204,6 +204,8 @@ void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::M
     double max_sigma = kPI;
     double max_accel; // TODO maximum possible for U_grad_norm (find potential at the suface + a little margin)
 
+    const int num_waypoints = 5;
+
     double alpha(0.5); /**< Weighting factor between distance and ucnertainty */
     
     Eigen::Vector3d pos(3);
@@ -211,13 +213,17 @@ void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::M
     pos(1) = state(1);
     pos(2) = state(2);
     
-    // TODO Compute geodesic waypoints (n) between pos and each vertex
-    const int num_waypoints = 5;
-    for (int ii = 0; ii < rmesh->get_verts().rows(); ++ii) { 
-    Eigen::Matrix<double, num_waypoints, 3> pos_d = sphere_waypoint(pos, rmesh->get_verts().row(1), num_waypoints);
+    Eigen::VectorXd vertex_control_cost;
+    Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_waypoints, 3);
 
-    // TODO Given all the waypoints find the integral of u^T R u where u = -F_1(pos_d) - F_2(pos_d)
+    for (int ii = 0; ii < rmesh->get_verts().rows(); ++ii) { 
+        // TODO Compute geodesic waypoints (n) between pos and each vertex
+        waypoints = sphere_waypoint(pos, rmesh->get_verts().row(ii), num_waypoints);
+
+        // TODO Given all the waypoints find the integral of u^T R u where u = -F_1(pos_d) - F_2(pos_d)
+        vertex_control_cost(ii) = integrate_control_cost(t, waypoints, ast_est); 
     }
+
     // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex
     Eigen::VectorXd sigma = central_angle(pos.normalized(), rmesh->get_verts().rowwise().normalized());
     Eigen::VectorXd cost = - (1 - alpha) *rmesh->get_weights().array()/max_weight + alpha * sigma.array()/max_sigma ;
