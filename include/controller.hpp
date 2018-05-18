@@ -88,8 +88,10 @@ class TranslationController {
         
         // Allow for input using an shared_ptr to asteroid
         void minimize_uncertainty(std::shared_ptr<const State> state,
+                                  std::shared_ptr<const ReconstructMesh> rmesh,
                                   std::shared_ptr<const Asteroid> ast_est);
         void minimize_uncertainty(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+                                  std::shared_ptr<const ReconstructMesh> rmesh,
                                   std::shared_ptr<const Asteroid> ast_est);
 
         Eigen::Matrix<double, 3, 1> get_posd( void ) const;
@@ -110,7 +112,13 @@ class Controller: public TranslationController, public AttitudeController {
                 std::shared_ptr<const ReconstructMesh> rmesh);
        void explore_asteroid(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
                std::shared_ptr<const ReconstructMesh> rmesh);
-
+        
+       void explore_asteroid(std::shared_ptr<const State> state,
+                             std::shared_ptr<const ReconstructMesh> rmesh,
+                             std::shared_ptr<const Asteroid> ast_est);
+       void explore_asteroid(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+                             std::shared_ptr<const ReconstructMesh> rmesh,
+                             std::shared_ptr<const Asteroid> ast_est);
         /** @fn Output a state object with the desired state
                 
             Output a state object with the desired state

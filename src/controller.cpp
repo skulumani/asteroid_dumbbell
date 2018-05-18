@@ -240,13 +240,15 @@ void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::M
 }
 
 void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+        std::shared_ptr<const ReconstructMesh> rmesh,
         std::shared_ptr<const Asteroid> ast_est) {
     
-    /* double max_weight = rmesh->get_weights().maxCoeff(); */
-    /* double max_sigma = kPI; */
-    /* double max_accel; // TODO maximum possible for U_grad_norm (find potential at the suface + a little margin) */
+    double max_weight = rmesh->get_weights().maxCoeff();
+    double max_sigma = kPI;
+    ast_est->polyhedron_potential((Eigen::Vector3d() << 0, 0, ast_est->get_axes().minCoeff()).finished());
+    double max_accel = ast_est->get_accel();
 
-    /* const int num_waypoints = 5; */
+    const int num_waypoints = 5;
 
     /* double alpha(0.5); /**< Weighting factor between distance and ucnertainty *1/ */
     
