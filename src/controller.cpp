@@ -195,16 +195,14 @@ double integrate_control_cost(const double& t,
     total_cost = delta_angle / 2 * (total_cost + control_cost(t, waypoints.row(num_points), ast_est));
 
     return total_cost;
-    
 }
+
 void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
         std::shared_ptr<const ReconstructMesh> rmesh) {
     
     double max_weight = rmesh->get_weights().maxCoeff();
     double max_sigma = kPI;
     double max_accel; // TODO maximum possible for U_grad_norm (find potential at the suface + a little margin)
-
-    const int num_waypoints = 5;
 
     double alpha(0.5); /**< Weighting factor between distance and ucnertainty */
     
@@ -213,17 +211,13 @@ void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::M
     pos(1) = state(1);
     pos(2) = state(2);
     
-    Eigen::VectorXd vertex_control_cost;
-    Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_waypoints, 3);
-
+    // TODO Compute geodesic waypoints (n) between pos and each vertex
+    const int num_waypoints = 5;
     for (int ii = 0; ii < rmesh->get_verts().rows(); ++ii) { 
-        // TODO Compute geodesic waypoints (n) between pos and each vertex
-        waypoints = sphere_waypoint(pos, rmesh->get_verts().row(ii), num_waypoints);
+    Eigen::Matrix<double, num_waypoints, 3> pos_d = sphere_waypoint(pos, rmesh->get_verts().row(1), num_waypoints);
 
-        // TODO Given all the waypoints find the integral of u^T R u where u = -F_1(pos_d) - F_2(pos_d)
-        vertex_control_cost(ii) = integrate_control_cost(t, waypoints, ast_est); 
+    // TODO Given all the waypoints find the integral of u^T R u where u = -F_1(pos_d) - F_2(pos_d)
     }
-
     // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex
     Eigen::VectorXd sigma = central_angle(pos.normalized(), rmesh->get_verts().rowwise().normalized());
     Eigen::VectorXd cost = - (1 - alpha) *rmesh->get_weights().array()/max_weight + alpha * sigma.array()/max_sigma ;
@@ -243,6 +237,54 @@ void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::M
     mposd = des_vector.normalized() * current_radius;
     mveld.setZero(3);
     macceld.setZero(3);
+}
+
+void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+        std::shared_ptr<const Asteroid> ast_est) {
+    
+    /* double max_weight = rmesh->get_weights().maxCoeff(); */
+    /* double max_sigma = kPI; */
+    /* double max_accel; // TODO maximum possible for U_grad_norm (find potential at the suface + a little margin) */
+
+    /* const int num_waypoints = 5; */
+
+    /* double alpha(0.5); /**< Weighting factor between distance and ucnertainty *1/ */
+    
+    /* Eigen::Vector3d pos(3); */
+    /* pos(0) = state(0); */
+    /* pos(1) = state(1); */
+    /* pos(2) = state(2); */
+    
+    /* Eigen::VectorXd vertex_control_cost; */
+    /* Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_waypoints, 3); */
+
+    /* for (int ii = 0; ii < rmesh->get_verts().rows(); ++ii) { */ 
+    /*     // TODO Compute geodesic waypoints (n) between pos and each vertex */
+    /*     waypoints = sphere_waypoint(pos, rmesh->get_verts().row(ii), num_waypoints); */
+
+    /*     // TODO Given all the waypoints find the integral of u^T R u where u = -F_1(pos_d) - F_2(pos_d) */
+    /*     vertex_control_cost(ii) = integrate_control_cost(t, waypoints, ast_est); */ 
+    /* } */
+
+    /* // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex */
+    /* Eigen::VectorXd sigma = central_angle(pos.normalized(), rmesh->get_verts().rowwise().normalized()); */
+    /* Eigen::VectorXd cost = - (1 - alpha) *rmesh->get_weights().array()/max_weight + alpha * sigma.array()/max_sigma ; */
+
+
+    /* // now find min index of cost */
+    /* Eigen::MatrixXd::Index min_cost_index; */
+    /* cost.minCoeff(&min_cost_index); */
+
+    /* Eigen::RowVector3d des_vector; */
+
+    /* des_vector = rmesh->get_verts().row(min_cost_index); */
+    /* // pick out the corresponding vertex of the asteroid that should be viewed */
+    /* // use current norm of position and output a position with same radius but just above the minium point */
+    /* double current_radius = pos.norm(); */
+
+    /* mposd = des_vector.normalized() * current_radius; */
+    /* mveld.setZero(3); */
+    /* macceld.setZero(3); */
 }
 
 Eigen::Matrix<double, 3, 1> TranslationController::get_posd( void ) const {
