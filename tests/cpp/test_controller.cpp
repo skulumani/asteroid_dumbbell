@@ -140,13 +140,40 @@ TEST(TestController, ControlCost) {
 
     // need an asteroid object constructed from the reconstructed mesh object
     std::shared_ptr<Asteroid> ast = std::make_shared<Asteroid>("cube", rmesh_ptr);
-    Controller controller;
     
     Eigen::Matrix<double, 1, 3> pos_des;
     pos_des << 1, 0, 0;
 
     double cost = control_cost(0, pos_des, ast);
     ASSERT_NEAR(cost, 3.9597117e-09, 1e-6);
+}
+
+TEST(TestController, ControlCostIntegral) {
+    std::shared_ptr<MeshData> mesh_ptr;
+    mesh_ptr = Loader::load("./integration/cube.obj");
+    std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(mesh_ptr);
+
+    // need an asteroid object constructed from the reconstructed mesh object
+    std::shared_ptr<Asteroid> ast = std::make_shared<Asteroid>("cube", rmesh_ptr);
+    
+    // generate a of waypoints
+    Eigen::Matrix<double, 1, 3> pos_end, pos_start;
+    pos_start << 1, 0, 0;
+    pos_end << 0, -1, 0;
+    
+    Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints = sphere_waypoint(pos_start, pos_end, 5);
+    
+    double total_control_cost_one = integrate_control_cost(0,
+                                                       waypoints,
+                                                       ast);
+    // now compare to a symmetric but  different path
+    waypoints = sphere_waypoint(-pos_start, -pos_end, 5);
+    
+    double total_control_cost_two = integrate_control_cost(0,
+                                                       waypoints,
+                                                       ast);
+
+    ASSERT_NEAR(total_control_cost_one, total_control_cost_two, 1e-6);
 }
 
 TEST(TestController, ExploreCube) {

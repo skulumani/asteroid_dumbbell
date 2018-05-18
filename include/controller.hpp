@@ -124,9 +124,7 @@ double control_cost(const double& t,
 
 double integrate_control_cost(const double& t,
                               const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& waypoints,
-                              const std::shared_ptr<Asteroid> ast_est,
-                              const Eigen::Ref<const Eigen::Matrix<double, 3, 1> >& pos,
-                              const Eigen::Ref<const Eigen::Matrix<double, 3, 1> >& vertex);
+                              const std::shared_ptr<Asteroid> ast_est);
 
 
 #endif

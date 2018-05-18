@@ -180,13 +180,11 @@ double control_cost(const double& t,
 
 double integrate_control_cost(const double& t,
                               const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& waypoints,
-                              const std::shared_ptr<Asteroid> ast_est,
-                              const Eigen::Ref<const Eigen::Matrix<double, 3, 1> >& pos,
-                              const Eigen::Ref<const Eigen::Matrix<double, 3, 1> >& vertex) {
+                              const std::shared_ptr<Asteroid> ast_est) {
     
-    const double initial_angle = 0;
-    const double final_angle = acos(pos.dot(vertex)) / pos.norm() / vertex.norm();
     const int num_points = waypoints.rows();
+    const double initial_angle = 0;
+    const double final_angle = acos(waypoints.row(0).dot(waypoints.row(num_points)) / waypoints.row(0).norm() / waypoints.bottomRows(1).norm());
     const double delta_angle = final_angle / num_points;
     
     double total_cost = control_cost(t, waypoints.row(0), ast_est);
@@ -204,7 +202,7 @@ void TranslationController::minimize_uncertainty(const Eigen::Ref<const Eigen::M
     
     double max_weight = rmesh->get_weights().maxCoeff();
     double max_sigma = kPI;
-    double max_accel; // TODO maximum possible value for U_grad
+    double max_accel; // TODO maximum possible for U_grad_norm (find potential at the suface + a little margin)
 
     double alpha(0.5); /**< Weighting factor between distance and ucnertainty */
     
