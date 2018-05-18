@@ -160,8 +160,8 @@ void TranslationController::minimize_uncertainty(std::shared_ptr<const State> st
 double control_cost(const double& t,
                     const Eigen::Ref<const Eigen::Matrix<double, 1, 3> >& pos_des, 
                     const std::shared_ptr<Asteroid> ast_est,
-                    const double& m1=500, const double& m2=500,
-                    const double& max_potential=1) {
+                    const double& m1, const double& m2,
+                    const double& max_potential) {
 
     Eigen::Matrix<double, 3, 3> Ra = ast_est->rot_ast2int(t);
     

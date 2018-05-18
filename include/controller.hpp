@@ -1,6 +1,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
+#include "potential.hpp"
 #include "state.hpp"
 
 #include <Eigen/Dense>
@@ -113,4 +114,19 @@ class Controller: public TranslationController, public AttitudeController {
         */ 
         std::shared_ptr<State> get_desired_state();       
 };
+
+// some extra functions for testing
+double control_cost(const double& t,
+                    const Eigen::Ref<const Eigen::Matrix<double, 1, 3> >& pos_des,
+                    const std::shared_ptr<Asteroid> ast_est,
+                    const double& m1=500, const double& m2=500,
+                    const double& max_potential=1);
+
+double integrate_control_cost(const double& t,
+                              const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& waypoints,
+                              const std::shared_ptr<Asteroid> ast_est,
+                              const Eigen::Ref<const Eigen::Matrix<double, 3, 1> >& pos,
+                              const Eigen::Ref<const Eigen::Matrix<double, 3, 1> >& vertex);
+
+
 #endif
