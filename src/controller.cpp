@@ -166,14 +166,15 @@ double control_cost(const double& t,
     Eigen::Matrix<double, 3, 3> Ra = ast_est->rot_ast2int(t);
     
     // position of COM in asteroid frame
-    Eigen::Matrix<double, 1, 3> z = (Ra * pos_des.transpose()).transpose();
+    Eigen::Matrix<double, 1, 3> z = (Ra.transpose() * pos_des.transpose()).transpose();
+    
 
     ast_est->polyhedron_potential(z);
 
     Eigen::Matrix<double, 3, 1> control = -(Ra * ast_est->get_acceleration()) * (m1 + m2);
-
+    
     double cost = (1.0 / max_potential) * control.transpose() * control;
-
+    
     return cost;
 }
 

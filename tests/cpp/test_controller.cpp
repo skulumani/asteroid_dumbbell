@@ -139,10 +139,16 @@ TEST(TestController, ControlCost) {
     std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(mesh_ptr);
 
     // need an asteroid object constructed from the reconstructed mesh object
-    Asteroid ast("cube", rmesh_ptr);
+    std::shared_ptr<Asteroid> ast = std::make_shared<Asteroid>("cube", rmesh_ptr);
     Controller controller;
     
+    Eigen::Matrix<double, 1, 3> pos_des;
+    pos_des << 1, 0, 0;
+
+    double cost = control_cost(0, pos_des, ast);
+    ASSERT_NEAR(cost, 3.9597117e-09, 1e-6);
 }
+
 TEST(TestController, ExploreCube) {
     std::shared_ptr<MeshData> mesh_ptr;
     mesh_ptr = Loader::load("./integration/cube.obj");
