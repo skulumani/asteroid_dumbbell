@@ -133,6 +133,23 @@ TEST(TestController, MinimumUncertaintyCube) {
 
 }
 
+TEST(TestTranslationController, MinimumUncertaintyCubeControl) {
+    std::shared_ptr<MeshData> mesh_ptr;
+    mesh_ptr = Loader::load("./integration/cube.obj");
+    std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(mesh_ptr);
+    // need an asteroid object constructed from the reconstructed mesh object
+    std::shared_ptr<Asteroid> ast = std::make_shared<Asteroid>("cube", rmesh_ptr);
+    
+    // define an initial state
+    std::shared_ptr<State> state_ptr = std::make_shared<State>();
+    state_ptr->pos((Eigen::Vector3d() << 1, 1, 1).finished());
+    
+    TranslationController tran_controller;
+    tran_controller.minimize_uncertainty(0, state_ptr, rmesh_ptr, ast);
+
+    ASSERT_TRUE(tran_controller.get_posd().isApprox((Eigen::Vector3d() << 1, 1, 1).finished()));
+}
+
 TEST(TestController, ControlCost) {
     std::shared_ptr<MeshData> mesh_ptr;
     mesh_ptr = Loader::load("./integration/cube.obj");
