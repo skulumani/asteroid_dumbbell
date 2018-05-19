@@ -170,21 +170,39 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> sphere_waypoint(const Eigen::Ref<const 
                                                           const int &num_points) {
     
     // Find a rotation vector (cross product)
-    Eigen::Matrix<double, 1, 3> normal_vector = initial_point.cross(final_point);
     double max_angle = acos(initial_point.dot(final_point) / initial_point.norm() / final_point.norm());
-
+    Eigen::Matrix<double, 1, 3> normal_vector;
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_points, 3);
-
-    // rotate inital vector about normal vector by angle steps
     Eigen::Matrix<double, Eigen::Dynamic, 1> angles(num_points);
+    // rotate inital vector about normal vector by angle steps
     angles = Eigen::VectorXd::LinSpaced(num_points, 0, max_angle);
 
     Eigen::Matrix<double, 3, 3> rot_mat(3, 3);
+    if ( max_angle < 1e-9  ) {
+        waypoints.setZero();
+        waypoints.row(0) = initial_point;
+    } else if ( abs(max_angle - kPI) < 1e-9 ) {
+        normal_vector = Eigen::RowVector3d::Random().normalized();
+        while (initial_point.normalized().dot(normal_vector) < 1e-9) {
+            normal_vector = Eigen::RowVector3d::Random().normalized();
+        }
 
-    for (int ii = 0; ii < num_points; ++ii) {
-        rot_mat = Eigen::AngleAxisd(angles(ii), normal_vector.normalized());
-        waypoints.row(ii) = rot_mat * initial_point.transpose();
+        for (int ii = 0; ii < num_points; ++ii) {
+            rot_mat = Eigen::AngleAxisd(angles(ii), normal_vector.normalized());
+            waypoints.row(ii) = rot_mat * initial_point.transpose();
+        }
+
+    } else {
+        normal_vector = initial_point.cross(final_point);
+
+        for (int ii = 0; ii < num_points; ++ii) {
+            rot_mat = Eigen::AngleAxisd(angles(ii), normal_vector.normalized());
+            waypoints.row(ii) = rot_mat * initial_point.transpose();
+        }
     }
+    
+
+
 
     return waypoints;
 }

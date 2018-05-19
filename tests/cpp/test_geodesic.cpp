@@ -197,6 +197,18 @@ TEST(TestWaypoint, EquatorialPlain) {
     final_point << 0, 1, 0;
     
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints = sphere_waypoint(initial_point, final_point, 5);
+    std::cout << waypoints << std::endl;
     ASSERT_TRUE(waypoints.row(0).isApprox(initial_point));
     ASSERT_TRUE(waypoints.row(4).isApprox(final_point, 1e-6));
 }
+
+TEST(TestWaypoint, ZeroDegreeVector) {
+    Eigen::Matrix<double, 1, 3> initial_point(3), final_point(3);
+    initial_point << 1, 0, 0;
+    final_point << 1, 0, 0;
+
+    Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints = sphere_waypoint(initial_point, final_point, 5);
+
+}
+
+
