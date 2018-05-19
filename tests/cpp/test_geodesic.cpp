@@ -221,7 +221,7 @@ TEST(TestWaypoint, PiDegreeVector) {
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints = sphere_waypoint(initial_point, final_point, 5);
     
     ASSERT_TRUE(waypoints.row(0).isApprox(initial_point));
-    ASSERT_TRUE(waypoints.row(4).isApprox(final_point.normalized(), 1e-6));
+    ASSERT_TRUE(waypoints.row(4).isApprox((Eigen::RowVector3d() << -1, -1, -1).finished(), 1e-6));
 }
 
 
