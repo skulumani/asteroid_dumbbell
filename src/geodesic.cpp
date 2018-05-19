@@ -170,13 +170,20 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> sphere_waypoint(const Eigen::Ref<const 
                                                           const int &num_points) {
     
     // Find a rotation vector (cross product)
-    double max_angle = acos(initial_point.dot(final_point) / initial_point.norm() / final_point.norm());
+    double dot_product = initial_point.dot(final_point) / initial_point.norm() / final_point.norm();
+    double max_angle = 0;
+    if (abs(dot_product + 1) < 1e-9) {
+        max_angle = kPI;
+    } else {
+        max_angle = acos(dot_product);
+    }
+
     Eigen::Matrix<double, 1, 3> normal_vector;
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_points, 3);
     Eigen::Matrix<double, Eigen::Dynamic, 1> angles(num_points);
     // rotate inital vector about normal vector by angle steps
     angles = Eigen::VectorXd::LinSpaced(num_points, 0, max_angle);
-
+    
     Eigen::Matrix<double, 3, 3> rot_mat(3, 3);
     if ( max_angle < 1e-9  ) {
         waypoints.setZero();

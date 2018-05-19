@@ -215,12 +215,14 @@ TEST(TestWaypoint, ZeroDegreeVector) {
 
 TEST(TestWaypoint, PiDegreeVector) {
     Eigen::Matrix<double, 1, 3> initial_point(3), final_point(3);
-    initial_point << 1, 0, 0;
-    final_point << -1, 0, 0;
+    initial_point << 1, 1, 1;
+    final_point << -0.5, -0.5, -0.5;
 
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints = sphere_waypoint(initial_point, final_point, 5);
-
+    
     ASSERT_TRUE(waypoints.row(0).isApprox(initial_point));
-    ASSERT_TRUE(waypoints.row(4).isApprox(final_point, 1e-6));
+    ASSERT_TRUE(waypoints.row(4).isApprox(final_point.normalized(), 1e-6));
 }
+
+
 
