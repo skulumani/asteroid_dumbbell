@@ -174,6 +174,8 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> sphere_waypoint(const Eigen::Ref<const 
     double max_angle = 0;
     if (abs(dot_product + 1) < 1e-9) {
         max_angle = kPI;
+    } else if (abs(dot_product - 1) < 1e-9) {
+        max_angle = 0;
     } else {
         max_angle = acos(dot_product);
     }

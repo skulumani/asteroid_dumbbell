@@ -204,9 +204,9 @@ TEST(TestWaypoint, EquatorialPlain) {
 
 TEST(TestWaypoint, ZeroDegreeVector) {
     Eigen::Matrix<double, 1, 3> initial_point(3), final_point(3);
-    initial_point << 1, 0, 0;
-    final_point << 1, 0, 0;
-
+    initial_point << 1, 1, 1;
+    final_point << 0.5, 0.5, 0.5;
+    
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints = sphere_waypoint(initial_point, final_point, 5);
     
     ASSERT_TRUE(waypoints.row(0).isApprox(initial_point));
