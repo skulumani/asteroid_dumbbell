@@ -262,7 +262,7 @@ void TranslationController::minimize_uncertainty(const double& t,
     pos(1) = state(1);
     pos(2) = state(2);
     
-    Eigen::VectorXd vertex_control_cost;
+    Eigen::VectorXd vertex_control_cost(rmesh->get_verts().rows());
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_waypoints, 3);
 
     for (int ii = 0; ii < rmesh->get_verts().rows(); ++ii) { 
@@ -314,35 +314,40 @@ void TranslationController::minimize_uncertainty(const double& t,
     Eigen::Vector3d pos(3);
     pos = state->get_pos();
 
-    Eigen::VectorXd vertex_control_cost;
+    Eigen::VectorXd vertex_control_cost(rmesh->get_verts().rows());
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_waypoints, 3);
 
     for (int ii = 0; ii < rmesh->get_verts().rows(); ++ii) { 
         waypoints = sphere_waypoint(pos, rmesh->get_verts().row(ii), num_waypoints);
-        /* vertex_control_cost(ii) = integrate_control_cost(t, waypoints, ast_est); */ 
+        vertex_control_cost(ii) = integrate_control_cost(t, waypoints, ast_est); 
     }
+    // need to handle the first and last vertex
+    // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex
+    Eigen::VectorXd sigma = central_angle(pos.normalized(), rmesh->get_verts().rowwise().normalized());
+    Eigen::VectorXd cost = - weighting_factor *rmesh->get_weights().array()/max_weight 
+                           + sigma_factor * sigma.array()/max_sigma 
+                           + control_factor * vertex_control_cost.array() / max_accel ;
+    
+    std::cout << pos.transpose() << std::endl;
+    std::cout << rmesh->get_verts().row(0) << std::endl;
+    std::cout << rmesh->get_verts().bottomRows(1) << std::endl;
+    std::cout << sphere_waypoint(pos, rmesh->get_verts().bottomRows(1), 5) << std::endl;
+    /* std::cout << sphere_waypoint(pos, rmesh->get_verts().row(0), num_waypoints) << std::endl; */
+    /* std::cout << vertex_control_cost.array().transpose() / max_accel << std::endl; */
+    // now find min index of cost
+    Eigen::MatrixXd::Index min_cost_index;
+    cost.minCoeff(&min_cost_index);
 
-    /* // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex */
-    /* Eigen::VectorXd sigma = central_angle(pos.normalized(), rmesh->get_verts().rowwise().normalized()); */
-    /* Eigen::VectorXd cost = - weighting_factor *rmesh->get_weights().array()/max_weight */ 
-    /*                        + sigma_factor * sigma.array()/max_sigma */ 
-    /*                        + control_factor * vertex_control_cost.array() / max_accel ; */
+    Eigen::RowVector3d des_vector;
 
+    des_vector = rmesh->get_verts().row(min_cost_index);
+    // pick out the corresponding vertex of the asteroid that should be viewed
+    // use current norm of position and output a position with same radius but just above the minium point
+    double current_radius = pos.norm();
 
-    /* // now find min index of cost */
-    /* Eigen::MatrixXd::Index min_cost_index; */
-    /* cost.minCoeff(&min_cost_index); */
-
-    /* Eigen::RowVector3d des_vector; */
-
-    /* des_vector = rmesh->get_verts().row(min_cost_index); */
-    /* // pick out the corresponding vertex of the asteroid that should be viewed */
-    /* // use current norm of position and output a position with same radius but just above the minium point */
-    /* double current_radius = pos.norm(); */
-
-    /* mposd = des_vector.normalized() * current_radius; */
-    /* mveld.setZero(3); */
-    /* macceld.setZero(3); */
+    mposd = des_vector.normalized() * current_radius;
+    mveld.setZero(3);
+    macceld.setZero(3);
 }
 
 Eigen::Matrix<double, 3, 1> TranslationController::get_posd( void ) const {

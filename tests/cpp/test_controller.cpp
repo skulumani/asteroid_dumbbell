@@ -142,7 +142,7 @@ TEST(TestTranslationController, MinimumUncertaintyCubeControl) {
     
     // define an initial state
     std::shared_ptr<State> state_ptr = std::make_shared<State>();
-    state_ptr->pos((Eigen::Vector3d() << 1, 1, 1).finished());
+    state_ptr->pos((Eigen::Vector3d() << 1, 1.1, 1).finished());
     
     TranslationController tran_controller;
     tran_controller.minimize_uncertainty(0, state_ptr, rmesh_ptr, ast);
