@@ -182,10 +182,11 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> sphere_waypoint(const Eigen::Ref<const 
         waypoints.setZero();
         waypoints.row(0) = initial_point;
     } else if ( abs(max_angle - kPI) < 1e-9 ) {
-        normal_vector = Eigen::RowVector3d::Random().normalized();
-        while (initial_point.normalized().dot(normal_vector) < 1e-9) {
-            normal_vector = Eigen::RowVector3d::Random().normalized();
+        Eigen::RowVector3d rand_vec = Eigen::RowVector3d::Random().normalized();
+        while (initial_point.normalized().dot(rand_vec) < 1e-9) {
+            rand_vec = Eigen::RowVector3d::Random().normalized();
         }
+        normal_vector = initial_point.cross(rand_vec);
 
         for (int ii = 0; ii < num_points; ++ii) {
             rot_mat = Eigen::AngleAxisd(angles(ii), normal_vector.normalized());
