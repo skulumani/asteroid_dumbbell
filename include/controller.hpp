@@ -115,10 +115,12 @@ class Controller: public TranslationController, public AttitudeController {
        void explore_asteroid(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
                std::shared_ptr<const ReconstructMesh> rmesh);
         
-       void explore_asteroid(std::shared_ptr<const State> state,
+       void explore_asteroid(const double& t,
+                             std::shared_ptr<const State> state,
                              std::shared_ptr<const ReconstructMesh> rmesh,
                              std::shared_ptr<Asteroid> ast_est);
-       void explore_asteroid(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+       void explore_asteroid(const double& t,
+                             const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
                              std::shared_ptr<const ReconstructMesh> rmesh,
                              std::shared_ptr<Asteroid> ast_est);
         /** @fn Output a state object with the desired state

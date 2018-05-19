@@ -265,15 +265,15 @@ void TranslationController::minimize_uncertainty(const double& t,
     const int num_waypoints = 5;
     
     // weighting for each of the cost components
-    double weighting_factor(0.3); /**< Weighting factor between distance and ucnertainty */
-    double sigma_factor(0.3);
-    double control_factor(0.4);
+    double weighting_factor(0.4); /**< Weighting factor between distance and ucnertainty */
+    double sigma_factor(0.5);
+    double control_factor(0.1);
 
     Eigen::Vector3d pos(3);
     pos(0) = state(0);
     pos(1) = state(1);
     pos(2) = state(2);
-    
+
     Eigen::VectorXd vertex_control_cost(rmesh->get_verts().rows());
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_waypoints, 3);
 
@@ -282,13 +282,13 @@ void TranslationController::minimize_uncertainty(const double& t,
         vertex_control_cost(ii) = integrate_control_cost(t, waypoints, ast_est); 
     }
 
+    // need to handle the first and last vertex
     // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex
     Eigen::VectorXd sigma = central_angle(pos.normalized(), rmesh->get_verts().rowwise().normalized());
     Eigen::VectorXd cost = - weighting_factor *rmesh->get_weights().array()/max_weight 
-                           + sigma_factor * sigma.array()/max_sigma 
-                           + control_factor * vertex_control_cost.array() / max_accel ;
-
-
+                           + sigma_factor * sigma.array()/max_sigma
+                           + control_factor * vertex_control_cost.array() / vertex_control_cost.maxCoeff() ;
+    
     // now find min index of cost
     Eigen::MatrixXd::Index min_cost_index;
     cost.minCoeff(&min_cost_index);
