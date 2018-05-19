@@ -184,15 +184,27 @@ double integrate_control_cost(const double& t,
     
     const int num_points = waypoints.rows();
     const double initial_angle = 0;
-    const double final_angle = acos(waypoints.row(0).dot(waypoints.row(num_points)) / waypoints.row(0).norm() / waypoints.bottomRows(1).norm());
-    const double delta_angle = final_angle / num_points;
-    
-    double total_cost = control_cost(t, waypoints.row(0), ast_est);
 
-    for (int ii = 1; ii < num_points - 1; ++ii) {
-        total_cost += 2 * control_cost(t, waypoints.row(ii), ast_est); 
+    double dot_product = waypoints.row(0).dot(waypoints.row(num_points)) / waypoints.row(0).norm() / waypoints.row(num_points).norm();
+    double final_angle = 0;
+    if (std::abs(dot_product + 1.0) < 1e-9) {
+        final_angle = kPI;
+    } else if (std::abs(dot_product - 1.0) < 1e-9) {
+        final_angle = 0;
+    } else {
+        final_angle = acos(dot_product);
     }
-    total_cost = delta_angle / 2 * (total_cost + control_cost(t, waypoints.row(num_points), ast_est));
+
+    double total_cost = control_cost(t, waypoints.row(0), ast_est);
+    if (waypoints.bottomRows(1).isApprox((Eigen::RowVector3d() << 0 ,0 ,0).finished())) {
+
+    } else {
+        const double delta_angle = final_angle / num_points;
+        for (int ii = 1; ii < num_points - 1; ++ii) {
+                total_cost += 2 * control_cost(t, waypoints.row(ii), ast_est); 
+        }
+        total_cost = delta_angle / 2 * (total_cost + control_cost(t, waypoints.row(num_points), ast_est));
+    }
 
     return total_cost;
 }
@@ -307,9 +319,9 @@ void TranslationController::minimize_uncertainty(const double& t,
     const int num_waypoints = 5;
     
     // weighting for each of the cost components
-    double weighting_factor(0.3); /**< Weighting factor between distance and ucnertainty */
-    double sigma_factor(0.3);
-    double control_factor(0.4);
+    double weighting_factor(0.4); /**< Weighting factor between distance and ucnertainty */
+    double sigma_factor(0.5);
+    double control_factor(0.1);
 
     Eigen::Vector3d pos(3);
     pos = state->get_pos();
@@ -321,19 +333,14 @@ void TranslationController::minimize_uncertainty(const double& t,
         waypoints = sphere_waypoint(pos, rmesh->get_verts().row(ii), num_waypoints);
         vertex_control_cost(ii) = integrate_control_cost(t, waypoints, ast_est); 
     }
+
     // need to handle the first and last vertex
     // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex
     Eigen::VectorXd sigma = central_angle(pos.normalized(), rmesh->get_verts().rowwise().normalized());
     Eigen::VectorXd cost = - weighting_factor *rmesh->get_weights().array()/max_weight 
-                           + sigma_factor * sigma.array()/max_sigma 
-                           + control_factor * vertex_control_cost.array() / max_accel ;
+                           + sigma_factor * sigma.array()/max_sigma
+                           + control_factor * vertex_control_cost.array() / vertex_control_cost.maxCoeff() ;
     
-    std::cout << pos.transpose() << std::endl;
-    std::cout << rmesh->get_verts().row(0) << std::endl;
-    std::cout << rmesh->get_verts().bottomRows(1) << std::endl;
-    std::cout << sphere_waypoint(pos, rmesh->get_verts().bottomRows(1), 5) << std::endl;
-    /* std::cout << sphere_waypoint(pos, rmesh->get_verts().row(0), num_waypoints) << std::endl; */
-    /* std::cout << vertex_control_cost.array().transpose() / max_accel << std::endl; */
     // now find min index of cost
     Eigen::MatrixXd::Index min_cost_index;
     cost.minCoeff(&min_cost_index);

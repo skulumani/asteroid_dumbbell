@@ -142,11 +142,10 @@ TEST(TestTranslationController, MinimumUncertaintyCubeControl) {
     
     // define an initial state
     std::shared_ptr<State> state_ptr = std::make_shared<State>();
-    state_ptr->pos((Eigen::Vector3d() << 1, 1.1, 1).finished());
+    state_ptr->pos((Eigen::Vector3d() << 1, 1, 1).finished());
     
     TranslationController tran_controller;
     tran_controller.minimize_uncertainty(0, state_ptr, rmesh_ptr, ast);
-
     ASSERT_TRUE(tran_controller.get_posd().isApprox((Eigen::Vector3d() << 1, 1, 1).finished()));
 }
 
@@ -175,8 +174,8 @@ TEST(TestController, ControlCostIntegral) {
     
     // generate a of waypoints
     Eigen::Matrix<double, 1, 3> pos_end, pos_start;
-    pos_start << 1, 0, 0;
-    pos_end << 0, -1, 0;
+    pos_start << 1,1, 1;
+    pos_end << 1, 1, 1;
     
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints = sphere_waypoint(pos_start, pos_end, 5);
     
@@ -189,7 +188,6 @@ TEST(TestController, ControlCostIntegral) {
     double total_control_cost_two = integrate_control_cost(0,
                                                        waypoints,
                                                        ast);
-
     ASSERT_NEAR(total_control_cost_one, total_control_cost_two, 1e-6);
 }
 
