@@ -400,6 +400,28 @@ void Controller::explore_asteroid(const Eigen::Ref<const Eigen::Matrix<double, 1
     body_fixed_pointing_attitude(new_state);
 }
 
+void Controller::explore_asteroid(const double& t,
+                                  std::shared_ptr<const State> state_ptr,
+                                  std::shared_ptr<const ReconstructMesh> rmesh_ptr,
+                                  std::shared_ptr<Asteroid> ast_est_ptr) {
+    
+    minimize_uncertainty(t, state_ptr, rmesh_ptr,  ast_est_ptr);
+
+    std::shared_ptr<State> new_state = get_desired_state();
+
+    body_fixed_pointing_attitude(new_state);
+}
+
+void Controller::explore_asteroid(const double& t,
+                                  const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+                                  std::shared_ptr<const ReconstructMesh> rmesh_ptr,
+                                  std::shared_ptr<Asteroid> ast_est_ptr) {
+    minimize_uncertainty(t, state, rmesh_ptr, ast_est_ptr);
+
+    std::shared_ptr<State> new_state = get_desired_state();
+
+    body_fixed_pointing_attitude(new_state);
+}
 std::shared_ptr<State> Controller::get_desired_state() {
     
     std::shared_ptr<State> state_ptr = std::make_shared<State>();

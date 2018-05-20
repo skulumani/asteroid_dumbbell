@@ -116,7 +116,7 @@ class Controller: public TranslationController, public AttitudeController {
        void explore_asteroid(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
                std::shared_ptr<const ReconstructMesh> rmesh);
     
-       // TODO Implement this function
+       // TODO Need some unit tests for tese
        void explore_asteroid(const double& t,
                              std::shared_ptr<const State> state,
                              std::shared_ptr<const ReconstructMesh> rmesh,
