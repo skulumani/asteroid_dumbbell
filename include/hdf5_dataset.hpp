@@ -10,13 +10,31 @@ namespace HDF5 {
     // Ahead of time declaration
     class Group;
     class File;
-    
+    /** @class DataSet
+
+        @brief DataSet class for managing HDF5 dataset
+        
+        This class allows one to directly save/read Eigen arrays to an HDF5 dataset
+
+        @author Shankar Kulumani
+        @version 20 May 2018
+    */    
     class DataSet {
         public:
             DataSet( void );
             virtual ~DataSet( void );
 
-            // Simply open a dataset with another function to read
+            /** @fn DataSet(const File* file, const std::string& dataset_name)
+                    
+                Open a dataset within the given file object
+
+                @param file HDF5 File object
+                @param dataset_name String holding the name of the dataset
+                @returns DataSet object
+
+                @author Shankar Kulumani
+                @version 20 May 2018
+            */
             DataSet(const File* file, const std::string& dataset_name);
             DataSet(const Group* group, const std::string& dataset_name);
 
