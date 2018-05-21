@@ -276,7 +276,8 @@ void TranslationController::minimize_uncertainty(const double& t,
 
     Eigen::VectorXd vertex_control_cost(rmesh->get_verts().rows());
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_waypoints, 3);
-
+    
+    #pragma omp parallel for
     for (int ii = 0; ii < rmesh->get_verts().rows(); ++ii) { 
         waypoints = sphere_waypoint(pos, rmesh->get_verts().row(ii), num_waypoints);
         vertex_control_cost(ii) = integrate_control_cost(t, waypoints, ast_est); 
@@ -329,6 +330,7 @@ void TranslationController::minimize_uncertainty(const double& t,
     Eigen::VectorXd vertex_control_cost(rmesh->get_verts().rows());
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_waypoints, 3);
 
+    #pragma omp parallel for
     for (int ii = 0; ii < rmesh->get_verts().rows(); ++ii) { 
         waypoints = sphere_waypoint(pos, rmesh->get_verts().row(ii), num_waypoints);
         vertex_control_cost(ii) = integrate_control_cost(t, waypoints, ast_est); 
