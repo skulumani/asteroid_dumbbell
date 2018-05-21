@@ -65,27 +65,27 @@ int main(int argc, char* argv[])
     sensor.dist(dist).num_steps(num_steps);
     
     // Create HDF5 file for saving the data
-    /* std::shared_ptr<HDF5::File> hf = std::make_shared<HDF5::File>(output_file, HDF5::File::Truncate); */
+    std::shared_ptr<HDF5::File> hf = std::make_shared<HDF5::File>(output_file, HDF5::File::Truncate);
     
-    /* HDF5::Group reconstructed_vertex_group(hf.get(), "reconstructed_vertex"), */
-    /*             reconstructed_weight_group(hf.get(), "reconstructed_weight"), */
-    /*             state_group(hf.get(), "state"), */
-    /*             targets_group(hf.get(), "targets"), */
-    /*             intersections_group(hf.get(), "intersections"); */
+    HDF5::Group reconstructed_vertex_group(hf.get(), "reconstructed_vertex"),
+                reconstructed_weight_group(hf.get(), "reconstructed_weight"),
+                state_group(hf.get(), "state"),
+                targets_group(hf.get(), "targets"),
+                intersections_group(hf.get(), "intersections");
 
-    /* // place satellite in a specific location and define view axis */
-    /* State initial_state, state; */
-    /* initial_state.pos((Eigen::RowVector3d() << 1.5, 0, 0).finished()) */
-    /*      .vel((Eigen::RowVector3d() << 0, 0, 0).finished()) */
-    /*      .att((Eigen::MatrixXd::Identity(3, 3))) */
-    /*      .ang_vel((Eigen::RowVector3d() << 0, 0, 0).finished()); */
-    /* std::shared_ptr<State> state_ptr = std::make_shared<State>(state); */
-    /* std::shared_ptr<State> initial_state_ptr = std::make_shared<State>(initial_state); */
-    /* std::shared_ptr<State> new_state_ptr = std::make_shared<State>(); */
+    // place satellite in a specific location and define view axis
+    State initial_state, state;
+    initial_state.pos((Eigen::RowVector3d() << 1.5, 0, 0).finished())
+         .vel((Eigen::RowVector3d() << 0, 0, 0).finished())
+         .att((Eigen::MatrixXd::Identity(3, 3)))
+         .ang_vel((Eigen::RowVector3d() << 0, 0, 0).finished());
+    std::shared_ptr<State> state_ptr = std::make_shared<State>(state);
+    std::shared_ptr<State> initial_state_ptr = std::make_shared<State>(initial_state);
+    std::shared_ptr<State> new_state_ptr = std::make_shared<State>();
 
-    /* state_ptr->update_state(initial_state_ptr); */
-    /* // modify the initial state to point at the body using the controller */
-    /* controller.explore_asteroid(state_ptr, rmesh_ptr); */
+    state_ptr->update_state(initial_state_ptr);
+    // modify the initial state to point at the body using the controller
+    controller.explore_asteroid(0, state_ptr, est_rmesh_ptr, est_ast_ptr);
     /* new_state_ptr = controller.get_desired_state(); */
     /* state_ptr->update_state(new_state_ptr); */
     
