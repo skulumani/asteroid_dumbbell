@@ -68,6 +68,10 @@ class MeshParam {
         MeshParam( std::shared_ptr<MeshData> mesh_in);
 		
 		std::shared_ptr<MeshData> mesh;
+        
+        // Getters for vertices and faces
+        Eigen::MatrixXd get_verts( void ) const { return mesh->get_verts(); }
+        Eigen::MatrixXi get_faces( void ) const { return mesh->get_faces(); }
 
         // define all the member variables
         std::size_t num_v, num_f, num_e;
@@ -163,6 +167,9 @@ class Asteroid {
 
         // member variables
         Eigen::Vector3d get_axes( void ) const { return axes; }
+
+        Eigen::MatrixXd get_verts( void ) const { return mesh_param->get_verts(); }
+        Eigen::MatrixXi get_faces( void ) const { return mesh_param->get_faces(); }
 
 };
 // declare some shit
