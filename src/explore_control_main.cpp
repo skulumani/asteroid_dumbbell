@@ -8,6 +8,8 @@
 #include "lidar.hpp"
 #include "controller.hpp"
 #include "state.hpp"
+#include "potential.hpp"
+
 #include "hdf5.hpp"
 
 #include "input_parser.hpp"
@@ -21,37 +23,31 @@
 
 int main(int argc, char* argv[])
 {
-    // CONSTANTS
-    // semi major axes of castalia
-    Eigen::Vector3d axes(3);
-    axes << 1.6130 / 2.0, 0.9810 / 2.0, 0.8260 / 2.0;
-    double min_angle(10), max_radius(0.03), max_distance(0.5);
 
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
         std::cout << "Kinematic only exploration with asteroid reconstruction" << std::endl;
     }
 
-    const std::string input_file = input.get_command_option("-i");
-    if (input_file.empty()) {
-        std::cout << "You need to input file name!" << std::endl;
-        std::cout << "explore -i asteroid.obj -o data.hdf5" << std::endl;
-        return 1;
-    }
+    const std::string input_file = "./data/shape_model/CASTALIA/castalia.obj";
     
     const std::string output_file = input.get_command_option("-o");
     if (output_file.empty()) {
         std::cout << "You need an output file name!" << std::endl;
-        std::cout << "explore -i asteroid.obj -o data.hdf5" << std::endl;
+        std::cout << "explore -o data.hdf5" << std::endl;
         return 1;
     }
 
+    // initialize objects
+    std::shared_ptr<MeshData> true_meshdata_ptr = Loader::load(input_file);
+    std::shared_ptr<Asteroid> true_ast_ptr = std::make_shared<Asteroid>(true_meshdata_ptr);
+
+    std::shared_ptr<ReconstructMesh> 
+    // CONSTANTS
+    double min_angle(10), max_radius(0.03), max_distance(0.5);
     // initialize all the objects
     double surf_area(0.01);
     double max_angle( pow(surf_area / (axes(0) * axes(0)), 0.5));
-
-    std::shared_ptr<MeshData> true_asteroid;
-    true_asteroid = Loader::load(input_file);
      
     RayCaster caster(true_asteroid);
     SurfMesh ellipsoid(axes(0), axes(1), axes(2),
