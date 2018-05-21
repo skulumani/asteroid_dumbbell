@@ -43,8 +43,8 @@ struct SurfMesh {
 	// deconstructor
 	virtual ~SurfMesh( void ) {}
 	// member functions
-	Eigen::MatrixXd verts( void ) { return v; }
-	Eigen::MatrixXi faces( void ) { return f; }
+	Eigen::MatrixXd get_verts( void ) { return v; }
+	Eigen::MatrixXi get_faces( void ) { return f; }
 	
 	// Instance members - The polyhedron, vertices and faces	
 	CGAL::Polyhedron_3<CGAL::Surface_mesh_default_triangulation_3::Geom_traits,CGAL::Polyhedron_items_with_id_3> poly;

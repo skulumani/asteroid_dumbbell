@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
     RayCaster caster(true_asteroid);
     SurfMesh ellipsoid(axes(0), axes(1), axes(2),
             min_angle, max_radius, max_distance);
-    std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(ellipsoid.verts(), ellipsoid.faces());
+    std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(ellipsoid.get_verts(), ellipsoid.get_faces());
     Controller controller;
 
     Lidar sensor;
