@@ -207,6 +207,10 @@ add_executable(explore ${explore_src})
 target_link_libraries(explore cgal_cpp input_parser_cpp eigen_hdf5
     ${HDF5_CXX_LIBRARIES} )
 
+# exploration using control cost function
+add_executable(explore_control src/explore_control_main.cpp)
+target_link_libraries(explore_control cgal_cpp input_parser_cpp eigen_hdf5
+    ${HDF5_CXX_LIBRARIES})
 # memory tester 
 set(memory_tester_src src/memory_tester.cpp src/loader.cpp src/mesh.cpp src/polyhedron.cpp)
 add_executable(memory_tester ${memory_tester_src})
