@@ -97,7 +97,6 @@ class TranslationController {
                                   std::shared_ptr<const State> state,
                                   std::shared_ptr<const ReconstructMesh> rmesh,
                                   std::shared_ptr<Asteroid> ast_est);
-        // TODO Create a unit test for this
         void minimize_uncertainty(const double& t,
                                   const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
                                   std::shared_ptr<const ReconstructMesh> rmesh,

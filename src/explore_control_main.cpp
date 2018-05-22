@@ -23,7 +23,6 @@
 
 int main(int argc, char* argv[])
 {
-    Eigen::initParallel();
 
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
@@ -105,7 +104,7 @@ int main(int argc, char* argv[])
     hf->write("initial_state", state_ptr->get_state()); 
 
     // LOOP HERE
-    for (int ii = 0; ii < 10; ++ii) {
+    for (int ii = 0; ii < 2; ++ii) {
         
         // compute targets for use in caster (point at the asteroid origin)
         target = sensor.define_target(state_ptr->get_pos(), state_ptr->get_att(), dist);    
