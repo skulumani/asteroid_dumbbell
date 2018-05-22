@@ -3,6 +3,7 @@
 #include "reconstruct.hpp"
 #include "geodesic.hpp"
 #include "potential.hpp"
+#include "surface_mesher.hpp"
 
 #include <Eigen/Dense>
 
@@ -109,12 +110,18 @@ void AttitudeController::body_fixed_pointing_attitude(const double& time,
     assert(assert_SO3(mRd));
 }
 
+// TRANSLATIONCONTROLLER SHIT ***********************************************
 TranslationController::TranslationController( void ) {
     mposd.setZero(3);
     mveld.setZero(3);
     macceld.setZero(3);
 }
 
+void TranslationController::generate_controller_mesh( void ) {
+    SurfMesh circle(1.0, 1.0, 1.0, 20, 0.4, 0.2);
+    controller_vertices = circle.get_verts();
+    controller_faces = circle.get_faces();
+}
 void TranslationController::inertial_fixed_state(std::shared_ptr<const State> des_state) {
     mposd = des_state->get_pos();
     mveld.setZero(3);
@@ -369,6 +376,7 @@ Eigen::Matrix<double, 3, 1> TranslationController::get_acceld( void ) const {
     return macceld;
 }
 
+// CONTROLLER SHIT ************************************************************
 Controller::Controller( void ) {
     
 }

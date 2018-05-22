@@ -59,6 +59,12 @@ class TranslationController {
     friend class Controller; 
     
     private:
+        Eigen::MatrixXd controller_vertices;
+        Eigen::MatrixXi controller_faces;
+        
+        void generate_controller_mesh( void );
+        void build_controller_mesh_mapping(std::shared_ptr<const MeshData> meshdata_ptr,
+                                           const double& max_angle);
 
     public:
         TranslationController( void );
