@@ -122,6 +122,22 @@ void TranslationController::generate_controller_mesh( void ) {
     controller_vertices = circle.get_verts();
     controller_faces = circle.get_faces();
 }
+
+void TranslationController::build_controller_mesh_mapping(std::shared_ptr<const MeshData> meshdata_ptr,
+        const double& max_angle) {
+    
+    // define some references
+    const Eigen::MatrixXd highres_vertices& = meshdata_ptr->vertices;
+    const Eigen::MatrixXi highres_faces& = meshdata_ptr->faces;
+
+    // loop over the low resolution mesh
+    for (int ii = 0; ii < controller_vertices.rows(); ++ii) {
+        // find dot product of this vector with all vectors in highres_vertices
+
+        // for those less than max_angle store the index someplace
+    }
+}
+
 void TranslationController::inertial_fixed_state(std::shared_ptr<const State> des_state) {
     mposd = des_state->get_pos();
     mveld.setZero(3);
