@@ -77,9 +77,13 @@ set(eigen_hdf5_src
 add_library(eigen_hdf5 SHARED ${eigen_hdf5_src})
 target_link_libraries(eigen_hdf5 ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 
+add_executable(main ${PROJECT_SOURCE_DIR}/src/main.cpp)
+target_link_libraries(main eigen_hdf5)
 # TESTING
 ENABLE_TESTING()
-add_executable(test_hdf5 tests/test_hdf5.cpp tests/test_all.cpp)
+add_executable(test_hdf5 
+    ${PROJECT_SOURCE_DIR}/tests/test_hdf5.cpp 
+    ${PROJECT_SOURCE_DIR}/tests/test_all.cpp)
 target_link_libraries(test_hdf5 gtest eigen_hdf5)
 add_test(NAME test_hdf5 COMMAND test_hdf5
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}) 

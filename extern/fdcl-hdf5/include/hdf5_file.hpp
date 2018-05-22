@@ -11,7 +11,7 @@ namespace HDF5 {
     class File;
     class Group;
     class DataSet;
-
+    
 class File {
     public: 
         static const int ReadOnly = 0; /**< Read only access */

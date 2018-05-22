@@ -3,7 +3,12 @@
 #include <iostream>
 
 namespace HDF5 {
-    
+   
+    const int File::ReadOnly; /**< Read only access */
+    const int File::ReadWrite; /**< ReadWrite access */
+    const int File::Truncate; /**< Overwrite a file if it exists or create a new one */
+    const int File::Excl; /**< Only open if the file doesn't exist */
+    const int File::Create; /**< Create a new file */
     File::~File ( void ) {
         file_ptr->close();
     }
