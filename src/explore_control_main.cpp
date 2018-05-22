@@ -86,47 +86,47 @@ int main(int argc, char* argv[])
     state_ptr->update_state(initial_state_ptr);
     // modify the initial state to point at the body using the controller
     controller.explore_asteroid(0, state_ptr, est_rmesh_ptr, est_ast_ptr);
-    /* new_state_ptr = controller.get_desired_state(); */
-    /* state_ptr->update_state(new_state_ptr); */
+    new_state_ptr = controller.get_desired_state();
+    state_ptr->update_state(new_state_ptr);
     
-    /* // targets to be updated in the loop */
-    /* Eigen::Matrix<double, 1, Eigen::Dynamic> target(1, 3); */
-    /* Eigen::Matrix<double, 1, Eigen::Dynamic> intersection(1, 3); */
+    // targets to be updated in the loop
+    Eigen::Matrix<double, 1, Eigen::Dynamic> target(1, 3);
+    Eigen::Matrix<double, 1, Eigen::Dynamic> intersection(1, 3);
     
-    /* // save initial data to the HDF5 file */
-    /* hf->write("truth_vertex", true_asteroid->get_verts()); */
-    /* hf->write("truth_faces", true_asteroid->get_faces()); */
+    // save initial data to the HDF5 file
+    hf->write("truth_vertex", true_ast_ptr->get_verts());
+    hf->write("truth_faces", true_ast_ptr->get_faces());
     
-    /* hf->write("initial_vertex", rmesh_ptr->get_verts()); */
-    /* hf->write("initial_faces", rmesh_ptr->get_faces()); */
-    /* hf->write("initial_weight", rmesh_ptr->get_weights()); */
+    hf->write("initial_vertex", est_rmesh_ptr->get_verts());
+    hf->write("initial_faces", est_rmesh_ptr->get_faces());
+    hf->write("initial_weight", est_rmesh_ptr->get_weights());
 
-    /* hf->write("initial_state", state_ptr->get_state()); */ 
+    hf->write("initial_state", state_ptr->get_state()); 
 
-    /* // LOOP HERE */
-    /* for (int ii = 0; ii < rmesh_ptr->get_verts().rows(); ++ii) { */
+    // LOOP HERE
+    for (int ii = 0; ii < 10; ++ii) {
         
-    /*     // compute targets for use in caster (point at the asteroid origin) */
-    /*     target = sensor.define_target(state_ptr->get_pos(), state_ptr->get_att(), dist); */    
+        // compute targets for use in caster (point at the asteroid origin)
+        target = sensor.define_target(state_ptr->get_pos(), state_ptr->get_att(), dist);    
 
-    /*     // perform raycasting on the true mesh (true_asteroid pointer) */
-    /*     intersection = caster.castray(state_ptr->get_pos(), target); */
+        // perform raycasting on the true mesh (true_asteroid pointer)
+        intersection = caster.castray(state_ptr->get_pos(), target);
 
-    /*     // use this measurement to update rmesh (inside holds teh mesh estimate) */
-    /*     rmesh_ptr->single_update(intersection, max_angle); */
-    /*     // use the updated weight to find a new positoin to move to */
-    /*     controller.explore_asteroid(state_ptr, rmesh_ptr); */
-    /*     new_state_ptr = controller.get_desired_state(); */
-    /*     // update the state ptr with the newly calculated state */
-    /*     state_ptr->update_state(new_state_ptr); */
-    /*     // save the data (raycast interseciton, position of sat, ast estimate, targets) to hdf5 */
-    /*     reconstructed_vertex_group.write(std::to_string(ii), rmesh_ptr->get_verts()); */
-    /*     reconstructed_weight_group.write(std::to_string(ii), rmesh_ptr->get_weights()); */
-    /*     state_group.write(std::to_string(ii), state_ptr->get_state()); */
-    /*     targets_group.write(std::to_string(ii), target); */
-    /*     intersections_group.write(std::to_string(ii), intersection); */
+        // use this measurement to update rmesh (inside holds teh mesh estimate)
+        est_rmesh_ptr->single_update(intersection, max_angle);
+        // use the updated weight to find a new positoin to move to
+        controller.explore_asteroid(0, state_ptr, est_rmesh_ptr, true_ast_ptr);
+        new_state_ptr = controller.get_desired_state();
+        // update the state ptr with the newly calculated state
+        state_ptr->update_state(new_state_ptr);
+        // save the data (raycast interseciton, position of sat, ast estimate, targets) to hdf5
+        reconstructed_vertex_group.write(std::to_string(ii), est_rmesh_ptr->get_verts());
+        reconstructed_weight_group.write(std::to_string(ii), est_rmesh_ptr->get_weights());
+        state_group.write(std::to_string(ii), state_ptr->get_state());
+        targets_group.write(std::to_string(ii), target);
+        intersections_group.write(std::to_string(ii), intersection);
 
-    /* } */
+    }
     
     /* /1* hf.close(); *1/ */
     return 0;
