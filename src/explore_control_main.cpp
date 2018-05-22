@@ -23,6 +23,7 @@
 
 int main(int argc, char* argv[])
 {
+    Eigen::initParallel();
 
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
