@@ -72,7 +72,7 @@ class TranslationController {
         
         // an extra constructor to initialize the matrices
         TranslationController(std::shared_ptr<const MeshData> meshdata_ptr,
-                              const double& max_angle);
+                              const double& max_angle=0.53);
 
         void inertial_fixed_state(std::shared_ptr<const State> des_state);
         void inertial_fixed_state(const double& time, 
