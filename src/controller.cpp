@@ -144,11 +144,14 @@ void TranslationController::build_controller_mesh_mapping(std::shared_ptr<const 
     
     Eigen::VectorXd dot_product(highres_vertices.rows()); 
     // loop over the low resolution mesh
-    for (int ii = 0; ii < controller_vertices.rows(); ++ii) {
+    /* for (int ii = 0; ii < controller_vertices.rows(); ++ii) { */
         // find dot product of this vector with all vectors in highres_vertices
-        dot_product = (highres_vertices.array().rowwise() * controller_vertices.row(ii).array()).rowwise().sum();
+        dot_product = (highres_vertices.array().rowwise() * controller_vertices.row(0).array()).rowwise().sum();
         // for those less than max_angle store the index someplace
-    }
+        
+        // create a bool eigen matrix with those dot_products less than some value
+        // store in a std::vector<std::vector<Eigen::RowVectorXd> >
+    /* } */
 }
 
 void TranslationController::inertial_fixed_state(std::shared_ptr<const State> des_state) {

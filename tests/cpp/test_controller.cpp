@@ -149,6 +149,13 @@ TEST(TestTranslationController, MinimumUncertaintyCubeControl) {
     ASSERT_TRUE(tran_controller.get_posd().isApprox((Eigen::Vector3d() << 1, 1, 1).finished()));
 }
 
+TEST(TestTranslationController, ControllerMeshMapping) {
+    std::shared_ptr<MeshData> meshdata_ptr;
+    meshdata_ptr = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+    
+    TranslationController tran_controller(meshdata_ptr);
+}
+
 TEST(TestController, ControlCost) {
     std::shared_ptr<MeshData> mesh_ptr;
     mesh_ptr = Loader::load("./integration/cube.obj");
