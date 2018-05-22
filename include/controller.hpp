@@ -70,6 +70,10 @@ class TranslationController {
         TranslationController( void );
         virtual ~TranslationController( void ) {};
         
+        // an extra constructor to initialize the matrices
+        TranslationController(std::shared_ptr<const MeshData> meshdata_ptr,
+                              const double& max_angle);
+
         void inertial_fixed_state(std::shared_ptr<const State> des_state);
         void inertial_fixed_state(const double& time, 
                 const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_in,

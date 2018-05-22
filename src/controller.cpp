@@ -115,6 +115,18 @@ TranslationController::TranslationController( void ) {
     mposd.setZero(3);
     mveld.setZero(3);
     macceld.setZero(3);
+
+}
+
+TranslationController::TranslationController(std::shared_ptr<const MeshData> meshdata_ptr,
+                                             const double& max_angle) {
+    
+    mposd.setZero(3);
+    mveld.setZero(3);
+    macceld.setZero(3);
+
+    generate_controller_mesh();
+    build_controller_mesh_mapping(meshdata_ptr, max_angle);
 }
 
 void TranslationController::generate_controller_mesh( void ) {
@@ -127,13 +139,14 @@ void TranslationController::build_controller_mesh_mapping(std::shared_ptr<const 
         const double& max_angle) {
     
     // define some references
-    const Eigen::MatrixXd highres_vertices& = meshdata_ptr->vertices;
-    const Eigen::MatrixXi highres_faces& = meshdata_ptr->faces;
-
+    const Eigen::MatrixXd& highres_vertices = meshdata_ptr->vertices;
+    const Eigen::MatrixXi& highres_faces = meshdata_ptr->faces;
+    
+    Eigen::VectorXd dot_product(highres_vertices.rows()); 
     // loop over the low resolution mesh
     for (int ii = 0; ii < controller_vertices.rows(); ++ii) {
         // find dot product of this vector with all vectors in highres_vertices
-
+        dot_product = (highres_vertices.array().rowwise() * controller_vertices.row(ii).array()).rowwise().sum();
         // for those less than max_angle store the index someplace
     }
 }
