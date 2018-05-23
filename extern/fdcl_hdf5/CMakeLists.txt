@@ -1,9 +1,18 @@
 cmake_minimum_required(VERSION 3.10)
-project( fdcl-hdf5 VERSION 0.1 )
+project( fdcl_hdf5 VERSION 0.1 DESCRIPTION "FDCL HDF5 Library")
 
 enable_language(CXX)
 set(CMAKE_CXX_STANDARD 11)
+set(DEFAULT_BUILD_TYPE "Release")
 
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to '${DEFAULT_BUILD_TYPE}' as none was specified.")
+  set(CMAKE_BUILD_TYPE "${DEFAULT_BUILD_TYPE}" CACHE STRING "Choose the type of build." FORCE)
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
+include(GNUInstallDirs)
 
 # HDF5 Setup
 set(ENV{HDF5_ROOT} /usr/local/hdf5)
@@ -76,16 +85,19 @@ set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_INCLUDE_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 
-set(fdcl-hdf5_src 
+set(fdcl_hdf5_src 
     ${PROJECT_SOURCE_DIR}/src/hdf5_eigen.cpp
     ${PROJECT_SOURCE_DIR}/src/hdf5_file.cpp
     ${PROJECT_SOURCE_DIR}/src/hdf5_group.cpp
     ${PROJECT_SOURCE_DIR}/src/hdf5_dataset.cpp)
-add_library(${PROJECT_NAME} SHARED ${fdcl-hdf5_src})
+add_library(${PROJECT_NAME} SHARED ${fdcl_hdf5_src})
 target_link_libraries(${PROJECT_NAME} ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
+set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION}
+    SOVERSION 1)
 
 add_executable(main ${PROJECT_SOURCE_DIR}/src/main.cpp)
 target_link_libraries(main ${PROJECT_NAME})
+
 # TESTING
 ENABLE_TESTING()
 add_executable(test_hdf5 
