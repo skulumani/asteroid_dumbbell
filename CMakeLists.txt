@@ -44,6 +44,14 @@ else()
     message(STATUS "Found HDF5: ${HDF5_VERSION}")
 endif()
 
+find_package(FDCL_HDF5 REQUIRED)
+if (NOT FDCL_HDF5_FOUND)
+    message(STATUS "This project requires FDCL HDF5 and will not compile")
+    return()
+else()
+    message(STATUS "Found FDCL_HDF5: ${FDCL_HDF5_VERSION}")
+endif()
+
 if ( HDF5_IS_PARALLEL )
     message(STATUS "HDF5 parallel is installed")
 else()
@@ -172,14 +180,6 @@ set(input_parser_src
     )
 add_library(input_parser_cpp SHARED ${input_parser_src})
 
-set(eigen_hdf5_src 
-    ${PROJECT_SOURCE_DIR}/src/hdf5_eigen.cpp
-    ${PROJECT_SOURCE_DIR}/src/hdf5_file.cpp
-    ${PROJECT_SOURCE_DIR}/src/hdf5_group.cpp
-    ${PROJECT_SOURCE_DIR}/src/hdf5_dataset.cpp)
-add_library(eigen_hdf5 SHARED ${eigen_hdf5_src})
-target_link_libraries(eigen_hdf5 ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
-
 # EXECUTABLES
 # mesh loading
 set(mesh_src src/mesh_main.cpp)
@@ -204,12 +204,12 @@ target_link_libraries(reconstruct_mesh cgal_cpp input_parser_cpp)
 # exploration example 
 set( explore_src src/explore_main.cpp)
 add_executable(explore ${explore_src})
-target_link_libraries(explore cgal_cpp input_parser_cpp eigen_hdf5
+target_link_libraries(explore cgal_cpp input_parser_cpp fdcl_hdf5
     ${HDF5_CXX_LIBRARIES} )
 
 # exploration using control cost function
 add_executable(explore_control src/explore_control_main.cpp)
-target_link_libraries(explore_control cgal_cpp input_parser_cpp eigen_hdf5
+target_link_libraries(explore_control cgal_cpp input_parser_cpp fdcl_hdf5
     ${HDF5_CXX_LIBRARIES})
 # memory tester 
 set(memory_tester_src src/memory_tester.cpp src/loader.cpp src/mesh.cpp src/polyhedron.cpp)
@@ -262,24 +262,16 @@ set(test_all_src
 	tests/cpp/test_lidar.cpp
     tests/cpp/test_controller.cpp
 	tests/cpp/test_utilities.cpp
-    tests/cpp/test_hdf5.cpp
     tests/cpp/test_libigl.cpp
     src/wavefront.cpp)
 
 add_executable(test_all ${test_all_src})
 target_link_libraries(test_all gtest 
     cgal_cpp 
-    eigen_hdf5
+    fdcl_hdf5
     igl::core)
 add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-
-
-add_executable(test_hdf5 tests/cpp/test_hdf5.cpp tests/cpp/test_all.cpp)
-target_link_libraries(test_hdf5 gtest
-    eigen_hdf5)
-add_test(NAME test_hdf5 COMMAND test_hdf5
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}) 
 
 add_executable(test_libigl tests/cpp/test_libigl.cpp tests/cpp/test_all.cpp)
 target_link_libraries(test_libigl gtest igl::core)

@@ -7,3 +7,6 @@
 [submodule "extern/libigl"]
 	path = extern/libigl
 	url = https://github.com/libigl/libigl.git
+[submodule "extern/fdcl-hdf5"]
+	path = extern/fdcl-hdf5
+	url = git@github.com:skulumani/fdcl-hdf5.git
