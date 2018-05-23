@@ -4,6 +4,7 @@ project( fdcl-hdf5 VERSION 0.1 )
 enable_language(CXX)
 set(CMAKE_CXX_STANDARD 11)
 
+
 # HDF5 Setup
 set(ENV{HDF5_ROOT} /usr/local/hdf5)
 find_package(HDF5 REQUIRED COMPONENTS C CXX)
@@ -66,24 +67,30 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
+################################################################################
 # BUILD TARGETS
-include_directories(${PROJECT_SOURCE_DIR}/include)
+################################################################################
+# set some paths for including
+set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 
-set(eigen_hdf5_src 
+include_directories(${PROJECT_INCLUDE_DIR})
+include_directories(${PROJECT_BINARY_DIR})
+
+set(fdcl-hdf5_src 
     ${PROJECT_SOURCE_DIR}/src/hdf5_eigen.cpp
     ${PROJECT_SOURCE_DIR}/src/hdf5_file.cpp
     ${PROJECT_SOURCE_DIR}/src/hdf5_group.cpp
     ${PROJECT_SOURCE_DIR}/src/hdf5_dataset.cpp)
-add_library(eigen_hdf5 SHARED ${eigen_hdf5_src})
-target_link_libraries(eigen_hdf5 ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
+add_library(${PROJECT_NAME} SHARED ${fdcl-hdf5_src})
+target_link_libraries(${PROJECT_NAME} ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 
 add_executable(main ${PROJECT_SOURCE_DIR}/src/main.cpp)
-target_link_libraries(main eigen_hdf5)
+target_link_libraries(main ${PROJECT_NAME})
 # TESTING
 ENABLE_TESTING()
 add_executable(test_hdf5 
     ${PROJECT_SOURCE_DIR}/tests/test_hdf5.cpp 
     ${PROJECT_SOURCE_DIR}/tests/test_all.cpp)
-target_link_libraries(test_hdf5 gtest eigen_hdf5)
+target_link_libraries(test_hdf5 gtest ${PROJECT_NAME})
 add_test(NAME test_hdf5 COMMAND test_hdf5
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}) 
