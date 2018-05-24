@@ -111,6 +111,10 @@ class TranslationController {
         Eigen::Matrix<double, 3, 1> get_posd( void ) const;
         Eigen::Matrix<double, 3, 1> get_veld( void ) const;
         Eigen::Matrix<double, 3, 1> get_acceld( void ) const;
+
+        Eigen::MatrixXd get_controller_vertices( void ) const { return controller_vertices; }
+        Eigen::MatrixXi get_controller_faces( void ) const { return controller_faces; }
+
     protected:
         Eigen::Matrix<double, 3, 1> mposd;
         Eigen::Matrix<double, 3, 1> mveld;

@@ -154,6 +154,8 @@ TEST(TestTranslationController, ControllerMeshMapping) {
     meshdata_ptr = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
     
     TranslationController tran_controller(meshdata_ptr);
+
+    ASSERT_LE(tran_controller.get_controller_vertices().rows(), 100);
 }
 
 TEST(TestController, ControlCost) {
