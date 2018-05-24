@@ -134,7 +134,7 @@ TranslationController::TranslationController(std::shared_ptr<const MeshData> mes
 
 void TranslationController::generate_controller_mesh( void ) {
     SurfMesh circle(1.0, 1.0, 1.0, 20, 0.4, 0.2);
-    controller_vertices = circle.get_verts().normalized();
+    controller_vertices = circle.get_verts().rowwise().normalized();
     controller_faces = circle.get_faces();
 }
 
@@ -146,7 +146,9 @@ void TranslationController::build_controller_mesh_mapping(std::shared_ptr<const 
     const Eigen::MatrixXi& highres_faces = meshdata_ptr->faces;
     
     Eigen::VectorXd cos_angle(highres_vertices.rows()); 
-    
+    Eigen::VectorXd max_angle_vec(highres_vertices.rows());
+    max_angle_vec.setConstant(cos(max_angle));
+
     Eigen::MatrixXd highres_vertices_uvec(highres_vertices.rows(), 3), 
                     controller_uvec(highres_vertices.rows(), 3);
     highres_vertices_uvec = highres_vertices.rowwise().normalized();
@@ -163,7 +165,7 @@ void TranslationController::build_controller_mesh_mapping(std::shared_ptr<const 
         // find dot product of this vector with all vectors in highres_vertices
         cos_angle = igl::dot_row(highres_vertices_uvec, controller_uvec);
         // for those less than max_angle store the index someplace
-        angle_condition = cos_angle.array() >= cos(max_angle);
+        angle_condition = cos_angle.array() > max_angle_vec.array();
         angle_index = vector_find<Eigen::Array<bool, Eigen::Dynamic, 1> >(angle_condition);
         // store in a std::vector<std::vector<Eigen::RowVectorXd> >
         mesh_mapping[ii] = angle_index;
