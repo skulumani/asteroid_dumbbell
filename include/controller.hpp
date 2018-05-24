@@ -126,29 +126,29 @@ class Controller: public TranslationController, public AttitudeController {
         Controller( void );
         virtual ~Controller( void ) {};
 
-       void explore_asteroid(std::shared_ptr<const State> state, 
+        void explore_asteroid(std::shared_ptr<const State> state, 
                 std::shared_ptr<const ReconstructMesh> rmesh);
-       void explore_asteroid(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
-               std::shared_ptr<const ReconstructMesh> rmesh);
-    
-       // TODO Need some unit tests for tese
-       void explore_asteroid(const double& t,
-                             std::shared_ptr<const State> state,
-                             std::shared_ptr<const ReconstructMesh> rmesh,
-                             std::shared_ptr<Asteroid> ast_est);
-       void explore_asteroid(const double& t,
-                             const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
-                             std::shared_ptr<const ReconstructMesh> rmesh,
-                             std::shared_ptr<Asteroid> ast_est);
+        void explore_asteroid(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+                std::shared_ptr<const ReconstructMesh> rmesh);
+
+        // TODO Need some unit tests for tese
+        void explore_asteroid(const double& t,
+                std::shared_ptr<const State> state,
+                std::shared_ptr<const ReconstructMesh> rmesh,
+                std::shared_ptr<Asteroid> ast_est);
+        void explore_asteroid(const double& t,
+                const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+                std::shared_ptr<const ReconstructMesh> rmesh,
+                std::shared_ptr<Asteroid> ast_est);
         /** @fn Output a state object with the desired state
-                
-            Output a state object with the desired state
 
-            @returns state_ptr Pointer to a state object
+          Output a state object with the desired state
 
-            @author Shankar Kulumani
-            @version 22 April 2018
-        */ 
+          @returns state_ptr Pointer to a state object
+
+          @author Shankar Kulumani
+          @version 22 April 2018
+          */ 
         std::shared_ptr<State> get_desired_state();       
 };
 
