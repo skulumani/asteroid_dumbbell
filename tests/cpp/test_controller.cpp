@@ -146,7 +146,7 @@ TEST(TestTranslationController, MinimumUncertaintyCubeControl) {
     
     TranslationController tran_controller(rmesh_ptr->get_mesh());
     tran_controller.minimize_uncertainty(0, state_ptr, rmesh_ptr, ast);
-    /* std::cout << */ 
+    std::cout << tran_controller.get_posd() << std::endl;
     /* ASSERT_TRUE(tran_controller.get_posd().isApprox((Eigen::Vector3d() << 1, 1, 1).finished())); */
 }
 
@@ -157,6 +157,7 @@ TEST(TestTranslationController, ControllerMeshMapping) {
     TranslationController tran_controller(meshdata_ptr);
 
     ASSERT_LE(tran_controller.get_controller_vertices().rows(), 100);
+    ASSERT_GT(tran_controller.get_mesh_mapping()[0].size(), 10);
 }
 
 TEST(TestController, ControlCost) {
