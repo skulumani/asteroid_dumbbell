@@ -146,8 +146,8 @@ TEST(TestTranslationController, MinimumUncertaintyCubeControl) {
     
     TranslationController tran_controller(rmesh_ptr->get_mesh());
     tran_controller.minimize_uncertainty(0, state_ptr, rmesh_ptr, ast);
-    std::cout << tran_controller.get_posd() << std::endl;
-    /* ASSERT_TRUE(tran_controller.get_posd().isApprox((Eigen::Vector3d() << 1, 1, 1).finished())); */
+    
+    ASSERT_TRUE(tran_controller.get_posd().isApprox((Eigen::Vector3d() << 1.01113, 0.958925, 1.02863).finished(), 1e-4));
 }
 
 TEST(TestTranslationController, ControllerMeshMapping) {
