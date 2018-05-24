@@ -241,7 +241,7 @@ pybind11_add_module(geodesic MODULE
 pybind11_add_module(controller MODULE
     src/controller.cpp src/controller_bindings.cpp src/reconstruct.cpp 
     src/geodesic.cpp src/state.cpp src/mesh.cpp)
-
+target_link_libraries(controller PRIVATE igl::core)
 
 ################################################################################
 # Testing example
@@ -266,9 +266,10 @@ set(test_all_src
     src/wavefront.cpp)
 
 add_executable(test_all ${test_all_src})
-target_link_libraries(test_all gtest 
+target_link_libraries(test_all 
+    gtest 
     cgal_cpp 
-    fdcl_hdf5
+    fdcl_hdf5 
     igl::core)
 add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
