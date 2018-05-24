@@ -173,7 +173,7 @@ set(cgal_src
     ${PROJECT_SOURCE_DIR}/src/potential.cpp
     )
 add_library(cgal_cpp SHARED ${cgal_src})
-target_link_libraries(cgal_cpp igl::core)
+target_link_libraries(cgal_cpp igl::core fdcl_hdf5)
 
 set(input_parser_src
     ${PROJECT_SOURCE_DIR}/src/input_parser.cpp
