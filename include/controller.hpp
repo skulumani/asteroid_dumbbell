@@ -64,7 +64,7 @@ class TranslationController {
         
         void generate_controller_mesh( void );
         void build_controller_mesh_mapping(std::shared_ptr<const MeshData> meshdata_ptr,
-                                           const double& max_angle);
+                                           const double& max_angle=0.53);
 
     public:
         TranslationController( void );

@@ -6,7 +6,9 @@
 #include "surface_mesher.hpp"
 
 #include <igl/dot_row.h>
+
 #include <Eigen/Dense>
+#include <Eigen/SparseCore>
 
 #include <memory>
 #include <iostream>
@@ -144,23 +146,29 @@ void TranslationController::build_controller_mesh_mapping(std::shared_ptr<const 
     const Eigen::MatrixXi& highres_faces = meshdata_ptr->faces;
     
     Eigen::VectorXd cos_angle(highres_vertices.rows()); 
-    Eigen::Matrix<bool, Eigen::Dynamic, 1> index_match(highres_vertices.rows());
     
-    Eigen::Matrix<double, Eigen::Dynamic, 3> highres_vertices_uvec(highres_vertices.rows(), 3);
+    Eigen::MatrixXd highres_vertices_uvec(highres_vertices.rows(), 3), 
+                    controller_uvec(highres_vertices.rows(), 3);
     highres_vertices_uvec = highres_vertices.rowwise().normalized();
+    
+    Eigen::Array<bool, Eigen::Dynamic, 1> angle_condition(highres_vertices.rows());
+    Eigen::VectorXi angle_index;
 
-    Eigen::RowVector3d controller_uvec;
     // loop over the low resolution mesh
-    for (int ii = 0; ii < controller_vertices.rows(); ++ii) {
-        controller_uvec = controller_vertices.row(ii).normalized();
+    /* for (int ii = 0; ii < controller_vertices.rows(); ++ii) { */
+    for (int ii = 0; ii < 2; ++ii) {
+        controller_uvec = controller_vertices.row(ii).normalized().replicate(highres_vertices.rows(), 1);
         
         // find dot product of this vector with all vectors in highres_vertices
         cos_angle = igl::dot_row(highres_vertices_uvec, controller_uvec);
         // for those less than max_angle store the index someplace
-        /* index_match = dot_product */
+        angle_condition = cos_angle.array() >= cos(max_angle);
+        angle_index = vector_find<Eigen::Array<bool, Eigen::Dynamic, 1> >(angle_condition);
         // create a bool eigen matrix with those dot_products less than some value
         // store in a std::vector<std::vector<Eigen::RowVectorXd> >
     }
+
+    std::cout << angle_index.size() << std::endl;
 }
 
 void TranslationController::inertial_fixed_state(std::shared_ptr<const State> des_state) {
