@@ -114,7 +114,7 @@ class TranslationController {
 
         Eigen::MatrixXd get_controller_vertices( void ) const { return controller_vertices; }
         Eigen::MatrixXi get_controller_faces( void ) const { return controller_faces; }
-
+        std::vector<Eigen::VectorXi> get_mesh_mapping( void ) const { return mesh_mapping; }
     protected:
         Eigen::Matrix<double, 3, 1> mposd;
         Eigen::Matrix<double, 3, 1> mveld;
