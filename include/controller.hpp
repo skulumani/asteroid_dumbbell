@@ -5,6 +5,7 @@
 #include "state.hpp"
 
 #include <Eigen/Dense>
+
 #include <memory>
 
 class ReconstructMesh;
@@ -61,7 +62,8 @@ class TranslationController {
     private:
         Eigen::MatrixXd controller_vertices;
         Eigen::MatrixXi controller_faces;
-        
+        std::vector<Eigen::VectorXi> mesh_mapping;
+
         void generate_controller_mesh( void );
         void build_controller_mesh_mapping(std::shared_ptr<const MeshData> meshdata_ptr,
                                            const double& max_angle=0.53);

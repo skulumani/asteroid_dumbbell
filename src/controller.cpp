@@ -8,7 +8,6 @@
 #include <igl/dot_row.h>
 
 #include <Eigen/Dense>
-#include <Eigen/SparseCore>
 
 #include <memory>
 #include <iostream>
@@ -153,10 +152,11 @@ void TranslationController::build_controller_mesh_mapping(std::shared_ptr<const 
     
     Eigen::Array<bool, Eigen::Dynamic, 1> angle_condition(highres_vertices.rows());
     Eigen::VectorXi angle_index;
-
+    
+    mesh_mapping.resize(controller_vertices.rows());
     // loop over the low resolution mesh
-    /* for (int ii = 0; ii < controller_vertices.rows(); ++ii) { */
-    for (int ii = 0; ii < 2; ++ii) {
+    /* #pragma omp parallel for */
+    for (int ii = 0; ii < controller_vertices.rows(); ++ii) {
         controller_uvec = controller_vertices.row(ii).normalized().replicate(highres_vertices.rows(), 1);
         
         // find dot product of this vector with all vectors in highres_vertices
@@ -164,11 +164,10 @@ void TranslationController::build_controller_mesh_mapping(std::shared_ptr<const 
         // for those less than max_angle store the index someplace
         angle_condition = cos_angle.array() >= cos(max_angle);
         angle_index = vector_find<Eigen::Array<bool, Eigen::Dynamic, 1> >(angle_condition);
-        // create a bool eigen matrix with those dot_products less than some value
         // store in a std::vector<std::vector<Eigen::RowVectorXd> >
+        mesh_mapping[ii] = angle_index;
     }
-
-    std::cout << angle_index.size() << std::endl;
+    
 }
 
 void TranslationController::inertial_fixed_state(std::shared_ptr<const State> des_state) {
