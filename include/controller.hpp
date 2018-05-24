@@ -126,6 +126,9 @@ class Controller: public TranslationController, public AttitudeController {
         Controller( void );
         virtual ~Controller( void ) {};
 
+        Controller(std::shared_ptr<const MeshData> meshdata_ptr,
+                const double& max_angle=0.53);
+
         void explore_asteroid(std::shared_ptr<const State> state, 
                 std::shared_ptr<const ReconstructMesh> rmesh);
         void explore_asteroid(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
