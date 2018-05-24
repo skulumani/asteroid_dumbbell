@@ -133,7 +133,7 @@ TranslationController::TranslationController(std::shared_ptr<const MeshData> mes
 
 void TranslationController::generate_controller_mesh( void ) {
     SurfMesh circle(1.0, 1.0, 1.0, 20, 0.4, 0.2);
-    controller_vertices = circle.get_verts();
+    controller_vertices = circle.get_verts().normalized();
     controller_faces = circle.get_faces();
 }
 
@@ -157,7 +157,7 @@ void TranslationController::build_controller_mesh_mapping(std::shared_ptr<const 
     // loop over the low resolution mesh
     /* #pragma omp parallel for */
     for (int ii = 0; ii < controller_vertices.rows(); ++ii) {
-        controller_uvec = controller_vertices.row(ii).normalized().replicate(highres_vertices.rows(), 1);
+        controller_uvec = controller_vertices.row(ii).replicate(highres_vertices.rows(), 1);
         
         // find dot product of this vector with all vectors in highres_vertices
         cos_angle = igl::dot_row(highres_vertices_uvec, controller_uvec);
