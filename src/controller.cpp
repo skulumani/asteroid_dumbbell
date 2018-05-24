@@ -327,7 +327,7 @@ void TranslationController::minimize_uncertainty(const double& t,
     ast_est->polyhedron_potential((Eigen::Vector3d() << 0, 0, min_axis).finished());
     double max_accel = ast_est->get_acceleration().norm();
 
-    const int num_waypoints = 5;
+    const int num_waypoints = 1;
     
     // weighting for each of the cost components
     double weighting_factor(0.4); /**< Weighting factor between distance and ucnertainty */
@@ -340,15 +340,19 @@ void TranslationController::minimize_uncertainty(const double& t,
     Eigen::VectorXd vertex_control_cost(controller_vertices.rows());
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_waypoints, 3);
     Eigen::VectorXd weight_cost(controller_vertices.rows()); 
-    
+    Eigen::VectorXd region_weight_cost;
+
     for (int ii = 0; ii < controller_vertices.rows(); ++ii) { 
+        if (num_waypoints != 1 ) {
         waypoints = sphere_waypoint(pos, pos.norm() * controller_vertices.row(ii), num_waypoints);
         vertex_control_cost(ii) = integrate_control_cost(t, waypoints, ast_est); 
+        } else {
+            vertex_control_cost(ii) = control_cost(t, controller_vertices.row(ii), ast_est);
+        }
 
         // need to extra out the vectors in this region and get the weight
         weight_cost(ii) = igl::slice(rmesh->get_weights(), mesh_mapping[ii]).sum() / mesh_mapping[ii].size(); 
     }
-
     // need to handle the first and last vertex
     // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex
     Eigen::VectorXd sigma = central_angle(pos.normalized(), controller_vertices);
@@ -359,10 +363,24 @@ void TranslationController::minimize_uncertainty(const double& t,
     // now find min index of cost
     Eigen::MatrixXd::Index min_cost_index;
     cost.minCoeff(&min_cost_index);
+    // now pick the best vector within the region  
+    Eigen::MatrixXd region_verts;
+    Eigen::VectorXd region_weight, region_cost, region_sigma;
+    igl::slice(rmesh->get_verts(),mesh_mapping[min_cost_index], (Eigen::Vector3i() << 0, 1, 2).finished(), region_verts);
+    region_weight = igl::slice(rmesh->get_weights(), mesh_mapping[min_cost_index]);
+    region_sigma = central_angle(pos.normalized(), region_verts);
 
+    region_cost = - 0.5 * region_weight.array() / max_weight + 0.5 * region_sigma.array() / max_sigma;
+
+    
+    // find minimum of the region
+    Eigen::MatrixXd::Index min_region_index;
+    region_cost.minCoeff(&min_region_index);
+    // get the desired vector
     Eigen::RowVector3d des_vector;
 
-    des_vector = controller_vertices.row(min_cost_index);
+    des_vector = region_verts.row(min_region_index);
+
     // pick out the corresponding vertex of the asteroid that should be viewed
     // use current norm of position and output a position with same radius but just above the minium point
     double current_radius = pos.norm();
