@@ -4,6 +4,7 @@
 #include "geodesic.hpp"
 #include "potential.hpp"
 #include "surface_mesher.hpp"
+#include "hdf5.hpp"
 
 #include <igl/dot_row.h>
 #include <igl/slice.h>
@@ -133,9 +134,15 @@ TranslationController::TranslationController(std::shared_ptr<const MeshData> mes
 }
 
 void TranslationController::generate_controller_mesh( void ) {
-    SurfMesh circle(1.0, 1.0, 1.0, 20, 0.4, 0.2);
-    controller_vertices = circle.get_verts().rowwise().normalized();
-    controller_faces = circle.get_faces();
+    /* SurfMesh circle(1.0, 1.0, 1.0, 20, 0.4, 0.2); */
+    /* controller_vertices = circle.get_verts().rowwise().normalized(); */
+    /* controller_faces = circle.get_faces(); */
+
+    // just load the hdf5 file
+    HDF5::File hf = HDF5::File("./data/coarse_sphere.hdf5", HDF5::File::ReadOnly);
+    hf.read("vertices", controller_vertices);
+    hf.read("faces", controller_faces);
+    controller_vertices = controller_vertices.rowwise().normalized();
 }
 
 void TranslationController::build_controller_mesh_mapping(std::shared_ptr<const MeshData> meshdata_ptr,

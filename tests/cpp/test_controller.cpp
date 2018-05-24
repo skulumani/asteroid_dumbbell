@@ -135,7 +135,7 @@ TEST(TestController, MinimumUncertaintyCube) {
 
 TEST(TestTranslationController, MinimumUncertaintyCubeControl) {
     std::shared_ptr<MeshData> mesh_ptr;
-    mesh_ptr = Loader::load("./integration/cube.obj");
+    mesh_ptr = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
     std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(mesh_ptr);
     // need an asteroid object constructed from the reconstructed mesh object
     std::shared_ptr<Asteroid> ast = std::make_shared<Asteroid>("cube", rmesh_ptr);
