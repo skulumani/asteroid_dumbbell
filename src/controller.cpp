@@ -330,9 +330,9 @@ void TranslationController::minimize_uncertainty(const double& t,
     const int num_waypoints = 1;
     
     // weighting for each of the cost components
-    double weighting_factor(0.4); /**< Weighting factor between distance and ucnertainty */
-    double sigma_factor(0.5);
-    double control_factor(0.1);
+    double weighting_factor(0.9); /**< Weighting factor between distance and ucnertainty */
+    double sigma_factor(0.1);
+    double control_factor(0.0);
 
     Eigen::Vector3d pos(3);
     pos = state->get_pos();
@@ -370,7 +370,7 @@ void TranslationController::minimize_uncertainty(const double& t,
     region_weight = igl::slice(rmesh->get_weights(), mesh_mapping[min_cost_index]);
     region_sigma = central_angle(pos.normalized(), region_verts);
 
-    region_cost = - 0.5 * region_weight.array() / max_weight + 0.5 * region_sigma.array() / max_sigma;
+    region_cost = - 0.9 * region_weight.array() / max_weight + 0.1 * region_sigma.array() / max_sigma;
 
     
     // find minimum of the region
