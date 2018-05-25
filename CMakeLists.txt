@@ -70,7 +70,7 @@ endif()
 include(${EIGEN3_USE_FILE})
 
 # Boost and its components
-find_package( Boost REQUIRED )
+find_package( Boost 1.66 REQUIRED log )
 if ( NOT Boost_FOUND )
   message(STATUS "This project requires the Boost library, and will not be compiled.")
   return()  
