@@ -1,7 +1,7 @@
 #!/bin/bash
-BOOST_VER=1.66.0
-BOOST_SHA256_SUM="bd0df411efd9a585e5a2212275f8762079fed8842264954675a4fddc46cfcf60"
-BOOST_URL="https://dl.bintray.com/boostorg/release/${BOOST_VER}/source/boost_1_66_0.tar.gz"
+BOOST_VER=1.67.0
+BOOST_SHA256_SUM="8aa4e330c870ef50a896634c931adf468b21f8a69b77007e45c444151229f665"
+BOOST_URL="https://dl.bintray.com/boostorg/release/${BOOST_VER}/source/boost_1_67_0.tar.gz"
 TEMP_DIR="$(mktemp -d)"
 INSTALL_DIR="/usr/local"
 
