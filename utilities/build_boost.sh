@@ -42,7 +42,8 @@ tar -xzf boost.tar.gz -C ./boost --strip-components=1
 # sudo mv boost/boost ${INSTALL_DIR}
 
 echo "Remove old boost"
-# rm -rf /usr/include/boost
+sudo rm -rf /usr/include/boost
+sudo rm /usr/local/lib/libboost*
 
 echo "Now installing Boost and compiled libraries"
 cd boost
