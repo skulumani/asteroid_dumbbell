@@ -462,9 +462,10 @@ Controller::Controller( void ) {
 }
 
 Controller::Controller(std::shared_ptr<const MeshData> meshdata_ptr,
-                       const double& max_angle) {
+                       const double& max_angle) : TranslationController(meshdata_ptr, max_angle) {
     // TODO need to call different constructor of base class
 }
+
 void Controller::explore_asteroid(std::shared_ptr<const State> state_ptr,
         std::shared_ptr<const ReconstructMesh> rmesh_ptr) {
     
