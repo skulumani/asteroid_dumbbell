@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     
     // other objects
     RayCaster caster(true_meshdata_ptr);
-    Controller controller;
+    Controller controller(est_meshdata_ptr);
 
     Lidar sensor;
     // initialize all the objects
@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
     hf->write("initial_state", state_ptr->get_state()); 
 
     // LOOP HERE
-    for (int ii = 0; ii < 2; ++ii) {
+    for (int ii = 0; ii < est_meshdata_ptr->get_verts().rows(); ++ii) {
         
         // compute targets for use in caster (point at the asteroid origin)
         target = sensor.define_target(state_ptr->get_pos(), state_ptr->get_att(), dist);    
