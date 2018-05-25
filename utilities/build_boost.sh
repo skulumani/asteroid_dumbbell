@@ -41,6 +41,9 @@ tar -xzf boost.tar.gz -C ./boost --strip-components=1
 # echo "Now copying to ${INSTALL_DIR}/boost"
 # sudo mv boost/boost ${INSTALL_DIR}
 
+echo "Remove old boost"
+# rm -rf /usr/include/boost
+
 echo "Now installing Boost and compiled libraries"
 cd boost
 ./bootstrap.sh --prefix=${INSTALL_DIR} --with-libraries=all --with-python=$HOME/anaconda3/bin/python3
