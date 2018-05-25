@@ -537,6 +537,7 @@ void Controller::explore_asteroid(const double& t,
 
     body_fixed_pointing_attitude(new_state);
 }
+
 std::shared_ptr<State> Controller::get_desired_state() {
     
     std::shared_ptr<State> state_ptr = std::make_shared<State>();
