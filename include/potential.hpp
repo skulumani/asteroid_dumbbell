@@ -126,9 +126,7 @@ class Asteroid {
         
         Asteroid(const std::string& name_in, MeshParam& mesh_param);
         Asteroid(const std::string& name_in, std::shared_ptr<MeshParam> mesh_param);
-
         Asteroid(const std::string& name_in, std::shared_ptr<ReconstructMesh> rmesh_in);
-
         Asteroid(const std::string& name_in, std::shared_ptr<MeshData> mesh_in);
 
         // Functions to compute the potential

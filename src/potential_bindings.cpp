@@ -22,6 +22,14 @@ PYBIND11_MODULE(asteroid, m) {
                             std::shared_ptr<MeshParam>>(),
              "Asteroid constructor from MeshParam shared_ptr",
              pybind11::arg("name"), pybind11::arg("MeshParam shared_ptr"))
+        .def(pybind11::init<const std::string&,
+                            std::shared_ptr<ReconstructMesh>>(),
+             "Asteroid constructor from ReconstructMesh shared_ptr",
+             pybind11::arg("name"), pybind11::arg("ReconstructMesh shared_ptr"))
+        .def(pybind11::init<const std::string&,
+                             std::shared_ptr<MeshData>>(),
+             "Asteroid constructor from MeshData shared_ptr",
+             pybind11::arg("name"), pybind11::arg("MeshData shared_ptr"))
         .def("get_potential", &Asteroid::get_potential, "Get the potential")
         .def("get_acceleration", &Asteroid::get_acceleration, "Get the acceleration")
         .def("get_gradient_mat", &Asteroid::get_gradient_mat, "Get the gradient matrix")
