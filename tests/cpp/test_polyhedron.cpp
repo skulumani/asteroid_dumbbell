@@ -84,11 +84,6 @@ TEST_F(TestPolyhedron, PolyhedronFaces) {
     EXPECT_TRUE(Fe_true.isApprox(f));
 }
 
-TEST_F(TestPolyhedron, PolyhedronVolume) {
-    double volume;
-    volume = PolyVolume::volume(Ve_true, Fe_true);
-    ASSERT_EQ(volume, 1);
-}
 
 // TODO Test other overloads of the polyhedron volume function
 // TODO Add test for a sphere from surface mesher (polyhedron compared to analytical sphere volume)
