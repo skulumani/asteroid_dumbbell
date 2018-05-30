@@ -39,10 +39,18 @@ PYBIND11_MODULE(controller, m) {
 
     pybind11::class_<Controller, AttitudeController, TranslationController, std::shared_ptr<Controller>>(m, "Controller")
         .def(pybind11::init<>(), "Combinded controller constructor")
+        .def(pybind11::init<std::shared_ptr<const MeshData>, const double&>(), "Control based exploration constructor",
+                pybind11::arg("MeshData pointer"), pybind11::arg("max_angle") = 0.2)
         .def("explore_asteroid", (void (Controller::*)(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >&,
                         std::shared_ptr<const ReconstructMesh>)) &Controller::explore_asteroid,
                 "Explore an asteroid by minimizing uncertainty",
-                pybind11::arg("state"), pybind11::arg("rmesh shared_ptr"));
+                pybind11::arg("state"), pybind11::arg("rmesh shared_ptr"))
+        .def("explore_asteroid", (void (Controller::*)(const double&,
+                                                       const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >&,
+                                                       std::shared_ptr<const ReconstructMesh>,
+                                                       std::shared_ptr<Asteroid>)) &Controller::explore_asteroid,
+                "Explore asteroid with a control cost component",
+                pybind11::arg("time"), pybind11::arg("state"), pybind11::arg("reconstruct_mesh"), pybind11::arg("asteroid"));
     
     // TODO Add overload for explore asteroid function then add here as well
 }
