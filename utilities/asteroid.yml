@@ -3,12 +3,12 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - python=3.5.4
+  - python=3.5.4 # needed for work with blender
   # - cgal
   - ipython
   - numpy>=1.14
   - scipy>=1
-  - pyqt=4
+  - pyqt>5
   - pip
   - pytest
   - pytest-cov
@@ -24,6 +24,6 @@ dependencies:
     - pyface
     - envisage
     # - pydistmesh # only makes solid meshes and not surface mesh
-    # - mayavi
+    - mayavi
 prefix: /home/shankar/anaconda3/envs/asteroid
 
