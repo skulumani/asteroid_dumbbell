@@ -273,13 +273,61 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
         ii = 1
         while system.successful() and system.t < tf:
             t = system.t + dt
+            # TODO Make sure the asteroid (est and truth) are being rotated by ROT3(t)
             state = system.integrate(system.t + dt)
 
             logger.info("Step: {} Time: {}".format(ii, t))
 
+            if not (np.floor(t) % 1):
+                targets = lidar.define_targets(state[0:3],
+                                               state[6:15].reshape((3, 3)),
+                                               np.linalg.norm(state[0:3]))
 
+                # update the asteroid inside the caster
+                nv = true_ast.rotate_vertices(t)
+                Ra = true_ast.rot_ast2int(t)
+                
+                true_ast_meshdata.update_mesh(nv, true_ast_meshdata.get_faces())
+                caster.update_mesh(true_ast_meshdata)
 
+                # do the raycasting
+                intersections = caster.castarray(state[0:3], targets)
 
+                # reconstruct the mesh with new measurements
+                # convert the intersections to the asteroid frame
+                ast_ints = []
+                for pt in intersections:
+                    if np.linalg.norm(pt) < 1e-9:
+                        logger.info("No intersection for this point")
+                        pt_ast = np.array([np.nan, np.nan, np.nan])
+                    else:
+                        pt_ast = Ra.T.dot(pt)
+
+                    ast_ints.append(pt_ast)
+                
+                ast_ints = np.array(ast_ints)
+
+                est_ast_rmesh.update(ast_ints, max_angle)
+
+            v_group.create_dataset(str(ii), data=est_ast_rmesh.get_verts(), compression=compression,
+                                   compression_opts=compression_opts)
+            f_group.create_dataset(str(ii), data=est_ast_rmesh.get_faces(), compression=compression,
+                                   compression_opts=compression_opts)
+            w_group.create_dataset(str(ii), data=est_ast_rmesh.get_weights(), compression=compression,
+                                   compression_opts=compression_opts)
+
+            state_group.create_dataset(str(ii), data=state, compression=compression,
+                                       compression_opts=compression_opts)
+            targets_group.create_dataset(str(ii), data=targets, compression=compression,
+                                         compression_opts=compression_opts)
+            Ra_group.create_dataset(str(ii), data=Ra, compression=compression,
+                                    compression_opts=compression_opts)
+            inertial_intersections_group.create_dataset(str(ii), data=intersections, compression=compression,
+                                                        compression_opts=compression_opts)
+            asteroid_intersections_group.create_dataset(str(ii), data=ast_ints, compression=compression,
+                                                        compression_opts=compression_opts)
+            
+            ii += 1
 
 def animate(filename):
     """Given a HDF5 file from simulate this will animate teh motion
