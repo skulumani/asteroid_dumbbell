@@ -267,6 +267,19 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
         system.set_integrator("lsoda", atol=AbsTol, rtol=RelTol)
         system.set_initial_value(initial_state, t0)
         system.set_f_params(true_ast, dum, complete_controller, est_ast_rmesh, est_ast)
+        
+        point_cloud = defaultdict(list)
+
+        ii = 1
+        while system.successful() and system.t < tf:
+            t = system.t + dt
+            state = system.integrate(system.t + dt)
+
+            logger.info("Step: {} Time: {}".format(ii, t))
+
+
+
+
 
 def animate(filename):
     """Given a HDF5 file from simulate this will animate teh motion
