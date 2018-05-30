@@ -601,6 +601,88 @@ def eoms_controlled_inertial_pybind(t, state, ast, dum, complete_controller, est
 
     return state_dot
 
+
+def eoms_controlled_inertial_control_cost_pybind(t, state, ast, dum, complete_controller, est_ast_rmesh):
+    """Inertial dumbbell equations of motion around an asteroid using C++ bindings
+
+    This function must be used with scipy.integrate.ode class instead of the 
+    more convienent scipe.integrate.odeint. In addition, we can control the 
+    dumbbell given full state feedback. This uses several C++ functions which 
+    are exposed to Python using PyBind11
+    
+    Arguments
+    ---------
+    t : current simulation time step
+    state : (18, ) numpy array of the state
+        pos - (3,) position of the dumbbell with respect to the
+        asteroid center of mass and expressed in the inertial frame
+        vel - (3,) velocity of the dumbbell with respect to the
+        asteroid center of mass and expressed in the inertial frame
+        R - (9,) attitude of the dumbbell with defines the
+        transformation of a vector in the dumbbell frame to the
+        inertial frame ang_vel - (3,) angular velocity of the dumbbell
+        with respect to the inertial frame and represented in the
+        dumbbell frame
+    ast : asteroid object (from C++ bindings)
+    dum : dumbbell object (from Python)
+    complete_controller : controller object (from C++)
+    """ 
+    # unpack the state
+    pos = state[0:3] # location of the center of mass in the inertial frame
+    vel = state[3:6] # vel of com in inertial frame
+    R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+    ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
+
+    Ra = ast.rot_ast2int(t) # asteroid body frame to inertial frame
+
+    # unpack parameters for the dumbbell
+    J = dum.J
+
+    rho1 = dum.zeta1
+    rho2 = dum.zeta2
+
+    # position of each mass in the asteroid frame
+    z1 = Ra.T.dot(pos + R.dot(rho1))
+    z2 = Ra.T.dot(pos + R.dot(rho2))
+
+    z = Ra.T.dot(pos) # position of COM in asteroid frame
+
+    # gradient and potential at this state
+    ast.polyhedron_potential(z1)
+    U1 = ast.get_potential()
+    U1_grad = ast.get_acceleration()
+
+    ast.polyhedron_potential(z2)
+    U2 = ast.get_potential()
+    U2_grad = ast.get_acceleration()
+
+    F1 = dum.m1 * Ra.dot(U1_grad)
+    F2 = dum.m2 * Ra.dot(U2_grad)
+
+    M1 = dum.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
+    M2 = dum.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
+
+    # compute the desired states for exploration
+    complete_controller.explore_asteroid(state, est_ast_rmesh)
+
+    des_att_tuple = (complete_controller.get_Rd(), complete_controller.get_Rd_dot(),
+                     complete_controller.get_ang_vel_d(), complete_controller.get_ang_vel_d_dot())
+    des_tran_tuple = (complete_controller.get_posd(), complete_controller.get_veld(),
+                      complete_controller.get_acceld())
+    u_m = controller.attitude_controller(t, state, M1 + M2, dum, ast, des_att_tuple)
+    u_f = controller.translation_controller(t, state, F1 + F2, dum, ast, des_tran_tuple)
+
+    pos_dot = vel
+    vel_dot = 1 / (dum.m1 + dum.m2) * (F1 + F2 + u_f)
+    R_dot = R.dot(attitude.hat_map(ang_vel)).reshape(9)
+    ang_vel_dot = np.linalg.inv(J).dot(-np.cross(ang_vel, J.dot(ang_vel)) + M1 + M2 + u_m)
+
+    state_dot = np.hstack((pos_dot, vel_dot, R_dot, ang_vel_dot))
+
+    return state_dot
+
+
+
 def eoms_controlled_blender_traverse_then_land(t, state, dum, ast):
     """Inertial dumbbell equations of motion about an asteroid 
     

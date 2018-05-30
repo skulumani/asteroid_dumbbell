@@ -224,6 +224,12 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
             
             ii += 1
 
+def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
+    """Run the simulation with the control cost added in
+    """
+    logger = logging.getLogger(__name__)
+
+
 def animate(filename):
     """Given a HDF5 file from simulate this will animate teh motion
     """
