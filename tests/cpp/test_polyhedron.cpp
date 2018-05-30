@@ -91,3 +91,4 @@ TEST_F(TestPolyhedron, PolyhedronVolume) {
 }
 
 // TODO Test other overloads of the polyhedron volume function
+// TODO Add test for a sphere from surface mesher (polyhedron compared to analytical sphere volume)
