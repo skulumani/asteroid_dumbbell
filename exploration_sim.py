@@ -66,7 +66,7 @@ def initialize(hf):
     ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0], true_ast.get_axes()[1], true_ast.get_axes()[2],
                                       min_angle, max_radius, max_distance)
 
-    est_ast_meshdata = mesh_data.MeshData(ellipsoid.verts(), ellipsoid.faces())
+    est_ast_meshdata = mesh_data.MeshData(ellipsoid.get_verts(), ellipsoid.get_faces())
     est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
 
     # controller functions 
@@ -103,7 +103,7 @@ def initialize(hf):
     est_ast_group['min_angle'] = min_angle
     est_ast_group['max_distance'] = max_distance
     est_ast_group['max_radius'] = max_radius
-    est_ast_group.create_dataset('initial_vertices', data=ellipsoid.verts(), compression=compression,
+    est_ast_group.create_dataset('initial_vertices', data=ellipsoid.get_verts(), compression=compression,
                                  compression_opts=compression_opts)
     est_ast_group.create_dataset("initial_faces", data=ellipsoid.faces(), compression=compression,
                                  compression_opts=compression_opts)

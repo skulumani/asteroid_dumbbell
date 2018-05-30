@@ -240,7 +240,7 @@ pybind11_add_module(geodesic MODULE
 pybind11_add_module(controller MODULE
     src/controller.cpp src/controller_bindings.cpp src/reconstruct.cpp 
     src/geodesic.cpp src/state.cpp src/mesh.cpp)
-target_link_libraries(controller PRIVATE igl::core)
+target_link_libraries(controller PRIVATE igl::core fdcl_hdf5 cgal_cpp)
 
 ################################################################################
 # Testing example
