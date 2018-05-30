@@ -68,6 +68,7 @@ def initialize(hf):
 
     est_ast_meshdata = mesh_data.MeshData(ellipsoid.get_verts(), ellipsoid.get_faces())
     est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
+    est_ast = asteroid.Asteroid("castalia", est_ast_rmesh)
 
     # controller functions 
     complete_controller = controller_cpp.Controller()
@@ -105,7 +106,7 @@ def initialize(hf):
     est_ast_group['max_radius'] = max_radius
     est_ast_group.create_dataset('initial_vertices', data=ellipsoid.get_verts(), compression=compression,
                                  compression_opts=compression_opts)
-    est_ast_group.create_dataset("initial_faces", data=ellipsoid.faces(), compression=compression,
+    est_ast_group.create_dataset("initial_faces", data=ellipsoid.get_faces(), compression=compression,
                                  compression_opts=compression_opts)
 
     lidar_group = sim_group.create_group("lidar")
@@ -114,7 +115,7 @@ def initialize(hf):
     lidar_group.create_dataset("fov", data=lidar.get_fov())
     
     return (true_ast_meshdata, true_ast, complete_controller, est_ast_meshdata, 
-            est_ast_rmesh, lidar, caster, max_angle, 
+            est_ast_rmesh, est_ast, lidar, caster, max_angle, 
             dum, AbsTol, RelTol)
 
 def simulate(output_filename="/tmp/exploration_sim.hdf5"):
@@ -151,7 +152,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
 
         # initialize the simulation objects
         (true_ast_meshdata, true_ast, complete_controller,
-         est_ast_meshdata, est_ast_rmesh, lidar, caster, max_angle, dum,
+         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
          AbsTol, RelTol) = initialize(hf)
         
         # initialize the ODE function
@@ -255,6 +256,11 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
         Ra_group = hf.create_group("Ra")
         inertial_intersections_group = hf.create_group("inertial_intersections")
         asteroid_intersections_group = hf.create_group("asteroid_intersections")
+
+        # initialize the simulation objects
+        (true_ast_meshdata, true_ast, complete_controller,
+         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
+         AbsTol, RelTol) = initialize(hf)
 def animate(filename):
     """Given a HDF5 file from simulate this will animate teh motion
     """
