@@ -261,6 +261,13 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
         (true_ast_meshdata, true_ast, complete_controller,
          est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
          AbsTol, RelTol) = initialize(hf)
+
+        # initialize the ODE function
+        system = integrate.ode(eoms.eoms_controlled_inertial_control_cost_pybind)
+        system.set_integrator("lsoda", atol=AbsTol, rtol=RelTol)
+        system.set_initial_value(initial_state, t0)
+        system.set_f_params(true_ast, dum, complete_controller, est_ast_rmesh, est_ast)
+
 def animate(filename):
     """Given a HDF5 file from simulate this will animate teh motion
     """

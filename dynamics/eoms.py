@@ -602,7 +602,9 @@ def eoms_controlled_inertial_pybind(t, state, ast, dum, complete_controller, est
     return state_dot
 
 
-def eoms_controlled_inertial_control_cost_pybind(t, state, ast, dum, complete_controller, est_ast_rmesh):
+def eoms_controlled_inertial_control_cost_pybind(t, state, true_ast, dum, 
+                                                 complete_controller, 
+                                                 est_ast_rmesh, est_ast):
     """Inertial dumbbell equations of motion around an asteroid using C++ bindings
 
     This function must be used with scipy.integrate.ode class instead of the 
@@ -760,6 +762,7 @@ def eoms_controlled_blender_traverse_then_land(t, state, dum, ast):
     return statedot
 
 # TODO Make a driver function that takes a eoms_function object and then simulates that
+
 def sim_controlled_driver(time, initial_state,ast, dum,
                       des_att_func=controller.body_fixed_pointing_attitude,
                       des_tran_func=controller.inertial_fixed_state, 
