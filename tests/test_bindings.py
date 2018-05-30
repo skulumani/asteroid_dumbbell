@@ -47,10 +47,10 @@ class TestSurfaceMesher:
     smesh = surface_mesh.SurfMesh(1, 1, 1, 10, 0.2, 0.5)
 
     def test_vertices(self):
-        np.testing.assert_allclose(self.smesh.verts().shape[1], 3)
+        np.testing.assert_allclose(self.smesh.get_verts().shape[1], 3)
 
     def test_faces(self):
-        np.testing.assert_allclose(self.smesh.faces().shape[1], 3)
+        np.testing.assert_allclose(self.smesh.get_faces().shape[1], 3)
 
 class TestMeshDist:
     
