@@ -228,8 +228,33 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
     """Run the simulation with the control cost added in
     """
     logger = logging.getLogger(__name__)
+    
+    num_steps = int(10)
+    time = np.arange(0, num_steps)
+    t0, tf = time[0], time[-1]
+    dt = time[1] - time[0]
 
+    # define the initial condition
+    initial_pos = np.array([1.5, 0, 0])
+    initial_vel = np.array([0, 0, 0])
+    initial_R = attitude.rot3(np.pi / 2).reshape(-1)
+    initial_w = np.array([0, 0, 0])
+    initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
+    with h5py.File(output_filename, 'w') as hf:
+        hf.create_dataset('time', data=time, compression=compression,
+                          compression_opts=compression_opts)
+        hf.create_dataset("initial_state", data=initial_state, compression=compression,
+                          compression_opts=compression_opts)
+
+        v_group = hf.create_group("reconstructed_vertex")
+        f_group = hf.create_group("reconstructed_face")
+        w_group = hf.create_group("reconstructed_weight")
+        state_group = hf.create_group("state")
+        targets_group = hf.create_group("targets")
+        Ra_group = hf.create_group("Ra")
+        inertial_intersections_group = hf.create_group("inertial_intersections")
+        asteroid_intersections_group = hf.create_group("asteroid_intersections")
 def animate(filename):
     """Given a HDF5 file from simulate this will animate teh motion
     """
