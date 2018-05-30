@@ -1,6 +1,8 @@
 #include "stats.hpp"
 #include "mesh.hpp"
 #include "cgal_types.hpp"
+#include "potential.hpp"
+#include "reconstruct.hpp"
 
 #include <iostream>
 #include <memory>
@@ -22,33 +24,49 @@ void surface_mesh_stats(std::shared_ptr<MeshData> mesh) {
 }
 
 namespace PolyVolume {
-double volume(const Eigen::Ref<const Eigen::MatrixXd> &v, const Eigen::Ref<const Eigen::MatrixXi> &f) {
-    
-    double volume(0);
-    int a, b, c; 
+    double volume(const Eigen::Ref<const Eigen::MatrixXd> &v,
+                  const Eigen::Ref<const Eigen::MatrixXi> &f) {
 
-    Eigen::Vector3d v1, v2, v3;
+        double volume(0);
+        int a, b, c; 
 
-    Eigen::Matrix<double, 4, 4> tetrahedron_matrix;
+        Eigen::Vector3d v1, v2, v3;
 
-    // loop over all faces
-    for(int ii = 0; ii != f.rows(); ++ii) {
-        a = f.row(ii)[0];
-        b = f.row(ii)[1];
-        c = f.row(ii)[2];
-        
-        v1 << v.row(a);
-        v2 << v.row(b);
-        v3 << v.row(c);
-        
-        tetrahedron_matrix.row(0) << v(a, 0), v(a, 1), v(a, 2), 1;
-        tetrahedron_matrix.row(1) << v(b, 0), v(b, 1), v(b, 2), 1;
-        tetrahedron_matrix.row(2) << v(c, 0), v(c, 1), v(c, 2), 1;
-        tetrahedron_matrix.row(3) << 0, 0, 0, 1;
+        Eigen::Matrix<double, 4, 4> tetrahedron_matrix;
 
-        volume = volume + tetrahedron_matrix.determinant();
+        // loop over all faces
+        for(int ii = 0; ii != f.rows(); ++ii) {
+            a = f.row(ii)[0];
+            b = f.row(ii)[1];
+            c = f.row(ii)[2];
+
+            v1 << v.row(a);
+            v2 << v.row(b);
+            v3 << v.row(c);
+
+            tetrahedron_matrix.row(0) << v(a, 0), v(a, 1), v(a, 2), 1;
+            tetrahedron_matrix.row(1) << v(b, 0), v(b, 1), v(b, 2), 1;
+            tetrahedron_matrix.row(2) << v(c, 0), v(c, 1), v(c, 2), 1;
+            tetrahedron_matrix.row(3) << 0, 0, 0, 1;
+
+            volume = volume + tetrahedron_matrix.determinant();
+        }
+        return 1.0 / 6.0 * volume;
     }
-    return 1.0 / 6.0 * volume;
-}
 
-}
+    double volume(std::shared_ptr<const MeshData> meshdata_ptr) {
+        return volume(meshdata_ptr->get_verts(), meshdata_ptr->get_faces());
+    }
+    
+    double volume(std::shared_ptr<const Asteroid> ast_ptr) {
+        return volume(ast_ptr->get_verts(), ast_ptr->get_faces());
+    }
+
+    double volume(std::shared_ptr<const MeshParam> meshparam_ptr) {
+        return volume(meshparam_ptr->get_verts(), meshparam_ptr->get_faces());
+    }
+    
+    double volume(std::shared_ptr<const ReconstructMesh> rmesh_ptr) {
+        return volume(rmesh_ptr->get_verts(), rmesh_ptr->get_faces());
+    }
+} // End PolyVolume namespace
