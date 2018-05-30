@@ -665,7 +665,7 @@ def eoms_controlled_inertial_control_cost_pybind(t, state, true_ast, dum,
     M2 = dum.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
 
     # compute the desired states for exploration
-    complete_controller.explore_asteroid(state, est_ast_rmesh)
+    complete_controller.explore_asteroid(t, state, est_ast_rmesh, est_ast)
 
     des_att_tuple = (complete_controller.get_Rd(), complete_controller.get_Rd_dot(),
                      complete_controller.get_ang_vel_d(), complete_controller.get_ang_vel_d_dot())
