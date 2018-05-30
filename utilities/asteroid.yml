@@ -8,7 +8,7 @@ dependencies:
   - ipython
   - numpy>=1.14
   - scipy>=1
-  - pyqt>5
+  - matplotlib
   - pip
   - pytest
   - pytest-cov
@@ -17,12 +17,9 @@ dependencies:
     - h5py==2.8.0rc1
     - astro
     - kinematics
-    - matplotlib
     - vtk
     - traits
     - traitsui
-    - pyface
-    - envisage
     # - pydistmesh # only makes solid meshes and not surface mesh
     - mayavi
 prefix: /home/shankar/anaconda3/envs/asteroid
