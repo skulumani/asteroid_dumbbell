@@ -164,7 +164,6 @@ set(cgal_src
     ${PROJECT_SOURCE_DIR}/src/cgal.cpp
     ${PROJECT_SOURCE_DIR}/src/reconstruct.cpp
     ${PROJECT_SOURCE_DIR}/src/geodesic.cpp
-    ${PROJECT_SOURCE_DIR}/src/polyhedron.cpp
     ${PROJECT_SOURCE_DIR}/src/lidar.cpp
     ${PROJECT_SOURCE_DIR}/src/controller.cpp
     ${PROJECT_SOURCE_DIR}/src/state.cpp
