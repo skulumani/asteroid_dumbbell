@@ -28,11 +28,18 @@ class Polyhedron_builder : public CGAL::Modifier_base<HDS> {
         void operator() (HDS &hds);		
 };
 
-double polyhedron_volume(const Eigen::Ref<const Eigen::MatrixXd> &v, const Eigen::Ref<const Eigen::MatrixXi> &f);
+class MeshData;
+class Asteroid;
+class MeshParam;
+class ReconstructMesh;
 
-class Volume {
-    double polyhedron_volume( const Eigen::Ref<const Eigen::MatrixXd>& v,
-                              const Eigen::Ref<const Eigen::MatrixXi>& f);
+namespace PolyVolume {
+    double volume(const Eigen::Ref<const Eigen::MatrixXd> &v, 
+                             const Eigen::Ref<const Eigen::MatrixXi> &f);
+    double volume(std::shared_ptr<const MeshData> meshdata_ptr);
+    double volume(std::shared_ptr<const Asteroid> ast_ptr);
+    double volume(std::shared_ptr<const MeshParam> meshparam_ptr);
+    double volume(std::shared_ptr<const ReconstructMesh> rmesh_ptr);
 
-};
+}
 #endif

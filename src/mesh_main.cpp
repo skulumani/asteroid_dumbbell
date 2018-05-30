@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 
         // compute the volume of the mesh
         double vol;
-        vol = polyhedron_volume(mesh->vertices, mesh->faces);
+        vol = PolyVolume::volume(mesh->vertices, mesh->faces);
         std::cout << "Volume: " << vol << std::endl;
     
     }

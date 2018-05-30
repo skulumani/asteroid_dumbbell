@@ -111,7 +111,8 @@ void eigen_to_polyhedron(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F, Pol
     CGAL_assertion(P.is_triangle(P.halfedges_begin()));
 }
 
-double polyhedron_volume(const Eigen::Ref<const Eigen::MatrixXd> &v, const Eigen::Ref<const Eigen::MatrixXi> &f) {
+namespace PolyVolume {
+double volume(const Eigen::Ref<const Eigen::MatrixXd> &v, const Eigen::Ref<const Eigen::MatrixXi> &f) {
     
     double volume(0);
     int a, b, c; 
@@ -138,6 +139,8 @@ double polyhedron_volume(const Eigen::Ref<const Eigen::MatrixXd> &v, const Eigen
         volume = volume + tetrahedron_matrix.determinant();
     }
     return 1.0 / 6.0 * volume;
+}
+
 }
 
 /* // TODO Add documentation - overload the () operator */

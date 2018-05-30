@@ -86,6 +86,8 @@ TEST_F(TestPolyhedron, PolyhedronFaces) {
 
 TEST_F(TestPolyhedron, PolyhedronVolume) {
     double volume;
-    volume = polyhedron_volume(Ve_true, Fe_true);
+    volume = PolyVolume::volume(Ve_true, Fe_true);
     ASSERT_EQ(volume, 1);
 }
+
+// TODO Test other overloads of the polyhedron volume function
