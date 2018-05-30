@@ -18,6 +18,38 @@ State::State( void ) {
     state_to_array();
 }
 
+State::State(const double& time_in, const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_array) {
+    // set all the member variables
+    mpos.setZero(3);
+    mpos(0) = state_array(0); 
+    mpos(1) = state_array(1);
+    mpos(2) = state_array(2);
+
+    mvel.setZero(3);
+    mvel(0) = state_array(3);
+    mvel(1) = state_array(4);
+    mvel(2) = state_array(5);
+
+    mR.setZero(3, 3);
+    mR(0, 0) = state_array(6);
+    mR(0, 1) = state_array(7);
+    mR(0, 2) = state_array(8);
+    mR(1, 0) = state_array(9);
+    mR(1, 1) = state_array(10);
+    mR(1, 2) = state_array(11);
+    mR(2, 0) = state_array(12);
+    mR(2, 1) = state_array(13);
+    mR(2, 2) = state_array(14);
+
+    mang_vel.setZero(3);
+    mang_vel(0) = state_array(15);
+    mang_vel(1) = state_array(16);
+    mang_vel(2) = state_array(17);
+
+    mtime = time_in;
+    state_to_array();
+}
+
 // Definitions for getters of member variables
 Eigen::Vector3d State::get_pos( void ) const {
     return mpos;

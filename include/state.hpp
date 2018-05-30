@@ -16,6 +16,8 @@ class State {
     public:
         State( void );
         virtual ~State( void ) {};
+        
+        State(const double& time_in, const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_array);
 
         // named parameters idiom to set member attributes
         inline State& pos(const Eigen::Ref<const Eigen::Vector3d> &pos_in) {
