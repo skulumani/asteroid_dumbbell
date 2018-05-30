@@ -35,7 +35,8 @@ namespace PolyVolume {
         Eigen::Matrix<double, 4, 4> tetrahedron_matrix;
 
         // loop over all faces
-        for(int ii = 0; ii != f.rows(); ++ii) {
+        #pragma omp parallel for reduction(+: volume) private(a, b, c, v1, v2, v3, tetrahedron_matrix) shared(f, v)
+        for (int ii = 0; ii < f.rows(); ++ii) {
             a = f.row(ii)[0];
             b = f.row(ii)[1];
             c = f.row(ii)[2];

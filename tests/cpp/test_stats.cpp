@@ -1,7 +1,11 @@
 #include "stats.hpp"
+#include "surface_mesher.hpp"
+
 #include <Eigen/Dense>
 
 #include "gtest/gtest.h"
+
+#include <iostream>
 
 class TestStats: public ::testing::Test {
  protected:
@@ -63,3 +67,11 @@ TEST_F(TestStats, CubeVolume) {
     volume = PolyVolume::volume(Ve_true, Fe_true);
     ASSERT_EQ(volume, 1);
 }
+
+TEST_F(TestStats, SphereVolume) {
+    // create a sphere (ish) shape
+    SurfMesh smesh(1, 1, 1, 10, 0.1, 0.1);
+    double volume = PolyVolume::volume(smesh.get_verts(), smesh.get_faces());
+    ASSERT_NEAR(volume, 4.19, 1e-1);
+}
+
