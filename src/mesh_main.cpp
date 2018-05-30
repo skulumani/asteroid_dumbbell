@@ -2,10 +2,9 @@
 #include "mesh.hpp"
 #include "cgal.hpp"
 #include "polyhedron.hpp"
+#include "stats.hpp"
 
 #include "input_parser.hpp"
-
-#include "stats.hpp"
 
 #include <memory>
 
