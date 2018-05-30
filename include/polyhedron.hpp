@@ -30,4 +30,9 @@ class Polyhedron_builder : public CGAL::Modifier_base<HDS> {
 
 double polyhedron_volume(const Eigen::Ref<const Eigen::MatrixXd> &v, const Eigen::Ref<const Eigen::MatrixXi> &f);
 
+class Volume {
+    double polyhedron_volume( const Eigen::Ref<const Eigen::MatrixXd>& v,
+                              const Eigen::Ref<const Eigen::MatrixXi>& f);
+
+};
 #endif
