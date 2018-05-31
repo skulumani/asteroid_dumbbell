@@ -80,8 +80,7 @@ def initialize(hf):
     lidar = lidar.fov(np.deg2rad(np.array([7, 7]))).dist(2).num_steps(3)
 
     # raycaster from c++
-    # TODO create the caster from the vertices - a seperate meshdata
-    caster = cgal.RayCaster(true_ast_meshdata)
+    caster = cgal.RayCaster(v, f)
     
     # save a bunch of parameters to the HDF5 file
     sim_group = hf.create_group("simulation_parameters")
@@ -183,8 +182,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
                 Ra = true_ast.rot_ast2int(t)
                 
                 # this also updates true_ast (both point to same data) 
-                true_ast_meshdata.update_mesh(nv, true_ast_meshdata.get_faces())
-                caster.update_mesh(true_ast_meshdata)
+                caster.update_mesh(nv, true_ast.get_faces())
 
                 # do the raycasting
                 intersections = caster.castarray(state[0:3], targets)
@@ -289,8 +287,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
                 nv = true_ast.rotate_vertices(t)
                 Ra = true_ast.rot_ast2int(t)
                 
-                true_ast_meshdata.update_mesh(nv, true_ast_meshdata.get_faces())
-                caster.update_mesh(true_ast_meshdata)
+                caster.update_mesh(nv, true_ast.get_faces())
 
                 # do the raycasting
                 intersections = caster.castarray(state[0:3], targets)

@@ -568,7 +568,6 @@ def eoms_controlled_inertial_pybind(t, state, ast, dum, complete_controller, est
     z = Ra.T.dot(pos) # position of COM in asteroid frame
 
     # gradient and potential at this state
-    
     ast.polyhedron_potential(z1)
     U1 = ast.get_potential()
     U1_grad = ast.get_acceleration()
@@ -651,7 +650,6 @@ def eoms_controlled_inertial_control_cost_pybind(t, state, true_ast, dum,
     z = Ra.T.dot(pos) # position of COM in asteroid frame
 
     # gradient and potential at this state
-    # TODO NEed to make sure that the asteroid is not rotated here (asteroid fixed frame)
     ast.polyhedron_potential(z1)
     U1 = ast.get_potential()
     U1_grad = ast.get_acceleration()
