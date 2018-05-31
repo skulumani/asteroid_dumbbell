@@ -1,19 +1,4 @@
-"""Plot the data from explore_main
-
-Extended description of the module
-
-Notes
------
-    This is an example of an indented section. It's like any other section,
-    but the body is indented to help it stand out from surrounding text.
-
-If a section is indented, then a section break is created by
-resuming unindented text.
-
-Attributes
-----------
-module_level_variable1 : int
-    Descrption of the variable
+"""Plot the data from explore_main or explore_control
 
 Author
 ------
@@ -28,6 +13,8 @@ import argparse
 from point_cloud import wavefront
 from visualization import graphics
 import utilities
+
+import matplotlib.pyplot as plt
 
 def exploration_generate_plots(data_path, img_path='/tmp/diss_explore', 
                                magnification=1, step=1):
@@ -79,6 +66,31 @@ def exploration_generate_plots(data_path, img_path='/tmp/diss_explore',
             w = np.squeeze(rw[str(vk)][()])
             ms.reset(x=v[:, 0], y=v[:, 1], z=v[:, 2], triangles=f_initial, scalars=w)
             graphics.mayavi_savefig(mfig, filename, magnification=magnification)
+
+def plot_uncertainty(filename):
+    """Compute the sum of uncertainty and plot as function of time"""
+
+    with h5py.File(filename, 'r') as hf:
+        rv = hf['reconstructed_vertex']
+        rw = hf['reconstructed_weight']
+
+        # get all the keys for the groups
+        v_keys = np.array(utilities.sorted_nicely(list(rv.keys())))
+        w_keys = np.array(utilities.sorted_nicely(list(rw.keys())))
+    
+        t_array = []
+        w_array = []
+
+        for ii, wk in enumerate(w_keys):
+            t_array.append(ii)
+            w_array.append(np.sum(rw[wk][()]))
+
+        t_array = np.array(t_array)
+        w_array = np.array(w_array)
+
+        plt.figure()
+        plt.plot(t_array, w_array)
+        plt.show()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate plots from explore",
