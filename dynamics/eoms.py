@@ -643,7 +643,7 @@ def eoms_controlled_inertial_control_cost_pybind(t, state, true_ast, dum,
     R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
     ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
 
-    Ra = ast.rot_ast2int(t) # asteroid body frame to inertial frame
+    Ra = true_ast.rot_ast2int(t) # asteroid body frame to inertial frame
 
     # unpack parameters for the dumbbell
     J = dum.J
@@ -658,13 +658,13 @@ def eoms_controlled_inertial_control_cost_pybind(t, state, true_ast, dum,
     z = Ra.T.dot(pos) # position of COM in asteroid frame
 
     # gradient and potential at this state
-    ast.polyhedron_potential(z1)
-    U1 = ast.get_potential()
-    U1_grad = ast.get_acceleration()
+    true_ast.polyhedron_potential(z1)
+    U1 = true_ast.get_potential()
+    U1_grad = true_ast.get_acceleration()
 
-    ast.polyhedron_potential(z2)
-    U2 = ast.get_potential()
-    U2_grad = ast.get_acceleration()
+    true_ast.polyhedron_potential(z2)
+    U2 = true_ast.get_potential()
+    U2_grad = true_ast.get_acceleration()
 
     F1 = dum.m1 * Ra.dot(U1_grad)
     F2 = dum.m2 * Ra.dot(U2_grad)
@@ -677,12 +677,14 @@ def eoms_controlled_inertial_control_cost_pybind(t, state, true_ast, dum,
     complete_controller.explore_asteroid(t, state, est_ast_rmesh, est_ast)
     
     # Need to convert to the inertial frame for use in the controller
-    des_att_tuple = (complete_controller.get_Rd(), complete_controller.get_Rd_dot(),
-                     complete_controller.get_ang_vel_d(), complete_controller.get_ang_vel_d_dot())
-    des_tran_tuple = (complete_controller.get_posd(), complete_controller.get_veld(),
-                      complete_controller.get_acceld())
-    u_m = controller.attitude_controller(t, state, M1 + M2, dum, ast, des_att_tuple)
-    u_f = controller.translation_controller(t, state, F1 + F2, dum, ast, des_tran_tuple)
+    des_att_tuple = (Ra.dot(complete_controller.get_Rd()), Ra.dot(complete_controller.get_Rd_dot()),
+                     Ra.dot(complete_controller.get_ang_vel_d()), Ra.dot(complete_controller.get_ang_vel_d_dot()))
+    des_tran_tuple = (Ra.dot(complete_controller.get_posd()), Ra.dot(complete_controller.get_veld()),
+                      Ra.dot(complete_controller.get_acceld()))
+
+    # TODO Don't even have to pass in est_ast since external forces already calculated
+    u_m = controller.attitude_controller(t, state, M1 + M2, dum, est_ast, des_att_tuple)
+    u_f = controller.translation_controller(t, state, F1 + F2, dum, est_ast, des_tran_tuple)
 
     pos_dot = vel
     vel_dot = 1 / (dum.m1 + dum.m2) * (F1 + F2 + u_f)
