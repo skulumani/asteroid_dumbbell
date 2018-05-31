@@ -26,6 +26,8 @@ class MeshDistance {
 class RayCaster {
     public:
         RayCaster(std::shared_ptr<MeshData> mesh_in);
+        RayCaster(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
+                  const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in);
 
         // cast ray function
         Eigen::Matrix<double, 1, 3> castray(const Eigen::Ref<const Eigen::Vector3d>& psource,
@@ -37,6 +39,8 @@ class RayCaster {
 
         // update the raycaster with a new mesh ptr
         void update_mesh(std::shared_ptr<MeshData> mesh_in);
+        void update_mesh(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
+                         const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in);
 
         /**
             Compute the minimum distance to the mesh
