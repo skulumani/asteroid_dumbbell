@@ -74,6 +74,7 @@ int main(int argc, char* argv[])
                 intersections_group(hf.get(), "intersections");
 
     // place satellite in a specific location and define view axis
+    // satellite is in the asteroid fixed frame
     State initial_state, state;
     initial_state.pos((Eigen::RowVector3d() << 1.5, 0, 0).finished())
          .vel((Eigen::RowVector3d() << 0, 0, 0).finished())
@@ -111,7 +112,7 @@ int main(int argc, char* argv[])
 
         // perform raycasting on the true mesh (true_asteroid pointer)
         intersection = caster.castray(state_ptr->get_pos(), target);
-
+        // all intersections are in teh asteroid frame
         // use this measurement to update rmesh (inside holds teh mesh estimate)
         rmesh_ptr->single_update(intersection, max_angle);
         // use the updated weight to find a new positoin to move to
