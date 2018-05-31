@@ -181,6 +181,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
                 nv = true_ast.rotate_vertices(t)
                 Ra = true_ast.rot_ast2int(t)
                 
+                # this also updates true_ast (both point to same data) 
                 true_ast_meshdata.update_mesh(nv, true_ast_meshdata.get_faces())
                 caster.update_mesh(true_ast_meshdata)
 
