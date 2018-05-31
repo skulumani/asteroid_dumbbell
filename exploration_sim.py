@@ -22,6 +22,7 @@ import itertools
 import h5py
 import numpy as np
 from scipy import integrate
+import matplotlib.pyplot as plt
 
 from lib import asteroid, surface_mesh, cgal, mesh_data, reconstruct
 from lib import surface_mesh
@@ -394,7 +395,7 @@ def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
     logger.info("Starting image generation")
     
     magnification = 1
-    offscreen = False
+    offscreen = True
     # check if location exists
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -482,10 +483,44 @@ def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
             ms.reset(x=v[:, 0], y=v[:, 1], z=v[:, 2], triangles=f_initial)
             graphics.mayavi_savefig(mfig, filename, magnification=magnification)
     
+
     logger.info('Finished')
 
     return mfig
 
+def plot_uncertainty(filename):
+    """Compute the sum of uncertainty and plot as function of time"""
+    logger = logging.getLogger(__name__)
+    logger.info("Uncertainty plot as funciton of time")
+
+    with h5py.File(filename, 'r') as hf:
+        rv = hf['reconstructed_vertex']
+        rf = hf['reconstructed_face']
+        rw = hf['reconstructed_weight']
+
+        # get all the keys for the groups
+        v_keys = np.array(utilities.sorted_nicely(list(rv.keys())))
+        f_keys = np.array(utilities.sorted_nicely(list(rf.keys())))
+        w_keys = np.array(utilities.sorted_nicely(list(rw.keys())))
+        
+        v_initial = hf['simulation_parameters/estimate_asteroid/initial_vertices'][()]
+        f_initial = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
+        w_initial = np.squeeze(hf['simulation_parameters/estimate_asteroid/initial_weight'][()])
+    
+        t_array = []
+        w_array = []
+
+        for ii, wk in enumerate(w_keys):
+            t_array.append(ii)
+            w_array.append(np.sum(rw[wk][()]))
+
+        t_array = np.array(t_array)
+        w_array = np.array(w_array)
+
+        plt.figure()
+        plt.plot(t_array, w_array)
+        plt.show()
+                    
 if __name__ == "__main__":
     # logging_file = tempfile.mkstemp(suffix='.txt.')[1]
     logging_file = "/tmp/exploration_log.txt"
