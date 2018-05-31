@@ -234,7 +234,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
     """
     logger = logging.getLogger(__name__)
     
-    num_steps = int(100)
+    num_steps = int(1000)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -246,7 +246,12 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
     initial_w = np.array([0, 0, 0])
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
-    with h5py.File(output_filename, 'w') as hf:
+    # initialize the simulation objects
+    (true_ast_meshdata, true_ast, complete_controller,
+        est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
+        AbsTol, RelTol) = initialize(output_filename)
+
+    with h5py.File(output_filename, 'a') as hf:
         hf.create_dataset('time', data=time, compression=compression,
                           compression_opts=compression_opts)
         hf.create_dataset("initial_state", data=initial_state, compression=compression,
@@ -261,10 +266,6 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
         inertial_intersections_group = hf.create_group("inertial_intersections")
         asteroid_intersections_group = hf.create_group("asteroid_intersections")
 
-        # initialize the simulation objects
-        (true_ast_meshdata, true_ast, complete_controller,
-         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
-         AbsTol, RelTol) = initialize(hf)
 
         # initialize the ODE function
         system = integrate.ode(eoms.eoms_controlled_inertial_control_cost_pybind)
