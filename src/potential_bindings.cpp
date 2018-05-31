@@ -14,7 +14,9 @@ PYBIND11_MODULE(asteroid, m) {
         .def(pybind11::init<const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >&,
                             const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& >(),
              "MeshParam constructor from arrays",
-             pybind11::arg("vertices"), pybind11::arg("faces"));
+             pybind11::arg("vertices"), pybind11::arg("faces"))
+        .def("update_mesh", &MeshParam::update_mesh, "Update the MeshParam with new vertices and faces",
+                pybind11::arg("vertices"), pybind11::arg("faces"));
 
     // Expose the Asteroid class
     pybind11::class_<Asteroid, std::shared_ptr<Asteroid>>(m, "Asteroid")
