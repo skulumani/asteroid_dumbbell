@@ -10,6 +10,16 @@
 
 class ReconstructMesh;
 
+/** @class AttitudeController
+
+    @brief Attitude controller class 
+    
+    This class holds several functions to compute the desired attitude states
+    of a vehicle
+
+    @author Shankar Kulumani
+    @version 31 May 2018
+*/
 class AttitudeController {
     friend class Controller;
 
@@ -21,7 +31,11 @@ class AttitudeController {
                 
             Find desired attitude states to point at the body
 
-            @param state_in State shared pointer
+            @param state_in State shared pointer 
+                pos - interial frame
+                vel - vel of com in inertial frame
+                R - sc body frame to inertial frame
+                w - ang vel of sc wrt to inertial frame and in the body frame
             @returns None
 
             @author Shankar Kulumani
@@ -35,6 +49,10 @@ class AttitudeController {
 
             @param time Current simulation time
             @param state_in 1x18 vector for the current state
+                pos - interial frame
+                vel - vel of com in inertial frame
+                R - sc body frame to inertial frame
+                w - ang vel of sc wrt to inertial frame and in the body frame
             @returns None
 
             @author Shankar Kulumani
@@ -44,10 +62,10 @@ class AttitudeController {
                 const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_in);
 
         // getters for the desired attitude state
-        Eigen::Matrix<double, 3, 3> get_Rd() const;
-        Eigen::Matrix<double, 3, 3> get_Rd_dot() const;
-        Eigen::Matrix<double, 3, 1> get_ang_vel_d() const;
-        Eigen::Matrix<double, 3, 1> get_ang_vel_d_dot() const;
+        Eigen::Matrix<double, 3, 3> get_Rd() const; /**< SC Body to Inertial frame  */
+        Eigen::Matrix<double, 3, 3> get_Rd_dot() const; /**< Derivative of SC body to inertial frame */
+        Eigen::Matrix<double, 3, 1> get_ang_vel_d() const; /**< Ang vel of sc body wrt inertial frame in the sc body frame */
+        Eigen::Matrix<double, 3, 1> get_ang_vel_d_dot() const; /**< Derivative of ang vel of sc in sc body frame */
 
     protected:
         Eigen::Matrix<double, 3, 3> mRd; /**< Desired rotation matrix - body to inertial frame */
