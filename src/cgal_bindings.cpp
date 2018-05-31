@@ -24,8 +24,14 @@ PYBIND11_MODULE(cgal, m) {
     pybind11::class_<RayCaster, std::shared_ptr<RayCaster>>(m, "RayCaster")
         .def(pybind11::init<std::shared_ptr<MeshData>>(), "RayCaster constructor",
                 pybind11::arg("shared_ptr to MeshData object"))
-        .def("update_mesh", &RayCaster::update_mesh, "Update the mesh",
+        .def(pybind11::init<const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >&,
+                            const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >&>(),
+             "RayCaster constructor", pybind11::arg("vertices"), pybind11::arg("faces"))
+        .def("update_mesh",(void (RayCaster::*)(std::shared_ptr<MeshData>)) &RayCaster::update_mesh, "Update the mesh",
                 pybind11::arg("mesh"))
+        .def("updatae_mesh", (void (RayCaster::*)(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >&,
+                                                  const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >&)) &RayCaster::update_mesh, "Update the mesh",
+                pybind11::arg("vertices"), pybind11::arg("faces"))
         .def("castray", &RayCaster::castray, "Cast a ray and return the first intersections",
                 pybind11::arg("psource"), pybind11::arg("ptarget"))
         .def("minimum_distance", &RayCaster::minimum_distance, "Minimum distance from point to mesh",
