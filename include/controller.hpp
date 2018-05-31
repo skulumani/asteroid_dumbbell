@@ -124,7 +124,7 @@ class TranslationController {
             directly above the vertex with the maximum uncertainty.
 
             @param state State object defining the current state
-                pos - should be the position of sc in the asteroid frame (converted inside)
+                pos - should be the position of sc in the ASTEROID frame
             @param rmesh ReconstructMesh object with the v, f, and w 
             @returns void Desired state is saved to member variables
 
@@ -136,7 +136,29 @@ class TranslationController {
         void minimize_uncertainty(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
                                   std::shared_ptr<const ReconstructMesh> rmesh);
         
-        // Allow for input using an shared_ptr to asteroid
+        /** @fn void minimize_uncertainty(const double& t,
+         *                                std::shared_ptr<const State> state,
+         *                                std::shared_ptr<const ReconstructMesh> rmesh,
+         *                                std::shared_ptr<Asteroid> ast_est)
+                
+            Update the asteroid by computing the control cost for each vertex.
+            Need to input the inertial position of the spacecraft
+
+            @param t Simulation time in seconds
+            @param state Shared_ptr to current state
+                pos - interial frame positon wrt to asteroid
+                vel - vel of com in inertial frame
+                R - sc body frame to inertial frame
+                w - ang vel of sc wrt to inertial frame and in the body frame
+            @param rmesh ReconstructMesh object holding the weights for all the 
+                estimated vertices
+            @param ast_est estimated asteroid object to compute the estimated
+                dynamics and rotation
+            @returns None
+
+            @author Shankar Kulumani
+            @version 31 May 2018
+        */
         void minimize_uncertainty(const double& t,
                                   std::shared_ptr<const State> state,
                                   std::shared_ptr<const ReconstructMesh> rmesh,
@@ -154,9 +176,9 @@ class TranslationController {
         Eigen::MatrixXi get_controller_faces( void ) const { return controller_faces; }
         std::vector<Eigen::VectorXi> get_mesh_mapping( void ) const { return mesh_mapping; }
     protected:
-        Eigen::Matrix<double, 3, 1> mposd;
-        Eigen::Matrix<double, 3, 1> mveld;
-        Eigen::Matrix<double, 3, 1> macceld;
+        Eigen::Matrix<double, 3, 1> mposd; /**< Desired position in the asteroid fixed frame */
+        Eigen::Matrix<double, 3, 1> mveld; /**< Desired velocity of com wrt to asteroid in asteroid frame */
+        Eigen::Matrix<double, 3, 1> macceld; /**< Desired acceleration of com wrt to asteroid in asteorid frame */
 };
 
 class Controller: public TranslationController, public AttitudeController {

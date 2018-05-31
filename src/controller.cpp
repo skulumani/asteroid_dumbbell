@@ -223,7 +223,8 @@ double control_cost(const double& t,
 double integrate_control_cost(const double& t,
                               const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& waypoints,
                               const std::shared_ptr<Asteroid> ast_est) {
-    
+    // waypoints are defined in the inertial frame and will be converted 
+    // in control_cost
     const int num_points = waypoints.rows();
     const double initial_angle = 0;
 
@@ -253,7 +254,7 @@ double integrate_control_cost(const double& t,
 
 void TranslationController::minimize_uncertainty(std::shared_ptr<const State> state,
                                                  std::shared_ptr<const ReconstructMesh> rmesh) {
-    
+    // the state postion should be in the asteroid frame!    
     double max_weight = rmesh->get_weights().maxCoeff();
     double max_sigma = kPI;
     
@@ -302,10 +303,12 @@ void TranslationController::minimize_uncertainty(const double& t,
     double weighting_factor(0.5); /**< Weighting factor between distance and ucnertainty */
     double sigma_factor(0.4);
     double control_factor(0.1);
-
-    Eigen::Vector3d pos(3);
-    pos = state->get_pos();
     
+    // Rotate the position to the asteroid fixed frame
+    Eigen::Matrix<double, 3, 3> Ra = ast_est.rot_ast2int(t);
+    Eigen::Vector3d pos(3);
+    pos = Ra.transpose() * state->get_pos();
+     
     // compute the potential for each of the states in the controller mesh (controller vertices)
     Eigen::VectorXd vertex_control_cost(rmesh->get_verts().rows());
     vertex_control_cost.setZero();
