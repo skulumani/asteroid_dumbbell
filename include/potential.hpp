@@ -158,6 +158,9 @@ class Asteroid {
         Eigen::Matrix<double, Eigen::Dynamic, 3> rotate_vertices(const double& time) const;
 
         Eigen::Matrix<double, 3, 3> rot_ast2int(const double& time);
+        
+        // set the rotation of the asteroid by modifying the connected meshdata
+        void update_rotation(const double& time);
 
         // Getters for the potential variables
         double get_potential( void ) { return U; }

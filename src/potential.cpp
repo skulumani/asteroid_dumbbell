@@ -428,6 +428,20 @@ Eigen::Matrix<double, 3, 3> Asteroid::rot_ast2int(const double& time) {
     return Ra;
 }
 
+void Asteroid::update_rotation(const double& time) {
+    // get the current Ra
+    Eigen::Matrix<double, 3, 3> Ra = rot_ast2int(time);
+    // rotate asteroid vertices
+    Eigen::Matrix<double, Eigen::Dynamic, 3> nv(mesh_param->num_v, 3);
+    Eigen::Matrix<int, Eigen::Dynamic, 3> nf(mesh_param->num_f, 3);
+
+    nv = (Ra * mesh_param->get_verts().transpose()).transpose();
+    nf = mesh_param->get_faces();
+    // update the meshdata (vertices)
+    mesh_param->update_mesh(nv, nf); 
+    // update meshparam and asteroid parameters
+    init_asteroid();
+}
 std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::MatrixXd> & V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
 
     std::vector<std::vector<int> > vf_map(V.rows());
