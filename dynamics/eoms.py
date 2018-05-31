@@ -584,7 +584,7 @@ def eoms_controlled_inertial_pybind(t, state, ast, dum, complete_controller, est
 
     # compute the desired states for exploration
     complete_controller.explore_asteroid(state, est_ast_rmesh)
-
+    # TODO need to convert to the inertial frame
     des_att_tuple = (complete_controller.get_Rd(), complete_controller.get_Rd_dot(),
                      complete_controller.get_ang_vel_d(), complete_controller.get_ang_vel_d_dot())
     des_tran_tuple = (complete_controller.get_posd(), complete_controller.get_veld(),
@@ -667,7 +667,8 @@ def eoms_controlled_inertial_control_cost_pybind(t, state, true_ast, dum,
     # compute the desired states for exploration
     # TODO Figure out if exploration should happen in the inertial or asteroid frames
     complete_controller.explore_asteroid(t, state, est_ast_rmesh, est_ast)
-
+    
+    # Need to convert to the inertial frame for use in the controller
     des_att_tuple = (complete_controller.get_Rd(), complete_controller.get_Rd_dot(),
                      complete_controller.get_ang_vel_d(), complete_controller.get_ang_vel_d_dot())
     des_tran_tuple = (complete_controller.get_posd(), complete_controller.get_veld(),

@@ -270,7 +270,8 @@ void TranslationController::minimize_uncertainty(std::shared_ptr<const State> st
     // pick out the corresponding vertex of the asteroid that should be viewed
     // use current norm of position and output a position with same radius but just above the minium point
     double current_radius = state->get_pos().norm();
-
+    
+    // Asteroid fixed frame position
     mposd = des_vector.normalized() * current_radius;
     mveld.setZero(3);
     macceld.setZero(3);
