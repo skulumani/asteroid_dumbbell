@@ -124,7 +124,7 @@ class TranslationController {
             directly above the vertex with the maximum uncertainty.
 
             @param state State object defining the current state
-                pos - should be the position of sc in the inertial frame (converted inside)
+                pos - should be the position of sc in the asteroid frame (converted inside)
             @param rmesh ReconstructMesh object with the v, f, and w 
             @returns void Desired state is saved to member variables
 
