@@ -72,6 +72,9 @@ class MeshParam {
         // Getters for vertices and faces
         Eigen::MatrixXd get_verts( void ) const { return mesh->get_verts(); }
         Eigen::MatrixXi get_faces( void ) const { return mesh->get_faces(); }
+        
+        void update_mesh(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
+                         const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in);
 
         // define all the member variables
         std::size_t num_v, num_f, num_e;

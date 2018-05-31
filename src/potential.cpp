@@ -295,6 +295,16 @@ void MeshParam::edge_dyad( void ) {
     }
 }
 
+void MeshParam::update_mesh(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
+                            const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in) {
+    
+    // update the connected meshdata
+    mesh->update_mesh(V_in, F_in);
+    // update all the mesharameters
+    polyhedron_parameters();
+    face_dyad();
+    edge_dyad();
+}
 // ************************ Asteroid class ************************************
 Asteroid::Asteroid(const std::string& name_in, MeshParam& mesh_param_in) {
     mesh_param = std::make_shared<MeshParam>(mesh_param_in);
