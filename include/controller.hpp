@@ -29,7 +29,7 @@ class AttitudeController {
         
         /** @fn void body_fixed_pointing_attitude(std::shared_ptr<const State> state_in)
                 
-            Find desired attitude states to point at the body
+            Find desired attitude states to point at the body. 
 
             @param state_in State shared pointer 
                 pos - interial frame
@@ -62,14 +62,14 @@ class AttitudeController {
                 const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_in);
 
         // getters for the desired attitude state
-        Eigen::Matrix<double, 3, 3> get_Rd() const; /**< SC Body to Inertial frame  */
-        Eigen::Matrix<double, 3, 3> get_Rd_dot() const; /**< Derivative of SC body to inertial frame */
-        Eigen::Matrix<double, 3, 1> get_ang_vel_d() const; /**< Ang vel of sc body wrt inertial frame in the sc body frame */
+        Eigen::Matrix<double, 3, 3> get_Rd() const; /**< SC Body to asteroid frame  */
+        Eigen::Matrix<double, 3, 3> get_Rd_dot() const; /**< Derivative of SC body to asteroid frame */
+        Eigen::Matrix<double, 3, 1> get_ang_vel_d() const; /**< Ang vel of sc body wrt asteroid frame in the sc body frame */
         Eigen::Matrix<double, 3, 1> get_ang_vel_d_dot() const; /**< Derivative of ang vel of sc in sc body frame */
 
     protected:
-        Eigen::Matrix<double, 3, 3> mRd; /**< Desired rotation matrix - body to inertial frame */
-        Eigen::Matrix<double, 3, 3> mRd_dot; /**< Desired rotation matrix derivative - body to inertial frame */
+        Eigen::Matrix<double, 3, 3> mRd; /**< Desired rotation matrix - body to asteroid frame */
+        Eigen::Matrix<double, 3, 3> mRd_dot; /**< Desired rotation matrix derivative - body to asteroid frame */
         Eigen::Matrix<double, 3, 1> mang_vel_d; /**< Desired angular velocity */
         Eigen::Matrix<double, 3, 1> mang_vel_d_dot; /**< Desired angular velocity derivative */ 
 };
@@ -181,6 +181,17 @@ class TranslationController {
         Eigen::Matrix<double, 3, 1> macceld; /**< Desired acceleration of com wrt to asteroid in asteorid frame */
 };
 
+/** @class Controller
+
+    @brief A derived class holding the data from TranslationController and
+        AttitudeController
+    
+    This is one super class that does all the control (determining  the desired
+    state)
+
+    @author Shankar Kulumani
+    @version 31 May 2018
+*/
 class Controller: public TranslationController, public AttitudeController {
     public:
         Controller( void );
@@ -188,13 +199,46 @@ class Controller: public TranslationController, public AttitudeController {
 
         Controller(std::shared_ptr<const MeshData> meshdata_ptr,
                 const double& max_angle=0.2);
+        
+        /** @fn void explore_asteroid(std::shared_ptr<const State> state,
+         *                            std::shared_ptr<const ReconstructMesh> rmesh)
+                
+            Explore the asteroid by finding a best states to update the mesh.
+            The state should be in the asteroid fixed frame (position)
 
+            @param state Shared pointer to state
+                pos - should be the position of sc in the ASTEROID frame
+            @param rmesh Shared pointer to reconstruct mesh object
+            @returns None
+
+            @author Shankar Kulumani
+            @version 31 May 2018
+        */
         void explore_asteroid(std::shared_ptr<const State> state, 
                 std::shared_ptr<const ReconstructMesh> rmesh);
         void explore_asteroid(const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
                 std::shared_ptr<const ReconstructMesh> rmesh);
+        
+        /** @fn void explore_asteroid(const double& t,
+         *                            std::shared_ptr<const State> state,
+         *                            std::shared_ptr<const ReconstructMesh> rmesh,
+         *                            std::shared_ptr<Asteroid> ast_est)
+                
+            Explore an asteroid and incorporate a control cost
 
-        // TODO Need some unit tests for tese
+            @param state Shared_ptr to current state
+                pos - interial frame positon wrt to asteroid
+                vel - vel of com in inertial frame
+                R - sc body frame to inertial frame
+                w - ang vel of sc wrt to inertial frame and in the body frame
+            @param rmesh ReconstructMesh object holding the weights for all the 
+                estimated vertices
+            @param ast_est estimated asteroid object to compute the estimated
+                dynamics and rotation
+
+            @author Shankar Kulumani
+            @version 31 May 2018
+        */
         void explore_asteroid(const double& t,
                 std::shared_ptr<const State> state,
                 std::shared_ptr<const ReconstructMesh> rmesh,
@@ -208,6 +252,7 @@ class Controller: public TranslationController, public AttitudeController {
           Output a state object with the desired state
 
           @returns state_ptr Pointer to a state object
+            The states are all defined in the asteroid fixed frame
 
           @author Shankar Kulumani
           @version 22 April 2018
