@@ -9,6 +9,16 @@
 
 #include <Eigen/Dense>
 
+/** @class Lidar
+
+    @brief Lidar class allowing for the defination of targets and directions
+    
+    This sets up a camera sensor and gives operations to compute the view
+    directions targets for use with the RayCaster class
+
+    @author Shankar Kulumani
+    @version 31 May 2018
+*/
 class Lidar {
     public:
         Lidar( void );
@@ -82,7 +92,8 @@ class Lidar {
         /** @fn rotate_fov(const Eigen::Ref<const Eigen::Matrix<double, 3, 3> > &R_body2frame)
             
             Rotate the FOV by a given rotation matrix. Rotates all of the lidar
-            arr by the R. Only outputs the unit vectors
+            arr by the R. Only outputs the unit vectors. The output vectors are
+            in whatever frame the R matrix transforms them TO. So body to whatever frame
 
             @param R_body2frame Eigen (3,3) rotation matrix of body frame to inertial frame
 
