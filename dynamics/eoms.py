@@ -583,12 +583,20 @@ def eoms_controlled_inertial_pybind(t, state, ast, dum, complete_controller, est
     M2 = dum.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
 
     # compute the desired states for exploration
-    complete_controller.explore_asteroid(state, est_ast_rmesh)
-    # TODO need to convert to the inertial frame
-    des_att_tuple = (complete_controller.get_Rd(), complete_controller.get_Rd_dot(),
+    # need to convert the state to the asteroid fixed frame here
+    pos_ast = Ra.T.dot(pos)
+    vel_ast = Ra.T.dot(vel)
+    R_sc2ast = Ra.T.dot(R)
+    ang_vel_ast = ang_vel
+    
+    state_ast = np.hstack((pos_ast, vel_ast, R_sc2ast.reshape(-1), ang_vel_ast))
+    complete_controller.explore_asteroid(state_ast, est_ast_rmesh)
+
+    # need to convert these to the inertial frame
+    des_att_tuple = (Ra.dot(complete_controller.get_Rd()), Ra.dot(complete_controller.get_Rd_dot()),
                      complete_controller.get_ang_vel_d(), complete_controller.get_ang_vel_d_dot())
-    des_tran_tuple = (complete_controller.get_posd(), complete_controller.get_veld(),
-                      complete_controller.get_acceld())
+    des_tran_tuple = (Ra.dot(complete_controller.get_posd()), Ra.dot(complete_controller.get_veld()),
+                      Ra.dot(complete_controller.get_acceld()))
     u_m = controller.attitude_controller(t, state, M1 + M2, dum, ast, des_att_tuple)
     u_f = controller.translation_controller(t, state, F1 + F2, dum, ast, des_tran_tuple)
 
