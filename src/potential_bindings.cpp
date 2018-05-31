@@ -41,6 +41,8 @@ PYBIND11_MODULE(asteroid, m) {
         .def("rotate_vertices", &Asteroid::rotate_vertices, "Rotate teh asteroid vertices by ROT3",
                 pybind11::arg("time"))
         .def("rot_ast2int", &Asteroid::rot_ast2int, "Return the asteroid rotation asteroid to inertial",
+                pybind11::arg("time"))
+        .def("update_rotation", &Asteroid::update_rotation, "Rotate the asteroid and update all data",
                 pybind11::arg("time"));
 
 }
