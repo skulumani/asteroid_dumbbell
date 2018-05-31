@@ -80,6 +80,7 @@ def initialize(hf):
     lidar = lidar.fov(np.deg2rad(np.array([7, 7]))).dist(2).num_steps(3)
 
     # raycaster from c++
+    # TODO create the caster from the vertices - a seperate meshdata
     caster = cgal.RayCaster(true_ast_meshdata)
     
     # save a bunch of parameters to the HDF5 file
