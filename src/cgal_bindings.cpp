@@ -29,7 +29,7 @@ PYBIND11_MODULE(cgal, m) {
              "RayCaster constructor", pybind11::arg("vertices"), pybind11::arg("faces"))
         .def("update_mesh",(void (RayCaster::*)(std::shared_ptr<MeshData>)) &RayCaster::update_mesh, "Update the mesh",
                 pybind11::arg("mesh"))
-        .def("updatae_mesh", (void (RayCaster::*)(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >&,
+        .def("update_mesh", (void (RayCaster::*)(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >&,
                                                   const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >&)) &RayCaster::update_mesh, "Update the mesh",
                 pybind11::arg("vertices"), pybind11::arg("faces"))
         .def("castray", &RayCaster::castray, "Cast a ray and return the first intersections",
