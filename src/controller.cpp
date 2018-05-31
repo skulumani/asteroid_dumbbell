@@ -16,6 +16,7 @@
 #include <iostream>
 #include <cassert>
 
+
 AttitudeController::AttitudeController( void ) {
     mRd.setIdentity(3, 3);
     mRd_dot.setIdentity(3, 3);

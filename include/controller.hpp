@@ -74,6 +74,15 @@ class AttitudeController {
         Eigen::Matrix<double, 3, 1> mang_vel_d_dot; /**< Desired angular velocity derivative */ 
 };
 
+/** @class TranslationController
+
+    @brief Translation Controller for spacecraft
+    
+    Compute the desired position states for control around an asteroid
+
+    @author Shankar Kulumani
+    @version 31 May 2018
+*/
 class TranslationController {
     friend class Controller; 
     
@@ -93,7 +102,17 @@ class TranslationController {
         // an extra constructor to initialize the matrices
         TranslationController(std::shared_ptr<const MeshData> meshdata_ptr,
                               const double& max_angle=0.53);
+        
+        /** @fn void inertial_fixed_state(std::shared_ptr<const State> des_state)
+                
+            Define desired state in the inertial frame
 
+            @param des_state State shared_ptr in the inertial frame
+            @returns None
+
+            @author Shankar Kulumani
+            @version 31 May 2018
+        */
         void inertial_fixed_state(std::shared_ptr<const State> des_state);
         void inertial_fixed_state(const double& time, 
                 const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_in,
@@ -105,6 +124,7 @@ class TranslationController {
             directly above the vertex with the maximum uncertainty.
 
             @param state State object defining the current state
+                pos - should be the position of sc in the inertial frame (converted inside)
             @param rmesh ReconstructMesh object with the v, f, and w 
             @returns void Desired state is saved to member variables
 
@@ -173,7 +193,26 @@ class Controller: public TranslationController, public AttitudeController {
         std::shared_ptr<State> get_desired_state();       
 };
 
-// some extra functions for testing
+/** @fn double control_cost(const double& t,
+ *                          const Eigen::Ref<const Eigen::Matrix<double, 1, 3> >& pos_des,
+ *                          const std::shared_ptr<Asteroid> ast_est,
+ *                          const double &m1=500, const double& m2=500,
+ *                          const double& max_potential=1)
+        
+    Compute the control required to remain at the desired position in the asteroid
+    frame around an asteroid
+
+    @param t Current simulation time (for Ra rotation matrix)
+    @param pos_des Desired position in the asteroid fixed frame
+    @param ast_est Shared ptr to the asteroid estimate
+    @param m1 Mass of first dumbbell
+    @param m2 mass of second dumbbell
+    @param max_potential Max potential around the asteroid
+    @returns cost Cost Control cost requried, basically jsut the acceleration on the masses
+
+    @author Shankar Kulumani
+    @version 31 May 2018
+*/
 double control_cost(const double& t,
                     const Eigen::Ref<const Eigen::Matrix<double, 1, 3> >& pos_des,
                     const std::shared_ptr<Asteroid> ast_est,
@@ -183,6 +222,4 @@ double control_cost(const double& t,
 double integrate_control_cost(const double& t,
                               const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& waypoints,
                               const std::shared_ptr<Asteroid> ast_est);
-
-
 #endif
