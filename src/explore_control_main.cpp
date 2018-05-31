@@ -85,6 +85,7 @@ int main(int argc, char* argv[])
 
     state_ptr->update_state(initial_state_ptr);
     // modify the initial state to point at the body using the controller
+    // state is now in the inertial frame
     controller.explore_asteroid(0, state_ptr, est_rmesh_ptr, est_ast_ptr);
     new_state_ptr = controller.get_desired_state();
     state_ptr->update_state(new_state_ptr);

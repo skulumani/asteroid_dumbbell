@@ -128,7 +128,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
 
-    # define the initial condition
+    # define the initial condition in the inertial frame
     initial_pos = np.array([1.5, 0, 0])
     initial_vel = np.array([0, 0, 0])
     initial_R = attitude.rot3(np.pi / 2).reshape(-1)
