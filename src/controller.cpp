@@ -305,7 +305,7 @@ void TranslationController::minimize_uncertainty(const double& t,
     double control_factor(0.1);
     
     // Rotate the position to the asteroid fixed frame
-    Eigen::Matrix<double, 3, 3> Ra = ast_est.rot_ast2int(t);
+    Eigen::Matrix<double, 3, 3> Ra = ast_est->rot_ast2int(t);
     Eigen::Vector3d pos(3);
     pos = Ra.transpose() * state->get_pos();
      
