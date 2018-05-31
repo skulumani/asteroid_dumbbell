@@ -367,7 +367,8 @@ void Asteroid::init_asteroid( void ) {
 }
 
 void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state) {
-
+    
+    // state position should be in the asteroid fixed frame
     Eigen::Matrix<double, Eigen::Dynamic, 3> r_v = mesh_param->mesh->get_verts().rowwise() - state.transpose();
     
     // Compute w_face using laplacian_factor
