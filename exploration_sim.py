@@ -123,7 +123,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     """
     logger = logging.getLogger(__name__)
 
-    num_steps = int(10)
+    num_steps = int(1000)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -229,12 +229,12 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
     """
     logger = logging.getLogger(__name__)
     
-    num_steps = int(10)
+    num_steps = int(1000)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
 
-    # define the initial condition
+    # define the initial condition in the inertial frame
     initial_pos = np.array([1.5, 0, 0])
     initial_vel = np.array([0, 0, 0])
     initial_R = attitude.rot3(np.pi / 2).reshape(-1)
@@ -356,7 +356,7 @@ def animate(filename):
         est_initial_faces = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
 
         mfig = graphics.mayavi_figure(size=(800,600))
-        mesh, ast_axes = graphics.draw_polyhedron_mayavi(true_vertices, true_faces, mfig)
+        mesh, ast_axes = graphics.draw_polyhedron_mayavi(est_initial_vertices, est_initial_faces, mfig)
 
         # initialize a dumbbell object
         dum = dumbbell.Dumbbell(hf['simulation_parameters/dumbbell/m1'][()], 
@@ -377,16 +377,16 @@ def animate(filename):
         
         mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
 
-    animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
-                                               filename, mayavi_objects)
+    # animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
+    #                                            filename, mayavi_objects)
 
-def reconstruct_images(filename):
+def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
     """Read teh HDF5 data and generate a bunch of images of the reconstructing 
     asteroid
     """
     logger = logging.getLogger(__name__)
+    logger.info("Starting image generation")
 
-# TODO Add plotting functions from raycasting_sim.py
 if __name__ == "__main__":
     # logging_file = tempfile.mkstemp(suffix='.txt.')[1]
     logging_file = "/tmp/exploration_log.txt"
@@ -408,6 +408,8 @@ if __name__ == "__main__":
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--simulate", help="Run the exploration simulation",
                        action="store_true")
+    group.add_argument("-c", "--control_sim", help="Exploration with a control cost component",
+                       action="store_true")
     group.add_argument("-a", "--animate", help="Animate the data from the exploration sim",
                        action="store_true")
     group.add_argument("-r", "--reconstruct", help="Generate images for the reconstruction",
@@ -417,6 +419,8 @@ if __name__ == "__main__":
                                                                 
     if args.simulate:
         simulate(args.simulation_data)
+    elif args.control_sim:
+        simulate_control(args.simulation_data)
     elif args.reconstruct:
         output_path = tempfile.mkdtemp()
     elif args.animate:
