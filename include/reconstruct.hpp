@@ -5,12 +5,22 @@
 
 #include <Eigen/Dense>
 #include <memory>
+/** @class ReconstructMesh
 
+    @brief Mesh reconstruction using radial vertex adjustment for an asteroid
+    
+    Given datapoints/measurements of the surface of an asteroid, in the asteroid 
+    fixed frame. This will update the mesh, and an uncertainty metric, for each
+    vertex by radially changing its position
+
+    @author Shankar Kulumani
+    @version 31 May 2018
+*/
 class ReconstructMesh {
     public:
         ReconstructMesh( void ) {}
         virtual ~ReconstructMesh( void ) {}
-    
+        
         ReconstructMesh(const Eigen::Ref<const Eigen::MatrixXd> &v_in,
                         const Eigen::Ref<const Eigen::MatrixXi> &f_in,
                         const Eigen::Ref<const Eigen::MatrixXd> &w_in);
@@ -19,11 +29,37 @@ class ReconstructMesh {
         
         ReconstructMesh(const Eigen::Ref<const Eigen::MatrixXd> &v_in,
                         const Eigen::Ref<const Eigen::MatrixXi> &f_in);
+        
+        /** @fn void single_update(const Eigen::Ref<const Eigen::RowVector3d>& pt_in,
+         *                         const double & max_angle)
+                
+            Update mesh by taking a single measurement, in the asteroid fixed frame,
+            and moving the vertices that are close to it (angular seperation)
 
-        // Modify the vertices/weights with a new point
+            @param pt_in Row vector of measurement in the asteroid frame
+            @param max_angle Max angular seperation between the measurement and 
+                associated vertices
+            @returns None
+
+            @author Shankar Kulumani
+            @version 31 May 2018
+        */
         void single_update(const Eigen::Ref<const Eigen::RowVector3d> &pt_in,
                         const double &max_angle);
-        // now update given many points in an array
+        /** @fn void update(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
+         *                  const double& max_angle)
+                
+            Incorporate many points by treating each one in sequence using 
+            single_update
+
+            @param pots Array of measurements, nx3, in the asteroid frame
+            @param max_angle Max angular seperation between the measurement and 
+                associated vertices
+            @returns None
+
+            @author Shankar Kulumani
+            @version 31 May 2018
+        */
         void update(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
                 const double& max_angle);
 
@@ -36,9 +72,9 @@ class ReconstructMesh {
         
         void update_meshdata( void );
     private:
-        Eigen::VectorXd weights;
+        Eigen::VectorXd weights; /**< Weight for each vertex */
 
-        std::shared_ptr<MeshData> mesh;
+        std::shared_ptr<MeshData> mesh; /**< MeshData holding vertices */
 };
 
 template<typename T>
