@@ -17,6 +17,7 @@ import os
 import tempfile
 import argparse
 from collections import defaultdict
+import itertools
 
 import h5py
 import numpy as np
@@ -35,7 +36,7 @@ from visualization import graphics, animation
 compression = 'gzip'
 compression_opts = 4
 
-def initialize(hf):
+def initialize(output_filename):
     """Initialize all the things for the simulation
 
     Output_file : the actual HDF5 file to save the data/parameters to
@@ -83,36 +84,39 @@ def initialize(hf):
     caster = cgal.RayCaster(v, f)
     
     # save a bunch of parameters to the HDF5 file
-    sim_group = hf.create_group("simulation_parameters")
-    sim_group['AbsTol'] = AbsTol
-    sim_group['RelTol'] = RelTol
-    dumbbell_group = sim_group.create_group("dumbbell")
-    dumbbell_group["m1"] = 500
-    dumbbell_group["m2"] = 500
-    dumbbell_group['l'] = 0.003
-    
-    true_ast_group = sim_group.create_group("true_asteroid")
-    true_ast_group.create_dataset("vertices", data=v, compression=compression,
-                                  compression_opts=compression_opts)
-    true_ast_group.create_dataset("faces", data=f, compression=compression,
-                                  compression_opts=compression_opts)
-    true_ast_group['name'] = 'castalia.obj'
-    
-    est_ast_group = sim_group.create_group("estimate_asteroid")
-    est_ast_group['surf_area'] = surf_area
-    est_ast_group['max_angle'] = max_angle
-    est_ast_group['min_angle'] = min_angle
-    est_ast_group['max_distance'] = max_distance
-    est_ast_group['max_radius'] = max_radius
-    est_ast_group.create_dataset('initial_vertices', data=ellipsoid.get_verts(), compression=compression,
-                                 compression_opts=compression_opts)
-    est_ast_group.create_dataset("initial_faces", data=ellipsoid.get_faces(), compression=compression,
-                                 compression_opts=compression_opts)
+    with h5py.File(output_filename, 'w-') as hf:
+        sim_group = hf.create_group("simulation_parameters")
+        sim_group['AbsTol'] = AbsTol
+        sim_group['RelTol'] = RelTol
+        dumbbell_group = sim_group.create_group("dumbbell")
+        dumbbell_group["m1"] = 500
+        dumbbell_group["m2"] = 500
+        dumbbell_group['l'] = 0.003
+        
+        true_ast_group = sim_group.create_group("true_asteroid")
+        true_ast_group.create_dataset("vertices", data=v, compression=compression,
+                                    compression_opts=compression_opts)
+        true_ast_group.create_dataset("faces", data=f, compression=compression,
+                                    compression_opts=compression_opts)
+        true_ast_group['name'] = 'castalia.obj'
+        
+        est_ast_group = sim_group.create_group("estimate_asteroid")
+        est_ast_group['surf_area'] = surf_area
+        est_ast_group['max_angle'] = max_angle
+        est_ast_group['min_angle'] = min_angle
+        est_ast_group['max_distance'] = max_distance
+        est_ast_group['max_radius'] = max_radius
+        est_ast_group.create_dataset('initial_vertices', data=est_ast_rmesh.get_verts(), compression=compression,
+                                    compression_opts=compression_opts)
+        est_ast_group.create_dataset("initial_faces", data=est_ast_rmesh.get_faces(), compression=compression,
+                                    compression_opts=compression_opts)
+        est_ast_group.create_dataset("initial_weight", data=est_ast_rmesh.get_weights(), compression=compression,
+                                    compression_opts=compression_opts)
 
-    lidar_group = sim_group.create_group("lidar")
-    lidar_group.create_dataset("view_axis", data=lidar.get_view_axis())
-    lidar_group.create_dataset("up_axis", data=lidar.get_up_axis())
-    lidar_group.create_dataset("fov", data=lidar.get_fov())
+        lidar_group = sim_group.create_group("lidar")
+        lidar_group.create_dataset("view_axis", data=lidar.get_view_axis())
+        lidar_group.create_dataset("up_axis", data=lidar.get_up_axis())
+        lidar_group.create_dataset("fov", data=lidar.get_fov())
     
     return (true_ast_meshdata, true_ast, complete_controller, est_ast_meshdata, 
             est_ast_rmesh, est_ast, lidar, caster, max_angle, 
@@ -123,7 +127,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     """
     logger = logging.getLogger(__name__)
 
-    num_steps = int(1000)
+    num_steps = int(100)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -135,7 +139,12 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     initial_w = np.array([0, 0, 0])
     initial_state = np.hstack((initial_pos, initial_vel, initial_R, initial_w))
 
-    with h5py.File(output_filename, 'w') as hf:
+    # initialize the simulation objects
+    (true_ast_meshdata, true_ast, complete_controller,
+        est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
+        AbsTol, RelTol) = initialize(output_filename)
+
+    with h5py.File(output_filename, 'a') as hf:
         hf.create_dataset('time', data=time, compression=compression,
                           compression_opts=compression_opts)
         hf.create_dataset("initial_state", data=initial_state, compression=compression,
@@ -150,10 +159,6 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
         inertial_intersections_group = hf.create_group("inertial_intersections")
         asteroid_intersections_group = hf.create_group("asteroid_intersections")
 
-        # initialize the simulation objects
-        (true_ast_meshdata, true_ast, complete_controller,
-         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
-         AbsTol, RelTol) = initialize(hf)
         
         # initialize the ODE function
         system = integrate.ode(eoms.eoms_controlled_inertial_pybind)
@@ -229,7 +234,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
     """
     logger = logging.getLogger(__name__)
     
-    num_steps = int(1000)
+    num_steps = int(100)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -386,6 +391,99 @@ def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
     """
     logger = logging.getLogger(__name__)
     logger.info("Starting image generation")
+    
+    magnification = 1
+    offscreen = False
+    # check if location exists
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    logger.info('Opening {}'.format(filename))
+    with h5py.File(filename, 'r') as hf:
+        rv = hf['reconstructed_vertex']
+        rf = hf['reconstructed_face']
+        rw = hf['reconstructed_weight']
+
+        # get all the keys for the groups
+        v_keys = np.array(utilities.sorted_nicely(list(rv.keys())))
+        f_keys = np.array(utilities.sorted_nicely(list(rf.keys())))
+        w_keys = np.array(utilities.sorted_nicely(list(rw.keys())))
+        
+        v_initial = hf['simulation_parameters/estimate_asteroid/initial_vertices'][()]
+        f_initial = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
+        w_initial = np.squeeze(hf['simulation_parameters/estimate_asteroid/initial_weight'][()])
+
+        """Partial images during the reconstruction"""
+        logger.info('Starting on partial reconstruction images')
+
+        mfig = graphics.mayavi_figure(offscreen=offscreen)
+        mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial)
+        ms = mesh.mlab_source
+        graphics.mayavi_axes(mfig, [-1, 1, -1, 1, -1, 1], line_width=5, color=(1, 0, 0))
+        graphics.mayavi_view(fig=mfig)
+
+        partial_index = np.array([1, v_keys.shape[0]*1/4, v_keys.shape[0]*1/2,
+                                  v_keys.shape[0]*3/4, v_keys.shape[0]*4/4-1],
+                                 dtype=np.int)
+        for img_index, vk in enumerate(partial_index):
+            filename = os.path.join(output_path, 'partial_' + str(vk) + '.jpg')
+            v = rv[str(vk)][()]
+            # generate an image and save it 
+            ms.set(x=v[:, 0], y=v[:, 1], z=v[:,2], triangles=f_initial)
+            graphics.mlab.savefig(filename, magnification=magnification)
+        
+        """Partial images using a colormap for the data"""
+        logger.info('Now using a colormap for the uncertainty')
+        mfig = graphics.mayavi_figure(offscreen=offscreen)
+        mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial,
+                                       color=None, colormap='viridis',
+                                       scalars=w_initial)
+        ms = mesh.mlab_source
+        graphics.mayavi_axes(mfig, [-1, 1, -1, 1, -1, 1], line_width=5, color=(1, 0, 0))
+        graphics.mayavi_view(fig=mfig)
+
+        partial_index = np.array([1, v_keys.shape[0]*1/4, v_keys.shape[0]*1/2,
+                                  v_keys.shape[0]*3/4, v_keys.shape[0]*4/4-1],
+                                 dtype=np.int)
+        for img_index, vk in enumerate(partial_index):
+            filename = os.path.join(output_path, 'partial_weights_' + str(vk) + '.jpg')
+            v = rv[str(vk)][()]
+            w = np.squeeze(rw[str(vk)][()])
+            # generate an image and save it 
+            ms.set(x=v[:, 0], y=v[:, 1], z=v[:,2], triangles=f_initial,
+                     scalars=w)
+            graphics.mlab.savefig(filename, magnification=magnification)
+
+        """Generate the completed shape at a variety of different angles"""
+        logger.info('Now generating some views of the final shape')
+        # change the mesh to the finished mesh
+        ms.reset(x=rv[v_keys[-1]][()][:, 0],y=rv[v_keys[-1]][()][:, 1],z=rv[v_keys[-1]][()][:, 2],
+                 triangles=f_initial)
+        elevation = np.array([30, -30])
+        azimuth = np.array([0, 45, 135, 215, 315])
+    
+        for az, el in itertools.product(azimuth, elevation):
+            filename = os.path.join(output_path,'final_az=' + str(az) + '_el=' + str(el) + '.jpg')
+            graphics.mayavi_view(fig=mfig, azimuth=az, elevation=el)
+            graphics.mlab.savefig(filename, magnification=magnification)
+
+        """Create a bunch of images for animation"""
+        logger.info('Now making images for a movie')
+        animation_path = os.path.join(output_path, 'animation')
+        if not os.path.exists(animation_path):
+            os.makedirs(animation_path)
+        
+        ms.set(x=v_initial[:, 0], y=v_initial[:, 1], z=v_initial[:, 2], triangles=f_initial)
+
+        for ii, vk in enumerate(v_keys):
+            filename = os.path.join(animation_path, str(ii).zfill(7) + '.jpg')
+            v = rv[vk][()]
+            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:, 2], triangles=f_initial)
+            graphics.mayavi_savefig(mfig, filename, magnification=magnification)
+    
+    logger.info('Finished')
+
+    return mfig
 
 if __name__ == "__main__":
     # logging_file = tempfile.mkstemp(suffix='.txt.')[1]
@@ -423,6 +521,8 @@ if __name__ == "__main__":
         simulate_control(args.simulation_data)
     elif args.reconstruct:
         output_path = tempfile.mkdtemp()
+        reconstruct_images(args.simulation_data, output_path)
+        print("Images saved to: {}".format(output_path))
     elif args.animate:
         animate(args.simulation_data)
 
