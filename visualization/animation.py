@@ -149,6 +149,7 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
 
     This assumes an asteroid object from C++ and using the exploration sim
     """
+    pdb.set_trace()
     mesh, ast_axes, com, dum_axes, pc_lines = mayavi_objects
     
     # get all the keys for the reconstructed vertices and faces

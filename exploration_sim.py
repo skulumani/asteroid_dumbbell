@@ -383,9 +383,9 @@ def animate(filename):
         rf_group = hf['reconstructed_face']
         
         mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
-
-    # animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
-    #                                            filename, mayavi_objects)
+    
+    animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
+                                               filename, mayavi_objects)
 
 def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
     """Read teh HDF5 data and generate a bunch of images of the reconstructing 
