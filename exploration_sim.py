@@ -173,7 +173,6 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
             
             if not (np.floor(t) % 1):
                 # logger.info("RayCasting at t: {}".format(t))
-
                 targets = lidar.define_targets(state[0:3],
                                                state[6:15].reshape((3, 3)),
                                                np.linalg.norm(state[0:3]))
@@ -199,8 +198,8 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
 
                     ast_ints.append(pt_ast)
                 
+                # convert the intersections to the asteroid frame
                 ast_ints = np.array(ast_ints)
-
                 est_ast_rmesh.update(ast_ints, max_angle)
 
                 # save data to HDF5
