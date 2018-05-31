@@ -204,7 +204,7 @@ double control_cost(const double& t,
                     const std::shared_ptr<Asteroid> ast_est,
                     const double& m1, const double& m2,
                     const double& max_potential) {
-
+    // Assume that pos_des is given in the inertial frame
     Eigen::Matrix<double, 3, 3> Ra = ast_est->rot_ast2int(t);
     
     // position of COM in asteroid frame

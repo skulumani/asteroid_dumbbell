@@ -199,11 +199,11 @@ class Controller: public TranslationController, public AttitudeController {
  *                          const double &m1=500, const double& m2=500,
  *                          const double& max_potential=1)
         
-    Compute the control required to remain at the desired position in the asteroid
-    frame around an asteroid
+    Compute the control required to remain at the desired position in the inertial frame 
+    around an asteroid
 
     @param t Current simulation time (for Ra rotation matrix)
-    @param pos_des Desired position in the asteroid fixed frame
+    @param pos_des Desired position in the inertial frame
     @param ast_est Shared ptr to the asteroid estimate
     @param m1 Mass of first dumbbell
     @param m2 mass of second dumbbell
@@ -218,7 +218,21 @@ double control_cost(const double& t,
                     const std::shared_ptr<Asteroid> ast_est,
                     const double& m1=500, const double& m2=500,
                     const double& max_potential=1);
+/** @fn double integrate_control_cost(const double& t,
+ *                                    const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& waypoints,
+ *                                    const std::shared_ptr<Asteroid> ast_est)
+        
+    Compute the integral of the control cost to go along the path defined by 
+    the waypoints. This compute the cost for each location and sums them up
 
+    @param t Simulation time
+    @param waypoints All the waypoints (in the inertial frame) between the start and finish points around an asteroid
+    @param ast_est Estimate of asteroid shared_ptr
+    @returns cost Integrated control cost to go to each waypoint
+
+    @author Shankar Kulumani
+    @version 31 May 2018
+*/
 double integrate_control_cost(const double& t,
                               const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& waypoints,
                               const std::shared_ptr<Asteroid> ast_est);
