@@ -228,7 +228,7 @@ pybind11_add_module(mesh_data MODULE
 src/mesh.cpp src/polyhedron.cpp src/mesh_bindings.cpp)
 
 pybind11_add_module(cgal MODULE
-   src/cgal.cpp src/cgal_bindings.cpp src/mesh.cpp src/lidar.cpp)
+   src/cgal.cpp src/cgal_bindings.cpp src/mesh.cpp src/lidar.cpp src/polyhedron.cpp)
 
 pybind11_add_module(reconstruct MODULE
    src/reconstruct.cpp src/reconstruct_bindings.cpp src/mesh.cpp
