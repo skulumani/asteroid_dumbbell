@@ -243,6 +243,9 @@ pybind11_add_module(controller MODULE
     src/geodesic.cpp src/state.cpp src/mesh.cpp)
 target_link_libraries(controller PRIVATE igl::core fdcl_hdf5 cgal_cpp)
 
+pybind11_add_module(stats MODULE
+    src/stats_bindings.cpp)
+target_link_libraries(stats PRIVATE cgal_cpp)
 ################################################################################
 # Testing example
 ################################################################################
