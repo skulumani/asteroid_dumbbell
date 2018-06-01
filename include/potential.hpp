@@ -128,6 +128,9 @@ class Asteroid {
         virtual ~Asteroid ( void ) {};
         
         Asteroid(const std::string& name_in, MeshParam& mesh_param);
+        Asteroid(const std::string& name_in, 
+                 const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
+                 const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dyanmic, 3> >& F_in);
         Asteroid(const std::string& name_in, std::shared_ptr<MeshParam> mesh_param);
         Asteroid(const std::string& name_in, std::shared_ptr<ReconstructMesh> rmesh_in);
         Asteroid(const std::string& name_in, std::shared_ptr<MeshData> mesh_in);

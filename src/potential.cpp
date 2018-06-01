@@ -312,6 +312,14 @@ Asteroid::Asteroid(const std::string& name_in, MeshParam& mesh_param_in) {
     init_asteroid();
 }
 
+Asteroid::Asteroid(const std::string& name_in,
+                   const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
+                   const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in) {
+    mesh_param = std::make_shared<MeshParam>(V_in, F_in);
+    name = name_in;
+    init_asteroid();
+}
+
 Asteroid::Asteroid(const std::string& name_in, std::shared_ptr<MeshParam> mesh_param_in) {
     mesh_param = mesh_param_in;
     name = name_in;
