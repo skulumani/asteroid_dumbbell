@@ -36,7 +36,7 @@ from visualization import graphics, animation
 
 compression = 'gzip'
 compression_opts = 9
-max_steps = 1000
+max_steps = 5000
 
 def initialize(output_filename):
     """Initialize all the things for the simulation
@@ -164,7 +164,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
         
         # initialize the ODE function
         system = integrate.ode(eoms.eoms_controlled_inertial_pybind)
-        system.set_integrator("lsoda", atol=AbsTol, rtol=RelTol)
+        system.set_integrator("lsoda", atol=AbsTol, rtol=RelTol, nsteps=10000)
         system.set_initial_value(initial_state, t0)
         system.set_f_params(true_ast, dum, complete_controller, est_ast_rmesh)
         
@@ -553,6 +553,8 @@ if __name__ == "__main__":
                        action="store_true")
     group.add_argument("-r", "--reconstruct", help="Generate images for the reconstruction",
                        action="store_true")
+    group.add_argument("-u", "--uncertainty", help="Generate uncertainty plot",
+                       action="store_true")
 
     args = parser.parse_args()
                                                                 
@@ -566,5 +568,7 @@ if __name__ == "__main__":
         print("Images saved to: {}".format(output_path))
     elif args.animate:
         animate(args.simulation_data)
+    elif args.uncertainty:
+        plot_uncertainty(args.simulation_data)
 
 
