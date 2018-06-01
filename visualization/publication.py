@@ -107,10 +107,12 @@ def plot_state(time, pos_inertial, pos_asteroid, fname_suffix="", wscale=1, hsca
                                                                        figsize=scale_figsize(wscale, hscale))
     pos_mercator_inertial_ax.plot(np.rad2deg(pos_inertial_spherical[:, 2]),
                                   np.rad2deg(pos_inertial_spherical[:, 1]),
-                                  linewidth=linewidth, label='Spherical',
-                                  Trajectory', linestyle='-')
+                                  linewidth=linewidth, label='Spherical Trajectory',
+                                  linestyle='-')
     pos_mercator_inertial_ax.set_xlabel(r'Longitude')
     pos_mercator_inertial_ax.set_ylabel(r'Latitude')
+
+    plt.show()
     
 
     

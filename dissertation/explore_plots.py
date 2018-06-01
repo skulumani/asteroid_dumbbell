@@ -109,25 +109,17 @@ def plot_state_trajectory(filename):
         state_keys = np.array(utilities.sorted_nicely(list(state_group.keys())))
     
         t_array = np.zeros(len(state_keys))
-        state_inertial_array = np.zeros(len(state_keys), 18)
-        state_asteroid_array = np.zeros(len(state_keys), 18)
+        state_inertial_array = np.zeros((len(state_keys), 18))
+        state_asteroid_array = np.zeros((len(state_keys), 18))
 
         for ii, sk in enumerate(state_keys):
             t_array[ii] = ii
-            w_array.append(np.sum(rw[wk][()]))
+            state_inertial_array[ii, :] = state_group[sk][()]
+            state_asteroid_array[ii, :] = state_group[sk][()]
 
-        t_array = np.array(t_array)
-        w_array = np.array(w_array)
-
-        print(w_array[-1])
-
-    # parse out the state
     
-    # convert to asteroid frame
-
     # pass to the plotting function
-
-    pass
+    publication.plot_state(t_array, state_inertial_array, state_asteroid_array)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate plots from explore",
@@ -142,6 +134,8 @@ if __name__ == "__main__":
                        action="store_true")
     group.add_argument("-u", "--uncertainty", help="Uncertainty plot",
                        action="store_true")
+    group.add_argument("-s", "--state", help="State trajectory plot",
+                       action="store_true")
 
     args = parser.parse_args()
     
@@ -149,6 +143,8 @@ if __name__ == "__main__":
         exploration_generate_plots(args.hdf5_file, args.img_path);
     elif args.uncertainty:
         plot_uncertainty(args.hdf5_file)
+    elif args.state:
+        plot_state_trajectory(args.hdf5_file)
 
 
 
