@@ -92,6 +92,8 @@ def plot_uncertainty(filename):
         plt.plot(t_array, w_array)
         plt.show()
 
+        print(w_array[-1])
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate plots from explore",
                                      formatter_class=argparse.RawTextHelpFormatter)
