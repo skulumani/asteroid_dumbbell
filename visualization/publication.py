@@ -4,6 +4,8 @@ Author
 ------
 Shankar Kulumani		GWU		skulumani@gwu.edu
 """
+from point_cloud import wavefront
+
 import numpy as np
 
 import matplotlib
@@ -77,4 +79,40 @@ def plot_uncertainty(time, uncertainty,fname_suffix="", wscale=1, hscale=0.75,
             plt.savefig(fname + '_' + fname_suffix + '.eps', dpi=1200)
 
     plt.show()
+
+def plot_state(time, pos_inertial, pos_asteroid, fname_suffix="", wscale=1, hscale=0.75,
+               pgf_save=False):
+    """Plot the state trajectory in both three dimensions and mercator plot
+    
+    State is given in intertial frame around asteroid
+    """
+
+    # create the inertial position components plot
+    pos_comp_fig, pos_comp_ax = plt.subplots(3, 1, figsize=scale_figsize(wscale, hscale))
+    pos_comp_ax[0].plot(time/time[-1], pos_inertial[:, 0], linewidth=linewidth, label='x',
+                        linestyle='-')
+    pos_comp_ax[0].set_ylabel(r'$x$')
+    pos_comp_ax[1].plot(time/time[-1], pos_inertial[:, 1], linewidth=linewidth, label='y',
+                        linestyle='-')
+    pos_comp_ax[1].set_ylabel(r'$y$')
+    pos_comp_ax[2].plot(time/time[-1], pos_inertial[:, 2], linewidth=linewidth, label='z',
+                        linestyle='-')
+    pos_comp_ax[2].set_ylabel(r'$z$')
+    pos_comp_ax[2].set_xlabel(time_label)
+    plt.tight_layout()
+
+    # now convert the position to spherical coordinates and plot on a map
+    pos_inertial_spherical = wavefront.cartesian2spherical(pos_inertial)
+    pos_mercator_inertial_fig, pos_mercator_inertial_ax = plt.subplots(1, 1, 
+                                                                       figsize=scale_figsize(wscale, hscale))
+    pos_mercator_inertial_ax.plot(np.rad2deg(pos_inertial_spherical[:, 2]),
+                                  np.rad2deg(pos_inertial_spherical[:, 1]),
+                                  linewidth=linewidth, label='Spherical',
+                                  Trajectory', linestyle='-')
+    pos_mercator_inertial_ax.set_xlabel(r'Longitude')
+    pos_mercator_inertial_ax.set_ylabel(r'Latitude')
+    
+
+    
+
 

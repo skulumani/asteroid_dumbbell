@@ -32,7 +32,7 @@ from dynamics import dumbbell, eoms, controller
 from point_cloud import wavefront
 from kinematics import attitude
 import utilities
-from visualization import graphics, animation
+from visualization import graphics, animation, publication
 
 compression = 'gzip'
 compression_opts = 9
@@ -521,14 +521,12 @@ def plot_uncertainty(filename):
         t_array = np.array(t_array)
         w_array = np.array(w_array)
         
-        logger.info("Plotting")
-        plt.figure()
-        plt.plot(t_array, w_array)
-        plt.show()
-                    
+    logger.info("Plotting")
+    publication.plot_uncertainty(t_array, w_array)
+
 if __name__ == "__main__":
-    # logging_file = tempfile.mkstemp(suffix='.txt.')[1]
-    logging_file = "/tmp/exploration_log.txt"
+    logging_file = tempfile.mkstemp(suffix='.txt.')[1]
+    # logging_file = "/tmp/exploration_log.txt"
 
     logging.basicConfig(filename=logging_file,
                         filemode='w', level=logging.INFO,

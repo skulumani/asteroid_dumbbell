@@ -100,6 +100,12 @@ def plot_state_trajectory(filename):
     Plot state in 3D
     Plot state in cartesian map project
     """
+
+    # load the hdf5
+
+    # parse out the state
+
+    # pass to the plotting function
     pass
 
 if __name__ == "__main__":
