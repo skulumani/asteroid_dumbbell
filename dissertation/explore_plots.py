@@ -102,10 +102,31 @@ def plot_state_trajectory(filename):
     """
 
     # load the hdf5
+    with h5py.File(filename, 'r') as hf:
+        state_group = hf['state']
+
+        # get all the keys for the groups
+        state_keys = np.array(utilities.sorted_nicely(list(state_group.keys())))
+    
+        t_array = np.zeros(len(state_keys))
+        state_inertial_array = np.zeros(len(state_keys), 18)
+        state_asteroid_array = np.zeros(len(state_keys), 18)
+
+        for ii, sk in enumerate(state_keys):
+            t_array[ii] = ii
+            w_array.append(np.sum(rw[wk][()]))
+
+        t_array = np.array(t_array)
+        w_array = np.array(w_array)
+
+        print(w_array[-1])
 
     # parse out the state
+    
+    # convert to asteroid frame
 
     # pass to the plotting function
+
     pass
 
 if __name__ == "__main__":
