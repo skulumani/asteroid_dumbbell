@@ -150,7 +150,8 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
     This assumes an asteroid object from C++ and using the exploration sim
     """
     # pdb.set_trace()
-    mesh, ast_axes, com, dum_axes, pc_lines = mayavi_objects
+    # mesh, ast_axes, com, dum_axes, pc_lines = mayavi_objects
+    mesh, com, pc_points = mayavi_objects
     
     # get all the keys for the reconstructed vertices and faces
 
@@ -158,15 +159,16 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
     ms = mesh.mlab_source
     ts = com.mlab_source
 
-    ast_xs = ast_axes[0].mlab_source
-    ast_ys = ast_axes[1].mlab_source
-    ast_zs = ast_axes[2].mlab_source
+    # ast_xs = ast_axes[0].mlab_source
+    # ast_ys = ast_axes[1].mlab_source
+    # ast_zs = ast_axes[2].mlab_source
 
-    dum_xs = dum_axes[0].mlab_source
-    dum_ys = dum_axes[1].mlab_source
-    dum_zs = dum_axes[2].mlab_source
+    # dum_xs = dum_axes[0].mlab_source
+    # dum_ys = dum_axes[1].mlab_source
+    # dum_zs = dum_axes[2].mlab_source
     
-    pc_sources = [line.mlab_source for line in pc_lines]
+    pc_sources = pc_points.mlab_source
+
     with h5py.File(hdf5_file, 'r') as hf:
         rv_group = hf['reconstructed_vertex']
         rf_group = hf['reconstructed_face']
@@ -189,10 +191,10 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
             # update asteroid
             ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1], z=new_vertices[:,2],
                     triangles=new_faces)
-            # # update the satellite
-            # ts.set(x=pos[0], y=pos[1], z=pos[2])
+            # update the satellite
+            ts.set(x=pos[0], y=pos[1], z=pos[2])
             
-            # # update the asteroid axes
+            # update the asteroid axes
             # ast_xs.set(x=[0, Ra[0,0]], y=[0, Ra[1,0]], z=[0, Ra[2,0]])
             # ast_ys.set(x=[0, Ra[0,1]], y=[0, Ra[1,1]], z=[0, Ra[2,1]])
             # ast_zs.set(x=[0, Ra[0,2]], y=[0, Ra[1,2]], z=[0, Ra[2,2]])
@@ -204,10 +206,12 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
             # dum_zs.set(x=[pos[0], pos[0]+Rb2i[0,2]], y=[pos[1], pos[1]+Rb2i[1,2]],
             #              z=[pos[2], pos[2]+Rb2i[2,2]])
             
+            pc_sources.set(x=ints[:, 0], y=ints[:, 1], z=ints[:, 2])
             # for pcs, inter in zip(pc_sources, ints):
-            #     # check if intersection is empty
-            #     if inter.size > 2:
-            #         pcs.set(x=[pos[0], inter[0]], y=[pos[1], inter[1]], z=[pos[2], inter[2]])
-            #     else:
-            #         pcs.set(x=[pos[0], pos[0]+0.01], y=[pos[1], pos[1]+0.01], z=[pos[2], pos[2]+0.01])
+                # check if intersection is empty
+                # if inter.size > 2:
+                #     pcs.set(x=inter[0], y=inter[1], z=inter[2])
+                # else:
+                #     pcs.set(x=0, y=0, z=0)
+                # pcs.set(x=1, y=1, z=1)
             yield

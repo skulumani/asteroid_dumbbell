@@ -356,6 +356,7 @@ def animate(filename):
             inertial_intersections.append(intersections_group[key][()])
         
         state = np.array(state)
+        inertial_intersections = np.array(inertial_intersections)
         # get the true asteroid from the HDF5 file
         true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
         true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
@@ -365,26 +366,21 @@ def animate(filename):
         est_initial_faces = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
 
         mfig = graphics.mayavi_figure(size=(800,600))
-        mesh, ast_axes = graphics.draw_polyhedron_mayavi(est_initial_vertices, est_initial_faces, mfig)
-
+        # mesh, ast_axes = graphics.draw_polyhedron_mayavi(est_initial_vertices, est_initial_faces, mfig)
+        mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces)
         # initialize a dumbbell object
         dum = dumbbell.Dumbbell(hf['simulation_parameters/dumbbell/m1'][()], 
                                 hf['simulation_parameters/dumbbell/m2'][()],
                                 hf['simulation_parameters/dumbbell/l'][()])
-        com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
+        # com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
+        com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
+                                       color=(1, 0, 0), radius=0.1)
 
-        pc_lines = [graphics.mayavi_addLine(mfig, state[0, 0:3], p)
-                    for p in inertial_intersections[0]]
+        pc_points = graphics.mayavi_points3d(mfig, inertial_intersections[0], 
+                                             color=(0, 0, 1), scale_factor=0.05)
         
-        ast_meshdata = mesh_data.MeshData(true_vertices, true_faces)
-        ast_meshparam = asteroid.MeshParam(ast_meshdata)
-        ast = asteroid.Asteroid('castalia', ast_meshparam)
-        
-        # reconstructed vertices/faces groups
-        rv_group = hf['reconstructed_vertex']
-        rf_group = hf['reconstructed_face']
-        
-        mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
+        # mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
+        mayavi_objects = (mesh, com, pc_points)
     
     animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
                                                filename, mayavi_objects)
