@@ -76,6 +76,7 @@ if ( NOT Boost_FOUND )
   return()  
 endif()
 
+find_package(Threads REQUIRED)
 
 # just link executables against HDF5 target_link_libraries(target ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 
@@ -188,7 +189,7 @@ target_link_libraries(mesh cgal_cpp input_parser_cpp)
 # potential function
 set(potential_main_src src/potential_main.cpp src/potential.cpp)
 add_executable(potential_main ${potential_main_src})
-target_link_libraries(potential_main igl::core cgal_cpp)
+target_link_libraries(potential_main igl::core cgal_cpp Threads::Threads)
 
 # surface mesher
 set( surface_mesher_src src/surface_mesher_main.cpp )
