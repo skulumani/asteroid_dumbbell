@@ -301,8 +301,8 @@ void TranslationController::minimize_uncertainty(const double& t,
     
     // weighting for each of the cost components
     double weighting_factor(0.5); /**< Weighting factor between distance and ucnertainty */
-    double sigma_factor(0.5);
-    double control_factor(0.0);
+    double sigma_factor(0.49);
+    double control_factor(0.01);
     
     // Rotate the position to the asteroid fixed frame
     Eigen::Vector3d pos = state->get_pos();
@@ -334,7 +334,7 @@ void TranslationController::minimize_uncertainty(const double& t,
     Eigen::VectorXd sigma = central_angle(pos.normalized(),rmesh->get_verts().rowwise().normalized() );
     Eigen::VectorXd cost = - weighting_factor * rmesh->get_weights().array()/max_weight 
                            + sigma_factor * sigma.array()/max_sigma;
-                           /* + control_factor * vertex_control_cost.array() / max_accel; */
+                           + control_factor * vertex_control_cost.array() / max_accel;
     
     // now find min index of cost
     Eigen::MatrixXd::Index min_cost_index;
