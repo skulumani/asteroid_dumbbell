@@ -109,10 +109,19 @@ if __name__ == "__main__":
     # add options
     parser.add_argument("hdf5_file", help="The data file to read", type=str)
     parser.add_argument("img_path", help="The path to save images", type=str)
+    
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-r", "--reconstruct", help="Reconstruction plots for video",
+                       action="store_true")
+    group.add_argument("-u", "--uncertainty", help="Uncertainty plot",
+                       action="store_true")
 
     args = parser.parse_args()
-
-    exploration_generate_plots(args.hdf5_file, args.img_path);
+    
+    if args.reconstruct:
+        exploration_generate_plots(args.hdf5_file, args.img_path);
+    elif args.uncertainty:
+        plot_uncertainty(args.hdf5_file)
 
 
 
