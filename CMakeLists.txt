@@ -274,7 +274,8 @@ target_link_libraries(test_all
     gtest 
     cgal_cpp 
     fdcl_hdf5 
-    igl::core)
+    igl::core
+    Threads::Threads)
 add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
