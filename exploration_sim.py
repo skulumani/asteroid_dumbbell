@@ -35,7 +35,7 @@ import utilities
 from visualization import graphics, animation
 
 compression = 'gzip'
-compression_opts = 4
+compression_opts = 9
 
 def initialize(output_filename):
     """Initialize all the things for the simulation
@@ -128,7 +128,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     """
     logger = logging.getLogger(__name__)
 
-    num_steps = int(100)
+    num_steps = int(15000)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -235,7 +235,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
     """
     logger = logging.getLogger(__name__)
     
-    num_steps = int(5000)
+    num_steps = int(15000)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
