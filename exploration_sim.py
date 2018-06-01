@@ -524,6 +524,35 @@ def plot_uncertainty(filename):
     logger.info("Plotting")
     publication.plot_uncertainty(t_array, w_array)
 
+def plot_state_trajectory(filename):
+    """Plot the state trajectory of the satellite around the asteroid
+
+    """
+
+    with h5py.File(filename, 'r') as hf:
+        state_group = hf['state']
+        Ra_group = hf['Ra']
+
+        state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
+
+        t_array = np.zeros(len(state_keys))
+        state_inertial_array = np.zeros((len(state_keys), 18))
+        state_asteroid_array = np.zeros((len(state_keys), 18))
+        
+        pdb.set_trace()
+        for ii, sk in enumerate(state_keys):
+            t_array[ii] = ii
+            state_inertial_array[ii, :] = state_group[sk][()]
+            Ra = Ra_group[sk][()]
+            pos_ast = Ra.T.dot(state_inertial_array[ii, 0:3].T).T
+            vel_ast = Ra.T.dot(state_inertial_array[ii, 3:6].T).T
+            R_sc2ast = Ra.T.dot(state_inertial_array[ii, 6:15].reshape((3, 3)))
+            w_ast = state_inertial_array[ii, 15:18]
+
+            state_asteroid_array[ii, :] = np.hstack((pos_ast, vel_ast, R_sc2ast.reshape(-1), w_ast)) 
+
+    publication.plot_state(t_array, state_inertial_array, state_asteroid_array)
+
 if __name__ == "__main__":
     logging_file = tempfile.mkstemp(suffix='.txt.')[1]
     # logging_file = "/tmp/exploration_log.txt"
@@ -553,6 +582,8 @@ if __name__ == "__main__":
                        action="store_true")
     group.add_argument("-u", "--uncertainty", help="Generate uncertainty plot",
                        action="store_true")
+    group.add_argument("-st", "--state" , help="Generate state trajectory plots",
+                       action="store_true")
 
     args = parser.parse_args()
                                                                 
@@ -568,5 +599,6 @@ if __name__ == "__main__":
         animate(args.simulation_data)
     elif args.uncertainty:
         plot_uncertainty(args.simulation_data)
-
+    elif args.state:
+        plot_state_trajectory(args.simulation_data)
 
