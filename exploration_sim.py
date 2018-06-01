@@ -235,7 +235,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
     """
     logger = logging.getLogger(__name__)
     
-    num_steps = int(1000)
+    num_steps = int(5000)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -386,6 +386,7 @@ def animate(filename):
     
     animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
                                                filename, mayavi_objects)
+    graphics.mlab.show()
 
 def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
     """Read teh HDF5 data and generate a bunch of images of the reconstructing 
