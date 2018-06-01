@@ -301,12 +301,13 @@ void TranslationController::minimize_uncertainty(const double& t,
     
     // weighting for each of the cost components
     double weighting_factor(0.5); /**< Weighting factor between distance and ucnertainty */
-    double sigma_factor(0.4);
-    double control_factor(0.1);
+    double sigma_factor(0.5);
+    double control_factor(0.0);
     
     // Rotate the position to the asteroid fixed frame
+    Eigen::Vector3d pos = state->get_pos();
+
     Eigen::Matrix<double, 3, 3> Ra = ast_est->rot_ast2int(t);
-    Eigen::Vector3d pos(3);
     pos = Ra.transpose() * state->get_pos();
      
     // compute the potential for each of the states in the controller mesh (controller vertices)
