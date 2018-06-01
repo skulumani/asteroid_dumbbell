@@ -36,6 +36,7 @@ from visualization import graphics, animation
 
 compression = 'gzip'
 compression_opts = 9
+max_steps = 1000
 
 def initialize(output_filename):
     """Initialize all the things for the simulation
@@ -128,7 +129,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     """
     logger = logging.getLogger(__name__)
 
-    num_steps = int(15000)
+    num_steps = int(max_steps)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -235,7 +236,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
     """
     logger = logging.getLogger(__name__)
     
-    num_steps = int(15000)
+    num_steps = int(max_steps)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -499,7 +500,7 @@ def plot_uncertainty(filename):
         rv = hf['reconstructed_vertex']
         rf = hf['reconstructed_face']
         rw = hf['reconstructed_weight']
-
+        
         # get all the keys for the groups
         v_keys = np.array(utilities.sorted_nicely(list(rv.keys())))
         f_keys = np.array(utilities.sorted_nicely(list(rf.keys())))
@@ -513,12 +514,14 @@ def plot_uncertainty(filename):
         w_array = []
 
         for ii, wk in enumerate(w_keys):
+            logger.info("Step {}".format(ii))
             t_array.append(ii)
             w_array.append(np.sum(rw[wk][()]))
 
         t_array = np.array(t_array)
         w_array = np.array(w_array)
-
+        
+        logger.info("Plotting")
         plt.figure()
         plt.plot(t_array, w_array)
         plt.show()
