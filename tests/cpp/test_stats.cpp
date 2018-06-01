@@ -1,5 +1,8 @@
 #include "stats.hpp"
 #include "surface_mesher.hpp"
+#include "mesh_data.hpp"
+#include "potential.hpp"
+#include "reconstruct.hpp"
 
 #include <Eigen/Dense>
 
@@ -75,3 +78,36 @@ TEST_F(TestStats, SphereVolume) {
     ASSERT_NEAR(volume, 4.19, 1e-1);
 }
 
+TEST_F(TestStats, MeshDataVolume) {
+    SurfMesh smesh(1, 1, 1, 10, 0.1, 0.1);
+    double volume_verts = PolyVolume::volume(smesh.get_verts(), smesh.get_faces());
+    
+    std::shared_ptr<MeshData> mesh_ptr = std::make_shared<MeshData>(smesh.get_verts(), smesh.get_faces());
+    double volume_mesh = PolyVolume::volume(mesh_ptr);
+    ASSERT_NEAR(volume_verts, volume_mesh, 1e-6);
+}
+
+TEST_F(TestStats, AsteroidVolume) {
+    SurfMesh smesh(1, 1, 1, 10, 0.1, 0.1);
+    double volume_verts = PolyVolume::volume(smesh.get_verts(), smesh.get_faces());
+    std::shared_ptr<Asteroid> ast = std::make_shared<Asteroid>("cube", smesh.get_verts(), 
+                                                               smesh.get_faces());
+    double volume_ast = PolyVolume::volume(ast);
+    ASSERT_NEAR(volume_verts, volume_ast, 1e-6);
+}
+
+TEST_F(TestStats, MeshParamVolume) {
+    SurfMesh smesh(1, 1, 1, 10, 0.1, 0.1);
+    double volume_verts = PolyVolume::volume(smesh.get_verts(), smesh.get_faces());
+    std::shared_ptr<MeshParam> meshparam_ptr = std::make_shared<MeshParam>(smesh.get_verts(), smesh.get_faces());
+    doubel volume_mesh = PolyVolume::volume(meshparam_ptr);
+    ASSERT_NEAR(volume_verts, volume_mesh, 1e-6);
+}
+
+TEST_F(TestStats, ReconstructMeshVolume) {
+    SurfMesh smesh(1, 1, 1, 10, 0.1, 0.1);
+    double volume_verts = PolyVolume::volume(smesh.get_verts(), smesh.get_faces());
+    std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(smesh.get_verts(), smesh.get_faces()); 
+    double volume_rmesh = PolyVolume::volume(rmesh_ptr);
+    ASSERT_NEAR(volume_verts, volume_rmesh, 1e-6);
+}
