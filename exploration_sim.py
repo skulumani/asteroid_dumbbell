@@ -270,7 +270,8 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
 
         # initialize the ODE function
         system = integrate.ode(eoms.eoms_controlled_inertial_control_cost_pybind)
-        system.set_integrator("lsoda", atol=AbsTol, rtol=RelTol)
+        system.set_integrator("lsoda", atol=AbsTol, rtol=RelTol, nsteps=10000)
+        # system.set_integrator("vode", nsteps=5000, method='bdf')
         system.set_initial_value(initial_state, t0)
         system.set_f_params(true_ast, dum, complete_controller, est_ast_rmesh, est_ast)
         
