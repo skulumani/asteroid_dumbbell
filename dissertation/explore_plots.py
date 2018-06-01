@@ -11,10 +11,11 @@ import h5py
 import argparse
 
 from point_cloud import wavefront
-from visualization import graphics
+from visualization import graphics, publication
 import utilities
 
 import matplotlib.pyplot as plt
+from matplotlib import colors, cm
 
 def exploration_generate_plots(data_path, img_path='/tmp/diss_explore', 
                                magnification=1, step=1):
@@ -88,11 +89,18 @@ def plot_uncertainty(filename):
         t_array = np.array(t_array)
         w_array = np.array(w_array)
 
-        plt.figure()
-        plt.plot(t_array, w_array)
-        plt.show()
-
         print(w_array[-1])
+    
+    # now call the plotting function
+    publication.plot_uncertainty(t_array, w_array)
+
+def plot_state_trajectory(filename):
+    """Plot the state trajectory
+
+    Plot state in 3D
+    Plot state in cartesian map project
+    """
+    pass
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate plots from explore",
