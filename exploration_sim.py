@@ -36,7 +36,7 @@ from visualization import graphics, animation, publication
 
 compression = 'gzip'
 compression_opts = 9
-max_steps = 5000
+max_steps = 15000
 
 def initialize(output_filename):
     """Initialize all the things for the simulation
