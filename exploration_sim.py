@@ -367,8 +367,8 @@ def animate(filename):
         est_initial_faces = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
 
         mfig = graphics.mayavi_figure(size=(800,600))
-        # mesh, ast_axes = graphics.draw_polyhedron_mayavi(est_initial_vertices, est_initial_faces, mfig)
-        mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces)
+        mesh, ast_axes = graphics.draw_polyhedron_mayavi(est_initial_vertices, est_initial_faces, mfig)
+        # mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces)
         # initialize a dumbbell object
         dum = dumbbell.Dumbbell(hf['simulation_parameters/dumbbell/m1'][()], 
                                 hf['simulation_parameters/dumbbell/m2'][()],
