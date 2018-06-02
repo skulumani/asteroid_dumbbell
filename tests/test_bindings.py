@@ -26,6 +26,7 @@ surface_mesh = pytest.importorskip('lib.surface_mesh')
 reconstruct = pytest.importorskip('lib.reconstruct')
 geodesic = pytest.importorskip('lib.geodesic')
 controller = pytest.importorskip('lib.controller')
+stats = pytest.importorskip('lib.stats')
 
 class TestMeshData:
     v, f = wavefront.read_obj('./integration/cube.obj')
@@ -224,3 +225,13 @@ class TestController:
         cont.explore_asteroid(self.state, rmesh)
         print(cont.get_posd())
 
+
+class TestStats:
+    v, f = wavefront.read_obj('./integration/cube.obj')
+    mesh = mesh_data.MeshData(v, f)
+
+    def test_volume_vertices(self):
+        np.testing.assert_allclose(stats.volume(self.v, self.f), 1)
+
+    def test_volume_mesh(self):
+        np.testing.assert_allclose(stats.volume(self.mesh), 1)
