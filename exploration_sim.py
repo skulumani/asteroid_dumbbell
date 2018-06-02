@@ -27,6 +27,7 @@ import matplotlib.pyplot as plt
 from lib import asteroid, surface_mesh, cgal, mesh_data, reconstruct
 from lib import surface_mesh
 from lib import controller as controller_cpp
+from lib import stats
 
 from dynamics import dumbbell, eoms, controller
 from point_cloud import wavefront
@@ -568,6 +569,28 @@ def plot_state_trajectory(filename):
 
     publication.plot_state(t_array, state_inertial_array, state_asteroid_array)
 
+def plot_volume(filename):
+    """Compute the volume of the asteroid at each time step
+    """
+    with h5py.File(filename, 'r') as hf:
+        rv_group = hf['reconstructed_vertex']
+        rf_group = hf['reconstructed_face']
+
+        rv_keys = np.array(utilities.sorted_nicely(list(rv_group.keys())))
+
+        t_array = np.zeros(len(rv_keys))
+        vol_array = np.zeros(len(rv_keys))
+
+        for ii, key in enumerate(rv_keys):
+            t_array[ii] = ii
+            vol_array[ii] = stats.volume(rv_group[key][()], rf_group[key][()])
+
+        true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
+        true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
+        true_volume = stats.volume(true_vertices, true_faces)
+
+    publication.plot_volume(t_array, vol_array, true_volume)
+
 if __name__ == "__main__":
     logging_file = tempfile.mkstemp(suffix='.txt.')[1]
     # logging_file = "/tmp/exploration_log.txt"
@@ -603,6 +626,8 @@ if __name__ == "__main__":
                        action="store_true")
     group.add_argument("-st", "--state" , help="Generate state trajectory plots",
                        action="store_true")
+    group.add_argument("-v", "--volume", help="Generate plot of volume",
+                       action="store_true")
 
     args = parser.parse_args()
                                                                 
@@ -621,4 +646,6 @@ if __name__ == "__main__":
         plot_uncertainty(args.simulation_data)
     elif args.state:
         plot_state_trajectory(args.simulation_data)
+    elif args.volume:
+        plot_volume(args.simulation_data)
 

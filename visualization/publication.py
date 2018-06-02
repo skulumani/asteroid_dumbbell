@@ -126,7 +126,19 @@ def plot_state(time, pos_inertial, pos_asteroid, fname_suffix="", wscale=1, hsca
     pos_radius_ax.set_xlabel(time_label)
     pos_radius_ax.set_ylabel(r'Radius')
     plt.show()
+
+def plot_volume(time, volume, true_volume, fname_suffix="", wscale=1, hscale=0.75):
+    """Plot the volume over time"""
     
+    vol_fig, vol_ax = plt.subplots(1, 1, figsize=scale_figsize(wscale, hscale))
+    vol_ax.plot(time/time[-1], volume, linewidth=linewidth, label='Estimate',
+                linestyle='-')
+    vol_ax.plot(time/time[-1], np.full_like(volume, true_volume), linewidth=linewidth,
+                label='Truth', linestyle='-')
+    vol_ax.set_xlabel(time_label)
+    vol_ax.set_ylabel(r'Volume $km^3$')
+
+    plt.show()
 
     
 
