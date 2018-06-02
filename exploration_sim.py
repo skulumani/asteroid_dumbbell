@@ -313,7 +313,8 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
                     ast_ints.append(pt_ast)
                 
                 ast_ints = np.array(ast_ints)
-
+                
+                # this updates the estimated asteroid mesh used in both rmesh and est_ast
                 est_ast_rmesh.update(ast_ints, max_angle)
 
             v_group.create_dataset(str(ii), data=est_ast_rmesh.get_verts(), compression=compression,
