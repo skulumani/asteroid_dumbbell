@@ -3,6 +3,7 @@
 
 #include "potential.hpp"
 #include "state.hpp"
+#include "cgal.hpp"
 
 #include <Eigen/Dense>
 
@@ -87,6 +88,7 @@ class TranslationController {
     friend class Controller; 
     
     private:
+        RayCaster caster;
         Eigen::MatrixXd controller_vertices;
         Eigen::MatrixXi controller_faces;
         std::vector<Eigen::VectorXi> mesh_mapping;
