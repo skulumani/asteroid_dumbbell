@@ -1,6 +1,6 @@
 #include "stats.hpp"
 #include "surface_mesher.hpp"
-#include "mesh_data.hpp"
+#include "mesh.hpp"
 #include "potential.hpp"
 #include "reconstruct.hpp"
 
@@ -100,7 +100,7 @@ TEST_F(TestStats, MeshParamVolume) {
     SurfMesh smesh(1, 1, 1, 10, 0.1, 0.1);
     double volume_verts = PolyVolume::volume(smesh.get_verts(), smesh.get_faces());
     std::shared_ptr<MeshParam> meshparam_ptr = std::make_shared<MeshParam>(smesh.get_verts(), smesh.get_faces());
-    doubel volume_mesh = PolyVolume::volume(meshparam_ptr);
+    double volume_mesh = PolyVolume::volume(meshparam_ptr);
     ASSERT_NEAR(volume_verts, volume_mesh, 1e-6);
 }
 
