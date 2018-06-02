@@ -332,23 +332,22 @@ void TranslationController::minimize_uncertainty(const double& t,
 
     // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex
     Eigen::VectorXd sigma = central_angle(pos.normalized(),rmesh->get_verts().rowwise().normalized() );
-    Eigen::VectorXd cost = - weighting_factor * rmesh->get_weights().array()/max_weight 
-                           + sigma_factor * sigma.array()/max_sigma;
-                           + control_factor * vertex_control_cost.array() / max_accel;
+    Eigen::VectorXd cost = - weighting_factor *
+        rmesh->get_weights().array()/max_weight + sigma_factor *
+        sigma.array()/max_sigma; + control_factor * vertex_control_cost.array()
+        / max_accel;
     
     // now find min index of cost
     Eigen::MatrixXd::Index min_cost_index;
     cost.minCoeff(&min_cost_index);
     // get the desired vector
     Eigen::RowVector3d des_vector;
-
     des_vector = rmesh->get_verts().row(min_cost_index);
 
     // pick out the corresponding vertex of the asteroid that should be viewed
     // use current norm of position and output a position with same radius but just above the minium point
-    double current_radius = pos.norm();
-
-    mposd = des_vector.normalized() * current_radius;
+    double desired_radius = 1.5;
+    mposd = des_vector.normalized() * desired_radius;
     mveld.setZero(3);
     macceld.setZero(3);
 }
