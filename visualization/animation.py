@@ -146,7 +146,7 @@ def inertial_asteroid_trajectory(time, state, ast, dum, point_cloud,
 @mlab.animate()
 def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
                                      hdf5_file, mayavi_objects, 
-                                     move_cam=False):
+                                     move_cam=False, mesh_weight=False):
     """Animate the rotation of an asteroid and the motion of SC
 
     This assumes an asteroid object from C++ and using the exploration sim
@@ -175,6 +175,7 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
     with h5py.File(hdf5_file, 'r') as hf:
         rv_group = hf['reconstructed_vertex']
         rf_group = hf['reconstructed_face']
+        rw_group = hf['reconstructed_weight']
         Ra_group = hf['Ra']
 
         rv_keys = np.array(utilities.sorted_nicely(list(rv_group.keys())))
@@ -190,10 +191,16 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
             # rotate the asteroid
             new_vertices = Ra.dot(rv_group[key][()].T).T
             new_faces = rf_group[key][()]
-            
+            new_weight = np.squeeze(rw_group[key][()])
             # update asteroid
-            ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1], z=new_vertices[:,2],
-                    triangles=new_faces)
+            if mesh_weight:
+                ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                         z=new_vertices[:,2], triangles=new_faces,
+                         scalars=new_weight)
+            else:
+                ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                       z=new_vertices[:,2], triangles=new_faces)
+
             # update the satellite
             ts.set(x=pos[0], y=pos[1], z=pos[2])
             

@@ -371,7 +371,9 @@ def animate(filename, move_cam=False, mesh_weight=False):
         
         if mesh_weight:
             mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces,
-                                           scalars=np.squeeze(hf['simulation_parameters/estimate_asteroid/initial_weight'][()]))
+                                           scalars=np.squeeze(hf['simulation_parameters/estimate_asteroid/initial_weight'][()]),
+                                           color=None, colormap='viridis',
+                                           vmax=1e-1, vmin=1e-6)
         else:
             mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces)
 
@@ -399,7 +401,8 @@ def animate(filename, move_cam=False, mesh_weight=False):
         mayavi_objects = (mesh, com, pc_points)
     
     animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
-                                               filename, mayavi_objects, move_cam=move_cam)
+                                               filename, mayavi_objects, move_cam=move_cam,
+                                               mesh_weight=mesh_weight)
     graphics.mlab.show()
 
 def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
