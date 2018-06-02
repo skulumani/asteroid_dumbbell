@@ -153,7 +153,8 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
     """
     # pdb.set_trace()
     # mesh, ast_axes, com, dum_axes, pc_lines = mayavi_objects
-    mesh, com, pc_points = mayavi_objects
+    mesh, com, pc_points, time_text, weight_text = mayavi_objects
+
     f = mlab.gcf()
     camera = f.scene.camera
     # get all the keys for the reconstructed vertices and faces
@@ -161,7 +162,6 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
     # animate the rotation fo the asteroid
     ms = mesh.mlab_source
     ts = com.mlab_source
-
     # ast_xs = ast_axes[0].mlab_source
     # ast_ys = ast_axes[1].mlab_source
     # ast_zs = ast_axes[2].mlab_source
@@ -192,6 +192,11 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
             new_vertices = Ra.dot(rv_group[key][()].T).T
             new_faces = rf_group[key][()]
             new_weight = np.squeeze(rw_group[key][()])
+
+            # add current time 
+            time_text.trait_set(text="t: {:8.1f}".format(t))
+            weight_text.trait_set(text="w: {:8.1f}".format(np.sum(new_weight)))
+
             # update asteroid
             if mesh_weight:
                 ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],

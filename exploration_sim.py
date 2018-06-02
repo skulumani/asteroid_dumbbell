@@ -399,8 +399,13 @@ def animate(filename, move_cam=False, mesh_weight=False):
         pc_points = graphics.mayavi_points3d(mfig, inertial_intersections[0], 
                                              color=(0, 0, 1), scale_factor=0.05)
         
+        # add some text objects
+        time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
+                                       color=(0, 0, 0), width=0.05)
+        weight_text = graphics.mlab.text(0.1, 0.2, "w: {:8.1f}".format(0), figure=mfig,
+                                         color=(0, 0, 0), width=0.05)
         # mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
-        mayavi_objects = (mesh, com, pc_points)
+        mayavi_objects = (mesh, com, pc_points, time_text, weight_text)
     
     animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
                                                filename, mayavi_objects, move_cam=move_cam,
@@ -541,6 +546,28 @@ def plot_uncertainty(filename):
     logger.info("Plotting")
     publication.plot_uncertainty(t_array, w_array)
 
+def animate_uncertainty(filename):
+    """Create a 2D projection of the uncertainty of the surface as a function of 
+    time
+    """
+    with h5py.File(filename, 'r') as hf:
+        rv = hf['reconstructed_vertex']
+        rw = hf['reconstructed_weight']
+        
+        # get all the keys for the groups
+        v_keys = np.array(utilities.sorted_nicely(list(rv.keys())))
+        w_keys = np.array(utilities.sorted_nicely(list(rw.keys())))
+        
+        v_initial = hf['simulation_parameters/estimate_asteroid/initial_vertices'][()]
+        w_initial = np.squeeze(hf['simulation_parameters/estimate_asteroid/initial_weight'][()])
+
+        # convert vertices to spherical
+        vs_initial = wavefront.cartesian2spherical(v_initial)
+
+        fig, ax = plt.subplots(1, 1)
+        ax.contourf(vs_initial[:, 2], vs_initial[:, 1], np.diag(w_initial))
+        plt.show()
+
 def plot_state_trajectory(filename):
     """Plot the state trajectory of the satellite around the asteroid
 
@@ -624,6 +651,8 @@ if __name__ == "__main__":
                        action="store_true")
     group.add_argument("-u", "--uncertainty", help="Generate uncertainty plot",
                        action="store_true")
+    group.add_argument("-au", "--animate_uncertainty", help="Animate map view of uncertainty over time",
+                       action="store_true")
     group.add_argument("-st", "--state" , help="Generate state trajectory plots",
                        action="store_true")
     group.add_argument("-v", "--volume", help="Generate plot of volume",
@@ -648,4 +677,6 @@ if __name__ == "__main__":
         plot_state_trajectory(args.simulation_data)
     elif args.volume:
         plot_volume(args.simulation_data)
+    elif args.animate_uncertainty:
+        animate_uncertainty(args.simulation_data)
 
