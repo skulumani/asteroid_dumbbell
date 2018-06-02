@@ -337,7 +337,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
             
             ii += 1
 
-def animate(filename, move_cam=False):
+def animate(filename, move_cam=False, mesh_weight=False):
     """Given a HDF5 file from simulate this will animate teh motion
     """
     # TODO Animate the changing of the mesh itself as a function of time
@@ -365,10 +365,20 @@ def animate(filename, move_cam=False):
         
         est_initial_vertices = hf['simulation_parameters/estimate_asteroid/initial_vertices'][()]
         est_initial_faces = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
-
+            
+        # think about a black background as well
         mfig = graphics.mayavi_figure(size=(800,600))
-        mesh, ast_axes = graphics.draw_polyhedron_mayavi(est_initial_vertices, est_initial_faces, mfig)
-        # mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces)
+        
+        if mesh_weight:
+            mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces,
+                                           scalars=np.squeeze(hf['simulation_parameters/estimate_asteroid/initial_weight'][()]))
+        else:
+            mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces)
+
+        xaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([2, 0, 0]), color=(1, 0, 0)) 
+        yaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 2, 0]), color=(0, 1, 0)) 
+        zaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 0, 2]), color=(0, 0, 1)) 
+        ast_axes = (xaxis, yaxis, zaxis)
         # initialize a dumbbell object
         dum = dumbbell.Dumbbell(hf['simulation_parameters/dumbbell/m1'][()], 
                                 hf['simulation_parameters/dumbbell/m2'][()],
@@ -541,7 +551,6 @@ def plot_state_trajectory(filename):
         state_inertial_array = np.zeros((len(state_keys), 18))
         state_asteroid_array = np.zeros((len(state_keys), 18))
         
-        pdb.set_trace()
         for ii, sk in enumerate(state_keys):
             t_array[ii] = ii
             state_inertial_array[ii, :] = state_group[sk][()]
@@ -574,6 +583,8 @@ if __name__ == "__main__":
     #                     help="Filename to store the reconstruction data")
     parser.add_argument("-mc", "--move_cam", help="For use with the -a, --animate option. This will translate the camera and give you a view from the satellite",
                         action="store_true")
+    parser.add_argument("-mw", "--mesh_weight", help="For use with the -a, --animate option. This will add the uncertainty as a colormap to the asteroid",
+                        action="store_true")
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--simulate", help="Run the exploration simulation",
@@ -600,7 +611,8 @@ if __name__ == "__main__":
         reconstruct_images(args.simulation_data, output_path)
         print("Images saved to: {}".format(output_path))
     elif args.animate:
-        animate(args.simulation_data, move_cam=args.move_cam)
+        animate(args.simulation_data, move_cam=args.move_cam,
+                mesh_weight=args.mesh_weight)
     elif args.uncertainty:
         plot_uncertainty(args.simulation_data)
     elif args.state:

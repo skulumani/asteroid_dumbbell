@@ -69,6 +69,11 @@ def plot_uncertainty(time, uncertainty,fname_suffix="", wscale=1, hscale=0.75,
     uncertainty_ax.set_xlabel(time_label)
     uncertainty_ax.set_ylabel(r'Normalized Uncertainty')
 
+    uncertainty_unnorm_figure, uncertainty_unnorm_ax = plt.subplots(1, 1, figsize=scale_figsize(wscale, hscale))
+    uncertainty_unnorm_ax.plot(time/time[-1], uncertainty, linewidth=linewidth, linestyle='-', label='Uncertainty')
+    uncertainty_unnorm_ax.set_xlabel(time_label)
+    uncertainty_unnorm_ax.set_ylabel(r'Normalized Uncertainty')
+
     # save
     if pgf_save:
         fig_handles = (uncertainty_figure,)
@@ -111,7 +116,15 @@ def plot_state(time, pos_inertial, pos_asteroid, fname_suffix="", wscale=1, hsca
                                   linestyle='-')
     pos_mercator_inertial_ax.set_xlabel(r'Longitude')
     pos_mercator_inertial_ax.set_ylabel(r'Latitude')
-
+    
+    # plot the radius of the orbit vs. time
+    pos_radius_fig, pos_radius_ax = plt.subplots(1, 1,
+                                                 figsize=scale_figsize(wscale, hscale))
+    pos_radius_ax.plot(time/time[-1], pos_inertial_spherical[:, 0],
+                       linewidth=linewidth, label='Satellite radius',
+                       linestyle='-')
+    pos_radius_ax.set_xlabel(time_label)
+    pos_radius_ax.set_ylabel(r'Radius')
     plt.show()
     
 
