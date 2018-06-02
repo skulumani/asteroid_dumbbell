@@ -284,7 +284,8 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
             # TODO Make sure the asteroid (est and truth) are being rotated by ROT3(t)
             state = system.integrate(system.t + dt)
 
-            logger.info("Step: {} Time: {}".format(ii, t))
+            logger.info("Step: {} Time: {} Uncertainty: {}".format(ii, t, 
+                                                                   np.sum(est_ast_rmesh.get_weights())))
 
             if not (np.floor(t) % 1):
                 targets = lidar.define_targets(state[0:3],
