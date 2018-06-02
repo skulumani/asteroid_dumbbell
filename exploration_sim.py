@@ -339,7 +339,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
             
             ii += 1
 
-def animate(filename, move_cam=False, mesh_weight=False):
+def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
     """Given a HDF5 file from simulate this will animate teh motion
     """
     # TODO Animate the changing of the mesh itself as a function of time
@@ -407,10 +407,18 @@ def animate(filename, move_cam=False, mesh_weight=False):
         # mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
         mayavi_objects = (mesh, com, pc_points, time_text, weight_text)
     
+    if save_animation:
+        output_path = tempfile.mkdtemp()
+        print("Images saved to {}".format(output_path))
+    else:
+        output_path = ""
+
     animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
                                                filename, mayavi_objects, move_cam=move_cam,
-                                               mesh_weight=mesh_weight)
+                                               mesh_weight=mesh_weight, save_animation=save_animation,
+                                               output_path=output_path)
     graphics.mlab.show()
+
 
 def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
     """Read teh HDF5 data and generate a bunch of images of the reconstructing 
@@ -639,6 +647,8 @@ if __name__ == "__main__":
                         action="store_true")
     parser.add_argument("-mw", "--mesh_weight", help="For use with the -a, --animate option. This will add the uncertainty as a colormap to the asteroid",
                         action="store_true")
+    parser.add_argument("-sa", "--save_animation", help="Save the animation as a sequence of images",
+                        action="store_true")
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--simulate", help="Run the exploration simulation",
@@ -670,7 +680,8 @@ if __name__ == "__main__":
         print("Images saved to: {}".format(output_path))
     elif args.animate:
         animate(args.simulation_data, move_cam=args.move_cam,
-                mesh_weight=args.mesh_weight)
+                mesh_weight=args.mesh_weight,
+                save_animation=args.save_animation)
     elif args.uncertainty:
         plot_uncertainty(args.simulation_data)
     elif args.state:

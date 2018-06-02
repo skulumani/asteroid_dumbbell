@@ -5,6 +5,7 @@ from mayavi import mlab
 import h5py
 import numpy as np 
 import pdb
+import os
 
 import dynamics.asteroid as asteroid
 from kinematics import attitude
@@ -143,10 +144,12 @@ def inertial_asteroid_trajectory(time, state, ast, dum, point_cloud,
                 pcs.reset(x=[pos[0], pos[0]+0.01], y=[pos[1], pos[1]+0.01], z=[pos[2], pos[2]+0.01])
         yield
 
-@mlab.animate()
+@mlab.animate(delay=10)
 def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
                                      hdf5_file, mayavi_objects, 
-                                     move_cam=False, mesh_weight=False):
+                                     move_cam=False, mesh_weight=False,
+                                     save_animation=False, output_path="",
+                                     magnification=1):
     """Animate the rotation of an asteroid and the motion of SC
 
     This assumes an asteroid object from C++ and using the exploration sim
@@ -236,4 +239,11 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
                 # else:
                 #     pcs.set(x=0, y=0, z=0)
                 # pcs.set(x=1, y=1, z=1)
+
+
+            # save figure if desired
+            if save_animation:
+                filename = os.path.join(output_path, str(t).zfill(7) + '.jpg')
+                graphics.mayavi_savefig(f, filename, magnification=magnification)
+
             yield
