@@ -337,7 +337,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
             
             ii += 1
 
-def animate(filename):
+def animate(filename, move_cam=False):
     """Given a HDF5 file from simulate this will animate teh motion
     """
     # TODO Animate the changing of the mesh itself as a function of time
@@ -374,8 +374,13 @@ def animate(filename):
                                 hf['simulation_parameters/dumbbell/m2'][()],
                                 hf['simulation_parameters/dumbbell/l'][()])
         # com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
-        com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
-                                       color=(1, 0, 0), radius=0.1)
+        if move_cam:
+            com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
+                                           color=(1, 0, 0), radius=0.02,
+                                           opacity=0.5)
+        else:
+            com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
+                                           color=(1, 0, 0), radius=0.1)
 
         pc_points = graphics.mayavi_points3d(mfig, inertial_intersections[0], 
                                              color=(0, 0, 1), scale_factor=0.05)
@@ -384,7 +389,7 @@ def animate(filename):
         mayavi_objects = (mesh, com, pc_points)
     
     animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
-                                               filename, mayavi_objects)
+                                               filename, mayavi_objects, move_cam=move_cam)
     graphics.mlab.show()
 
 def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
@@ -567,6 +572,8 @@ if __name__ == "__main__":
                         help="Filename to store the simulation data")
     # parser.add_argument("reconstruct_data",
     #                     help="Filename to store the reconstruction data")
+    parser.add_argument("-mc", "--move_cam", help="For use with the -a, --animate option. This will translate the camera and give you a view from the satellite",
+                        action="store_true")
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--simulate", help="Run the exploration simulation",
@@ -593,7 +600,7 @@ if __name__ == "__main__":
         reconstruct_images(args.simulation_data, output_path)
         print("Images saved to: {}".format(output_path))
     elif args.animate:
-        animate(args.simulation_data)
+        animate(args.simulation_data, move_cam=args.move_cam)
     elif args.uncertainty:
         plot_uncertainty(args.simulation_data)
     elif args.state:

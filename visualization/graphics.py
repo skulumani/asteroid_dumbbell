@@ -388,7 +388,7 @@ def mayavi_addLine(fig, p1, p2, color=( 0, 0, 1 )):
 
     return line
 
-def mayavi_addPoint(fig, p, radius=0.1, color=( 0, 0, 1 )):
+def mayavi_addPoint(fig, p, radius=0.1, color=( 0, 0, 1 ), **kwargs):
     r"""Add a point to a mayavi figure
 
     mayavi_addPoint(fig, p, radius=0.1, color=[R, G, B])
@@ -417,12 +417,14 @@ def mayavi_addPoint(fig, p, radius=0.1, color=( 0, 0, 1 )):
         # TODO Plot all points at once and return a single handle for all of them
         points = []
         for pt in p:
-            points.append( mlab.points3d(pt[0], pt[1], pt[2],scale_factor=radius, color=color, figure=fig))
+            points.append( mlab.points3d(pt[0], pt[1], pt[2],scale_factor=radius, color=color, figure=fig,
+                                         **kwargs))
 
         return points
     else:
         p = np.squeeze(p)
-        point = mlab.points3d(p[0], p[1], p[2],scale_factor=radius, color=color, figure=fig)
+        point = mlab.points3d(p[0], p[1], p[2],scale_factor=radius, color=color, figure=fig,
+                              **kwargs)
         return point
 
 def mayavi_plot_trajectory(fig, pos, color=(1, 0, 0)):

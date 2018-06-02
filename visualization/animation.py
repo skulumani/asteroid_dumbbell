@@ -9,6 +9,7 @@ import pdb
 import dynamics.asteroid as asteroid
 from kinematics import attitude
 from visualization import graphics
+from point_cloud import wavefront
 import utilities
 
 
@@ -144,7 +145,8 @@ def inertial_asteroid_trajectory(time, state, ast, dum, point_cloud,
 
 @mlab.animate()
 def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
-                                     hdf5_file, mayavi_objects):
+                                     hdf5_file, mayavi_objects, 
+                                     move_cam=False):
     """Animate the rotation of an asteroid and the motion of SC
 
     This assumes an asteroid object from C++ and using the exploration sim
@@ -152,7 +154,8 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
     # pdb.set_trace()
     # mesh, ast_axes, com, dum_axes, pc_lines = mayavi_objects
     mesh, com, pc_points = mayavi_objects
-    
+    f = mlab.gcf()
+    camera = f.scene.camera
     # get all the keys for the reconstructed vertices and faces
 
     # animate the rotation fo the asteroid
@@ -194,6 +197,13 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
             # update the satellite
             ts.set(x=pos[0], y=pos[1], z=pos[2])
             
+            # update the camera view to be right behind the satellite
+            if move_cam:
+                pos_sph = wavefront.cartesian2spherical(pos)
+                graphics.mayavi_view(f, azimuth=np.rad2deg(pos_sph[2]),
+                                    elevation=90-np.rad2deg(pos_sph[1]),
+                                    distance=pos_sph[0]+0.5,
+                                    focalpoint=[0, 0, 0])
             # update the asteroid axes
             # ast_xs.set(x=[0, Ra[0,0]], y=[0, Ra[1,0]], z=[0, Ra[2,0]])
             # ast_ys.set(x=[0, Ra[0,1]], y=[0, Ra[1,1]], z=[0, Ra[2,1]])
