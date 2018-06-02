@@ -345,17 +345,27 @@ void TranslationController::minimize_uncertainty(const double& t,
     // get the desired vector
     Eigen::RowVector3d des_vector;
     des_vector = rmesh->get_verts().row(min_cost_index);
-
-    // pick out the corresponding vertex of the asteroid that should be viewed
-    // use current norm of position and output a position with same radius but just above the minium point
-    double desired_radius = 1.5;
-    mposd = des_vector.normalized() * desired_radius;
+    
+    if (rmesh->get_weights().sum() < 1e-2) {
+        caster.update_mesh(rmesh->get_mesh());
+        mposd = (Eigen::Vector3d() << 1.5, 0 ,0).finished();
+    } else {
+        double desired_radius = 1.5;
+        mposd = des_vector.normalized() * desired_radius;
+    }
+    // check for intersection only if angle is large to the des_vector
+    if (std::acos(mposd.dot(pos) / pos.norm() / mposd.norm()) > kPI/4.0) {
+        caster.update_mesh(rmesh->get_mesh());
+        if (caster.intersection(pos,  mposd)) {
+            Eigen::Matrix<double, Eigen::Dynamic, 3> wp(5, 3);
+            wp = sphere_waypoint(pos, mposd, 5);
+            mposd = wp.row(1);
+        }
+    }
+    // check if the total uncertainty is low enough and if so go the first
+    // waypoint towards a desired position
     mveld.setZero(3);
     macceld.setZero(3);
-
-    // make sure the path between current postiion and desired position does not hit the surface
-    // need a caster object if the straight line path will intersect we find some waypoints and choose the first one instead  
-    // check if the total uncertainty is low enough and if so go the first waypoint towards a desired position
 }
 
 void TranslationController::minimize_uncertainty(const double& t,
