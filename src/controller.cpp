@@ -133,6 +133,8 @@ TranslationController::TranslationController(std::shared_ptr<const MeshData> mes
 
     generate_controller_mesh();
     build_controller_mesh_mapping(meshdata_ptr, max_angle);
+
+    caster.init_mesh(meshdata_ptr);
 }
 
 void TranslationController::generate_controller_mesh( void ) {

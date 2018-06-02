@@ -28,11 +28,11 @@ class RayCaster {
         RayCaster( void );
         virtual ~RayCaster( void ) {};
 
-        RayCaster(std::shared_ptr<MeshData> mesh_in);
+        RayCaster(std::shared_ptr<const MeshData> mesh_in);
         RayCaster(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
                   const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in);
         
-        void init_mesh(std::shared_ptr<MeshData> mesh_in);
+        void init_mesh(std::shared_ptr<const MeshData> mesh_in);
         void init_mesh(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
                        const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >&  F_in);
         
@@ -50,7 +50,7 @@ class RayCaster {
                                                            const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> > &targets);
     
         // update the raycaster with a new mesh ptr
-        void update_mesh(std::shared_ptr<MeshData> mesh_in);
+        void update_mesh(std::shared_ptr<const MeshData> mesh_in);
         void update_mesh(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
                          const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in);
 
@@ -68,7 +68,7 @@ class RayCaster {
         void minimum_primitive(const Eigen::Ref<const Eigen::Vector3d> &pt);
     private:
         // needs the mesh to operate on
-        std::shared_ptr<MeshData> mesh;
+        std::shared_ptr<const MeshData> mesh;
         AABB_Tree tree; // holds the AABB tree for CGAL distance computations
 };
 
