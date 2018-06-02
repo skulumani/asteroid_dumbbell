@@ -37,7 +37,10 @@ PYBIND11_MODULE(cgal, m) {
         .def("minimum_distance", &RayCaster::minimum_distance, "Minimum distance from point to mesh",
                 pybind11::arg("pt"))
         .def("castarray", &RayCaster::castarray, "Cast many rays to the targets",
-                pybind11::arg("psource"), pybind11::arg("targets"));
+                pybind11::arg("psource"), pybind11::arg("targets"))
+        .def("accelerate", &RayCaster::accelerate, "Call the distance acceleration setup")
+        .def("intersection", &RayCaster::intersection, "Check for intersection between source and target",
+                pybind11::arg("psource"), pybind11::arg("ptarget"));
 
     pybind11::class_<Lidar, std::shared_ptr<Lidar>>(m, "Lidar")
         .def(pybind11::init<>(), "Lidar constructor")

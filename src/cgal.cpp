@@ -5,6 +5,10 @@
 #include <cmath>
 
 // Raycaster class
+RayCaster::RayCaster( void ) {
+
+}
+
 RayCaster::RayCaster(std::shared_ptr<MeshData> mesh_in) {
     // assign copy of pointer to object instance
     this->mesh = mesh_in;
@@ -22,6 +26,26 @@ RayCaster::RayCaster(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic
     this->tree.insert(faces(this->mesh->polyhedron).first,
             faces(this->mesh->polyhedron).second,
             this->mesh->polyhedron);
+    tree.accelerate_distance_queries();
+}
+
+void RayCaster::init_mesh(std::shared_ptr<MeshData> mesh_in) {
+    mesh = mesh_in;
+    this->tree.insert(faces(this->mesh->polyhedron).first,
+            faces(this->mesh->polyhedron).second,
+            this->mesh->polyhedron);
+}
+
+void RayCaster::init_mesh(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
+                          const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in) {
+    mesh = std::make_shared<MeshData>(V_in, F_in);
+    // update caster objects
+    this->tree.insert(faces(this->mesh->polyhedron).first,
+            faces(this->mesh->polyhedron).second,
+            this->mesh->polyhedron);
+}
+
+void RayCaster::accelerate( void ) {
     tree.accelerate_distance_queries();
 }
 
@@ -44,6 +68,16 @@ void RayCaster::update_mesh(const Eigen::Ref<const Eigen::Matrix<double, Eigen::
             faces(this->mesh->polyhedron).second,
             this->mesh->polyhedron);
     tree.accelerate_distance_queries();
+}
+
+bool RayCaster::intersection(const Eigen::Ref<const Eigen::Vector3d>& psource,
+                             const Eigen::Ref<const Eigen::Vector3d>& ptarget) {
+    
+    Point a(psource(0), psource(1), psource(2));
+    Point b(ptarget(0), ptarget(1), ptarget(2));
+    Ray ray_query(a, b);
+
+    return tree.do_intersect(ray_query);
 }
 
 Eigen::Matrix<double, 1, 3> RayCaster::castray(const Eigen::Ref<const Eigen::Vector3d>& psource, const Eigen::Ref<const Eigen::Vector3d>& ptarget) {
