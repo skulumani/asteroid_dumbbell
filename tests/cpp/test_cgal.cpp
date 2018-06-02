@@ -96,3 +96,26 @@ TEST_F(TestRayCaster, ItokawaIntersection) {
 
 }
 
+TEST_F(TestRayCaster, InitMeshIntersection) {
+    RayCaster caster;
+    std::shared_ptr<MeshData> mesh = Loader::load("./data/shape_model/ITOKAWA/itokawa_low.obj");
+
+    caster.init_mesh(mesh);
+    Eigen::RowVector3d psource(3), ptarget(3);
+    psource << 5, 0, 0;
+    ptarget << -5, 0, 0;
+
+    ASSERT_TRUE(caster.intersection(psource, ptarget));  
+}
+
+TEST_F(TestRayCaster, InitMeshNoIntersection) {
+    RayCaster caster;
+    std::shared_ptr<MeshData> mesh = Loader::load("./data/shape_model/ITOKAWA/itokawa_low.obj");
+
+    caster.init_mesh(mesh);
+    Eigen::RowVector3d psource(3), ptarget(3);
+    psource << 5, 0, 0;
+    ptarget << 10, 0, 0;
+
+    ASSERT_FALSE(caster.intersection(psource, ptarget));  
+}
