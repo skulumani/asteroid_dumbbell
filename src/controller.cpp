@@ -350,6 +350,10 @@ void TranslationController::minimize_uncertainty(const double& t,
     mposd = des_vector.normalized() * desired_radius;
     mveld.setZero(3);
     macceld.setZero(3);
+
+    // make sure the path between current postiion and desired position does not hit the surface
+    // need a caster object if the straight line path will intersect we find some waypoints and choose the first one instead  
+    // check if the total uncertainty is low enough and if so go the first waypoint towards a desired position
 }
 
 void TranslationController::minimize_uncertainty(const double& t,
