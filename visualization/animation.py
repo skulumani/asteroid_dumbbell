@@ -147,9 +147,7 @@ def inertial_asteroid_trajectory(time, state, ast, dum, point_cloud,
 @mlab.animate(delay=10)
 def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
                                      hdf5_file, mayavi_objects, 
-                                     move_cam=False, mesh_weight=False,
-                                     save_animation=False, output_path="",
-                                     magnification=1):
+                                     move_cam=False, mesh_weight=False):
     """Animate the rotation of an asteroid and the motion of SC
 
     This assumes an asteroid object from C++ and using the exploration sim
@@ -241,9 +239,73 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
                 # pcs.set(x=1, y=1, z=1)
 
 
-            # save figure if desired
-            if save_animation:
-                filename = os.path.join(output_path, str(t).zfill(7) + '.jpg')
-                graphics.mayavi_savefig(f, filename, magnification=magnification)
-
             yield
+
+def inertial_asteroid_trajectory_cpp_save(time, state, inertial_intersections,
+                                          hdf5_file, mayavi_objects,
+                                          move_cam=False, mesh_weight=False,
+                                          output_path="/tmp/exploration",
+                                          magnification=1):
+    """Animate the rotation of an asteroid and the motion of SC
+
+    This assumes an asteroid object from C++ and using the exploration sim
+    """
+    mesh, com, pc_points, time_text, weight_text = mayavi_objects
+
+    f = mlab.gcf()
+    camera = f.scene.camera
+    # get all the keys for the reconstructed vertices and faces
+
+    # animate the rotation fo the asteroid
+    ms = mesh.mlab_source
+    ts = com.mlab_source
+    pc_sources = pc_points.mlab_source
+
+    with h5py.File(hdf5_file, 'r') as hf:
+        rv_group = hf['reconstructed_vertex']
+        rf_group = hf['reconstructed_face']
+        rw_group = hf['reconstructed_weight']
+        Ra_group = hf['Ra']
+
+        rv_keys = np.array(utilities.sorted_nicely(list(rv_group.keys())))
+        
+        for (t, pos, Rb2i, ints, key) in zip(time, state[:, 0:3], state[:, 6:15],
+                                            inertial_intersections,
+                                            rv_keys):
+            # rotate teh asteroid
+            # Ra = ast.rot_ast2int(t)
+            Ra = Ra_group[key][()]
+            Rb2i = Rb2i.reshape((3,3))
+            # parse out the vertices x, y, z
+            # rotate the asteroid
+            new_vertices = Ra.dot(rv_group[key][()].T).T
+            new_faces = rf_group[key][()]
+            new_weight = np.squeeze(rw_group[key][()])
+
+            # add current time 
+            time_text.trait_set(text="t: {:8.1f}".format(t))
+            weight_text.trait_set(text="w: {:8.1f}".format(np.sum(new_weight)))
+
+            # update asteroid
+            if mesh_weight:
+                ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                         z=new_vertices[:,2], triangles=new_faces,
+                         scalars=new_weight)
+            else:
+                ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                       z=new_vertices[:,2], triangles=new_faces)
+
+            # update the satellite
+            ts.set(x=pos[0], y=pos[1], z=pos[2])
+            
+            # update the camera view to be right behind the satellite
+            if move_cam:
+                pos_sph = wavefront.cartesian2spherical(pos)
+                graphics.mayavi_view(f, azimuth=np.rad2deg(pos_sph[2]),
+                                    elevation=90-np.rad2deg(pos_sph[1]),
+                                    distance=pos_sph[0]+0.5,
+                                    focalpoint=[0, 0, 0])
+
+            pc_sources.set(x=ints[:, 0], y=ints[:, 1], z=ints[:, 2])
+            filename = os.path.join(output_path, str(t).zfill(7) + '.jpg')
+            graphics.mlab.savefig(filename, magnification=magnification)

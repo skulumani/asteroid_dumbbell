@@ -18,6 +18,7 @@ import tempfile
 import argparse
 from collections import defaultdict
 import itertools
+import subprocess
 
 import h5py
 import numpy as np
@@ -339,6 +340,91 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
             
             ii += 1
 
+def save_animation(filename, move_cam=False, mesh_weight=False):
+    """Given a HDF5 file from simulate this will animate teh motion
+    """
+    # TODO Animate the changing of the mesh itself as a function of time
+    with h5py.File(filename, 'r') as hf:
+        # get the inertial state and asteroid mesh object
+        time = hf['time'][()]
+        state_group = hf['state']
+        state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
+        
+        intersections_group = hf['inertial_intersections']
+
+        # extract out the entire state and intersections
+        state = []
+        inertial_intersections = []
+        for key in state_keys:
+            state.append(state_group[key][()])
+            inertial_intersections.append(intersections_group[key][()])
+        
+        state = np.array(state)
+        inertial_intersections = np.array(inertial_intersections)
+        # get the true asteroid from the HDF5 file
+        true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
+        true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
+        true_name = hf['simulation_parameters/true_asteroid/name'][()]
+        
+        est_initial_vertices = hf['simulation_parameters/estimate_asteroid/initial_vertices'][()]
+        est_initial_faces = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
+            
+        # think about a black background as well
+        mfig = graphics.mayavi_figure(size=(800,600), offscreen=True)
+        
+        if mesh_weight:
+            mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces,
+                                           scalars=np.squeeze(hf['simulation_parameters/estimate_asteroid/initial_weight'][()]),
+                                           color=None, colormap='viridis',
+                                           vmax=1e-1, vmin=1e-6)
+        else:
+            mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces)
+
+        xaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([2, 0, 0]), color=(1, 0, 0)) 
+        yaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 2, 0]), color=(0, 1, 0)) 
+        zaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 0, 2]), color=(0, 0, 1)) 
+        ast_axes = (xaxis, yaxis, zaxis)
+        # initialize a dumbbell object
+        dum = dumbbell.Dumbbell(hf['simulation_parameters/dumbbell/m1'][()], 
+                                hf['simulation_parameters/dumbbell/m2'][()],
+                                hf['simulation_parameters/dumbbell/l'][()])
+        # com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
+        if move_cam:
+            com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
+                                           color=(1, 0, 0), radius=0.02,
+                                           opacity=0.5)
+        else:
+            com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
+                                           color=(1, 0, 0), radius=0.1)
+
+        pc_points = graphics.mayavi_points3d(mfig, inertial_intersections[0], 
+                                             color=(0, 0, 1), scale_factor=0.05)
+        
+        # add some text objects
+        time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
+                                       color=(0, 0, 0), width=0.05)
+        weight_text = graphics.mlab.text(0.1, 0.2, "w: {:8.1f}".format(0), figure=mfig,
+                                         color=(0, 0, 0), width=0.05)
+        # mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
+        mayavi_objects = (mesh, com, pc_points, time_text, weight_text)
+    
+        output_path = tempfile.mkdtemp()
+        print("Images will be saved to {}".format(output_path))
+
+    animation.inertial_asteroid_trajectory_cpp_save(time, state, inertial_intersections,
+                                                    filename, mayavi_objects, move_cam=move_cam,
+                                                    mesh_weight=mesh_weight,
+                                                    output_path=output_path)
+    # now call ffmpeg
+    fps = 60
+    name = 'exploration'
+    ffmpeg_fname = os.path.join(output_path, '%07d.jpg')
+    cmd = "ffmpeg -framerate {} -i {} -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' {}.mp4".format(fps, ffmpeg_fname, name)
+    print(cmd)
+    subprocess.check_output(['bash', '-c', cmd])
+
+    # remove folder now
+
 def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
     """Given a HDF5 file from simulate this will animate teh motion
     """
@@ -407,16 +493,9 @@ def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
         # mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
         mayavi_objects = (mesh, com, pc_points, time_text, weight_text)
     
-    if save_animation:
-        output_path = tempfile.mkdtemp()
-        print("Images saved to {}".format(output_path))
-    else:
-        output_path = ""
-
     animation.inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
                                                filename, mayavi_objects, move_cam=move_cam,
-                                               mesh_weight=mesh_weight, save_animation=save_animation,
-                                               output_path=output_path)
+                                               mesh_weight=mesh_weight)
     graphics.mlab.show()
 
 
@@ -647,8 +726,6 @@ if __name__ == "__main__":
                         action="store_true")
     parser.add_argument("-mw", "--mesh_weight", help="For use with the -a, --animate option. This will add the uncertainty as a colormap to the asteroid",
                         action="store_true")
-    parser.add_argument("-sa", "--save_animation", help="Save the animation as a sequence of images",
-                        action="store_true")
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--simulate", help="Run the exploration simulation",
@@ -667,6 +744,8 @@ if __name__ == "__main__":
                        action="store_true")
     group.add_argument("-v", "--volume", help="Generate plot of volume",
                        action="store_true")
+    group.add_argument("-sa", "--save_animation", help="Save the animation as a sequence of images",
+                       action="store_true")
 
     args = parser.parse_args()
                                                                 
@@ -680,8 +759,7 @@ if __name__ == "__main__":
         print("Images saved to: {}".format(output_path))
     elif args.animate:
         animate(args.simulation_data, move_cam=args.move_cam,
-                mesh_weight=args.mesh_weight,
-                save_animation=args.save_animation)
+                mesh_weight=args.mesh_weight)
     elif args.uncertainty:
         plot_uncertainty(args.simulation_data)
     elif args.state:
@@ -690,4 +768,7 @@ if __name__ == "__main__":
         plot_volume(args.simulation_data)
     elif args.animate_uncertainty:
         animate_uncertainty(args.simulation_data)
+    elif args.save_animation:
+        save_animation(args.simulation_data, move_cam=args.move_cam,
+                       mesh_weight=args.mesh_weight)
 
