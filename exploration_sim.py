@@ -504,23 +504,48 @@ def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
                                                mesh_weight=mesh_weight)
     graphics.mlab.show()
 
-def landing(filename):
+def landing(input_filename, output_filename):
     """Open the HDF5 file and continue the simulation from the terminal state
     to landing on the surface over an additional few hours
     """
     logger = logging.getLogger(__name__)
 
     logger.info("Opening the HDF5 file from exploration {}".format(filename))
-
+    
+    # TODO Look at blender_sim
     # get all the terminal states from the exploration stage
-    with h5py.File(filename, 'r') as hf:
+    with h5py.File(input_filename, 'r') as hf:
         explore_tf = hf['time'][()][-1]
         explore_state = hf['state/' + str(explore_tf)][()]
         explore_Ra = hf['Ra/' + str(explore_tf)][()]
         explore_v = hf['reconstructed_vertex/' + str(explore_tf)][()]
         explore_f = hf['reconstructed_face/' + str(explore_tf)][()]
+        explore_w = hf['reconstructed_weight/' + str(explore_tf)][()]
+        
+        explore_name = hf['simulation_parameters/true_asteroid/name'][()][:-4]
+        explore_m1 = hf['simulation_parameters/dumbbell/m1'][()]
+        explore_m2 = hf['simulation_parameters/dumbbell/m2'][()]
+        explore_l = hf['simulation_parameters/dumbbell/l'][()]
+        explore_AbsTol = hf['simulation_parameters/AbsTol'][()]
+        explore_RelTol = hf['simulation_parameters/RelTol'][()]
+        
+        explore_true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
+        explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
 
     num_steps = int(7200) # 2 hours to go from home pos to the surface
+    time = np.arange(explore_tf, explore_tf + num_steps)
+    t0, tf = time[0], time[-1]
+    dt = time[1] - time[0]
+    
+    # initialize the asteroid and dumbbell objects
+    true_ast_meshdata = mesh_data.MeshData(v, f)
+    true_ast = asteroid.Asteroid('castalia', true_ast_meshdata)
+
+    dum = dumbbell.Dumbbell(m1=explore_m1, m2=explore_m2, l=explore_l)
+
+    initial_state = explore_state
+    
+    # define the system EOMS and simulate
 
 def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
     """Read teh HDF5 data and generate a bunch of images of the reconstructing 
