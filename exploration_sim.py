@@ -424,6 +424,12 @@ def save_animation(filename, move_cam=False, mesh_weight=False):
     subprocess.check_output(['bash', '-c', cmd])
 
     # remove folder now
+    for file in os.listdir(output_path): 
+        file_path = os.path.join(output_path, file)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+    os.rmdir(output_path)
+
 
 def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
     """Given a HDF5 file from simulate this will animate teh motion
