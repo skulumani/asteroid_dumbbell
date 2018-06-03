@@ -581,19 +581,19 @@ def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
             graphics.mayavi_view(fig=mfig, azimuth=az, elevation=el)
             graphics.mlab.savefig(filename, magnification=magnification)
 
-        """Create a bunch of images for animation"""
-        logger.info('Now making images for a movie')
-        animation_path = os.path.join(output_path, 'animation')
-        if not os.path.exists(animation_path):
-            os.makedirs(animation_path)
+        # """Create a bunch of images for animation"""
+        # logger.info('Now making images for a movie')
+        # animation_path = os.path.join(output_path, 'animation')
+        # if not os.path.exists(animation_path):
+        #     os.makedirs(animation_path)
         
-        ms.set(x=v_initial[:, 0], y=v_initial[:, 1], z=v_initial[:, 2], triangles=f_initial)
+        # ms.set(x=v_initial[:, 0], y=v_initial[:, 1], z=v_initial[:, 2], triangles=f_initial)
 
-        for ii, vk in enumerate(v_keys):
-            filename = os.path.join(animation_path, str(ii).zfill(7) + '.jpg')
-            v = rv[vk][()]
-            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:, 2], triangles=f_initial)
-            graphics.mayavi_savefig(mfig, filename, magnification=magnification)
+        # for ii, vk in enumerate(v_keys):
+        #     filename = os.path.join(animation_path, str(ii).zfill(7) + '.jpg')
+        #     v = rv[vk][()]
+        #     ms.reset(x=v[:, 0], y=v[:, 1], z=v[:, 2], triangles=f_initial)
+        #     graphics.mayavi_savefig(mfig, filename, magnification=magnification)
     
 
     logger.info('Finished')
