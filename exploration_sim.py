@@ -872,6 +872,10 @@ if __name__ == "__main__":
                        action="store_true")
     group.add_argument("-l" , "--landing", help="Continue from the end of exploration to the surface",
                        nargs=1, action="store")
+    group.add_argument("-la", "--landing_animation", help="Landing animation",
+                       action="store_true")
+    group.add_argument("-lsa", "--landing_save_animation", help="Save landing animation to a video",
+                       action="store_true")
 
     args = parser.parse_args()
                                                                 
@@ -898,5 +902,10 @@ if __name__ == "__main__":
         save_animation(args.simulation_data, move_cam=args.move_cam,
                        mesh_weight=args.mesh_weight)
     elif args.landing:
-        landing(args.landing[0], args.simulation_data)
+        if args.save_animation:
+            pass
+        elif args.animate:
+            pass
+        else:
+            landing(args.landing[0], args.simulation_data)
 
