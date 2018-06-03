@@ -545,7 +545,34 @@ def landing(output_filename, input_filename):
 
     initial_state = explore_state
     
-    # define the system EOMS and simulate
+    with h5py.File(output_filename, 'w-') as hf:
+        # save data to HDF5 file
+        hf.create_dataset('time', data=time, compression=compression,
+                          compression_opts=compression_opts)
+        hf.create_dataset("initial_state", data="initial_state", compression=compression,
+                          compression_opts=compression_opts)
+
+        state_group = hf.create_group("state")
+        Ra_group = hf.create_group("Ra")
+
+        # define the system EOMS and simulate
+        system = integrate.ode(eoms.eoms_controlled_land_pybind)
+        system.set_integrator("lsoda", atol=explore_AbsTol, rtol=explore_RelTol,  nsteps=10000)
+        system.set_initial_value(initial_state, t0)
+        system.set_f_params(true_ast, dum, est_ast)
+        
+        ii = 1
+        while system.successful() and system.t < tf:
+            t = system.t + dt
+            state = system.integrate(system.t + dt)
+
+            logger.info("Step: {} Time: {}".format(ii, t))
+            
+            state_group.create_dataset(str(ii), data=state, compression=compression,
+                                       compression_opts=compression_opts)
+            Ra_group.create_dataset(str(ii), data=Ra, compression=compression,
+                                    compression_opts=compression_opts)
+            ii+=1
 
 def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
     """Read teh HDF5 data and generate a bunch of images of the reconstructing 
