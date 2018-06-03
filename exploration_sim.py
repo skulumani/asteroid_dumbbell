@@ -504,6 +504,23 @@ def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
                                                mesh_weight=mesh_weight)
     graphics.mlab.show()
 
+def landing(filename):
+    """Open the HDF5 file and continue the simulation from the terminal state
+    to landing on the surface over an additional few hours
+    """
+    logger = logging.getLogger(__name__)
+
+    logger.info("Opening the HDF5 file from exploration {}".format(filename))
+
+    # get all the terminal states from the exploration stage
+    with h5py.File(filename, 'r') as hf:
+        explore_tf = hf['time'][()][-1]
+        explore_state = hf['state/' + str(explore_tf)][()]
+        explore_Ra = hf['Ra/' + str(explore_tf)][()]
+        explore_v = hf['reconstructed_vertex/' + str(explore_tf)][()]
+        explore_f = hf['reconstructed_face/' + str(explore_tf)][()]
+
+    num_steps = int(7200) # 2 hours to go from home pos to the surface
 
 def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
     """Read teh HDF5 data and generate a bunch of images of the reconstructing 
