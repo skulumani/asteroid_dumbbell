@@ -504,6 +504,50 @@ def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
                                                mesh_weight=mesh_weight)
     graphics.mlab.show()
 
+def animate_landing(filename, move_cam=False, mesh_weight=False):
+    """Animation for the landing portion of simulation
+    """
+    with h5py.File(filename, 'r') as hf:
+        time = hf['time'][()]
+        state_group = hf['state']
+        state_keys = np.array(utilities.sorted_nicely(list(state_group.keys())))
+
+        state = []
+        for key in state_keys:
+            state.append(state_group[key][()])
+
+        state=np.array(state)
+
+        mfig = graphics.mayavi_figure(size=(800, 600))
+
+        # option for the mesh weight
+        mesh = graphics.mayavi_addMesh(mfig, hf['vertices'][()], hf['faces'][()])
+        xaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([2, 0, 0]), color=(1, 0, 0)) 
+        yaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 2, 0]), color=(0, 1, 0)) 
+        zaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 0, 2]), color=(0, 0, 1)) 
+        ast_axes = (xaxis, yaxis, zaxis)
+
+        if move_cam:
+            com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
+                                           color=(1, 0, 0), radius=0.02,
+                                           opacity=0.5)
+        else:
+            com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
+                                           color=(1, 0, 0), radius=0.1)
+
+        # add some text objects
+        time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
+                                       color=(0, 0, 0), width=0.05)
+        weight_text = graphics.mlab.text(0.1, 0.2, "w: {:8.1f}".format(0), figure=mfig,
+                                         color=(0, 0, 0), width=0.05)
+
+        mayavi_objects = (mesh, com, time_text, weight_text)
+
+    animation.inertial_asteroid_landing_cpp(time, state, filename, mayavi_objects, 
+                                            move_cam=move_cam, mesh_weight=mesh_weight)
+    graphics.mlab.show()
+
+
 def landing(output_filename, input_filename):
     """Open the HDF5 file and continue the simulation from the terminal state
     to landing on the surface over an additional few hours
@@ -550,6 +594,10 @@ def landing(output_filename, input_filename):
         hf.create_dataset('time', data=time, compression=compression,
                           compression_opts=compression_opts)
         hf.create_dataset("initial_state", data="initial_state", compression=compression,
+                          compression_opts=compression_opts)
+        hf.create_dataset("vertices", data=explore_v, compression=compression,
+                          compression_opts=compression_opts)
+        hf.create_dataset("faces", data=explore_f, compression=compression,
                           compression_opts=compression_opts)
 
         state_group = hf.create_group("state")
