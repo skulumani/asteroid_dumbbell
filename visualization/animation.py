@@ -241,8 +241,9 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
 
             yield
 
+@mlab.animate(delay=10)
 def inertial_asteroid_landing_cpp(time, state, filename, mayavi_objects, 
-                                  move_cam=move_cam, mesh_weight=mesh_weight):
+                                  move_cam=False, mesh_weight=False):
     """Animation for the landing portion 
     """
     mesh, com, time_text, weight_text = mayavi_objects
@@ -254,12 +255,79 @@ def inertial_asteroid_landing_cpp(time, state, filename, mayavi_objects,
     ts = com.mlab_source
 
     with h5py.File(filename, 'r') as hf:
+        v = hf['vertices'][()]
+        f = hf['faces'][()]
+
         Ra_group = hf['Ra']
         keys = np.array(utilities.sorted_nicely(list(Ra_group.keys())))
-
+        
         for (t, pos, Rb2i, key) in zip(time, state[:, 0:3], state[:, 6:15],
                                        keys):
-            pass
+            Ra = Ra_group[key][()]
+            Rb2i = Rb2i.reshape((3, 3))
+            new_vertices = Ra.dot(v.T).T
+            new_faces = f
+
+            time_text.trait_set(text="t: {:8.1f}".format(t))
+
+            # option to change color of mesh_weight
+            ms.set(x=new_vertices[:, 0], y=new_vertices[:, 1],
+                   z=new_vertices[:, 2], triangles=new_faces)
+
+            ts.set(x=pos[0], y=pos[1], z=pos[2])
+
+            if move_cam:
+                pos_sph = wavefront.cartesian2spherical(pos)
+                graphics.mayavi_view(f, azimuth=np.rad2deg(pos_sph[2]),
+                                    elevation=90-np.rad2deg(pos_sph[1]),
+                                    distance=pos_sph[0]+0.5,
+                                    focalpoint=[0, 0, 0])
+            yield
+
+def inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects, 
+                                  move_cam=False, mesh_weight=False,
+                                       output_path="/tmp/landing", magnification=1):
+    """Animation for the landing portion 
+    """
+    mesh, com, time_text, weight_text = mayavi_objects
+
+    f = mlab.gcf()
+    camera = f.scene.camera
+
+    ms = mesh.mlab_source
+    ts = com.mlab_source
+
+    with h5py.File(filename, 'r') as hf:
+        v = hf['vertices'][()]
+        f = hf['faces'][()]
+
+        Ra_group = hf['Ra']
+        keys = np.array(utilities.sorted_nicely(list(Ra_group.keys())))
+        
+        for (t, pos, Rb2i, key) in zip(time, state[:, 0:3], state[:, 6:15],
+                                       keys):
+            Ra = Ra_group[key][()]
+            Rb2i = Rb2i.reshape((3, 3))
+            new_vertices = Ra.dot(v.T).T
+            new_faces = f
+
+            time_text.trait_set(text="t: {:8.1f}".format(t))
+
+            # option to change color of mesh_weight
+            ms.set(x=new_vertices[:, 0], y=new_vertices[:, 1],
+                   z=new_vertices[:, 2], triangles=new_faces)
+
+            ts.set(x=pos[0], y=pos[1], z=pos[2])
+
+            if move_cam:
+                pos_sph = wavefront.cartesian2spherical(pos)
+                graphics.mayavi_view(f, azimuth=np.rad2deg(pos_sph[2]),
+                                    elevation=90-np.rad2deg(pos_sph[1]),
+                                    distance=pos_sph[0]+0.5,
+                                    focalpoint=[0, 0, 0])
+            filename = os.path.join(output_path, str(t).zfill(7) + '.jpg')
+            graphics.mlab.savefig(filename, magnification=magnification)
+
 def inertial_asteroid_trajectory_cpp_save(time, state, inertial_intersections,
                                           hdf5_file, mayavi_objects,
                                           move_cam=False, mesh_weight=False,
