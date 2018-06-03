@@ -241,6 +241,25 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
 
             yield
 
+def inertial_asteroid_landing_cpp(time, state, filename, mayavi_objects, 
+                                  move_cam=move_cam, mesh_weight=mesh_weight):
+    """Animation for the landing portion 
+    """
+    mesh, com, time_text, weight_text = mayavi_objects
+
+    f = mlab.gcf()
+    camera = f.scene.camera
+
+    ms = mesh.mlab_source
+    ts = com.mlab_source
+
+    with h5py.File(filename, 'r') as hf:
+        Ra_group = hf['Ra']
+        keys = np.array(utilities.sorted_nicely(list(Ra_group.keys())))
+
+        for (t, pos, Rb2i, key) in zip(time, state[:, 0:3], state[:, 6:15],
+                                       keys):
+            pass
 def inertial_asteroid_trajectory_cpp_save(time, state, inertial_intersections,
                                           hdf5_file, mayavi_objects,
                                           move_cam=False, mesh_weight=False,
