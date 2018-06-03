@@ -550,6 +550,72 @@ def attitude_traverse_then_land_controller(time, state, ext_moment, dum, ast):
             -dum.J.dot( attitude.hat_map(ang_vel).dot(R.T).dot(Rd).dot(ang_vel_d)-
                 R.T.dot(Rd).dot(ang_vel_d_dot)) - ext_moment)
     return u_m
+
+def attitude_land_controller(time, state,  ext_moment, dum, ast):
+    """Landing controller to just stay pointed at the asteroid
+
+    This function is probably not necessary since many others do the same thing
+    """
+    # extract the state
+    pos = state[0:3] # location of the center of mass in the inertial frame
+    vel = state[3:6] # vel of com in inertial frame
+    R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+    ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
+    # compute the desired attitude command
+    Rd, Rd_dot, ang_vel_d, ang_vel_d_dot = body_fixed_pointing_attitude(time, state)
+    # determine error between command and current state
+    eR = 1/2 * attitude.vee_map(Rd.T.dot(R) - R.T.dot(Rd))
+    eW = ang_vel - R.T.dot(Rd).dot(ang_vel_d)
+    # compute attitude input
+    u_m = (-dum.kR*eR -dum.kW*eW + np.cross(ang_vel,dum.J.dot(ang_vel)) 
+            -dum.J.dot( attitude.hat_map(ang_vel).dot(R.T).dot(Rd).dot(ang_vel_d)-
+                R.T.dot(Rd).dot(ang_vel_d_dot)) - ext_moment)
+    return u_m
+
+def translation_land_controller(time, state, ext_force, dum, ast):
+    """Land vertically on the surface
+
+    """
+    # final position in the asteroid fixed frame
+    final_pos = np.array([1.6130/2, 0, 0])
+    initial_pos = np.array([1.5, 0, 0])
+    descent_tf = 7200
+
+    # extract the state
+    pos = state[0:3] # location of the center of mass in the inertial frame
+    vel = state[3:6] # vel of com in inertial frame
+    R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
+    ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
+    
+    m = dum.m1 + dum.m2
+
+    Ra2i = ast.rot_ast2int(time)
+    omega_ast = ast.get_omega()
+    omega_ast_dot = 0
+
+    omega_ast_vec = np.array([0, 0, omega_ast])
+    omega_ast_dot_vec = np.zeros(3)
+    # determine desired position and velocity in the body fixed frame at this current time input
+    # we'll use a simple linear interpolation between initial and final states
+    xslope =(final_pos[0] - initial_pos[0]) / (descent_tf) 
+    xdes =  xslope * time + initial_pos[0]
+    
+    body_pos_des = np.array([xdes, 0, 0])
+    body_vel_des = np.array([xslope, 0, 0])
+    body_acc_des = np.zeros(3)
+    # transform this body position/velocity into the inertial frame
+    inertial_pos = Ra2i.dot(body_pos_des)
+    inertial_vel = body_vel_des + np.cross(omega_ast_vec, body_pos_des)
+    inertial_accel = body_acc_des + 2 * np.cross(omega_ast_vec, body_vel_des) + np.cross(omega_ast_vec, np.cross(omega_ast_vec, body_pos_des))
+
+    # compute the error
+    ex = pos - inertial_pos
+    ev = vel - inertial_vel
+    # compute the control
+    u_f = -dum.kx * ex -dum.kv * ev - ext_force + m * inertial_accel
+
+    return u_f
+
 def translation_traverse_then_land_controller(time, state, ext_force, dum, ast):
     """SE(3) Translational Controller
 

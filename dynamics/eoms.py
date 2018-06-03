@@ -671,9 +671,23 @@ def eoms_controlled_inertial_control_cost_pybind(t, state, true_ast, dum,
 
     M1 = dum.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
     M2 = dum.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
+    
+    # compute the external force and moment using the asteroid estimate
+    est_ast.polyhedron_potential(z1)
+    U1_est = est_ast.get_potential()
+    U1_grad_est = est_ast.get_acceleration()
+
+    est_ast.polyhedron_potential(z2)
+    U2_est = est_ast.get_potential()
+    U2_grad_est = est_ast.get_acceleration()
+
+    F1_est = dum.m1 * Ra.dot(U1_grad_est)
+    F2_est = dum.m2 * Ra.dot(U2_grad_est)
+
+    M1_est = dum.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad_est))
+    M2_est = dum.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad_est))
 
     # compute the desired states for exploration
-    # TODO Figure out if exploration should happen in the inertial or asteroid frames
     complete_controller.explore_asteroid(t, state, est_ast_rmesh, est_ast)
     
     # Need to convert to the inertial frame for use in the controller
@@ -681,10 +695,10 @@ def eoms_controlled_inertial_control_cost_pybind(t, state, true_ast, dum,
                      Ra.dot(complete_controller.get_ang_vel_d()), Ra.dot(complete_controller.get_ang_vel_d_dot()))
     des_tran_tuple = (Ra.dot(complete_controller.get_posd()), Ra.dot(complete_controller.get_veld()),
                       Ra.dot(complete_controller.get_acceld()))
-
-    # TODO Don't even have to pass in est_ast since external forces already calculated
-    u_m = controller.attitude_controller(t, state, M1 + M2, dum, est_ast, des_att_tuple)
-    u_f = controller.translation_controller(t, state, F1 + F2, dum, est_ast, des_tran_tuple)
+    
+    #  need to pass in the estimated external torque and moment
+    u_m = controller.attitude_controller(t, state, M1_est+M2_est, dum, est_ast, des_att_tuple)
+    u_f = controller.translation_controller(t, state, F1_est+F2_est, dum, est_ast, des_tran_tuple)
 
     pos_dot = vel
     vel_dot = 1 / (dum.m1 + dum.m2) * (F1 + F2 + u_f)
@@ -744,24 +758,38 @@ def eoms_controlled_land_pybind(t, state, true_ast, dum, est_ast):
     z = Ra.T.dot(pos) # position of COM in asteroid frame
 
     # compute the potential at this state
-    (U1, U1_grad, U1_grad_mat, U1laplace) = ast.polyhedron_potential(z1)
-    (U2, U2_grad, U2_grad_mat, U2laplace) = ast.polyhedron_potential(z2)
+    true_ast.polyhedron_potential(z1)
+    U1 = true_ast.get_potential()
+    U1_grad = true_ast.get_accleration()
+
+    true_ast.polyhedron_potential(z2)
+    U2 = true_ast.get_potential()
+    U2_grad = true_ast.get_accleration()
 
     F1 = dum.m1*Ra.dot(U1_grad)
     F2 = dum.m2*Ra.dot(U2_grad)
 
     M1 = dum.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad))
     M2 = dum.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad))
+
+    # compute the external force and moment using the asteroid estimate
+    est_ast.polyhedron_potential(z1)
+    U1_est = est_ast.get_potential()
+    U1_grad_est = est_ast.get_acceleration()
+
+    est_ast.polyhedron_potential(z2)
+    U2_est = est_ast.get_potential()
+    U2_grad_est = est_ast.get_acceleration()
+
+    F1_est = dum.m1 * Ra.dot(U1_grad_est)
+    F2_est = dum.m2 * Ra.dot(U2_grad_est)
+
+    M1_est = dum.m1 * attitude.hat_map(rho1).dot(R.T.dot(Ra).dot(U1_grad_est))
+    M2_est = dum.m2 * attitude.hat_map(rho2).dot(R.T.dot(Ra).dot(U2_grad_est))
     
-    # generate image at this current state only at a specifc time
-    # blender.driver(pos, R, ast.omega * t, [5, 0, 1], 'test' + str.zfill(str(t), 4))
-    # use the imagery to figure out motion and pass to the controller instead
-    # of the true state
-
-
     # compute the control input
-    u_m = controller.attitude_traverse_then_land_controller(t, state, M1+M2, dum, ast)
-    u_f = controller.translation_traverse_then_land_controller(t, state, F1+F2, dum, ast)
+    u_m = controller.attitude_land_controller(t, state, M1_est + M2_est, dum, est_ast)
+    u_f = controller.translation_land_controller(t, state, F1_est + F2_est, dum, est_ast)
 
     pos_dot = vel
     vel_dot = 1/(dum.m1+dum.m2) *(F1 + F2 + u_f)
