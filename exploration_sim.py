@@ -504,7 +504,7 @@ def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
                                                mesh_weight=mesh_weight)
     graphics.mlab.show()
 
-def landing(input_filename, output_filename):
+def landing(output_filename, input_filename):
     """Open the HDF5 file and continue the simulation from the terminal state
     to landing on the surface over an additional few hours
     """
@@ -538,7 +538,7 @@ def landing(input_filename, output_filename):
     dt = time[1] - time[0]
     
     # initialize the asteroid and dumbbell objects
-    true_ast_meshdata = mesh_data.MeshData(v, f)
+    true_ast_meshdata = mesh_data.MeshData(explore_true_vertices, explore_true_faces)
     true_ast = asteroid.Asteroid('castalia', true_ast_meshdata)
 
     dum = dumbbell.Dumbbell(m1=explore_m1, m2=explore_m2, l=explore_l)
@@ -823,6 +823,5 @@ if __name__ == "__main__":
         save_animation(args.simulation_data, move_cam=args.move_cam,
                        mesh_weight=args.mesh_weight)
     elif args.landing:
-        pdb.set_trace()
         landing(args.landing[0], args.simulation_data)
 
