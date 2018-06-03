@@ -510,7 +510,7 @@ def landing(input_filename, output_filename):
     """
     logger = logging.getLogger(__name__)
 
-    logger.info("Opening the HDF5 file from exploration {}".format(filename))
+    logger.info("Opening the HDF5 file from exploration {}".format(input_filename))
     
     # TODO Look at blender_sim
     # get all the terminal states from the exploration stage
@@ -767,7 +767,8 @@ if __name__ == "__main__":
                                       formatter_class=argparse.RawTextHelpFormatter)
     
     parser.add_argument("simulation_data",
-                        help="Filename to store the simulation data")
+                        help="Filename to store the simulation data",
+                        action="store")
     # parser.add_argument("reconstruct_data",
     #                     help="Filename to store the reconstruction data")
     parser.add_argument("-mc", "--move_cam", help="For use with the -a, --animate option. This will translate the camera and give you a view from the satellite",
@@ -794,6 +795,8 @@ if __name__ == "__main__":
                        action="store_true")
     group.add_argument("-sa", "--save_animation", help="Save the animation as a sequence of images",
                        action="store_true")
+    group.add_argument("-l" , "--landing", help="Continue from the end of exploration to the surface",
+                       nargs=1, action="store")
 
     args = parser.parse_args()
                                                                 
@@ -819,4 +822,7 @@ if __name__ == "__main__":
     elif args.save_animation:
         save_animation(args.simulation_data, move_cam=args.move_cam,
                        mesh_weight=args.mesh_weight)
+    elif args.landing:
+        pdb.set_trace()
+        landing(args.landing[0], args.simulation_data)
 
