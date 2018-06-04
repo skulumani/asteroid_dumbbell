@@ -87,3 +87,7 @@ target_link_libraries(searching_surface_mesh_vertices ${CGAL_LIBRARIES} ${CGAL_3
 add_executable( mesh_implicit_function src/mesh_implicit_function.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS mesh_implicit_function )
 target_link_libraries(mesh_implicit_function ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
+
+add_executable(refine_and_fair src/refine_fair_example.cpp)
+add_to_cached_list(CGAL_EXECUTABLE_TARGETS refine_and_fair)
+target_link_libraries(refine_and_fair ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
