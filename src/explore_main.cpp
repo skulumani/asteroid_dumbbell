@@ -25,34 +25,25 @@ int main(int argc, char* argv[])
     // semi major axes of castalia
     Eigen::Vector3d axes(3);
     axes << 1.6130 / 2.0, 0.9810 / 2.0, 0.8260 / 2.0;
-    double min_angle(10), max_radius(0.03), max_distance(0.5);
 
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
         std::cout << "Kinematic only exploration with asteroid reconstruction" << std::endl;
     }
-
-    const std::string input_file = input.get_command_option("-i");
-    if (input_file.empty()) {
-        std::cout << "You need to input file name!" << std::endl;
-        std::cout << "explore -i asteroid.obj -o data.hdf5" << std::endl;
-        return 1;
-    }
     
     const std::string output_file = input.get_command_option("-o");
     if (output_file.empty()) {
         std::cout << "You need an output file name!" << std::endl;
-        std::cout << "explore -i asteroid.obj -o data.hdf5" << std::endl;
+        std::cout << "explore -o data.hdf5" << std::endl;
         return 1;
     }
 
     // initialize all the objects
+    double min_angle(10), max_radius(0.03), max_distance(0.5);
     double surf_area(0.01);
-    double max_angle( pow(surf_area / (axes(0) * axes(0)), 0.5));
 
-    std::shared_ptr<MeshData> true_asteroid;
-    true_asteroid = Loader::load(input_file);
-     
+    std::shared_ptr<MeshData> true_asteroid = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+
     RayCaster caster(true_asteroid);
     SurfMesh ellipsoid(axes(0), axes(1), axes(2),
             min_angle, max_radius, max_distance);
@@ -63,6 +54,7 @@ int main(int argc, char* argv[])
     double dist = 5;
     int num_steps = 3;
     sensor.dist(dist).num_steps(num_steps);
+    double max_angle( pow(surf_area / (axes[0] * axes[0]), 0.5));
     
     // Create HDF5 file for saving the data
     std::shared_ptr<HDF5::File> hf = std::make_shared<HDF5::File>(output_file, HDF5::File::Truncate);
