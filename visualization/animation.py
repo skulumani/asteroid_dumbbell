@@ -172,7 +172,7 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
     # dum_zs = dum_axes[2].mlab_source
     
     pc_sources = pc_points.mlab_source
-
+    
     with h5py.File(hdf5_file, 'r') as hf:
         rv_group = hf['reconstructed_vertex']
         rf_group = hf['reconstructed_face']
@@ -186,6 +186,7 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
                                             rv_keys):
             # rotate teh asteroid
             # Ra = ast.rot_ast2int(t)
+            mesh.scene.disable_render = True
             Ra = Ra_group[key][()]
             Rb2i = Rb2i.reshape((3,3))
             # parse out the vertices x, y, z
@@ -238,7 +239,7 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
                 #     pcs.set(x=0, y=0, z=0)
                 # pcs.set(x=1, y=1, z=1)
 
-
+            mesh.scene.disable_render = False
             yield
 
 @mlab.animate(delay=10)
@@ -263,6 +264,7 @@ def inertial_asteroid_landing_cpp(time, state, filename, mayavi_objects,
         
         for (t, pos, Rb2i, key) in zip(time, state[:, 0:3], state[:, 6:15],
                                        keys):
+            mesh.scene.disable_render = True
             Ra = Ra_group[key][()]
             Rb2i = Rb2i.reshape((3, 3))
             new_vertices = Ra.dot(v.T).T
@@ -282,6 +284,7 @@ def inertial_asteroid_landing_cpp(time, state, filename, mayavi_objects,
                                      elevation=90-np.rad2deg(pos_sph[1]),
                                      distance=pos_sph[0]+0.5,
                                      focalpoint=[0, 0, 0])
+            mesh.scene.disable_render = False
             yield
 
 def inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects, 
@@ -307,6 +310,7 @@ def inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects,
         ii = 0
         for (t, pos, Rb2i, key) in zip(time, state[:, 0:3], state[:, 6:15],
                                        keys):
+            mesh.scene.disable_render = True
             Ra = Ra_group[key][()]
             Rb2i = Rb2i.reshape((3, 3))
             new_vertices = Ra.dot(v.T).T
@@ -327,6 +331,7 @@ def inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects,
                                     distance=pos_sph[0]+0.5,
                                     focalpoint=[0, 0, 0])
             filename = os.path.join(output_path, str(ii).zfill(7) + '.jpg')
+            mesh.scene.disable_render = False
             graphics.mlab.savefig(filename, magnification=magnification)
             ii+=1
 
@@ -362,6 +367,7 @@ def inertial_asteroid_trajectory_cpp_save(time, state, inertial_intersections,
                                             inertial_intersections,
                                             rv_keys):
             # rotate teh asteroid
+            mesh.scene.disable_render = True
             # Ra = ast.rot_ast2int(t)
             Ra = Ra_group[key][()]
             Rb2i = Rb2i.reshape((3,3))
@@ -397,4 +403,5 @@ def inertial_asteroid_trajectory_cpp_save(time, state, inertial_intersections,
 
             pc_sources.set(x=ints[:, 0], y=ints[:, 1], z=ints[:, 2])
             filename = os.path.join(output_path, str(t).zfill(7) + '.jpg')
+            mesh.scene.disable_render = False
             graphics.mlab.savefig(filename, magnification=magnification)
