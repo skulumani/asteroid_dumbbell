@@ -15,3 +15,18 @@ component of the cost function. Plots results using `dissertation/explore_plots.
     ~~~
     python exploration_sim.py -a <name of hdf5>
     ~~~
+
+## Splitting large files
+
+To split:
+
+~~~
+split -b 1024MiB <filename> <prefix>
+~~~
+
+To combine:
+
+~~~
+cat <prefix>* 
+~~~
+
