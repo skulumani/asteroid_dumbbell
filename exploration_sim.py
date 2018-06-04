@@ -375,8 +375,7 @@ def save_animation(filename, move_cam=False, mesh_weight=False):
         if mesh_weight:
             mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces,
                                            scalars=np.squeeze(hf['simulation_parameters/estimate_asteroid/initial_weight'][()]),
-                                           color=None, colormap='viridis',
-                                           vmax=1e-1, vmin=1e-6)
+                                           color=None, colormap='viridis')
         else:
             mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces)
 
@@ -466,8 +465,7 @@ def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
         if mesh_weight:
             mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces,
                                            scalars=np.squeeze(hf['simulation_parameters/estimate_asteroid/initial_weight'][()]),
-                                           color=None, colormap='viridis',
-                                           vmax=1e-1, vmin=1e-6)
+                                           color=None, colormap='viridis')
         else:
             mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces)
 
@@ -521,7 +519,13 @@ def animate_landing(filename, move_cam=False, mesh_weight=False):
         mfig = graphics.mayavi_figure(size=(800, 600))
 
         # option for the mesh weight
-        mesh = graphics.mayavi_addMesh(mfig, hf['vertices'][()], hf['faces'][()])
+        if mesh_weight:
+            mesh = graphics.mayavi_addMesh(mfig, hf['vertices'][()], hf['faces'][()],
+                                           scalars=np.squeeze(hf['weight'][()]),
+                                           color=None, colormap='viridis')
+        else:
+            mesh = graphics.mayavi_addMesh(mfig, hf['vertices'][()], hf['faces'][()])
+
         xaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([2, 0, 0]), color=(1, 0, 0)) 
         yaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 2, 0]), color=(0, 1, 0)) 
         zaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 0, 2]), color=(0, 0, 1)) 
