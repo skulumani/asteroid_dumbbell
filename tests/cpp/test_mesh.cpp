@@ -72,3 +72,22 @@ TEST_F(TestMeshData, UpdateMesh) {
     ASSERT_EQ(mesh.polyhedron.is_valid(), 1);
     
 }
+
+TEST_F(TestMeshData, VertexIndexMatch) {
+    // check to make sure eigen_v.row(n) == Polyhedron vertex(n)
+    // initialize the mesh data object
+    MeshData mesh(Ve_true, Fe_true);
+    // go to a specific vertex and get teh vector
+    Polyhedron::Vertex_iterator pv_iter = mesh.polyhedron.vertices_begin();
+    
+    for (int ii = 0; ii < Ve_true.rows(); ++ii) {
+        EXPECT_EQ(pv_iter->point().x(), Ve_true(ii, 0));
+        EXPECT_EQ(pv_iter->point().y(), Ve_true(ii, 1));
+        EXPECT_EQ(pv_iter->point().z(), Ve_true(ii, 2));
+        std::advance(pv_iter, 1);
+    }
+}
+
+TEST_F(TestMeshData, FaceIndexMatch) {
+
+}
