@@ -576,8 +576,8 @@ def translation_land_controller(time, state, ext_force, dum, ast):
     """Land vertically on the surface
 
     """
-    # final position in the asteroid fixed frame
-    final_pos = np.array([1.6130/2, 0, 0])
+    # final position in the asteroid fixed frame (for castalia)
+    final_pos = np.array([0.734214, 0, 0])
     initial_pos = np.array([1.5, 0, 0])
     descent_tf = 7200
 
@@ -598,7 +598,7 @@ def translation_land_controller(time, state, ext_force, dum, ast):
     # determine desired position and velocity in the body fixed frame at this current time input
     # we'll use a simple linear interpolation between initial and final states
     xslope =(final_pos[0] - initial_pos[0]) / (descent_tf) 
-    xdes =  xslope * time + initial_pos[0]
+    xdes =  xslope * (time - 15000) + initial_pos[0]
     
     body_pos_des = np.array([xdes, 0, 0])
     body_vel_des = np.array([xslope, 0, 0])

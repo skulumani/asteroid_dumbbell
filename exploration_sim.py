@@ -584,6 +584,9 @@ def landing(output_filename, input_filename):
     # initialize the asteroid and dumbbell objects
     true_ast_meshdata = mesh_data.MeshData(explore_true_vertices, explore_true_faces)
     true_ast = asteroid.Asteroid('castalia', true_ast_meshdata)
+    
+    est_ast_meshdata = mesh_data.MeshData(explore_v, explore_f)
+    est_ast = asteroid.Asteroid('castalia', est_ast_meshdata)
 
     dum = dumbbell.Dumbbell(m1=explore_m1, m2=explore_m2, l=explore_l)
 
@@ -593,7 +596,7 @@ def landing(output_filename, input_filename):
         # save data to HDF5 file
         hf.create_dataset('time', data=time, compression=compression,
                           compression_opts=compression_opts)
-        hf.create_dataset("initial_state", data="initial_state", compression=compression,
+        hf.create_dataset("initial_state", data=initial_state, compression=compression,
                           compression_opts=compression_opts)
         hf.create_dataset("vertices", data=explore_v, compression=compression,
                           compression_opts=compression_opts)
@@ -618,7 +621,7 @@ def landing(output_filename, input_filename):
             
             state_group.create_dataset(str(ii), data=state, compression=compression,
                                        compression_opts=compression_opts)
-            Ra_group.create_dataset(str(ii), data=Ra, compression=compression,
+            Ra_group.create_dataset(str(ii), data=est_ast.rot_ast2int(t), compression=compression,
                                     compression_opts=compression_opts)
             ii+=1
 
@@ -873,7 +876,7 @@ if __name__ == "__main__":
     group.add_argument("-l" , "--landing", help="Continue from the end of exploration to the surface",
                        nargs=1, action="store")
     group.add_argument("-la", "--landing_animation", help="Landing animation",
-                       action="store_true")
+                       nargs=1, action="store")
     group.add_argument("-lsa", "--landing_save_animation", help="Save landing animation to a video",
                        action="store_true")
 
@@ -902,10 +905,7 @@ if __name__ == "__main__":
         save_animation(args.simulation_data, move_cam=args.move_cam,
                        mesh_weight=args.mesh_weight)
     elif args.landing:
-        if args.save_animation:
-            pass
-        elif args.animate:
-            pass
-        else:
-            landing(args.landing[0], args.simulation_data)
+        landing(args.landing[0], args.simulation_data)
+    elif args.landing_animation:
+        animate_landing(args.landing_animation[0], move_cam=args.move_cam, mesh_weight=args.mesh_weight)
 

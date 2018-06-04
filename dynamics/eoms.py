@@ -743,7 +743,7 @@ def eoms_controlled_land_pybind(t, state, true_ast, dum, est_ast):
     R = np.reshape(state[6:15],(3,3)) # sc body frame to inertial frame
     ang_vel = state[15:18] # angular velocity of sc wrt inertial frame defined in body frame
 
-    Ra = attitude.rot3(ast.omega*(t - 3600), 'c') # asteroid body frame to inertial frame
+    Ra = est_ast.rot_ast2int(t) # asteroid body frame to inertial frame
 
     # unpack parameters for the dumbbell
     J = dum.J
@@ -760,11 +760,11 @@ def eoms_controlled_land_pybind(t, state, true_ast, dum, est_ast):
     # compute the potential at this state
     true_ast.polyhedron_potential(z1)
     U1 = true_ast.get_potential()
-    U1_grad = true_ast.get_accleration()
+    U1_grad = true_ast.get_acceleration()
 
     true_ast.polyhedron_potential(z2)
     U2 = true_ast.get_potential()
-    U2_grad = true_ast.get_accleration()
+    U2_grad = true_ast.get_acceleration()
 
     F1 = dum.m1*Ra.dot(U1_grad)
     F2 = dum.m2*Ra.dot(U2_grad)
