@@ -40,50 +40,50 @@ endif()
 
 # ALL THE EXECUTABLES
 
-add_executable( points_and_segments  points_and_segments.cpp )
+add_executable( points_and_segments  src/points_and_segments.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS points_and_segments )
 target_link_libraries(points_and_segments   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
-add_executable( surprising surprising.cpp )
+add_executable( surprising src/surprising.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS surprising )
 target_link_libraries(surprising   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
-add_executable( exact exact.cpp )
+add_executable( exact src/exact.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS exact )
 target_link_libraries(exact   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
-add_executable( points_and_vectors points_and_vectors.cpp )
+add_executable( points_and_vectors src/points_and_vectors.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS points_and_vectors)
 target_link_libraries(points_and_vectors  ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
-add_executable( hds_prog_default hds_prog_default.cpp )
+add_executable( hds_prog_default src/hds_prog_default.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS hds_prog_default )
 target_link_libraries(hds_prog_default   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
-add_executable( hds_prog_graph hds_prog_graph.cpp )
+add_executable( hds_prog_graph src/hds_prog_graph.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS hds_prog_graph )
 target_link_libraries(hds_prog_graph   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
-add_executable( polyhedron_prog_tetra polyhedron_prog_tetra.cpp )
+add_executable( polyhedron_prog_tetra src/polyhedron_prog_tetra.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS polyhedron_prog_tetra )
 target_link_libraries(polyhedron_prog_tetra   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
-add_executable( polyhedron_prog_incr_builder polyhedron_prog_incr_builder.cpp )
+add_executable( polyhedron_prog_incr_builder src/polyhedron_prog_incr_builder.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS polyhedron_prog_incr_builder )
 target_link_libraries(polyhedron_prog_incr_builder   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
-add_executable( AABB_polyhedron_facet_intersection_example AABB_polyhedron_facet_intersection_example.cpp )
+add_executable( AABB_polyhedron_facet_intersection_example src/AABB_polyhedron_facet_intersection_example.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS AABB_polyhedron_facet_intersection_example )
 target_link_libraries(AABB_polyhedron_facet_intersection_example ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
 
-add_executable( AABB_triangle_3_example AABB_triangle_3_example.cpp )
+add_executable( AABB_triangle_3_example src/AABB_triangle_3_example.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS AABB_triangle_3_example )
 target_link_libraries(AABB_triangle_3_example ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
 
-add_executable( searching_surface_mesh_vertices searching_surface_mesh_vertices.cpp )
+add_executable( searching_surface_mesh_vertices src/searching_surface_mesh_vertices.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS searching_surface_mesh_vertices )
 target_link_libraries(searching_surface_mesh_vertices ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
 
-add_executable( mesh_implicit_function mesh_implicit_function.cpp )
+add_executable( mesh_implicit_function src/mesh_implicit_function.cpp )
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS mesh_implicit_function )
 target_link_libraries(mesh_implicit_function ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
