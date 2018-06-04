@@ -23,5 +23,6 @@ dependencies:
     - traitsui
     # - pydistmesh # only makes solid meshes and not surface mesh
     - mayavi
+    - PyQt5
 prefix: /home/shankar/anaconda3/envs/asteroid
 
