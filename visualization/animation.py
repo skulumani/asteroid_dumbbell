@@ -214,9 +214,9 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
             if move_cam:
                 pos_sph = wavefront.cartesian2spherical(pos)
                 graphics.mayavi_view(f, azimuth=np.rad2deg(pos_sph[2]),
-                                    elevation=90-np.rad2deg(pos_sph[1]),
-                                    distance=pos_sph[0]+0.5,
-                                    focalpoint=[0, 0, 0])
+                                     elevation=90-np.rad2deg(pos_sph[1]),
+                                     distance=pos_sph[0]+0.5,
+                                     focalpoint=[0, 0, 0])
             # update the asteroid axes
             # ast_xs.set(x=[0, Ra[0,0]], y=[0, Ra[1,0]], z=[0, Ra[2,0]])
             # ast_ys.set(x=[0, Ra[0,1]], y=[0, Ra[1,1]], z=[0, Ra[2,1]])
@@ -248,8 +248,8 @@ def inertial_asteroid_landing_cpp(time, state, filename, mayavi_objects,
     """
     mesh, com, time_text, weight_text = mayavi_objects
 
-    f = mlab.gcf()
-    camera = f.scene.camera
+    fig = mlab.gcf()
+    camera = fig.scene.camera
 
     ms = mesh.mlab_source
     ts = com.mlab_source
@@ -278,21 +278,21 @@ def inertial_asteroid_landing_cpp(time, state, filename, mayavi_objects,
 
             if move_cam:
                 pos_sph = wavefront.cartesian2spherical(pos)
-                graphics.mayavi_view(f, azimuth=np.rad2deg(pos_sph[2]),
-                                    elevation=90-np.rad2deg(pos_sph[1]),
-                                    distance=pos_sph[0]+0.5,
-                                    focalpoint=[0, 0, 0])
+                graphics.mayavi_view(fig, azimuth=np.rad2deg(pos_sph[2]),
+                                     elevation=90-np.rad2deg(pos_sph[1]),
+                                     distance=pos_sph[0]+0.5,
+                                     focalpoint=[0, 0, 0])
             yield
 
 def inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects, 
-                                  move_cam=False, mesh_weight=False,
+                                       move_cam=False, mesh_weight=False,
                                        output_path="/tmp/landing", magnification=1):
     """Animation for the landing portion 
     """
     mesh, com, time_text, weight_text = mayavi_objects
 
-    f = mlab.gcf()
-    camera = f.scene.camera
+    fig = mlab.gcf()
+    camera = fig.scene.camera
 
     ms = mesh.mlab_source
     ts = com.mlab_source
@@ -304,6 +304,7 @@ def inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects,
         Ra_group = hf['Ra']
         keys = np.array(utilities.sorted_nicely(list(Ra_group.keys())))
         
+        ii = 0
         for (t, pos, Rb2i, key) in zip(time, state[:, 0:3], state[:, 6:15],
                                        keys):
             Ra = Ra_group[key][()]
@@ -321,12 +322,13 @@ def inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects,
 
             if move_cam:
                 pos_sph = wavefront.cartesian2spherical(pos)
-                graphics.mayavi_view(f, azimuth=np.rad2deg(pos_sph[2]),
+                graphics.mayavi_view(fig, azimuth=np.rad2deg(pos_sph[2]),
                                     elevation=90-np.rad2deg(pos_sph[1]),
                                     distance=pos_sph[0]+0.5,
                                     focalpoint=[0, 0, 0])
-            filename = os.path.join(output_path, str(t).zfill(7) + '.jpg')
+            filename = os.path.join(output_path, str(ii) + '.jpg')
             graphics.mlab.savefig(filename, magnification=magnification)
+            ii+=1
 
 def inertial_asteroid_trajectory_cpp_save(time, state, inertial_intersections,
                                           hdf5_file, mayavi_objects,
@@ -389,9 +391,9 @@ def inertial_asteroid_trajectory_cpp_save(time, state, inertial_intersections,
             if move_cam:
                 pos_sph = wavefront.cartesian2spherical(pos)
                 graphics.mayavi_view(f, azimuth=np.rad2deg(pos_sph[2]),
-                                    elevation=90-np.rad2deg(pos_sph[1]),
-                                    distance=pos_sph[0]+0.5,
-                                    focalpoint=[0, 0, 0])
+                                     elevation=90-np.rad2deg(pos_sph[1]),
+                                     distance=pos_sph[0]+0.5,
+                                     focalpoint=[0, 0, 0])
 
             pc_sources.set(x=ints[:, 0], y=ints[:, 1], z=ints[:, 2])
             filename = os.path.join(output_path, str(t).zfill(7) + '.jpg')

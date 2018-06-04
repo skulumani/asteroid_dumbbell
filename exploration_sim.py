@@ -551,6 +551,73 @@ def animate_landing(filename, move_cam=False, mesh_weight=False):
                                             move_cam=move_cam, mesh_weight=mesh_weight)
     graphics.mlab.show()
 
+def save_animate_landing(filename, move_cam=False, mesh_weight=False):
+    """Save the landing animation
+    """
+
+    with h5py.File(filename, 'r') as hf:
+        time = hf['time'][()]
+        state_group = hf['state']
+        state_keys = np.array(utilities.sorted_nicely(list(state_group.keys())))
+
+        state = []
+        for key in state_keys:
+            state.append(state_group[key][()])
+
+        state=np.array(state)
+
+        mfig = graphics.mayavi_figure(size=(800, 600), offscreen=True)
+
+        # option for the mesh weight
+        if mesh_weight:
+            mesh = graphics.mayavi_addMesh(mfig, hf['vertices'][()], hf['faces'][()],
+                                           scalars=np.squeeze(hf['weight'][()]),
+                                           color=None, colormap='viridis')
+        else:
+            mesh = graphics.mayavi_addMesh(mfig, hf['vertices'][()], hf['faces'][()])
+
+        xaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([2, 0, 0]), color=(1, 0, 0)) 
+        yaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 2, 0]), color=(0, 1, 0)) 
+        zaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 0, 2]), color=(0, 0, 1)) 
+        ast_axes = (xaxis, yaxis, zaxis)
+
+        if move_cam:
+            com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
+                                           color=(1, 0, 0), radius=0.02,
+                                           opacity=0.5)
+        else:
+            com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
+                                           color=(1, 0, 0), radius=0.1)
+
+        # add some text objects
+        time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
+                                       color=(0, 0, 0), width=0.05)
+        weight_text = graphics.mlab.text(0.1, 0.2, "w: {:8.1f}".format(0), figure=mfig,
+                                         color=(0, 0, 0), width=0.05)
+
+        mayavi_objects = (mesh, com, time_text, weight_text)
+
+        output_path = tempfile.mkdtemp()
+        print("Images will be saved to {}".format(output_path))
+
+    animation.inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects, 
+                                                 move_cam=move_cam, mesh_weight=mesh_weight,
+                                                 output_path=output_path)
+    # now call ffmpeg
+    fps = 60
+    name = 'landing'
+    ffmpeg_fname = os.path.join(output_path, '%07d.jpg')
+    cmd = "ffmpeg -framerate {} -i {} -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' {}.mp4".format(fps, ffmpeg_fname, name)
+    print(cmd)
+    subprocess.check_output(['bash', '-c', cmd])
+
+    # remove folder now
+    for file in os.listdir(output_path): 
+        file_path = os.path.join(output_path, file)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+    os.rmdir(output_path)
+
 
 def landing(output_filename, input_filename):
     """Open the HDF5 file and continue the simulation from the terminal state
@@ -605,6 +672,8 @@ def landing(output_filename, input_filename):
         hf.create_dataset("vertices", data=explore_v, compression=compression,
                           compression_opts=compression_opts)
         hf.create_dataset("faces", data=explore_f, compression=compression,
+                          compression_opts=compression_opts)
+        hf.create_dataset("weight", data=explore_w, compression=compression,
                           compression_opts=compression_opts)
 
         state_group = hf.create_group("state")
@@ -882,7 +951,7 @@ if __name__ == "__main__":
     group.add_argument("-la", "--landing_animation", help="Landing animation",
                        nargs=1, action="store")
     group.add_argument("-lsa", "--landing_save_animation", help="Save landing animation to a video",
-                       action="store_true")
+                       action="store", nargs=1)
 
     args = parser.parse_args()
                                                                 
@@ -912,4 +981,6 @@ if __name__ == "__main__":
         landing(args.landing[0], args.simulation_data)
     elif args.landing_animation:
         animate_landing(args.landing_animation[0], move_cam=args.move_cam, mesh_weight=args.mesh_weight)
+    elif args.landing_save_animation:
+        save_animate_landing(args.landing_save_animation[0], move_cam=args.move_cam, mesh_weight=args.mesh_weight) 
 
