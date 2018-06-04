@@ -326,7 +326,7 @@ def inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects,
                                     elevation=90-np.rad2deg(pos_sph[1]),
                                     distance=pos_sph[0]+0.5,
                                     focalpoint=[0, 0, 0])
-            filename = os.path.join(output_path, str(ii) + '.jpg')
+            filename = os.path.join(output_path, str(ii).zfill(7) + '.jpg')
             graphics.mlab.savefig(filename, magnification=magnification)
             ii+=1
 
