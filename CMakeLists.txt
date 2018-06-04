@@ -280,7 +280,7 @@ add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 add_executable(test_libigl tests/cpp/test_libigl.cpp tests/cpp/test_all.cpp)
-target_link_libraries(test_libigl gtest igl::core)
+target_link_libraries(test_libigl gtest igl::core Threads::Threads)
 add_test(NAME test_libigl COMMAND test_libigl
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
