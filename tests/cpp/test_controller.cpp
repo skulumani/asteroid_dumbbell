@@ -186,13 +186,13 @@ TEST(TestController, ControlCostIntegral) {
     // generate a of waypoints
     Eigen::Matrix<double, 1, 3> pos_end, pos_start;
     pos_start << 1,1, 1;
-    pos_end << 1, 1, 1;
+    pos_end << 1, 0, 0;
     
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints = sphere_waypoint(pos_start, pos_end, 5);
     
     double total_control_cost_one = integrate_control_cost(0,
-                                                       waypoints,
-                                                       ast);
+            waypoints,
+            ast);
     // now compare to a symmetric but  different path
     waypoints = sphere_waypoint(-pos_start, -pos_end, 5);
     
