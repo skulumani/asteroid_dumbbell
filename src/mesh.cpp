@@ -4,6 +4,7 @@
 #include <igl/copyleft/cgal/mesh_to_polyhedron.h>
 #include <igl/copyleft/cgal/polyhedron_to_mesh.h>
 
+// TODO Convert polyhedron/surface_mesh back to Eigen
 // Member methods
 MeshData::MeshData(const Eigen::Ref<const Eigen::MatrixXd> &V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
     this->vertices = V;
