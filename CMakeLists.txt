@@ -1,17 +1,21 @@
-cmake_minimum_required(VERSION 3.10)
-project( asteroid_dumbell )
+cmake_minimum_required(VERSION 3.11.3)
+project( asteroid_dumbell C CXX )
 
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
+# if (NOT CMAKE_BUILD_TYPE)
+# set(CMAKE_BUILD_TYPE Release)
+# endif()
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic -Weffc++")
+# set python path
+set(PYTHON_INCLUDE_DIR /home/shankar/anaconda3/envs/asteroid/include/python3.5m)
+set(PYTHON_LIBRARY /home/shankar/anaconda3/envs/asteroid/lib/libpython3.5m.so)
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic -lpthread -pthread")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
+# Add -Weffc++ for all sorts of good errors to fix
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 ################################################################################
 # GLOBAL SETUP
 ################################################################################
-enable_language(CXX)
 set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
@@ -88,11 +92,13 @@ find_package(Threads REQUIRED)
 # just link executables against HDF5 target_link_libraries(target ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES})
 
 # setup Python
-#set(PYBIND11_PYTHON_VERSION 3.5 CACHE STRING "")
-# include(${PROJECT_SOURCE_DIR}/FindPythonAnaconda.cmake)
+# include(FindPythonAnaconda)
 # Pybind11 setup
-find_package(PythonInterp REQUIRED)
-find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
+find_package(PythonInterp 3.5.4 REQUIRED)
+if (PYTHONINTERP_FOUND)
+    message(STATUS "Python Found: ${PYTHON_VERSION_STRING}")
+endif()
+find_package(PythonLibs 3.5.4 REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 link_libraries(${PYTHON_LIBRARIES})
 link_directories(${PYTHON_LIBRARY_DIRS})
@@ -102,7 +108,7 @@ add_subdirectory(extern/pybind11)
 # libigl setup
 option(LIBIGL_USE_STATIC_LIBRARY     "Use libigl as static library" OFF)
 option(LIBIGL_WITH_ANTTWEAKBAR       "Use AntTweakBar"    OFF)
-option(LIBIGL_WITH_CGAL              "Use CGAL"           OFF)
+option(LIBIGL_WITH_CGAL              "Use CGAL"           ON)
 option(LIBIGL_WITH_COMISO            "Use CoMiso"         OFF)
 option(LIBIGL_WITH_CORK              "Use Cork"           OFF)
 option(LIBIGL_WITH_EMBREE            "Use Embree"         OFF)
@@ -180,7 +186,7 @@ set(cgal_src
     ${PROJECT_SOURCE_DIR}/src/potential.cpp
     )
 add_library(cgal_cpp SHARED ${cgal_src})
-target_link_libraries(cgal_cpp igl::core fdcl_hdf5)
+target_link_libraries(cgal_cpp igl::core igl::cgal fdcl_hdf5)
 
 set(input_parser_src
     ${PROJECT_SOURCE_DIR}/src/input_parser.cpp
@@ -287,7 +293,7 @@ add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 add_executable(test_libigl tests/cpp/test_libigl.cpp tests/cpp/test_all.cpp)
-target_link_libraries(test_libigl gtest igl::core Threads::Threads)
+target_link_libraries(test_libigl gtest igl::core Threads::Threads ${CMAKE_THREAD_LIBS_INIT})
 add_test(NAME test_libigl COMMAND test_libigl
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
