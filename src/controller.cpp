@@ -229,8 +229,7 @@ double integrate_control_cost(const double& t,
     // in control_cost
     const int num_points = waypoints.rows();
     const double initial_angle = 0;
-
-    double dot_product = waypoints.row(0).dot(waypoints.row(num_points)) / waypoints.row(0).norm() / waypoints.row(num_points).norm();
+    double dot_product = waypoints.row(0).dot(waypoints.row(num_points-1)) / waypoints.row(0).norm() / waypoints.row(num_points-1).norm();
     double final_angle = 0;
     if (std::abs(dot_product + 1.0) < 1e-9) {
         final_angle = kPI;
@@ -248,9 +247,9 @@ double integrate_control_cost(const double& t,
         for (int ii = 1; ii < num_points - 1; ++ii) {
                 total_cost += 2 * control_cost(t, waypoints.row(ii), ast_est); 
         }
-        total_cost = delta_angle / 2 * (total_cost + control_cost(t, waypoints.row(num_points), ast_est));
+        total_cost = delta_angle / 2 * (total_cost + control_cost(t, waypoints.row(num_points-1), ast_est));
     }
-
+    
     return total_cost;
 }
 
