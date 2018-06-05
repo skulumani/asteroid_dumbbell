@@ -85,6 +85,8 @@ int main(int argc, char* argv[]) {
     refined_off << mesh->surface_mesh;
     refined_off.close();
     std::cout << "Refinement added " << new_vertices.size() << " vertices." << std::endl;
+
+    // TODO Try isotropic refinement as well
     /* std::cout << "Vertices: \n" << mesh->vertices << std::endl; */
     /* std::cout << "Faces: \n" << mesh->faces << std::endl; */
 
