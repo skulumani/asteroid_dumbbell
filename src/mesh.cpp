@@ -63,6 +63,13 @@ void MeshData::build_surface_mesh() {
     for(Face_index fd: surface_mesh.faces()) {
         face_descriptor.push_back(fd);
     }
+
+    /* // can also loop over edges */
+    /* for(Edge_index ed: surface_mesh.edges()) { */
+    /*     // returns a vertex_index for the start/finish of the edge */
+    /*     vds = source(ed, surface_mesh); */
+    /*     vde = end(ed, surface_mesh); */
+    /* } */
 }
 
 void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
