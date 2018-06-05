@@ -77,9 +77,6 @@ void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, E
     V.resize(num_v, 3);
     F.resize(num_f, 3);
 
-    // loop and fill the eigen array
-    build_polyhedron_index(P);
-
     std::size_t row, col;
     row = 0;
     col = 0;
@@ -109,7 +106,9 @@ void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, E
 void eigen_to_polyhedron(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F, Polyhedron &P) {
     Polyhedron_builder<HalfedgeDS> builder(V, F);
     P.delegate(builder);
-    /* CGAL_assertion(P.is_triangle(P.halfedges_begin())); */
+    // loop and fill the eigen array
+    build_polyhedron_index(P);
+    /* CGAL_assertion(P.is_valid()); */
 }
 
 
