@@ -2,6 +2,7 @@
 #include <igl/readOBJ.h>
 #include <igl/sort.h>
 #include <igl/unique_rows.h>
+#include <igl/copyleft/cgal/mesh_to_polyhedron.h>
 
 #include "gtest/gtest.h"
 #include <Eigen/Dense>

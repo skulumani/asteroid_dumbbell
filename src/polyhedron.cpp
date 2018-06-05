@@ -1,6 +1,7 @@
 #include "polyhedron.hpp"
 #include "cgal_types.hpp"
 
+
 void build_polyhedron_index(Polyhedron &P) {
     std::size_t ii = 0;
     for (Vertex_iterator vert = P.vertices_begin(); vert != P.vertices_end(); ++vert) {
@@ -108,7 +109,7 @@ void polyhedron_to_eigen(Polyhedron &P, Eigen::PlainObjectBase<VectorType> &V, E
 void eigen_to_polyhedron(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F, Polyhedron &P) {
     Polyhedron_builder<HalfedgeDS> builder(V, F);
     P.delegate(builder);
-    CGAL_assertion(P.is_triangle(P.halfedges_begin()));
+    /* CGAL_assertion(P.is_triangle(P.halfedges_begin())); */
 }
 
 
