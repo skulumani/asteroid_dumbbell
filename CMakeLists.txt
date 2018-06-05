@@ -9,8 +9,8 @@ project( asteroid_dumbell C CXX )
 set(PYTHON_INCLUDE_DIR /home/shankar/anaconda3/envs/asteroid/include/python3.5m)
 set(PYTHON_LIBRARY /home/shankar/anaconda3/envs/asteroid/lib/libpython3.5m.so)
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic -lpthread -pthread")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS "-lpthread -pthread")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic")
 # Add -Weffc++ for all sorts of good errors to fix
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 ################################################################################
@@ -22,7 +22,6 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
 
 # Find OpenMP
 set(ENV{OMP_NUM_THREADS} 4)
@@ -107,23 +106,23 @@ add_subdirectory(extern/pybind11)
 
 # libigl setup
 option(LIBIGL_USE_STATIC_LIBRARY     "Use libigl as static library" OFF)
-option(LIBIGL_WITH_ANTTWEAKBAR       "Use AntTweakBar"    OFF)
+# option(LIBIGL_WITH_ANTTWEAKBAR       "Use AntTweakBar"    OFF)
 option(LIBIGL_WITH_CGAL              "Use CGAL"           ON)
-option(LIBIGL_WITH_COMISO            "Use CoMiso"         OFF)
-option(LIBIGL_WITH_CORK              "Use Cork"           OFF)
-option(LIBIGL_WITH_EMBREE            "Use Embree"         OFF)
-option(LIBIGL_WITH_LIM               "Use LIM"            OFF)
-option(LIBIGL_WITH_MATLAB            "Use Matlab"         OFF)
-option(LIBIGL_WITH_MOSEK             "Use MOSEK"          OFF)
-option(LIBIGL_WITH_OPENGL            "Use OpenGL"         OFF)
-option(LIBIGL_WITH_OPENGL_GLFW       "Use GLFW"           OFF)
-option(LIBIGL_WITH_OPENGL_GLFW_IMGUI "Use ImGui"          OFF)
-option(LIBIGL_WITH_PNG               "Use PNG"            OFF)
-option(LIBIGL_WITH_PYTHON            "Use Python"         OFF)
-option(LIBIGL_WITH_TETGEN            "Use Tetgen"         OFF)
-option(LIBIGL_WITH_TRIANGLE          "Use Triangle"       OFF)
-option(LIBIGL_WITH_VIEWER            "Use OpenGL viewer"  OFF)
-option(LIBIGL_WITH_XML               "Use XML"            OFF)
+# option(LIBIGL_WITH_COMISO            "Use CoMiso"         OFF)
+# option(LIBIGL_WITH_CORK              "Use Cork"           OFF)
+# option(LIBIGL_WITH_EMBREE            "Use Embree"         OFF)
+# option(LIBIGL_WITH_LIM               "Use LIM"            OFF)
+# option(LIBIGL_WITH_MATLAB            "Use Matlab"         OFF)
+# option(LIBIGL_WITH_MOSEK             "Use MOSEK"          OFF)
+# option(LIBIGL_WITH_OPENGL            "Use OpenGL"         OFF)
+# option(LIBIGL_WITH_OPENGL_GLFW       "Use GLFW"           OFF)
+# option(LIBIGL_WITH_OPENGL_GLFW_IMGUI "Use ImGui"          OFF)
+# option(LIBIGL_WITH_PNG               "Use PNG"            OFF)
+# option(LIBIGL_WITH_PYTHON            "Use Python"         OFF)
+# option(LIBIGL_WITH_TETGEN            "Use Tetgen"         OFF)
+# option(LIBIGL_WITH_TRIANGLE          "Use Triangle"       OFF)
+# option(LIBIGL_WITH_VIEWER            "Use OpenGL viewer"  OFF)
+# option(LIBIGL_WITH_XML               "Use XML"            OFF)
 
 find_package(LIBIGL REQUIRED QUIET)
 
@@ -167,6 +166,7 @@ endif()
 # BUILD TARGETS
 ################################################################################
 include_directories(${PROJECT_SOURCE_DIR}/include)
+# include_directories(${PROJECT_SOURCE_DIR}/extern/libigl/include/igl/copyleft/cgal)
 
 # LIBRARIES
 # create some shared libraries for things
@@ -224,10 +224,6 @@ target_link_libraries(explore cgal_cpp input_parser_cpp fdcl_hdf5
 add_executable(explore_control src/explore_control_main.cpp)
 target_link_libraries(explore_control cgal_cpp input_parser_cpp fdcl_hdf5
     ${HDF5_CXX_LIBRARIES})
-# memory tester 
-set(memory_tester_src src/memory_tester.cpp src/loader.cpp src/mesh.cpp src/polyhedron.cpp)
-add_executable(memory_tester ${memory_tester_src})
-
 ################################################################################
 # PYTHON BINDING
 ################################################################################
@@ -237,24 +233,29 @@ target_link_libraries(asteroid PRIVATE igl::core cgal_cpp)
 
 pybind11_add_module(surface_mesh MODULE
 src/surface_mesher.cpp src/surface_mesh_bindings.cpp)
+target_link_libraries(surface_mesh PRIVATE cgal_cpp)
 
 pybind11_add_module(mesh_data MODULE
 src/mesh.cpp src/polyhedron.cpp src/mesh_bindings.cpp)
+target_link_libraries(mesh_data PRIVATE cgal_cpp)
 
 pybind11_add_module(cgal MODULE
    src/cgal.cpp src/cgal_bindings.cpp src/mesh.cpp src/lidar.cpp src/polyhedron.cpp)
+target_link_libraries(cgal PRIVATE cgal_cpp)
 
 pybind11_add_module(reconstruct MODULE
    src/reconstruct.cpp src/reconstruct_bindings.cpp src/mesh.cpp
    src/polyhedron.cpp src/geodesic.cpp)
+target_link_libraries(reconstruct PRIVATE cgal_cpp)
 
 pybind11_add_module(geodesic MODULE
    src/geodesic.cpp src/geodesic_bindings.cpp)
+target_link_libraries(geodesic PRIVATE cgal_cpp)
 
 pybind11_add_module(controller MODULE
     src/controller.cpp src/controller_bindings.cpp src/reconstruct.cpp 
     src/geodesic.cpp src/state.cpp src/mesh.cpp)
-target_link_libraries(controller PRIVATE igl::core fdcl_hdf5 cgal_cpp)
+target_link_libraries(controller PRIVATE fdcl_hdf5 cgal_cpp)
 
 pybind11_add_module(stats MODULE
     src/stats_bindings.cpp)
@@ -293,7 +294,7 @@ add_test(NAME test_all COMMAND test_all
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 add_executable(test_libigl tests/cpp/test_libigl.cpp tests/cpp/test_all.cpp)
-target_link_libraries(test_libigl gtest igl::core Threads::Threads ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(test_libigl gtest igl::core igl::cgal)
 add_test(NAME test_libigl COMMAND test_libigl
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
