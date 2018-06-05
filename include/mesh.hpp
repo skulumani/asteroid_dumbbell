@@ -33,11 +33,14 @@ class MeshData {
        
         // Surface mesh shit
         Mesh surface_mesh;
-        
+    
+        // indices to interface with the surface_mesh
         std::vector<Vertex_index> vertex_descriptor;
-        std::vector<std::vector<Vertex_index> > face_descriptor;
+        std::vector<std::vector<Vertex_index> > vertex_in_face_descriptor;
+        std::vector<Face_index> face_descriptor;
 
     private:
+
         // build the polyhedron
         void build_polyhedron();
         void build_surface_mesh();

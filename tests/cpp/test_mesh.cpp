@@ -103,3 +103,30 @@ TEST_F(TestMeshData, PolyhedronFaceIndexMatch) {
         f_index++;
     }
 }
+
+TEST_F(TestMeshData, SurfaceMeshVertexIndexMatch) {
+    MeshData mesh(Ve_true, Fe_true);
+    
+    for (int ii = 0; ii < mesh.vertex_descriptor.size(); ++ii) {
+        EXPECT_EQ(mesh.surface_mesh.point(mesh.vertex_descriptor[ii]).x(), Ve_true(ii, 0));
+        EXPECT_EQ(mesh.surface_mesh.point(mesh.vertex_descriptor[ii]).y(), Ve_true(ii, 1));
+        EXPECT_EQ(mesh.surface_mesh.point(mesh.vertex_descriptor[ii]).z(), Ve_true(ii, 2));
+    }
+
+    /* for(Mesh::Vertex_index vd : mesh.surface_mesh.vertices()){ */
+    /*     std::cout << mesh.surface_mesh.point(vd).x() << std::endl; */
+    /* } */
+}
+
+TEST_F(TestMeshData, SurfaceMeshFaceIndexMatch) {
+    MeshData mesh(Ve_true, Fe_true);
+
+    for (int ii = 0; ii < mesh.vertex_in_face_descriptor.size(); ++ii) {
+        // get the vertices of this face
+        for (int jj = 0; jj < mesh.vertex_in_face_descriptor[ii].size(); ++jj) {
+            EXPECT_EQ(mesh.surface_mesh.point(mesh.vertex_in_face_descriptor[ii][jj]).x(), Ve_true(Fe_true(ii, jj), 0));
+            EXPECT_EQ(mesh.surface_mesh.point(mesh.vertex_in_face_descriptor[ii][jj]).y(), Ve_true(Fe_true(ii, jj), 1));
+            EXPECT_EQ(mesh.surface_mesh.point(mesh.vertex_in_face_descriptor[ii][jj]).z(), Ve_true(Fe_true(ii, jj), 2));
+        }
+    }
+}

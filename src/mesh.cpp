@@ -56,9 +56,13 @@ void MeshData::build_surface_mesh() {
 
         this->surface_mesh.add_face(v1, v2, v3);
         face_indices = {v1, v2, v3};
-        this->face_descriptor.push_back(face_indices);
+        this->vertex_in_face_descriptor.push_back(face_indices);
     }
-
+    
+    // store face descriptors to an array
+    for(Face_index fd: surface_mesh.faces()) {
+        face_descriptor.push_back(fd);
+    }
 }
 
 void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
@@ -69,6 +73,11 @@ void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
     // clear the mesh
     this->surface_mesh.clear();
     this->polyhedron.clear();
+    
+    // clear the descriptors
+    vertex_descriptor.clear();
+    vertex_in_face_descriptor.clear();
+    face_descriptor.clear();
 
     this->build_polyhedron();
     this->build_surface_mesh();
