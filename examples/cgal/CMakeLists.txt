@@ -91,3 +91,7 @@ target_link_libraries(mesh_implicit_function ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_
 add_executable(refine_and_fair src/refine_fair_example.cpp)
 add_to_cached_list(CGAL_EXECUTABLE_TARGETS refine_and_fair)
 target_link_libraries(refine_and_fair ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
+
+add_executable(isotropic_refine src/isotropic_remeshing_example.cpp)
+add_to_cached_list(CGAL_EXECUTABLE_TARGETS isotropic_refine)
+target_link_libraries(isotropic_refine ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
