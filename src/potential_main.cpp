@@ -12,6 +12,8 @@ int main() {
     // check if mesh is valid
     mesh_data->surface_mesh.is_valid();
     CGAL::is_triangle_mesh(mesh_data->surface_mesh);
+
+    std::cout << mesh_data->get_vertex(100) << std::endl;
     /* double start = omp_get_wtime(); */
     /* std::shared_ptr<MeshParam> mesh_param = std::make_shared<MeshParam>(mesh_data); */
     /* double end = omp_get_wtime() - start; */

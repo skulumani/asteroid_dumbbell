@@ -4,6 +4,7 @@
 #include <igl/copyleft/cgal/mesh_to_polyhedron.h>
 #include <igl/copyleft/cgal/polyhedron_to_mesh.h>
 
+#include <tuple>
 // TODO Convert polyhedron/surface_mesh back to Eigen
 // Member methods
 MeshData::MeshData(const Eigen::Ref<const Eigen::MatrixXd> &V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
@@ -21,8 +22,6 @@ void MeshData::build_polyhedron() {
 }
 
 void MeshData::build_surface_mesh() {
-    typedef CGAL::Surface_mesh<Kernel::Point_3> Mesh;
-    typedef Mesh::Vertex_index vertex_descriptor;
 
     // create some vertices
     Kernel::Point_3 p, p1, p2, p3;
@@ -43,7 +42,7 @@ void MeshData::build_surface_mesh() {
     }
     
 
-    std::vector<vertex_descriptor> face_indices;
+    std::vector<Vertex_index> face_indices;
 
     for (int ii = 0; ii < F.rows(); ++ii) {
         p1 = Kernel::Point_3(V(F(ii, 0), 0), V(F(ii, 0), 1), V(F(ii, 0), 2));
@@ -70,8 +69,48 @@ void MeshData::build_surface_mesh() {
     /*     vds = source(ed, surface_mesh); */
     /*     vde = end(ed, surface_mesh); */
     /* } */
+
+    // Build property maps for the surface mesh
+    Mesh::Property_map<Face_index, Eigen::Vector3d> unit_face_normal;
+    bool unit_face_normal_created;
+    std::tie( unit_face_normal, unit_face_normal_created ) 
+        = surface_mesh.add_property_map<Face_index, Eigen::Vector3d>(
+                "f:unit_face_normal", (Eigen::Vector3d() << 0, 0, 0).finished());
+    assert(unit_face_normal_created);
+
+    // edge normal, halfedge normal, face dyad, edge dyad
 }
 
+void MeshData::build_face_normals( void ) {
+    // loop over all faces
+    for (Face_index fd: surface_mesh.faces() ){
+        // need to consecutive vertices in face to get teh normal
+        Eigen::Vector3d vec1, vec2, vec3;
+        Halfedge_index h1, h2, h3;
+        h1 = surface_mesh.halfedge(fd);
+        h2 = surface_mesh.next(h1);
+        h3 = surface_mesh.next(h2);
+
+        Vertex_index v1, v2, v3;
+        v1 = surface_mesh.source(h1);
+        v2 = surface_mesh.source(h2);
+        v3 = surface_mesh.source(h3);
+
+        // now extract the point into Eigen arrays
+        vec1 = get_vertex(v1);
+        vec2 = get_vertex(v2);
+        vec3 = get_vertex(v3);
+
+        Eigen::Vector3d edge1, edge2, face_normal;
+        edge1 = vec2 - vec1;
+        edge2 = vec3 - vec1;
+    
+        face_normal = edge1.cross(edge2);
+        std::cout << face_normal.transpose() << std::endl;
+        // save normal as a property
+
+    }
+}
 void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
     // update the polyhedron and surface mesh
     this->vertices = V;

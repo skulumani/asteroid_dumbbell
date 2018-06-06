@@ -161,3 +161,8 @@ TEST_F(TestMeshData, GetSurfaceMeshFaceVerticesCube) {
     EXPECT_TRUE(mesh.get_face_vertices(index1).isApprox(Fe_true.row(index1)));
     ASSERT_TRUE(mesh.get_face_vertices(index1).isApprox(mesh.get_face_vertices(index2)));
 }
+
+TEST_F(TestMeshData, BuildSurfaceMeshFaceNormals) {
+    MeshData mesh(Ve_true, Fe_true);
+    mesh.build_face_normals();
+}
