@@ -142,6 +142,5 @@ TEST_F(TestMeshData, GetSurfaceMeshFacesCube) {
     MeshData mesh(Ve_true, Fe_true);
     Eigen::Matrix<int, Eigen::Dynamic, 3> out_faces;
     out_faces = mesh.get_surface_mesh_faces();
-    std::cout << out_faces << std::endl;
-    /* ASSERT_TRUE(out_faces.isApprox(Fe_true)); */ 
+    ASSERT_TRUE(out_faces.isApprox(Fe_true)); 
 }

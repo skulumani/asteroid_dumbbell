@@ -116,15 +116,11 @@ Eigen::Matrix<int, Eigen::Dynamic, 3> MeshData::get_surface_mesh_faces( void ) {
     Eigen::Matrix<int, Eigen::Dynamic, 3> faces(num_f, 3);
 
     for ( Face_index fd: surface_mesh.faces() ) {
-        std::cout << (std::size_t)fd;
-        std::cout <<  " ";
         std::size_t col_index = 0;
         for (Vertex_index vd: vertices_around_face(surface_mesh.halfedge(fd), surface_mesh)) {
             faces(row_index, col_index) = (int)vd;
-            std::cout << (int)vd; 
             ++col_index;
         }
-        std::cout << std::endl;
         ++row_index;
     }
 
