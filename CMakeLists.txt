@@ -46,7 +46,7 @@ message(STATUS "CGAL Lib: ${CGAL_LIBRARIES}")
 
 # HDF5 Setup
 set(ENV{HDF5_ROOT} /usr/local/hdf5)
-find_package(HDF5 REQUIRED COMPONENTS C CXX)
+find_package(HDF5 1.10.2 REQUIRED COMPONENTS C CXX)
 if (NOT HDF5_FOUND)
     message(STATUS "This project requires HDF5 and will not compile")
     return()
@@ -72,7 +72,7 @@ include_directories(${HDF5_INCLUDE_DIRS})
 set(hdf5_libs hdf5 hdf5_cpp)
 
 # Eigen setup
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 3.3.4 REQUIRED)
 if (NOT Eigen3_FOUND)
     message(STATUS "This project requires Eigen3 and will not be compiled.")
     return()
