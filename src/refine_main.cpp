@@ -57,9 +57,11 @@ int main(int argc, char* argv[]) {
     
     std::cout << "Refinement added " << new_vertices.size() << " vertices." << std::endl;
     // write to OBJ
-    std::string output_file = "/tmp/" + remove_extension(base_name(input_file)) + ".obj";
+    std::string output_file = "/tmp/" + remove_extension(base_name(input_file)) + "_refine.obj";
     std::cout << "Saving to: " + output_file << std::endl;
     
     // take surface mesh and convert to vertices
-    /* igl::writeOBJ(output_file, */ 
+    igl::writeOBJ(output_file, mesh->get_surface_mesh_vertices(), mesh->get_surface_mesh_faces());
+
+    return 0;
 }
