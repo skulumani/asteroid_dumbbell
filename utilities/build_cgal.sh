@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CGAL_VER='CGAL-4.11'
+CGAL_VER='CGAL-4.12'
 TEMP_DIR="$(mktemp -d)"
 CGAL_RELEASE_URL='https://github.com/CGAL/cgal/releases/download/releases%2F'${CGAL_VER}'/'${CGAL_VER}'.tar.xz'
 
