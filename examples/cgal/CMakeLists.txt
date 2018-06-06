@@ -95,3 +95,7 @@ target_link_libraries(refine_and_fair ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARI
 add_executable(isotropic_refine src/isotropic_remeshing_example.cpp)
 add_to_cached_list(CGAL_EXECUTABLE_TARGETS isotropic_refine)
 target_link_libraries(isotropic_refine ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
+
+add_executable(isotropic_refine_patch src/isotropic_remeshing_of_patch_example.cpp)
+add_to_cached_list(CGAL_EXECUTABLE_TARGETS isotropic_refine_patch)
+target_link_libraries(isotropic_refine_patch ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
