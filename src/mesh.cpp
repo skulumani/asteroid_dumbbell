@@ -126,4 +126,37 @@ Eigen::Matrix<int, Eigen::Dynamic, 3> MeshData::get_surface_mesh_faces( void ) {
 
     return faces;
 }
+
+template<typename Index>
+Eigen::RowVector3d MeshData::get_vertex(const Index& index) {
+    // form Vertex_index
+    Vertex_index vd(index);
+    
+    // create an array and return
+    Eigen::RowVector3d vertex;
+    vertex(0) = surface_mesh.point(vd).x();
+    vertex(1) = surface_mesh.point(vd).y();
+    vertex(2) = surface_mesh.point(vd).z();
+
+    return vertex;
+}
+
+template<typename Index>
+Eigen::RowVector3i MeshData::get_face_vertices(const Index& index) {
+    Face_index fd(index);
+
+    Eigen::RowVector3i face_vertices;
+    std::size_t col_index = 0;
+    for (Vertex_index vd: vertices_around_face(surface_mesh.halfedge(fd), surface_mesh)) {
+        face_vertices(col_index) = (int)vd;
+        ++col_index;
+    }
+    return face_vertices;
+}
+
 // Template Specialization
+template Eigen::RowVector3d MeshData::get_vertex<std::size_t>(const std::size_t&);
+template Eigen::RowVector3d MeshData::get_vertex<int>(const int&);
+
+template Eigen::RowVector3i MeshData::get_face_vertices<std::size_t>(const std::size_t&);
+template Eigen::RowVector3i MeshData::get_face_vertices<int>(const int&);

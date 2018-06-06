@@ -42,6 +42,13 @@ class MeshData {
         // convert surface mesh to eigen arrays
         Eigen::Matrix<double, Eigen::Dynamic, 3> get_surface_mesh_vertices( void );
         Eigen::Matrix<int, Eigen::Dynamic, 3> get_surface_mesh_faces( void );
+
+        // get a specific face/vertex using an index like access operator
+        template<typename Index>
+        Eigen::RowVector3d get_vertex(const Index& index);
+
+        template<typename Index>
+        Eigen::RowVector3i get_face_vertices(const Index& index);
     private:
 
         // build the polyhedron

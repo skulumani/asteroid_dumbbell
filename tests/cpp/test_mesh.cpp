@@ -144,3 +144,20 @@ TEST_F(TestMeshData, GetSurfaceMeshFacesCube) {
     out_faces = mesh.get_surface_mesh_faces();
     ASSERT_TRUE(out_faces.isApprox(Fe_true)); 
 }
+
+TEST_F(TestMeshData, GetSurfaceMeshVertexCube) {
+    MeshData mesh(Ve_true, Fe_true);
+    std::size_t index_1(0);
+    int index_2(0);
+    EXPECT_TRUE(mesh.get_vertex(index_1).isApprox(Ve_true.row(index_1))); 
+    ASSERT_TRUE(mesh.get_vertex(index_1).isApprox(mesh.get_vertex(index_2)));
+}
+
+TEST_F(TestMeshData, GetSurfaceMeshFaceVerticesCube) {
+    MeshData mesh(Ve_true, Fe_true);
+    std::size_t index1(0);
+    int index2(0);
+    
+    EXPECT_TRUE(mesh.get_face_vertices(index1).isApprox(Fe_true.row(index1)));
+    ASSERT_TRUE(mesh.get_face_vertices(index1).isApprox(mesh.get_face_vertices(index2)));
+}
