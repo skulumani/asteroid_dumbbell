@@ -35,7 +35,7 @@ endif()
 
 # CGAL Setup
 set(ENV{CGAL_DIR} /usr/local/lib/CGAL)
-find_package(CGAL COMPONENTS)
+find_package(CGAL 4.12 COMPONENTS)
 if (NOT CGAL_FOUND)
    message(STATUS "This project requires the CGAL Library and will not compile")
    return()
