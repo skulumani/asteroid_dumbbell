@@ -65,39 +65,6 @@ int main(int argc, char* argv[]) {
     vol = PolyVolume::volume(mesh->vertices, mesh->faces);
     std::cout << "Volume: " << vol << std::endl;
     
-    // try to refine a portion of the mesh
-    // need face descriptors for faces to refine
-    Face_index f_index = mesh->face_descriptor[0];
-    std::vector<Face_index> faces_to_refine;
-    faces_to_refine.push_back(mesh->face_descriptor[0]);
-    faces_to_refine.push_back(mesh->face_descriptor[1]);
-    // make std;:vectors to store the descriptors to the new faces/vertices
-    /* std::vector<Face_index> new_faces; */
-    /* std::vector<Vertex_index> new_vertices; */
-    /* CGAL::Polygon_mesh_processing::refine( */
-    /*         mesh->surface_mesh, */
-    /*         faces_to_refine, */
-    /*         std::back_inserter(new_faces), */
-    /*         std::back_inserter(new_vertices), */
-    /*         CGAL::Polygon_mesh_processing::parameters::density_control_factor(100.0)); */
-
-    /* // save to a different obj for visualizaiton in python */
-    /* std::ofstream refined_off("/tmp/cube_refined.off"); */
-    /* refined_off << mesh->surface_mesh; */
-    /* refined_off.close(); */
-    /* std::cout << "Refinement added " << new_vertices.size() << " vertices." << std::endl; */
-
-    std::cout << "Old number of vertices: " << mesh->surface_mesh.number_of_vertices() << std::endl;
-    double target_edge_length(0.01);
-    CGAL::Polygon_mesh_processing::isotropic_remeshing(
-            faces_to_refine,
-            target_edge_length,
-            mesh->surface_mesh,
-            CGAL::Polygon_mesh_processing::parameters::number_of_iterations(3));
-    std::cout << "New Number of vertices: " << mesh->surface_mesh.number_of_vertices() << std::endl;
-    std::ofstream remesh_off("/tmp/cube_remesh.off");
-    remesh_off << mesh->surface_mesh;
-    remesh_off.close();
     /* std::cout << "Vertices: \n" << mesh->vertices << std::endl; */
     /* std::cout << "Faces: \n" << mesh->faces << std::endl; */
 

@@ -228,6 +228,10 @@ target_link_libraries(explore_control cgal_cpp input_parser_cpp fdcl_hdf5
 # mesh refinement example
 add_executable(refine src/refine_main.cpp)
 target_link_libraries(refine cgal_cpp input_parser_cpp igl::core)
+
+# mesh remeshing example
+add_executable(remesh src/remesh_main.cpp)
+target_link_libraries(remesh cgal_cpp input_parser_cpp igl::core)
 ################################################################################
 # PYTHON BINDING
 ################################################################################
