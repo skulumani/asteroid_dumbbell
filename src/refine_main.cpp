@@ -61,5 +61,5 @@ int main(int argc, char* argv[]) {
     std::cout << "Saving to: " + output_file << std::endl;
     
     // take surface mesh and convert to vertices
-    igl::writeOBJ(output_file, 
+    /* igl::writeOBJ(output_file, */ 
 }

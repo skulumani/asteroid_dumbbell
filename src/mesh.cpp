@@ -90,26 +90,44 @@ void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
     this->build_surface_mesh();
 }
 
-template<typename VectorType, typename IndexType>
-void surface_mesh_to_eigen(MeshData mesh) {
-    // TODO add inputs for eigen v and f
 
-    const unsigned int num_v = mesh.surface_mesh.number_of_vertices();
-    const unsigned int num_f = mesh.surface_mesh.number_of_faces();
+Eigen::Matrix<double, Eigen::Dynamic, 3> MeshData::get_surface_mesh_vertices( void ) {
+    // extract out vertices from surface_mesh
+    std::size_t num_v = surface_mesh.number_of_vertices();
+    std::size_t row_index = 0;
 
-    /* V.resize(num_v, 3); */
-    /* F.resize(num_f, 3); */
-    
-    // vertex iterators over the mesh
-    Mesh::Vertex_range::iterator vb, ve;
-    Mesh::Vertex_range r = mesh.vertices;
+    Eigen::Matrix<double, Eigen::Dynamic, 3> vertices(num_v, 3);
 
-    vb = r.begin();
-    ve = r.end();
-    
-    // iterate over vertices and print to stdout
-    for (Vertex_index vd : mesh.vertices()) {
-        std::cout << vd << std::endl; 
+    for (Vertex_index vd: surface_mesh.vertices() ) {
+        Eigen::Matrix<double, 1, 3> row; 
+        row << surface_mesh.point(vd).x(), surface_mesh.point(vd).y(), surface_mesh.point(vd).z();
+        
+        vertices.row(row_index) = row;
+        ++row_index;
     }
+
+    return vertices;
 }
 
+Eigen::Matrix<int, Eigen::Dynamic, 3> MeshData::get_surface_mesh_faces( void ) {
+    std::size_t num_f = surface_mesh.number_of_faces();
+    std::size_t row_index = 0;
+
+    Eigen::Matrix<int, Eigen::Dynamic, 3> faces(num_f, 3);
+
+    for ( Face_index fd: surface_mesh.faces() ) {
+        std::cout << (std::size_t)fd;
+        std::cout <<  " ";
+        std::size_t col_index = 0;
+        for (Vertex_index vd: vertices_around_face(surface_mesh.halfedge(fd), surface_mesh)) {
+            faces(row_index, col_index) = (int)vd;
+            std::cout << (int)vd; 
+            ++col_index;
+        }
+        std::cout << std::endl;
+        ++row_index;
+    }
+
+    return faces;
+}
+// Template Specialization

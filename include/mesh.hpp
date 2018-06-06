@@ -38,7 +38,10 @@ class MeshData {
         std::vector<Vertex_index> vertex_descriptor;
         std::vector<std::vector<Vertex_index> > vertex_in_face_descriptor;
         std::vector<Face_index> face_descriptor;
-
+        
+        // convert surface mesh to eigen arrays
+        Eigen::Matrix<double, Eigen::Dynamic, 3> get_surface_mesh_vertices( void );
+        Eigen::Matrix<int, Eigen::Dynamic, 3> get_surface_mesh_faces( void );
     private:
 
         // build the polyhedron

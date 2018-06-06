@@ -130,3 +130,18 @@ TEST_F(TestMeshData, SurfaceMeshFaceIndexMatch) {
         }
     }
 }
+
+TEST_F(TestMeshData, GetSurfaceMeshVerticesCube) {
+    MeshData mesh(Ve_true, Fe_true);
+    Eigen::Matrix<double, Eigen::Dynamic, 3> out_verts;
+    out_verts = mesh.get_surface_mesh_vertices();
+    ASSERT_TRUE(out_verts.isApprox(Ve_true));
+}
+
+TEST_F(TestMeshData, GetSurfaceMeshFacesCube) {
+    MeshData mesh(Ve_true, Fe_true);
+    Eigen::Matrix<int, Eigen::Dynamic, 3> out_faces;
+    out_faces = mesh.get_surface_mesh_faces();
+    std::cout << out_faces << std::endl;
+    /* ASSERT_TRUE(out_faces.isApprox(Fe_true)); */ 
+}
