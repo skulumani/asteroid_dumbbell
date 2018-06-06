@@ -6,7 +6,7 @@ import numpy as np
 
 ast_p = asteroid_python.Asteroid('castalia', 0, 'obj')
 
-v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj')
+v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
 mesh_data = mesh_data.MeshData(v, f)
 mesh_param = asteroid_cpp.MeshParam(mesh_data)
 ast_c = asteroid_cpp.Asteroid('castalia', mesh_param)
