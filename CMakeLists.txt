@@ -202,7 +202,8 @@ target_link_libraries(mesh cgal_cpp input_parser_cpp)
 # potential function
 set(potential_main_src src/potential_main.cpp src/potential.cpp)
 add_executable(potential_main ${potential_main_src})
-target_link_libraries(potential_main igl::core cgal_cpp Threads::Threads)
+target_link_libraries(potential_main igl::core cgal_cpp Threads::Threads
+    input_parser_cpp)
 
 # surface mesher
 set( surface_mesher_src src/surface_mesher_main.cpp )

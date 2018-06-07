@@ -1,13 +1,27 @@
 #include "potential.hpp"
 #include "loader.hpp"
 #include "mesh.hpp"
-#include <omp.h>
 
+#include "input_parser.hpp"
+
+#include <omp.h>
 #include <iostream>
 
-int main() {
-    
-    std::shared_ptr<MeshData> mesh_data = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+int main(int argc, char* argv[]) {
+    InputParser input(argc, argv);
+    if (input.option_exists("-h")) {
+        std::cout << "Potential test: potential_main -i obj_file.obj" << std::endl;
+        return 0;
+    }
+
+    const std::string input_file = input.get_command_option("-i");
+    if (input_file.empty()) {
+        std::cout << "You need an input file" << std::endl;
+        std::cout << "potential_main -i obj_file.obj" << std::endl;
+        return 1;
+    }
+
+    std::shared_ptr<MeshData> mesh_data = Loader::load(input_file);
     
     Asteroid ast("cube", mesh_data);
     Eigen::Vector3d state; 
