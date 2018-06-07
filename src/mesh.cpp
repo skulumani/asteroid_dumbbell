@@ -293,8 +293,6 @@ bool MeshData::build_face_factor(const Eigen::Ref<const Eigen::Vector3d>& pos) {
 
 void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
     // update the polyhedron and surface mesh
-    this->vertices = V;
-    this->faces = F;
     
     // clear the mesh
     this->surface_mesh.clear();
@@ -305,8 +303,8 @@ void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
     vertex_in_face_descriptor.clear();
     face_descriptor.clear();
 
-    this->build_polyhedron();
-    this->build_surface_mesh();
+    this->build_polyhedron(V, F);
+    this->build_surface_mesh(V, F);
 }
 
 // MeshData Getters
