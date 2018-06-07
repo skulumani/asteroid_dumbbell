@@ -352,6 +352,21 @@ Eigen::Matrix<int, Eigen::Dynamic, 3> MeshData::get_faces( void ) const {
     return faces;
 }
 
+double MeshData::number_of_vertices( void ) const {
+    return surface_mesh.number_of_vertices();
+}
+
+double MeshData::number_of_edges( void ) const {
+    return surface_mesh.number_of_edges();
+}
+
+double MeshData::number_of_faces( void ) const {
+    return surface_mesh.number_of_faces();
+}
+
+double MeshData::number_of_halfedges( void ) const {
+    return surface_mesh.number_of_halfedges();
+}
 template<typename Index>
 Eigen::Vector3d MeshData::get_face_normal(const Index& fd_in) {
     Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;

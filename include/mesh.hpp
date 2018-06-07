@@ -47,6 +47,12 @@ class MeshData {
         // convert surface mesh to eigen arrays
         Eigen::Matrix<double, Eigen::Dynamic, 3> get_verts( void ) const;
         Eigen::Matrix<int, Eigen::Dynamic, 3> get_faces( void ) const;
+
+        double number_of_vertices( void ) const;
+        double number_of_edges( void ) const;
+        double number_of_faces( void ) const;
+        double number_of_halfedges( void ) const;
+
         template<typename Index>
         Eigen::RowVector3d get_vertex(const Index& index);
 
