@@ -105,14 +105,16 @@ void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &
     }
     
     // update the mesh pointer with the new vertices
-    /* mesh->update_mesh(vertices, faces); */ 
+    std::cout << V << std::endl;
+    std::cout << F << std::endl;
+    /* mesh->update_mesh(V, F); */ 
 }
 
 void ReconstructMesh::update(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
         const double& max_angle) {
     std::size_t num_pts(pts.rows());
     
-    for (int ii = 0; ii < num_pts; ++ii) {
+    for (std::size_t ii = 0; ii < num_pts; ++ii) {
         single_update(pts.row(ii), max_angle);
     }
 }

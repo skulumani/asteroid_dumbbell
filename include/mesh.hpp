@@ -20,7 +20,8 @@ class MeshData {
        
         
         // update mesh from arrays and faces array
-        void update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
+        void update_mesh(const Eigen::Ref<const Eigen::MatrixXd> &V, 
+                const Eigen::Ref<const Eigen::MatrixXi> &F);
 
         Polyhedron polyhedron;
        
