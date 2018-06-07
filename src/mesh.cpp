@@ -198,7 +198,7 @@ void MeshData::build_edge_properties( void ){
     std::tie(halfedge_unit_normal, found)
         = surface_mesh.property_map<Halfedge_index, Eigen::Vector3d>(
                 "h:halfedge_unit_normal");
-
+    
     for (Edge_index ed: surface_mesh.edges()) {
 
         Halfedge_index h1, h2;
