@@ -50,13 +50,16 @@ class MeshData {
         template<typename Index>
         Eigen::RowVector3i get_face_vertices(const Index& index);
 
-        // compute normal to each face of surface_mesh
-        void build_face_normals( void );
     private:
 
         // build the polyhedron
         void build_polyhedron();
         void build_surface_mesh();
+
+        // compute normal to each face of surface_mesh
+        void build_face_normals( void );
+
+        void build_halfedge_normals( void );
         
 };
 

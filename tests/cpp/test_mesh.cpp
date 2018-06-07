@@ -164,16 +164,22 @@ TEST_F(TestMeshData, GetSurfaceMeshFaceVerticesCube) {
 
 TEST_F(TestMeshData, BuildSurfaceMeshFaceNormalsCube) {
     MeshData mesh(Ve_true, Fe_true);
-    // build normals automatically
-    //
-    // get the normals
-    /* mesh.build_face_normals(); */
-    Mesh::Property_map<Face_index, Eigen::Vector3d> unit_face_normal;
+    Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
     bool found;
-    std::tie(unit_face_normal, found) = mesh.surface_mesh.property_map<
-        Face_index,  Eigen::Vector3d>("f:unit_face_normal");
+    std::tie(face_unit_normal, found) = mesh.surface_mesh.property_map<
+        Face_index,  Eigen::Vector3d>("f:face_unit_normal");
     ASSERT_TRUE(found);
+    Face_index fd(0);
+    ASSERT_EQ(face_unit_normal[fd].size(), 3);
+}
 
+TEST_F(TestMeshData, BuildSurfaceMeshHalfedgeNormalsCube) {
+    MeshData mesh(Ve_true, Fe_true);
+    Mesh::Property_map<Halfedge_index, Eigen::Vector3d> halfedge_unit_normal;
+    bool found;
+    std::tie(halfedge_unit_normal, found) = mesh.surface_mesh.property_map<
+        Halfedge_index, Eigen::Vector3d>("h:halfedge_unit_normal");
+    ASSERT_TRUE(found);
 }
 
 

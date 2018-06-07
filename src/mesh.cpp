@@ -80,15 +80,16 @@ void MeshData::build_surface_mesh() {
     assert(surface_mesh.is_valid());
     // face_normal, edge normal, halfedge normal, face dyad, edge dyad
     build_face_normals();
+    build_halfedge_normals();
 }
 
 void MeshData::build_face_normals( void ) {
     // Build property maps for the surface mesh
-    Mesh::Property_map<Face_index, Eigen::Vector3d> unit_face_normal;
+    Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
     bool created;
-    std::tie( unit_face_normal, created ) 
+    std::tie( face_unit_normal, created ) 
         = surface_mesh.add_property_map<Face_index, Eigen::Vector3d>(
-                "f:unit_face_normal", (Eigen::Vector3d() << 0, 0, 0).finished());
+                "f:face_unit_normal", (Eigen::Vector3d() << 0, 0, 0).finished());
     assert(created);
 
     // loop over all faces
@@ -115,13 +116,45 @@ void MeshData::build_face_normals( void ) {
         edge2 = vec3 - vec1;
     
         face_normal = edge1.cross(edge2);
-        unit_face_normal[fd] = face_normal.normalized();
+        face_unit_normal[fd] = face_normal.normalized();
         // save normal as a property
     }
 }
 
 void MeshData::build_halfedge_normals( void ) {
+    Mesh::Property_map<Halfedge_index, Eigen::Vector3d> halfedge_unit_normal;
+    bool created;
+    std::tie(halfedge_unit_normal, created) 
+        = surface_mesh.add_property_map<Halfedge_index, Eigen::Vector3d>(
+                "h:halfedge_unit_normal", (Eigen::Vector3d() << 0, 0, 0).finished());
+    
+    assert(created);
+    
+    Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
+    bool found;
+    std::tie(face_unit_normal, found) 
+        = surface_mesh.property_map<Face_index, Eigen::Vector3d>(
+                "f:face_unit_normal");
 
+    for (Halfedge_index hd: surface_mesh.halfedges()) {
+        Vertex_index vs, ve;
+        vs = surface_mesh.source(hd);
+        ve = surface_mesh.target(hd);
+
+        Eigen::Vector3d vec_start, vec_end, vec_edge, face_normal;
+        vec_start = get_vertex(vs);
+        vec_end = get_vertex(ve);
+        vec_edge = vec_end - vec_start;
+
+        Face_index fd;
+        fd = surface_mesh.face(hd);
+        face_normal = face_unit_normal[fd];
+
+        Eigen::Vector3d edge_normal;
+        edge_normal = vec_edge.cross(face_normal);
+
+        halfedge_unit_normal[hd] = edge_normal.normalized();
+    }
 }
 
 void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
