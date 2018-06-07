@@ -87,6 +87,8 @@ TEST_F(TestReconstruct, UpdateMeshVertices) {
     double max_angle(1);
 
     reconstruct_mesh.single_update(pt, max_angle);
+
+    std::cout << reconstruct_mesh.get_verts() << std::endl;
     EXPECT_TRUE(reconstruct_mesh.get_verts().row(7).isApprox(pt.transpose()));
 
 }

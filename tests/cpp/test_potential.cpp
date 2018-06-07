@@ -1,4 +1,6 @@
 #include "potential.hpp"
+#include "loader.hpp"
+#include "mesh.hpp"
 
 #include "gtest/gtest.h"
 
@@ -154,49 +156,6 @@ TEST_F(TestMeshParam, Faces) {
     ASSERT_TRUE(mesh_param.Fc.isApprox(Fe_true.col(2)));
 }
 
-/* TEST_F(TestMeshParam, Vertices) { */
-/*     Eigen::Matrix<double, 12, 3> V1, V2, V3; */
-/*     V1 << -0.5, -0.5, -0.5, */ 
-/*        -0.5, -0.5, -0.5, */ 
-/*        -0.5, -0.5, -0.5, */ 
-/*        -0.5, -0.5, -0.5, */ 
-/*        -0.5,  0.5, -0.5, */ 
-/*        -0.5,  0.5, -0.5, */ 
-/*        0.5, -0.5, -0.5, */ 
-/*        0.5, -0.5, -0.5, */ 
-/*        -0.5, -0.5, -0.5, */ 
-/*        -0.5, -0.5, -0.5, */ 
-/*        -0.5, -0.5,  0.5, */ 
-/*        -0.5, -0.5,  0.5; */
-/*     V2 << 0.5,  0.5, -0.5, */
-/*        -0.5,  0.5, -0.5, */ 
-/*        -0.5,  0.5,  0.5, */ 
-/*        -0.5, -0.5,  0.5, */ 
-/*        0.5,  0.5,  0.5, */ 
-/*        -0.5,  0.5,  0.5, */ 
-/*        0.5,  0.5, -0.5, */ 
-/*        0.5,  0.5,  0.5, */ 
-/*        0.5, -0.5, -0.5, */ 
-/*        0.5, -0.5,  0.5, */ 
-/*        0.5, -0.5,  0.5, */ 
-/*        0.5,  0.5,  0.5; */
-/*     V3 << 0.5, -0.5, -0.5, */
-/*        0.5,  0.5, -0.5, */  
-/*        -0.5,  0.5, -0.5, */  
-/*        -0.5,  0.5,  0.5, */  
-/*        0.5,  0.5, -0.5, */  
-/*        0.5,  0.5,  0.5, */  
-/*        0.5,  0.5,  0.5, */  
-/*        0.5, -0.5,  0.5, */  
-/*        0.5, -0.5,  0.5, */  
-/*        -0.5, -0.5,  0.5, */  
-/*        0.5,  0.5,  0.5, */  
-/*        -0.5,  0.5,  0.5; */
-    
-/*     ASSERT_TRUE(mesh_param.V1.isApprox(V1)); */
-/*     ASSERT_TRUE(mesh_param.V2.isApprox(V2)); */
-/*     ASSERT_TRUE(mesh_param.V3.isApprox(V3)); */
-/* } */
 
 TEST_F(TestMeshParam, Edges) {
     Eigen::Matrix<double, 12, 3> e1, e2, e3; 
@@ -280,22 +239,6 @@ TEST_F(TestMeshParam, UniqueEdgeVertexMap) {
     // unique index is correct but gets the second one sometimes
 }
 
-TEST_F(TestMeshParam, NormalFace) {
-    Eigen::Matrix<double, 12, 3> normal_face;
-    normal_face << 0.,  0., -1.,
-       0.,  0., -1.,  
-       -1.,  0.,  0.,  
-       -1.,  0.,  0.,  
-       -0.,  1.,  0.,  
-       0.,  1.,  0.,  
-       1.,  0.,  0.,  
-       1.,  0., -0.,  
-       0., -1.,  0.,  
-       0., -1.,  0.,  
-       0.,  0.,  1.,  
-       0., -0.,  1.;
-    ASSERT_TRUE(mesh_param.normal_face.isApprox(normal_face));
-}
 
 TEST_F(TestMeshParam, EdgeNormals) {
     Eigen::Matrix<double, 12, 3> e1_normal, e2_normal, e3_normal;

@@ -166,7 +166,23 @@ TEST_F(TestMeshData, GetSurfaceMeshFaceVerticesCube) {
 }
 
 TEST_F(TestMeshData, BuildSurfaceMeshFaceNormalsCube) {
+    Eigen::Matrix<double, 12, 3> normal_face;
+    normal_face << 0.,  0., -1.,
+       0.,  0., -1.,  
+       -1.,  0.,  0.,  
+       -1.,  0.,  0.,  
+       -0.,  1.,  0.,  
+       0.,  1.,  0.,  
+       1.,  0.,  0.,  
+       1.,  0., -0.,  
+       0., -1.,  0.,  
+       0., -1.,  0.,  
+       0.,  0.,  1.,  
+       0., -0.,  1.;
     MeshData mesh(Ve_true, Fe_true);
+    for (Face_index fd: mesh.faces()) {
+        std::cout << mesh.get_face_normal(fd).transpose() << std::endl;
+    }
     Face_index fd(0);
     ASSERT_EQ(mesh.get_face_normal(fd).size(), 3);
 }
