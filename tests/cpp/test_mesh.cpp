@@ -183,6 +183,23 @@ TEST_F(TestMeshData, BuildSurfaceMeshHalfedgeNormalsCube) {
     ASSERT_EQ(mesh.get_halfedge_normal(hd).size(), 3);
 }
 
+TEST_F(TestMeshData, EdgeFactorCube) {
+    MeshData mesh(Ve_true, Fe_true);
+    Eigen::VectorXd edge_factor_true(mesh.surface_mesh.number_of_edges());
+    edge_factor_true << 0.690726, 0.533437, 0.424906, 0.424906, 0.533437,
+                     0.690726, 0.533437, 0.424906, 0.533437, 1.00573, 0.838132,
+                     0.838132, 1.00573, 0.838132, 0.533437, 0.690726, 0.533437,
+                     1.00573;
+
+    // build edge factor
+    Eigen::Vector3d pos;
+    pos << 1, 1, 1;
+    mesh.build_edge_factor(pos);
+    for(Edge_index ed : mesh.surface_mesh.edges()) {
+        EXPECT_NEAR(mesh.get_edge_factor(ed), edge_factor_true((int)ed), 1e-3);
+    }
+}
+
 TEST(TestMeshDataCastalia, OutwardFaceNormals) {
     std::shared_ptr<MeshData> mesh = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
     for (Face_index fd: mesh->surface_mesh.faces() ) {

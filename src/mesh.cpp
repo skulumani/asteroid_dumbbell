@@ -6,6 +6,7 @@
 
 #include <tuple>
 #include <assert.h>
+#include <cmath>
 
 // TODO Convert polyhedron/surface_mesh back to Eigen
 // Member methods
@@ -84,7 +85,7 @@ void MeshData::build_surface_mesh() {
     build_edge_properties();
 }
 
-void MeshData::build_face_properties( void ) {
+bool MeshData::build_face_properties( void ) {
     // Build property maps for the surface mesh
     Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
     bool created;
@@ -108,7 +109,7 @@ void MeshData::build_face_properties( void ) {
                 "f:face_dyad", Eigen::Matrix3d::Zero());
     assert(created);
 
-    // loop over all faces
+    // loop over all faces need to dereference the iterators but not the index
     for (Face_index fd: surface_mesh.faces() ){
         // need to consecutive vertices in face to get teh normal
         Halfedge_index h1, h2, h3;
@@ -141,9 +142,10 @@ void MeshData::build_face_properties( void ) {
 
         assert(face_dyad[fd].isApprox(face_dyad[fd].transpose(), 1e-3));
     }
+    return true;
 }
 
-void MeshData::build_halfedge_properties( void ) {
+bool MeshData::build_halfedge_properties( void ) {
     Mesh::Property_map<Halfedge_index, Eigen::Vector3d> halfedge_unit_normal;
     bool created;
     std::tie(halfedge_unit_normal, created) 
@@ -174,9 +176,10 @@ void MeshData::build_halfedge_properties( void ) {
 
         halfedge_unit_normal[hd] = vec_edge.cross(face_normal).normalized();
     }
+    return true;
 }
 
-void MeshData::build_edge_properties( void ){
+bool MeshData::build_edge_properties( void ){
     // edge dyad
     Mesh::Property_map<Edge_index, Eigen::Matrix3d> edge_dyad;
     bool created;
@@ -214,8 +217,41 @@ void MeshData::build_edge_properties( void ){
         // doesn't work for matrices close to zero
         /* assert((edge_dyad[ed] - edge_dyad[ed].transpose()).isApprox(Eigen::Matrix3d::Zero(), 1e-3)); */
     }
-
+    return true;
 }
+
+bool MeshData::build_edge_factor( const Eigen::Ref<const Eigen::Vector3d>& pos ) {
+    // create a property map
+    Mesh::Property_map<Edge_index, double> edge_factor;
+    bool created;
+    std::tie(edge_factor, created)
+        = surface_mesh.add_property_map<Edge_index, double>(
+                "e:edge_factor", 0);
+    assert(created);
+
+    // loop over edges
+    for (Edge_index ed : surface_mesh.edges()) {
+
+        // get vertex of each edge endpoitn
+        Vertex_index v1, v2;
+        v1 = surface_mesh.vertex(ed, 0);
+        v2 = surface_mesh.vertex(ed, 1);
+
+        Eigen::Vector3d vec1, vec2;
+        vec1 = get_vertex(v1);
+        vec2 = get_vertex(v2);
+        // subtract from state adn find norm
+        double r1, r2;
+        r1 = (vec1 - pos).norm();
+        r2 = (vec2 - pos).norm();
+        // find length of edge
+        double e = (vec1 - vec2).norm();
+        // take natural log
+        edge_factor[ed] = std::log((r1 + r2 + e)/(r1 + r2 - e));
+    }
+    return true;
+}
+
 
 void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
     // update the polyhedron and surface mesh
@@ -235,6 +271,7 @@ void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
     this->build_surface_mesh();
 }
 
+// MeshData Getters
 template<typename Index>
 Eigen::Vector3d MeshData::get_face_normal(const Index& fd_in) {
     Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
@@ -286,6 +323,16 @@ Eigen::Matrix3d MeshData::get_edge_dyad(const Index& ed_in) {
         Edge_index, Eigen::Matrix3d>("e:edge_dyad");
     Edge_index ed(ed_in);
     return edge_dyad[ed];
+}
+
+template<typename Index>
+double MeshData::get_edge_factor(const Index& ed_in) {
+    Mesh::Property_map<Edge_index, double> edge_factor;
+    bool found;
+    std::tie(edge_factor, found) = surface_mesh.property_map<
+        Edge_index, double>("e:edge_factor");
+    Edge_index ed(ed_in);
+    return edge_factor[ed];
 }
 
 Eigen::Matrix<double, Eigen::Dynamic, 3> MeshData::get_surface_mesh_vertices( void ) {
@@ -367,3 +414,5 @@ template Eigen::Matrix3d MeshData::get_face_dyad<Face_index>(const Face_index&);
 template Eigen::Vector3d MeshData::get_halfedge_normal<Halfedge_index>(const Halfedge_index&);
 
 template Eigen::Matrix3d MeshData::get_edge_dyad<Edge_index>(const Edge_index&);
+
+template double MeshData::get_edge_factor<Edge_index>(const Edge_index&);

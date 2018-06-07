@@ -39,6 +39,9 @@ class MeshData {
         std::vector<std::vector<Vertex_index> > vertex_in_face_descriptor;
         std::vector<Face_index> face_descriptor;
         
+        // L Edge factor (function of current position)
+        bool build_edge_factor(const Eigen::Ref<const Eigen::Vector3d>& pos);
+
         // convert surface mesh to eigen arrays
         Eigen::Matrix<double, Eigen::Dynamic, 3> get_surface_mesh_vertices( void );
         Eigen::Matrix<int, Eigen::Dynamic, 3> get_surface_mesh_faces( void );
@@ -63,7 +66,9 @@ class MeshData {
         
         template<typename Index>
         Eigen::Matrix3d get_edge_dyad(const Index& ed);
-
+        
+        template<typename Index>
+        double get_edge_factor(const Index& ed);
     private:
 
         // build the polyhedron
@@ -71,9 +76,9 @@ class MeshData {
         void build_surface_mesh();
 
         // compute normal to each face of surface_mesh
-        void build_face_properties( void );
-        void build_halfedge_properties( void );
-        void build_edge_properties( void ); 
+        bool build_face_properties( void );
+        bool build_halfedge_properties( void );
+        bool build_edge_properties( void ); 
 };
 
 
