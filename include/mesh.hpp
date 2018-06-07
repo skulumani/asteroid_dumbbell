@@ -41,6 +41,8 @@ class MeshData {
         
         // L Edge factor (function of current position)
         bool build_edge_factor(const Eigen::Ref<const Eigen::Vector3d>& pos);
+        // w face factor (function of the current position)
+        bool build_face_factor(const Eigen::Ref<const Eigen::Vector3d>& pos);
 
         // convert surface mesh to eigen arrays
         Eigen::Matrix<double, Eigen::Dynamic, 3> get_surface_mesh_vertices( void );
@@ -69,6 +71,9 @@ class MeshData {
         
         template<typename Index>
         double get_edge_factor(const Index& ed);
+
+        template<typename Index>
+        double get_face_factor(const Index& ed);
     private:
 
         // build the polyhedron

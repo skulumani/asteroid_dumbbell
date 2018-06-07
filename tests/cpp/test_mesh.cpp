@@ -200,6 +200,20 @@ TEST_F(TestMeshData, EdgeFactorCube) {
     }
 }
 
+TEST_F(TestMeshData, FaceFactorCube) {
+    MeshData mesh(Ve_true, Fe_true);
+    Eigen::VectorXd face_factor_true(mesh.surface_mesh.number_of_faces());
+    face_factor_true << 0.0863697 , 0.0863697 , 0.0863697 , 0.0863697 ,
+                     -0.0863697, -0.0863697, -0.0863697, -0.0863697, 0.0863697
+                         , 0.0863697, -0.0863697, -0.0863697;
+    Eigen::Vector3d pos;
+    pos << 1, 1, 1;
+    mesh.build_face_factor(pos);
+    for (Face_index fd : mesh.surface_mesh.faces()) {
+        EXPECT_NEAR(mesh.get_face_factor(fd), face_factor_true((int)fd), 1e-3);
+    }
+}
+
 TEST(TestMeshDataCastalia, OutwardFaceNormals) {
     std::shared_ptr<MeshData> mesh = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
     for (Face_index fd: mesh->surface_mesh.faces() ) {

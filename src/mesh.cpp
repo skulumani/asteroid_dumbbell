@@ -252,6 +252,50 @@ bool MeshData::build_edge_factor( const Eigen::Ref<const Eigen::Vector3d>& pos )
     return true;
 }
 
+bool MeshData::build_face_factor(const Eigen::Ref<const Eigen::Vector3d>& pos) {
+    // face factor w property map
+    Mesh::Property_map<Face_index, double> face_factor;
+    bool created;
+    std::tie(face_factor, created) = surface_mesh.add_property_map<Face_index, double>(
+            "f:face_factor", 0);
+    assert(created);
+    
+    for (Face_index fd: surface_mesh.faces()) {
+        Halfedge_index h1, h2, h3;
+        h1 = surface_mesh.halfedge(fd);
+        h2 = surface_mesh.next(h1);
+        h3 = surface_mesh.next(h2);
+        assert(surface_mesh.next(h3) == h1);
+
+        Vertex_index v1, v2, v3;
+        v1 = surface_mesh.source(h1);
+        v2 = surface_mesh.source(h2);
+        v3 = surface_mesh.source(h3);
+        assert(surface_mesh.target(h1) == v2);
+        assert(surface_mesh.target(h2) == v3);
+        assert(surface_mesh.target(h3) == v1);
+
+        // now extract the point into Eigen arrays
+        Eigen::Vector3d vec1, vec2, vec3, r1, r2, r3;
+        vec1 = get_vertex(v1);
+        vec2 = get_vertex(v2);
+        vec3 = get_vertex(v3);
+        r1 = vec1 - pos;
+        r2 = vec2 - pos;
+        r3 = vec3 - pos;
+
+        double num, den;
+        num = r1.dot(r2.cross(r3));
+        den = r1.norm() * r2.norm() * r3.norm() 
+            + r1.norm() * r2.dot(r3) 
+            + r2.norm() * r3.dot(r1)
+            + r3.norm() * r1.dot(r2);
+
+        face_factor[fd] = 2.0 * atan2(num, den);
+    }
+
+    return true;
+}
 
 void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
     // update the polyhedron and surface mesh
@@ -335,6 +379,16 @@ double MeshData::get_edge_factor(const Index& ed_in) {
     return edge_factor[ed];
 }
 
+template<typename Index>
+double MeshData::get_face_factor(const Index& fd_in) {
+    Mesh::Property_map<Face_index, double> face_factor;
+    bool found;
+    std::tie(face_factor, found) = surface_mesh.property_map<
+        Face_index, double>("f:face_factor");
+    Face_index fd(fd_in);
+    return face_factor[fd];
+}
+
 Eigen::Matrix<double, Eigen::Dynamic, 3> MeshData::get_surface_mesh_vertices( void ) {
     // extract out vertices from surface_mesh
     std::size_t num_v = surface_mesh.number_of_vertices();
@@ -416,3 +470,4 @@ template Eigen::Vector3d MeshData::get_halfedge_normal<Halfedge_index>(const Hal
 template Eigen::Matrix3d MeshData::get_edge_dyad<Edge_index>(const Edge_index&);
 
 template double MeshData::get_edge_factor<Edge_index>(const Edge_index&);
+template double MeshData::get_face_factor<Face_index>(const Face_index&);
