@@ -18,9 +18,6 @@ class MeshData {
         MeshData(const Eigen::Ref<const Eigen::MatrixXd> &V, const Eigen::Ref<const Eigen::MatrixXi> &F);
         // get and set the data here
        
-        // member functions
-        Eigen::MatrixXd get_verts( void ) const { return vertices; }
-        Eigen::MatrixXi get_faces( void ) const { return faces; }
         
         // update mesh from arrays and faces array
         void update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
@@ -44,11 +41,12 @@ class MeshData {
         // w face factor (function of the current position)
         bool build_face_factor(const Eigen::Ref<const Eigen::Vector3d>& pos);
 
-        // convert surface mesh to eigen arrays
-        Eigen::Matrix<double, Eigen::Dynamic, 3> get_surface_mesh_vertices( void );
-        Eigen::Matrix<int, Eigen::Dynamic, 3> get_surface_mesh_faces( void );
-
+        // GETTERS
         // get a specific face/vertex using an index like access operator
+        //
+        // convert surface mesh to eigen arrays
+        Eigen::Matrix<double, Eigen::Dynamic, 3> get_verts( void ) const;
+        Eigen::Matrix<int, Eigen::Dynamic, 3> get_faces( void ) const;
         template<typename Index>
         Eigen::RowVector3d get_vertex(const Index& index);
 
