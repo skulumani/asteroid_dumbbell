@@ -215,13 +215,19 @@ bool MeshData::build_edge_properties( void ){
 }
 
 bool MeshData::build_edge_factor( const Eigen::Ref<const Eigen::Vector3d>& pos ) {
-    // create a property map
+    // test if property map exists if not then create
     Mesh::Property_map<Edge_index, double> edge_factor;
-    bool created;
-    std::tie(edge_factor, created)
-        = surface_mesh.add_property_map<Edge_index, double>(
-                "e:edge_factor", 0);
-    assert(created);
+    bool found, created;
+    std::tie(edge_factor, found) = surface_mesh.property_map<
+        Edge_index, double>("e:edge_factor");
+
+    if (!found) { // need to create
+        // create a property map
+        std::tie(edge_factor, created)
+            = surface_mesh.add_property_map<Edge_index, double>(
+                    "e:edge_factor", 0);
+        assert(created);
+    }
 
     // loop over edges
     for (Edge_index ed : surface_mesh.edges()) {
@@ -247,12 +253,16 @@ bool MeshData::build_edge_factor( const Eigen::Ref<const Eigen::Vector3d>& pos )
 }
 
 bool MeshData::build_face_factor(const Eigen::Ref<const Eigen::Vector3d>& pos) {
-    // face factor w property map
     Mesh::Property_map<Face_index, double> face_factor;
-    bool created;
-    std::tie(face_factor, created) = surface_mesh.add_property_map<Face_index, double>(
-            "f:face_factor", 0);
-    assert(created);
+    bool created, found;
+    std::tie(face_factor, found) = surface_mesh.property_map<
+        Face_index, double>("f:face_factor");
+    if (!found) {
+        // face factor w property map
+        std::tie(face_factor, created) = surface_mesh.add_property_map<Face_index, double>(
+                "f:face_factor", 0);
+        assert(created);
+    }
     
     for (Face_index fd: surface_mesh.faces()) {
         Halfedge_index h1, h2, h3;
