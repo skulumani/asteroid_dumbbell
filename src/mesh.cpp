@@ -206,8 +206,8 @@ bool MeshData::build_edge_properties( void ){
         f1 = surface_mesh.face(h1);
         f2 = surface_mesh.face(h2);
 
-        edge_dyad[ed] = face_unit_normal[f1] * halfedge_unit_normal[h2].transpose() 
-            + face_unit_normal[f2] * halfedge_unit_normal[h1].transpose();
+        edge_dyad[ed] = face_unit_normal[f1] * halfedge_unit_normal[h1].transpose() 
+            + face_unit_normal[f2] * halfedge_unit_normal[h2].transpose();
         // doesn't work for matrices close to zero
         /* assert((edge_dyad[ed] - edge_dyad[ed].transpose()).isApprox(Eigen::Matrix3d::Zero(), 1e-3)); */
     }
@@ -457,6 +457,7 @@ double MeshData::get_face_factor(const Index& fd_in) {
     std::tie(face_factor, found) = surface_mesh.property_map<
         Face_index, double>("f:face_factor");
     Face_index fd(fd_in);
+    assert(found);
     return face_factor[fd];
 }
 

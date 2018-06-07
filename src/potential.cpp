@@ -368,7 +368,7 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
     
     // build L and w
     mesh_data->build_edge_factor(state);
-    mesh_data->build_edge_factor(state);
+    mesh_data->build_face_factor(state);
     
     double w_sum = mesh_data->get_sum_face_factor();
 
@@ -432,7 +432,6 @@ std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> Asteroid::face_contribution
         U_grad += F_dyad * r * w_factor;
         U_mat += F_dyad * w_factor;
     }
-
     return std::make_tuple(U, U_grad, U_mat);
 }
 
@@ -457,7 +456,6 @@ std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> Asteroid::edge_contribution
         U_grad += E_dyad * r * L_factor;
         U_mat += E_dyad * L_factor;
     }
-
     return std::make_tuple(U, U_grad, U_mat);
 }
 
