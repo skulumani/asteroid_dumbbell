@@ -122,6 +122,11 @@ class Asteroid {
         double Ulaplace;
 
         void init_asteroid( void );
+        
+        std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> face_contribution(
+                const Eigen::Ref<const Eigen::Vector3d>& state) const;
+        std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> edge_contribution(
+                const Eigen::Ref<const Eigen::Vector3d>& state) const;
 
     public:
         Asteroid ( void ) {};
@@ -132,17 +137,6 @@ class Asteroid {
                  const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in);
         Asteroid(const std::string& name_in, std::shared_ptr<ReconstructMesh> rmesh_in);
         Asteroid(const std::string& name_in, std::shared_ptr<MeshData> mesh_in);
-
-        // Functions to compute the potential
-        Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v);
-
-        std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> edge_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v);
-
-        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
-                const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> >& w_face);
-
-        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
-                const std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd>& L_tuple);
 
         /** @fn void polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state)
                 
