@@ -61,18 +61,21 @@ Eigen::VectorXi vector_find(const Eigen::Ref<const T> &logical_vec) {
 void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &pt,
                                     const double &max_angle) {
     
+    Eigen::Matrix<double, Eigen::Dynamic, 3> V = mesh->get_verts();
+    Eigen::Matrix<int, Eigen::Dynamic, 3> F = mesh->get_faces();
+
     double pt_radius = pt.norm();
-    Eigen::VectorXd vert_radius = this->mesh->vertices.rowwise().norm();
+    Eigen::VectorXd vert_radius = V.rowwise().norm();
 
     Eigen::Vector3d pt_uvec = pt.normalized();
-    Eigen::Matrix<double, Eigen::Dynamic, 3> vert_uvec(this->mesh->vertices.rows(), 3);
-    vert_uvec = this->mesh->vertices.rowwise().normalized();
+    Eigen::Matrix<double, Eigen::Dynamic, 3> vert_uvec(V.rows(), 3);
+    vert_uvec = V.rowwise().normalized();
     
     // compute the angular distance between the pt and each vertex
     Eigen::Matrix<double, Eigen::Dynamic, 1> delta_sigma(vert_uvec.rows(), 1);
     delta_sigma = central_angle(pt_uvec, vert_uvec);
 
-    Eigen::Array<bool, Eigen::Dynamic, 1> region_condition(this->mesh->vertices.rows());
+    Eigen::Array<bool, Eigen::Dynamic, 1> region_condition(V.rows());
     region_condition = delta_sigma.array() < max_angle;
     
     Eigen::VectorXi region_index = vector_find<Eigen::Array<bool, Eigen::Dynamic, 1> >(region_condition);
@@ -88,7 +91,7 @@ void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &
 
     for (int ii = 0; ii < region_index.size(); ++ii) {
         weight(ii) = pow(delta_sigma(region_index(ii)) * pt_radius, 2);
-        mesh_region.row(ii) = this->mesh->vertices.row(region_index(ii));
+        mesh_region.row(ii) = V.row(region_index(ii));
         weight_old(ii) = this->weights(region_index(ii));
         radius_old(ii) = vert_radius(region_index(ii));
     }
@@ -97,7 +100,7 @@ void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &
     weight_new = (weight_old.array() * weight.array()) / (weight_old.array() + weight.array());
     // Now update the mesh->vertices of the object/self
     for (int ii = 0; ii < region_index.size(); ++ii) {
-        this->mesh->vertices.row(region_index(ii)) = radius_new(ii) * vert_uvec.row(region_index(ii));
+        V.row(region_index(ii)) = radius_new(ii) * vert_uvec.row(region_index(ii));
         this->weights(region_index(ii)) = weight_new(ii);
     }
     
