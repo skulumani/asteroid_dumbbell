@@ -79,6 +79,11 @@ class Asteroid(object):
                 verts, faces = wavefront.read_obj('./integration/cube.obj')
                 # translate so center of object is at origin
                 # verts = verts - np.array([0.5, 0.5, 0.5])
+            elif name == 'tetrahedron':
+                verts, faces = wavefront.read_obj('./integration/tetrahedron.obj')
+            elif name == 'octahedron':
+                verts, faces = wavefront.read_obj('./integration/octahedron.obj')
+
             else:
                 self.logger.warning('Unknown asteroid name : {}'.format(name))
 
@@ -129,8 +134,18 @@ class Asteroid(object):
             self.sigma = 1
             self.axes=np.array([0.9, 1.0, 1.1])
             self.omega = 1
+        elif self.name == 'tetrahedron':
+            self.M = 1
+            self.sigma = 1
+            self.axes = np.array([0.9, 1.0, 1.1])
+            self.omega = 1
         else:
             self.logger.error('Unknown asteroid name : {}'.format(self.name))
+            self.logger.error('Just assuming default values')
+            self.M = 1
+            self.sigma = 1
+            self.axes = np.array([0.9, 1.0, 1.1])
+            self.omega = 1
 
         self.mu = self.G * self.M
         self.sigma = self.sigma / 1000 * \
@@ -337,7 +352,6 @@ class Asteroid(object):
             # compute the contribution of the each face
             U_face, U_grad_face, U_grad_mat_face  = polyhedron.face_contribution(r_v, Fa, F_face, w_face)
             U_edge, U_grad_edge, U_grad_mat_edge = polyhedron.edge_contribution(state, e_vertex_map, unique_index, V, E1_edge, E2_edge, E3_edge, L1_edge, L2_edge, L3_edge)
-
             # combine edge and face summations
             U = 1 / 2 * G * sigma * U_edge - 1 / 2 * G * sigma * U_face
             U_grad = -G * sigma * U_grad_edge + G * sigma * U_grad_face
