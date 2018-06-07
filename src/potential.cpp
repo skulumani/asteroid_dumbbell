@@ -394,40 +394,41 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
         /* } */
         
         /* // combine them both */
-        U = 1.0 / 2.0 * G * sigma * (std::get<0>(edge_grav) - std::get<0>(face_grav));
-        U_grad = G * sigma * (-std::get<1>(edge_grav) + std::get<1>(face_grav));
-        U_grad_mat = G * sigma * (std::get<2>(edge_grav) - std::get<2>(face_grav));
-        Ulaplace = -G * sigma * w_sum ;
+        mU = 1.0 / 2.0 * G * sigma * (std::get<0>(edge_grav) - std::get<0>(face_grav));
+        mU_grad = G * sigma * (-std::get<1>(edge_grav) + std::get<1>(face_grav));
+        mU_grad_mat = G * sigma * (std::get<2>(edge_grav) - std::get<2>(face_grav));
+        mUlaplace = -G * sigma * w_sum ;
     } else {
-        U = 0;
-        U_grad.setZero();
-        U_grad_mat.setZero();
-        Ulaplace = 0;
+        mU = 0;
+        mU_grad.setZero();
+        mU_grad_mat.setZero();
+        mUlaplace = 0;
     }
     // TODO int return type for inside/outside
 }
 
 std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> Asteroid::face_contribution(
-        const Eigen::Ref<const Eigen::Vector3d>& state) {
-    U = 0;
-    U_grad = Eigen::Vector3d::Zero();
-    U_mat = Eigen::Matrix3d::Zero();
+        const Eigen::Ref<const Eigen::Vector3d>& state) const {
+
+    double U = 0;
+    Eigen::Vector3d U_grad = Eigen::Vector3d::Zero();
+    Eigen::Matrix3d U_mat = Eigen::Matrix3d::Zero();
 
     // loop over the faces and compute gravity
     for (Face_index fd: mesh_data->faces()) {
         // get a vector from the face
         Halfedge_index h1 = mesh_data->surface_mesh.halfedge(fd);
-        Vertex_index v1 = surface_mesh.source(h1);
+        Vertex_index v1 = mesh_data->surface_mesh.source(h1);
         Eigen::Vector3d vec1 = mesh_data->get_vertex(v1);
         // subtract from current state
-        Eigen::Vector3d r = vec1 - state
+        Eigen::Vector3d r = vec1 - state;
 
         // get a Face dyad and face factor
         Eigen::Matrix3d F_dyad = mesh_data->get_face_dyad(fd);
         
         double w_factor = mesh_data->get_face_factor(fd);
         // multiply
-        U += r.transpose() * F_dyad * r * w_factor;
+        U += (r.transpose() * F_dyad * r * w_factor).value();
         U_grad += F_dyad * r * w_factor;
         U_mat += F_dyad * w_factor;
     }
@@ -436,15 +437,15 @@ std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> Asteroid::face_contribution
 }
 
 std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> Asteroid::edge_contribution(
-        const Eigen::Ref<const Eigen::Vector3d>& state) {
-    U = 0;
-    U_grad = Eigen::Vector3d::Zero();
-    U_mat = Eigen::Matrix3d::Zero();
+        const Eigen::Ref<const Eigen::Vector3d>& state) const {
+    double U = 0;
+    Eigen::Vector3d U_grad = Eigen::Vector3d::Zero();
+    Eigen::Matrix3d U_mat = Eigen::Matrix3d::Zero();
     
     // loop over the edges
     for (Edge_index ed: mesh_data->edges()) {
         // get a vector from the edge
-        Vertex_index v1 = mesh_data->surface_mesh.vertex(ed);
+        Vertex_index v1 = mesh_data->surface_mesh.vertex(ed, 0);
         Eigen::Vector3d vec1 = mesh_data->get_vertex(v1);
         // compute difference with state
         Eigen::Vector3d r = vec1 - state;
@@ -452,12 +453,12 @@ std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> Asteroid::edge_contribution
         Eigen::Matrix3d E_dyad = mesh_data->get_edge_dyad(ed);
         double L_factor = mesh_data->get_edge_factor(ed);
 
-        U += r.transpose() * E_dyad * r * L_factor;
+        U += (r.transpose() * E_dyad * r * L_factor).value();
         U_grad += E_dyad * r * L_factor;
         U_mat += E_dyad * L_factor;
     }
 
-    std::make_tuple(U, U_grad, U_mat);
+    return std::make_tuple(U, U_grad, U_mat);
 }
 
 Eigen::Matrix<double, Eigen::Dynamic, 3> Asteroid::rotate_vertices(const double& time) const {
