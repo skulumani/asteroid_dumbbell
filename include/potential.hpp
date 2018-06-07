@@ -116,10 +116,10 @@ class Asteroid {
 
         std::shared_ptr<MeshData> mesh_data;
 
-        double U; 
-        Eigen::Vector3d U_grad;
-        Eigen::Matrix3d U_grad_mat;
-        double Ulaplace;
+        double mU; 
+        Eigen::Vector3d mU_grad;
+        Eigen::Matrix3d mU_grad_mat;
+        double mUlaplace;
 
         void init_asteroid( void );
         
@@ -158,10 +158,10 @@ class Asteroid {
         void update_rotation(const double& time);
 
         // Getters for the potential variables
-        double get_potential( void ) { return U; }
-        Eigen::Vector3d get_acceleration( void ) { return U_grad; }
-        Eigen::Matrix3d get_gradient_mat( void ) { return U_grad_mat; }
-        double get_laplace( void ) { return Ulaplace; }
+        double get_potential( void ) { return mU; }
+        Eigen::Vector3d get_acceleration( void ) { return mU_grad; }
+        Eigen::Matrix3d get_gradient_mat( void ) { return mU_grad_mat; }
+        double get_laplace( void ) { return mUlaplace; }
         double get_omega( void) const { return omega; }
 
         // member variables
