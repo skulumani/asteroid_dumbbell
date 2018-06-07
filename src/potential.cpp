@@ -119,7 +119,7 @@ void MeshParam::face_dyad( void ) {
    	F_face.resize(num_f);
     
     #pragma omp parallel for
-    for (int ii = 0; ii < num_f; ++ii) {
+    for (std::size_t ii = 0; ii < num_f; ++ii) {
         // outer product of normal_face vectors
         F_face[ii] = normal_face.row(ii).transpose() * normal_face.row(ii);
     }
@@ -216,7 +216,7 @@ void MeshParam::edge_dyad( void ) {
     #pragma omp task depend(in:e1_face_map)
     {
         #pragma omp parallel for
-        for (int ii = 0; ii < num_f; ++ii) {
+        for (std::size_t ii = 0; ii < num_f; ++ii) {
             // pick out the normals for the edges of the current face
             nA = normal_face.row(ii);
 
@@ -243,7 +243,7 @@ void MeshParam::edge_dyad( void ) {
     #pragma omp task depend(in:e2_face_map)
     {
         #pragma omp parallel for
-        for (int ii = 0; ii < num_f; ++ii) {
+        for (std::size_t ii = 0; ii < num_f; ++ii) {
             // pick out the normals for the edges of the current face
             nA = normal_face.row(ii);
 
@@ -270,7 +270,7 @@ void MeshParam::edge_dyad( void ) {
     #pragma omp task depend(in:e3_face_map)
     {
         #pragma omp parallel for
-        for (int ii = 0; ii < num_f; ++ii) {
+        for (std::size_t ii = 0; ii < num_f; ++ii) {
             // pick out the normals for the edges of the current face
             nA = normal_face.row(ii);
 
