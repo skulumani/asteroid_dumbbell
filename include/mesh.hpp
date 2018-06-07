@@ -49,6 +49,20 @@ class MeshData {
 
         template<typename Index>
         Eigen::RowVector3i get_face_vertices(const Index& index);
+        
+        // Getters for the property maps
+        template<typename Index>
+        Eigen::Vector3d get_face_normal(const Index& fd);
+        template<typename Index>
+        Eigen::Vector3d get_face_center(const Index& fd);
+        template<typename Index>
+        Eigen::Matrix3d get_face_dyad(const Index& fd);
+        
+        template<typename Index>
+        Eigen::Vector3d get_halfedge_normal(const Index& hd);
+        
+        template<typename Index>
+        Eigen::Matrix3d get_edge_dyad(const Index& ed);
 
     private:
 

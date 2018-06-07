@@ -3,6 +3,8 @@
 
 #include "gtest/gtest.h"
 
+#include <memory>
+
 // The fixture for testing class Foo.
 class TestMeshData: public ::testing::Test {
  protected:
@@ -165,33 +167,63 @@ TEST_F(TestMeshData, GetSurfaceMeshFaceVerticesCube) {
 
 TEST_F(TestMeshData, BuildSurfaceMeshFaceNormalsCube) {
     MeshData mesh(Ve_true, Fe_true);
-    Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
-    bool found;
-    std::tie(face_unit_normal, found) = mesh.surface_mesh.property_map<
-        Face_index,  Eigen::Vector3d>("f:face_unit_normal");
-    ASSERT_TRUE(found);
     Face_index fd(0);
-    ASSERT_EQ(face_unit_normal[fd].size(), 3);
+    ASSERT_EQ(mesh.get_face_normal(fd).size(), 3);
 }
 
 TEST_F(TestMeshData, BuildSurfaceMeshCenterFaceCube) {
     MeshData mesh(Ve_true, Fe_true);
-    Mesh::Property_map<Face_index, Eigen::Vector3d> face_center;
-    bool found;
-    std::tie(face_center, found) = mesh.surface_mesh.property_map<
-        Face_index, Eigen::Vector3d>("f:face_center");
-    ASSERT_TRUE(found);
     Face_index fd(0);
-    ASSERT_EQ(face_center[fd].size(), 3);
+    ASSERT_EQ(mesh.get_face_center(fd).size(), 3);
 }
 
 TEST_F(TestMeshData, BuildSurfaceMeshHalfedgeNormalsCube) {
     MeshData mesh(Ve_true, Fe_true);
-    Mesh::Property_map<Halfedge_index, Eigen::Vector3d> halfedge_unit_normal;
-    bool found;
-    std::tie(halfedge_unit_normal, found) = mesh.surface_mesh.property_map<
-        Halfedge_index, Eigen::Vector3d>("h:halfedge_unit_normal");
-    ASSERT_TRUE(found);
+    Halfedge_index hd(0);
+    ASSERT_EQ(mesh.get_halfedge_normal(hd).size(), 3);
+}
+
+TEST(TestMeshDataCastalia, OutwardFaceNormals) {
+    std::shared_ptr<MeshData> mesh = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+    for (Face_index fd: mesh->surface_mesh.faces() ) {
+        Eigen::Vector3d face_normal, center_face;
+        face_normal = mesh->get_face_normal(fd);
+        center_face = mesh->get_face_center(fd);
+        EXPECT_GT(face_normal.dot(center_face), 0);
+    }
+}
+
+TEST(TestMeshDataCastalia, SymmetricFaceDyad) {
+    std::shared_ptr<MeshData> mesh = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+    for (Face_index fd: mesh->surface_mesh.faces()) {
+        EXPECT_TRUE(mesh->get_face_dyad(fd).isApprox(
+                    mesh->get_face_dyad(fd).transpose(), 1e-3));
+    }
 }
 
 
+TEST(TestMeshDataCastalia, SymmetricEdgeDyad) {
+    std::shared_ptr<MeshData> mesh = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+    for (Edge_index ed: mesh->surface_mesh.edges()) {
+
+        EXPECT_TRUE(mesh->get_edge_dyad(ed).isApprox(
+                    mesh->get_edge_dyad(ed).transpose(), 1e-3));
+    }
+}
+
+TEST(TestMeshDataItokawa, SymmetricFaceDyad) {
+    std::shared_ptr<MeshData> mesh = Loader::load("./data/shape_model/ITOKAWA/itokawa_low.obj");
+    for (Face_index fd: mesh->surface_mesh.faces()) {
+        EXPECT_TRUE(mesh->get_face_dyad(fd).isApprox(
+                    mesh->get_face_dyad(fd).transpose(), 1e-3));
+    }
+}
+
+
+TEST(TestMeshDataItokawa, SymmetricEdgeDyad) {
+    std::shared_ptr<MeshData> mesh = Loader::load("./data/shape_model/ITOKAWA/itokawa_low.obj");
+    for (Edge_index ed: mesh->surface_mesh.edges()) {
+        EXPECT_TRUE((mesh->get_edge_dyad(ed) - mesh->get_edge_dyad(ed))
+                .isApprox(Eigen::Matrix3d::Zero(), 1e-3));
+    }
+}
