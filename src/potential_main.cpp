@@ -7,7 +7,7 @@
 
 int main() {
     
-    std::shared_ptr<MeshData> mesh_data = Loader::load("./integration/cube.obj");
+    std::shared_ptr<MeshData> mesh_data = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
     
     Asteroid ast("cube", mesh_data);
     Eigen::Vector3d state; 
