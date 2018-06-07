@@ -22,10 +22,6 @@ class MeshData {
         // update mesh from arrays and faces array
         void update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
 
-        // storing data of the mesh
-        Eigen::MatrixXd vertices;
-        Eigen::MatrixXi faces;
-
         Polyhedron polyhedron;
        
         // Surface mesh shit
@@ -52,6 +48,9 @@ class MeshData {
         double number_of_edges( void ) const;
         double number_of_faces( void ) const;
         double number_of_halfedges( void ) const;
+        
+        // Range types for iteration
+        Mesh::Vertex_range vertices( void ) const;
 
         template<typename Index>
         Eigen::RowVector3d get_vertex(const Index& index);
@@ -82,8 +81,12 @@ class MeshData {
     private:
 
         // build the polyhedron
-        void build_polyhedron();
-        void build_surface_mesh();
+        void build_polyhedron(
+                const Eigen::Ref<const Eigen::MatrixXd>& V,
+                const Eigen::Ref<const Eigen::MatrixXi>& F);
+        void build_surface_mesh(
+                const Eigen::Ref<const Eigen::MatrixXd>& V,
+                const Eigen::Ref<const Eigen::MatrixXi>& F);
 
         // compute normal to each face of surface_mesh
         bool build_face_properties( void );

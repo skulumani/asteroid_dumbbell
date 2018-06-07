@@ -8,31 +8,25 @@
 #include <assert.h>
 #include <cmath>
 
-// TODO Convert polyhedron/surface_mesh back to Eigen
+// TODO COMPLETELY REMOVE POLYHEDRON
 // Member methods
 MeshData::MeshData(const Eigen::Ref<const Eigen::MatrixXd> &V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
-    this->vertices = V;
-    this->faces = F;
-
-    this->build_polyhedron();
-    this->build_surface_mesh();
+    this->build_polyhedron(V, F);
+    this->build_surface_mesh(V, F);
 }
 
-void MeshData::build_polyhedron() {
+void MeshData::build_polyhedron(const Eigen::Ref<const Eigen::MatrixXd> &V, 
+        const Eigen::Ref<const Eigen::MatrixXi> &F) {
     // only called after initialization
-    eigen_to_polyhedron(this->vertices, this->faces, this->polyhedron);
+    eigen_to_polyhedron(V, F, polyhedron);
     /* igl::copyleft::cgal::mesh_to_polyhedron(vertices, faces, polyhedron); */
 }
 
-void MeshData::build_surface_mesh() {
-
+void MeshData::build_surface_mesh(const Eigen::Ref<const Eigen::MatrixXd> & V,
+        const Eigen::Ref<const Eigen::MatrixXi>& F) {
     // create some vertices
     Kernel::Point_3 p, p1, p2, p3;
     Mesh::Vertex_index v, v1, v2, v3;
-
-    // save the data to the class
-    Eigen::MatrixXd& V = this->vertices;
-    Eigen::MatrixXi& F = this->faces;
 
     // build the mesh
     // build vector of vertex descriptors
