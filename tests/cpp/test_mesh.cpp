@@ -1,4 +1,5 @@
 #include "mesh.hpp"
+#include "loader.hpp"
 
 #include "gtest/gtest.h"
 
@@ -171,6 +172,17 @@ TEST_F(TestMeshData, BuildSurfaceMeshFaceNormalsCube) {
     ASSERT_TRUE(found);
     Face_index fd(0);
     ASSERT_EQ(face_unit_normal[fd].size(), 3);
+}
+
+TEST_F(TestMeshData, BuildSurfaceMeshCenterFaceCube) {
+    MeshData mesh(Ve_true, Fe_true);
+    Mesh::Property_map<Face_index, Eigen::Vector3d> face_center;
+    bool found;
+    std::tie(face_center, found) = mesh.surface_mesh.property_map<
+        Face_index, Eigen::Vector3d>("f:face_center");
+    ASSERT_TRUE(found);
+    Face_index fd(0);
+    ASSERT_EQ(face_center[fd].size(), 3);
 }
 
 TEST_F(TestMeshData, BuildSurfaceMeshHalfedgeNormalsCube) {

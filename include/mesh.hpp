@@ -58,7 +58,6 @@ class MeshData {
 
         // compute normal to each face of surface_mesh
         void build_face_normals( void );
-
         void build_halfedge_normals( void );
         
 };

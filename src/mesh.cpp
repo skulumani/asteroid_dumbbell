@@ -91,6 +91,14 @@ void MeshData::build_face_normals( void ) {
         = surface_mesh.add_property_map<Face_index, Eigen::Vector3d>(
                 "f:face_unit_normal", (Eigen::Vector3d() << 0, 0, 0).finished());
     assert(created);
+    
+    // Center face property map
+    Mesh::Property_map<Face_index, Eigen::Vector3d> face_center;
+    /* bool created; */
+    std::tie(face_center, created) 
+        = surface_mesh.add_property_map<Face_index, Eigen::Vector3d>(
+                "f:face_center", (Eigen::Vector3d() << 0 ,0 ,0).finished());
+    assert(created);
 
     // loop over all faces
     for (Face_index fd: surface_mesh.faces() ){
