@@ -5,6 +5,8 @@
 #include <igl/copyleft/cgal/polyhedron_to_mesh.h>
 
 #include <tuple>
+#include <assert.h>
+
 // TODO Convert polyhedron/surface_mesh back to Eigen
 // Member methods
 MeshData::MeshData(const Eigen::Ref<const Eigen::MatrixXd> &V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
@@ -39,6 +41,8 @@ void MeshData::build_surface_mesh() {
         v = this->surface_mesh.add_vertex(p);
 
         this->vertex_descriptor.push_back(v);
+
+        assert(surface_mesh.is_valid(v));
     }
     
 
@@ -53,7 +57,9 @@ void MeshData::build_surface_mesh() {
         v2 = this->vertex_descriptor[F(ii, 1)];
         v3 = this->vertex_descriptor[F(ii, 2)];
 
-        this->surface_mesh.add_face(v1, v2, v3);
+        Face_index f = this->surface_mesh.add_face(v1, v2, v3);
+        assert(surface_mesh.is_valid(f));
+
         face_indices = {v1, v2, v3};
         this->vertex_in_face_descriptor.push_back(face_indices);
     }
@@ -70,18 +76,21 @@ void MeshData::build_surface_mesh() {
     /*     vde = end(ed, surface_mesh); */
     /* } */
 
-    // Build property maps for the surface mesh
-    Mesh::Property_map<Face_index, Eigen::Vector3d> unit_face_normal;
-    bool unit_face_normal_created;
-    std::tie( unit_face_normal, unit_face_normal_created ) 
-        = surface_mesh.add_property_map<Face_index, Eigen::Vector3d>(
-                "f:unit_face_normal", (Eigen::Vector3d() << 0, 0, 0).finished());
-    assert(unit_face_normal_created);
-
-    // edge normal, halfedge normal, face dyad, edge dyad
+    // assert that the mesh is valid
+    assert(surface_mesh.is_valid());
+    // face_normal, edge normal, halfedge normal, face dyad, edge dyad
+    build_face_normals();
 }
 
 void MeshData::build_face_normals( void ) {
+    // Build property maps for the surface mesh
+    Mesh::Property_map<Face_index, Eigen::Vector3d> unit_face_normal;
+    bool created;
+    std::tie( unit_face_normal, created ) 
+        = surface_mesh.add_property_map<Face_index, Eigen::Vector3d>(
+                "f:unit_face_normal", (Eigen::Vector3d() << 0, 0, 0).finished());
+    assert(created);
+
     // loop over all faces
     for (Face_index fd: surface_mesh.faces() ){
         // need to consecutive vertices in face to get teh normal
@@ -106,11 +115,15 @@ void MeshData::build_face_normals( void ) {
         edge2 = vec3 - vec1;
     
         face_normal = edge1.cross(edge2);
-        std::cout << face_normal.transpose() << std::endl;
+        unit_face_normal[fd] = face_normal.normalized();
         // save normal as a property
-
     }
 }
+
+void MeshData::build_halfedge_normals( void ) {
+
+}
+
 void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
     // update the polyhedron and surface mesh
     this->vertices = V;

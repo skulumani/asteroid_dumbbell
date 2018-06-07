@@ -162,7 +162,18 @@ TEST_F(TestMeshData, GetSurfaceMeshFaceVerticesCube) {
     ASSERT_TRUE(mesh.get_face_vertices(index1).isApprox(mesh.get_face_vertices(index2)));
 }
 
-TEST_F(TestMeshData, BuildSurfaceMeshFaceNormals) {
+TEST_F(TestMeshData, BuildSurfaceMeshFaceNormalsCube) {
     MeshData mesh(Ve_true, Fe_true);
-    mesh.build_face_normals();
+    // build normals automatically
+    //
+    // get the normals
+    /* mesh.build_face_normals(); */
+    Mesh::Property_map<Face_index, Eigen::Vector3d> unit_face_normal;
+    bool found;
+    std::tie(unit_face_normal, found) = mesh.surface_mesh.property_map<
+        Face_index,  Eigen::Vector3d>("f:unit_face_normal");
+    ASSERT_TRUE(found);
+
 }
+
+
