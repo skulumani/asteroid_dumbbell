@@ -289,6 +289,7 @@ set(test_all_src
 	tests/cpp/test_utilities.cpp
     tests/cpp/test_libigl.cpp
     tests/cpp/test_stats.cpp
+    tests/cpp/test_potential.cpp
     src/wavefront.cpp)
 
 add_executable(test_all ${test_all_src})
@@ -306,10 +307,10 @@ target_link_libraries(test_libigl gtest igl::core igl::cgal)
 add_test(NAME test_libigl COMMAND test_libigl
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
-add_executable(test_potential tests/cpp/test_potential.cpp tests/cpp/test_all.cpp src/potential.cpp)
-target_link_libraries(test_potential gtest igl::core cgal_cpp)
-add_test(NAME test_potential COMMAND test_potential,
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+# add_executable(test_potential tests/cpp/test_potential.cpp tests/cpp/test_all.cpp src/potential.cpp)
+# target_link_libraries(test_potential gtest igl::core cgal_cpp)
+# add_test(NAME test_potential COMMAND test_potential,
+#     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 # this will install to /usr/local by default
 # install(TARGETS read_obj DESTINATION bin)
