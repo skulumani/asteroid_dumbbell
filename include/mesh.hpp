@@ -51,6 +51,9 @@ class MeshData {
         
         // Range types for iteration
         Mesh::Vertex_range vertices( void ) const;
+        Mesh::Face_range faces( void ) const;
+        Mesh::Edge_range edges( void ) const;
+        Mesh::Halfedge_range halfedges( void ) const;
 
         template<typename Index>
         Eigen::RowVector3d get_vertex(const Index& index);
