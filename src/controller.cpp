@@ -153,8 +153,8 @@ void TranslationController::build_controller_mesh_mapping(std::shared_ptr<const 
         const double& max_angle) {
     
     // define some references
-    const Eigen::MatrixXd& highres_vertices = meshdata_ptr->vertices;
-    const Eigen::MatrixXi& highres_faces = meshdata_ptr->faces;
+    const Eigen::MatrixXd& highres_vertices = meshdata_ptr->get_verts();
+    const Eigen::MatrixXi& highres_faces = meshdata_ptr->get_faces();
     
     Eigen::VectorXd cos_angle(highres_vertices.rows()); 
     Eigen::VectorXd max_angle_vec(highres_vertices.rows());

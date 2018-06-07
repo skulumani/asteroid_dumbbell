@@ -63,15 +63,15 @@ class TestMeshData: public ::testing::Test {
 
 TEST_F(TestMeshData, EigenConstructor) {
     MeshData mesh(Ve_true, Fe_true);
-    ASSERT_TRUE(mesh.vertices.isApprox(Ve_true));
-    ASSERT_TRUE(mesh.faces.isApprox(Fe_true));
+    ASSERT_TRUE(mesh.get_verts().isApprox(Ve_true));
+    ASSERT_TRUE(mesh.get_faces().isApprox(Fe_true));
 }
 
 TEST_F(TestMeshData, UpdateMesh) {
     MeshData mesh;
     mesh.update_mesh(Ve_true, Fe_true);
-    ASSERT_TRUE(mesh.vertices.isApprox(Ve_true));
-    ASSERT_TRUE(mesh.faces.isApprox(Fe_true));
+    ASSERT_TRUE(mesh.get_verts().isApprox(Ve_true));
+    ASSERT_TRUE(mesh.get_faces().isApprox(Fe_true));
     ASSERT_EQ(mesh.polyhedron.is_valid(), 1);
     
 }
@@ -110,7 +110,7 @@ TEST_F(TestMeshData, PolyhedronFaceIndexMatch) {
 TEST_F(TestMeshData, SurfaceMeshVertexIndexMatch) {
     MeshData mesh(Ve_true, Fe_true);
     
-    for (int ii = 0; ii < mesh.vertex_descriptor.size(); ++ii) {
+    for (std::size_t ii = 0; ii < mesh.vertex_descriptor.size(); ++ii) {
         EXPECT_EQ(mesh.surface_mesh.point(mesh.vertex_descriptor[ii]).x(), Ve_true(ii, 0));
         EXPECT_EQ(mesh.surface_mesh.point(mesh.vertex_descriptor[ii]).y(), Ve_true(ii, 1));
         EXPECT_EQ(mesh.surface_mesh.point(mesh.vertex_descriptor[ii]).z(), Ve_true(ii, 2));
@@ -124,9 +124,9 @@ TEST_F(TestMeshData, SurfaceMeshVertexIndexMatch) {
 TEST_F(TestMeshData, SurfaceMeshFaceIndexMatch) {
     MeshData mesh(Ve_true, Fe_true);
 
-    for (int ii = 0; ii < mesh.vertex_in_face_descriptor.size(); ++ii) {
+    for (std::size_t ii = 0; ii < mesh.vertex_in_face_descriptor.size(); ++ii) {
         // get the vertices of this face
-        for (int jj = 0; jj < mesh.vertex_in_face_descriptor[ii].size(); ++jj) {
+        for (std::size_t jj = 0; jj < mesh.vertex_in_face_descriptor[ii].size(); ++jj) {
             EXPECT_EQ(mesh.surface_mesh.point(mesh.vertex_in_face_descriptor[ii][jj]).x(), Ve_true(Fe_true(ii, jj), 0));
             EXPECT_EQ(mesh.surface_mesh.point(mesh.vertex_in_face_descriptor[ii][jj]).y(), Ve_true(Fe_true(ii, jj), 1));
             EXPECT_EQ(mesh.surface_mesh.point(mesh.vertex_in_face_descriptor[ii][jj]).z(), Ve_true(Fe_true(ii, jj), 2));
@@ -137,14 +137,14 @@ TEST_F(TestMeshData, SurfaceMeshFaceIndexMatch) {
 TEST_F(TestMeshData, GetSurfaceMeshVerticesCube) {
     MeshData mesh(Ve_true, Fe_true);
     Eigen::Matrix<double, Eigen::Dynamic, 3> out_verts;
-    out_verts = mesh.get_surface_mesh_vertices();
+    out_verts = mesh.get_verts();
     ASSERT_TRUE(out_verts.isApprox(Ve_true));
 }
 
 TEST_F(TestMeshData, GetSurfaceMeshFacesCube) {
     MeshData mesh(Ve_true, Fe_true);
     Eigen::Matrix<int, Eigen::Dynamic, 3> out_faces;
-    out_faces = mesh.get_surface_mesh_faces();
+    out_faces = mesh.get_faces();
     ASSERT_TRUE(out_faces.isApprox(Fe_true)); 
 }
 
