@@ -306,36 +306,26 @@ void MeshParam::update_mesh(const Eigen::Ref<const Eigen::Matrix<double, Eigen::
     edge_dyad();
 }
 // ************************ Asteroid class ************************************
-Asteroid::Asteroid(const std::string& name_in, MeshParam& mesh_param_in) {
-    mesh_param = std::make_shared<MeshParam>(mesh_param_in);
-    name = name_in;
-    init_asteroid();
-}
 
 Asteroid::Asteroid(const std::string& name_in,
                    const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
                    const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in) {
-    mesh_param = std::make_shared<MeshParam>(V_in, F_in);
+    mesh_data = std::make_shared<MeshData>(V_in, F_in);
     name = name_in;
     init_asteroid();
 }
 
-Asteroid::Asteroid(const std::string& name_in, std::shared_ptr<MeshParam> mesh_param_in) {
-    mesh_param = mesh_param_in;
-    name = name_in;
-    init_asteroid();
-}
 
 Asteroid::Asteroid(const std::string& name_in, 
                    std::shared_ptr<ReconstructMesh> rmesh_in) {
-    mesh_param = std::make_shared<MeshParam>(rmesh_in->get_mesh());
+    mesh_data = rmesh_in->get_mesh();
     name = name_in;
     init_asteroid();
 }
 
 Asteroid::Asteroid(const std::string& name_in,
                    std::shared_ptr<MeshData> mesh_in) {
-    mesh_param = std::make_shared<MeshParam>(mesh_in);
+    mesh_data = mesh_in;
     name = name_in;
     init_asteroid();
 }
@@ -376,37 +366,39 @@ void Asteroid::init_asteroid( void ) {
 
 void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state) {
     
-    // state position should be in the asteroid fixed frame
-    Eigen::Matrix<double, Eigen::Dynamic, 3> r_v = mesh_param->mesh->get_verts().rowwise() - state.transpose();
-    
-    // Compute w_face using laplacian_factor
-    Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v);
-    
-    if (std::abs(w_face.sum()) < 1e-10) {
-        std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all =
-            edge_factor(r_v);
-        
-        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav, edge_grav;
+    // build L and w
+    mesh_data->build_edge_factor(state);
+    mesh_data->build_edge_factor(state);
 
-        #pragma omp parallel shared(r_v)
-        {
-            #pragma omp task
-            {
-                // face contribution
-                face_grav = face_contribution(r_v, w_face);
-            }
-            #pragma omp task
-            {
-            // edge contribution
-            edge_grav = edge_contribution(r_v, L_all);
-            }
-        }
+    if (mesh_data->get_sum_face_factor() < 1e-10) {
+        /* std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all = */
+        /*     edge_factor(r_v); */
         
-        // combine them both
-        U = 1.0 / 2.0 * G * sigma * (std::get<0>(edge_grav) - std::get<0>(face_grav));
-        U_grad = G * sigma * (-std::get<1>(edge_grav) + std::get<1>(face_grav));
-        U_grad_mat = G * sigma * (std::get<2>(edge_grav) - std::get<2>(face_grav));
-        Ulaplace = -G * sigma * w_face.sum();
+        /* std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav, edge_grav; */
+
+        /* #pragma omp parallel shared(r_v) */
+        /* { */
+        /*     #pragma omp task */
+        /*     { */
+        /*         // face contribution */
+        /*         face_grav = face_contribution(r_v, w_face); */
+        /*     } */
+        /*     #pragma omp task */
+        /*     { */
+        /*     // edge contribution */
+        /*     edge_grav = edge_contribution(r_v, L_all); */
+        /*     } */
+        /* } */
+        
+        /* // combine them both */
+        /* U = 1.0 / 2.0 * G * sigma * (std::get<0>(edge_grav) - std::get<0>(face_grav)); */
+        /* U_grad = G * sigma * (-std::get<1>(edge_grav) + std::get<1>(face_grav)); */
+        /* U_grad_mat = G * sigma * (std::get<2>(edge_grav) - std::get<2>(face_grav)); */
+        /* Ulaplace = -G * sigma * w_face.sum(); */
+        U = 0;
+        U_grad.setZero();
+        U_grad_mat.setZero();
+        Ulaplace = 0;
 
     } else {
         U = 0;

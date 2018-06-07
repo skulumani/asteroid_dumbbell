@@ -114,7 +114,7 @@ class Asteroid {
         Eigen::Vector3d axes; /**< Semi-major axes - km */
         double omega; /**< Rotation rate - rad/sec */
 
-        std::shared_ptr<MeshParam> mesh_param;
+        std::shared_ptr<MeshData> mesh_data;
 
         double U; 
         Eigen::Vector3d U_grad;
@@ -127,11 +127,9 @@ class Asteroid {
         Asteroid ( void ) {};
         virtual ~Asteroid ( void ) {};
         
-        Asteroid(const std::string& name_in, MeshParam& mesh_param);
         Asteroid(const std::string& name_in, 
                  const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
                  const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in);
-        Asteroid(const std::string& name_in, std::shared_ptr<MeshParam> mesh_param);
         Asteroid(const std::string& name_in, std::shared_ptr<ReconstructMesh> rmesh_in);
         Asteroid(const std::string& name_in, std::shared_ptr<MeshData> mesh_in);
 
@@ -175,8 +173,8 @@ class Asteroid {
         // member variables
         Eigen::Vector3d get_axes( void ) const { return axes; }
 
-        Eigen::MatrixXd get_verts( void ) const { return mesh_param->get_verts(); }
-        Eigen::MatrixXi get_faces( void ) const { return mesh_param->get_faces(); }
+        Eigen::MatrixXd get_verts( void ) const { return mesh_data->get_verts(); }
+        Eigen::MatrixXi get_faces( void ) const { return mesh_data->get_faces(); }
 
 };
 // declare some shit
