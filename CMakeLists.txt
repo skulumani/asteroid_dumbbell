@@ -12,7 +12,7 @@ set(PYTHON_LIBRARY /home/shankar/anaconda3/envs/asteroid/lib/libpython3.5m.so)
 set(CMAKE_CXX_FLAGS "-lpthread -pthread")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic")
 # Add -Weffc++ for all sorts of good errors to fix
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3")
 ################################################################################
 # GLOBAL SETUP
 ################################################################################
