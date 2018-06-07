@@ -425,40 +425,12 @@ double MeshData::get_face_factor(const Index& fd_in) {
     return face_factor[fd];
 }
 
-Eigen::Matrix<double, Eigen::Dynamic, 3> MeshData::get_surface_mesh_vertices( void ) {
-    // extract out vertices from surface_mesh
-    std::size_t num_v = surface_mesh.number_of_vertices();
-    std::size_t row_index = 0;
-
-    Eigen::Matrix<double, Eigen::Dynamic, 3> vertices(num_v, 3);
-
-    for (Vertex_index vd: surface_mesh.vertices() ) {
-        Eigen::Matrix<double, 1, 3> row; 
-        row << surface_mesh.point(vd).x(), surface_mesh.point(vd).y(), surface_mesh.point(vd).z();
-        
-        vertices.row(row_index) = row;
-        ++row_index;
+double MeshData::get_sum_face_factor( void ) {
+    double w_face_sum = 0;
+    for (Face_index fd : surface_mesh.faces()) {
+        w_face_sum += get_face_factor(fd);    
     }
-
-    return vertices;
-}
-
-Eigen::Matrix<int, Eigen::Dynamic, 3> MeshData::get_surface_mesh_faces( void ) {
-    std::size_t num_f = surface_mesh.number_of_faces();
-    std::size_t row_index = 0;
-
-    Eigen::Matrix<int, Eigen::Dynamic, 3> faces(num_f, 3);
-
-    for ( Face_index fd: surface_mesh.faces() ) {
-        std::size_t col_index = 0;
-        for (Vertex_index vd: vertices_around_face(surface_mesh.halfedge(fd), surface_mesh)) {
-            faces(row_index, col_index) = (int)vd;
-            ++col_index;
-        }
-        ++row_index;
-    }
-
-    return faces;
+    return w_face_sum;
 }
 
 template<typename Index>

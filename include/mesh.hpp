@@ -72,6 +72,7 @@ class MeshData {
 
         template<typename Index>
         double get_face_factor(const Index& ed);
+        double get_sum_face_factor( void );
     private:
 
         // build the polyhedron
