@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
     // update the mesh with new data
     mesh->update_mesh(v_eigen, f_eigen);
 
-    surface_mesh_stats(mesh);
+    Stats::surface_mesh_stats(mesh);
 
     /* print_surface_mesh_vertices(mesh); */
 
