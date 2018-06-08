@@ -107,7 +107,7 @@ class MeshParam {
 class Asteroid {
     private: 
         // member variables to hold the potential
-        const double G = 6.673e-20; /**< Gravitational constant - km^3/kg/sec^2 */
+        double G = 6.673e-20; /**< Gravitational constant - km^3/kg/sec^2 */
         double sigma; /**< Density - kg/km^3 */
         std::string name; /**< Asteroid name - string */
         double M; /**< Mass - kg */
@@ -157,18 +157,25 @@ class Asteroid {
         // set the rotation of the asteroid by modifying the connected meshdata
         void update_rotation(const double& time);
 
+        // Setters
+        void set_grav_constant(const double& G_in) { G = G_in;}
+        void set_sigma(const double& sigma_in) { sigma = sigma_in; }
+
         // Getters for the potential variables
         double get_potential( void ) { return mU; }
         Eigen::Vector3d get_acceleration( void ) { return mU_grad; }
         Eigen::Matrix3d get_gradient_mat( void ) { return mU_grad_mat; }
+
         double get_laplace( void ) { return mUlaplace; }
         double get_omega( void) const { return omega; }
+        double get_grav_constant( void ) const { return G; }
+        double get_sigma( void ) const { return sigma; } 
 
         // member variables
         Eigen::Vector3d get_axes( void ) const { return axes; }
-
         Eigen::MatrixXd get_verts( void ) const { return mesh_data->get_verts(); }
         Eigen::MatrixXi get_faces( void ) const { return mesh_data->get_faces(); }
+
 
 };
 // declare some shit
