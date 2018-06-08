@@ -7,23 +7,8 @@
 PYBIND11_MODULE(asteroid, m) {
     m.doc() = "Asteroid potential function in C++";
     
-    // Expose the MesParam class
-    pybind11::class_<MeshParam, std::shared_ptr<MeshParam>>(m, "MeshParam")
-        .def(pybind11::init<std::shared_ptr<MeshData>>(), "MeshParam constructor",
-             pybind11::arg("shared_ptr to MeshData object"))
-        .def(pybind11::init<const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >&,
-                            const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& >(),
-             "MeshParam constructor from arrays",
-             pybind11::arg("vertices"), pybind11::arg("faces"))
-        .def("update_mesh", &MeshParam::update_mesh, "Update the MeshParam with new vertices and faces",
-                pybind11::arg("vertices"), pybind11::arg("faces"));
-
     // Expose the Asteroid class
     pybind11::class_<Asteroid, std::shared_ptr<Asteroid>>(m, "Asteroid")
-        .def(pybind11::init<const std::string&,
-                            std::shared_ptr<MeshParam>>(),
-             "Asteroid constructor from MeshParam shared_ptr",
-             pybind11::arg("name"), pybind11::arg("MeshParam shared_ptr"))
         .def(pybind11::init<const std::string&,
                             std::shared_ptr<ReconstructMesh>>(),
              "Asteroid constructor from ReconstructMesh shared_ptr",
