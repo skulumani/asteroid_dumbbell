@@ -54,10 +54,27 @@ TEST(TestAsteroid, TetrahedronGravity) {
     
 }
 
-TEST(TestAsteroid, OctahedronGravity) {
+TEST(TestAsteroid, AnalyticalCube) {
+    std::shared_ptr<MeshData> mesh = Loader::load("./integration/cube.obj");
+    Asteroid ast("cube", mesh);
+    ast.set_grav_constant(6.67408e-11 * (1.0 / 1000.0) * (1.0 / 1000.0) * (1.0 / 1000.0));
+    ast.set_sigma(1e6 * (1000.0 ) * (1000.0) * (1000.0));
+    Eigen::Matrix<double, 1, 3> state;
+    state << 1, 2, 3;
+    
+    Eigen::Vector3d U_grad_true;
+    U_grad_true << -1.273782722739791e-06, -2.548008881415967e-06,
+                -3.823026510474731e-06;
 
+    ast.polyhedron_potential(state);
+    
+    ASSERT_NEAR(ast.get_potential(),0.26726619638669064 * ast.get_grav_constant() * ast.get_sigma(), 1e-10);
+    ASSERT_TRUE(ast.get_acceleration().isApprox(U_grad_true, 1e-10));
 }
 
+TEST(TestAsteroid, AnalyticalCubeHighRes) {
+
+}
 TEST(TestAsteroid, CastaliaGravity) {
     std::shared_ptr<MeshData> mesh_data = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
     Eigen::Matrix<double, 1, 3> state;
