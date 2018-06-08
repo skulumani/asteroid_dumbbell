@@ -63,6 +63,7 @@ void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &
     
     Eigen::Matrix<double, Eigen::Dynamic, 3> V = mesh->get_verts();
     Eigen::Matrix<int, Eigen::Dynamic, 3> F = mesh->get_faces();
+    
 
     double pt_radius = pt.norm();
     Eigen::VectorXd vert_radius = V.rowwise().norm();
@@ -105,9 +106,9 @@ void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &
     }
     
     // update the mesh pointer with the new vertices
-    std::cout << V << std::endl;
-    std::cout << F << std::endl;
-    /* mesh->update_mesh(V, F); */ 
+    /* std::cout << V << std::endl; */
+    /* std::cout << F << std::endl; */
+    mesh->update_mesh(V, F); 
 }
 
 void ReconstructMesh::update(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,

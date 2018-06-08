@@ -180,11 +180,9 @@ TEST_F(TestMeshData, BuildSurfaceMeshFaceNormalsCube) {
        0.,  0.,  1.,  
        0., -0.,  1.;
     MeshData mesh(Ve_true, Fe_true);
-    for (Face_index fd: mesh.faces()) {
-        std::cout << mesh.get_face_normal(fd).transpose() << std::endl;
+    for (Face_index fd : mesh.faces()) {
+        EXPECT_TRUE(mesh.get_face_normal(fd).isApprox(normal_face.row((int)fd).transpose()));
     }
-    Face_index fd(0);
-    ASSERT_EQ(mesh.get_face_normal(fd).size(), 3);
 }
 
 TEST_F(TestMeshData, BuildSurfaceMeshCenterFaceCube) {
