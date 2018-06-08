@@ -22,6 +22,8 @@ const double kPI = 3.141592653589793115997963468544185161591;
 */
 Eigen::VectorXd central_angle(const Eigen::Ref<const Eigen::Matrix<double, 1, 3> > &pt_uvec,
                               const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> > &vert_uvec);
+double single_central_angle(const Eigen::Ref<const Eigen::Vector3d>& pt_uvec,
+        const Eigen::Ref<const Eigen::Vector3d>& vert_uvec);
 
 /**
     Convert spherical coords to cartesian
