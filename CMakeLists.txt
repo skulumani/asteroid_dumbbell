@@ -10,7 +10,8 @@ set(PYTHON_INCLUDE_DIR /home/shankar/anaconda3/envs/asteroid/include/python3.5m)
 set(PYTHON_LIBRARY /home/shankar/anaconda3/envs/asteroid/lib/libpython3.5m.so)
 
 set(CMAKE_CXX_FLAGS "-lpthread -pthread")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic")
+# set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
 # Add -Weffc++ for all sorts of good errors to fix
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3")
 ################################################################################
@@ -184,6 +185,7 @@ set(cgal_src
     ${PROJECT_SOURCE_DIR}/src/utilities.cpp
     ${PROJECT_SOURCE_DIR}/src/surface_mesher.cpp
     ${PROJECT_SOURCE_DIR}/src/potential.cpp
+    ${PROJECT_SOURCE_DIR}/src/wavefront.cpp
     )
 add_library(cgal_cpp SHARED ${cgal_src})
 target_link_libraries(cgal_cpp igl::core igl::cgal fdcl_hdf5)
