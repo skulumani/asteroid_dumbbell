@@ -41,7 +41,7 @@ typedef Mesh::Edge_index Edge_index;
 typedef Mesh::Halfedge_index Halfedge_index;
 
 // AABB typedefs
-typedef CGAL::AABB_face_graph_triangle_primitive<Polyhedron> Primitive;
+typedef CGAL::AABB_face_graph_triangle_primitive<Mesh> Primitive;
 typedef CGAL::AABB_traits<Kernel, Primitive> AABB_Traits;
 typedef CGAL::AABB_tree<AABB_Traits> AABB_Tree;
 typedef boost::optional< AABB_Tree::Intersection_and_primitive_id<Segment>::Type > Segment_intersection;
