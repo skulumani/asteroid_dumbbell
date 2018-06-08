@@ -10,20 +10,26 @@
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
-        std::cout << "Potential test: potential_main -i obj_file.obj" << std::endl;
+        std::cout << "Potential test: \npotential_main -i obj_file.obj -n name" << std::endl;
         return 0;
     }
 
     const std::string input_file = input.get_command_option("-i");
     if (input_file.empty()) {
         std::cout << "You need an input file" << std::endl;
-        std::cout << "potential_main -i obj_file.obj" << std::endl;
+        std::cout << "potential_main -i obj_file.obj -n name" << std::endl;
         return 1;
     }
-
+    
+    const std::string name = input.get_command_option("-n");
+    if (name.empty()) {
+        std::cout << "You need the name: cube, castalia, itokawa" << std::endl;
+        std::cout << "potential_main -i obj_file.obj -n name" << std::endl;
+        return 1;
+    }
     std::shared_ptr<MeshData> mesh_data = Loader::load(input_file);
     
-    Asteroid ast("cube", mesh_data);
+    Asteroid ast(name, mesh_data);
     Eigen::Vector3d state; 
     state << 1, 2, 3;
     
