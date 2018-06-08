@@ -303,11 +303,6 @@ void MeshData::update_mesh(const Eigen::Ref<const Eigen::MatrixXd> &V,
     // clear the mesh
     this->surface_mesh.clear();
 
-    // clear the descriptors
-    vertex_descriptor.clear();
-    vertex_in_face_descriptor.clear();
-    face_descriptor.clear();
-    
     this->build_surface_mesh(V, F);
 }
 

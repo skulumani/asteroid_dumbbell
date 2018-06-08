@@ -43,7 +43,8 @@ int main(int argc, char* argv[]) {
     
     // define a set of faces to refine
     std::vector<Face_index> faces_to_refine;
-    faces_to_refine.push_back(mesh->face_descriptor[0]);
+    Face_index fd(0);
+    faces_to_refine.push_back(fd);
     
     // vectors to store the new faces/vertices
     std::vector<Face_index> new_faces;

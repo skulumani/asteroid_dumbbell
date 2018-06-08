@@ -28,11 +28,6 @@ class MeshData {
         // Surface mesh shit
         Mesh surface_mesh;
     
-        // indices to interface with the surface_mesh
-        std::vector<Vertex_index> vertex_descriptor;
-        std::vector<std::vector<Vertex_index> > vertex_in_face_descriptor;
-        std::vector<Face_index> face_descriptor;
-        
         // L Edge factor (function of current position)
         bool build_edge_factor(const Eigen::Ref<const Eigen::Vector3d>& pos);
         // w face factor (function of the current position)
