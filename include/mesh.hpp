@@ -60,6 +60,8 @@ class MeshData {
 
         template<typename Index>
         Eigen::RowVector3d get_vertex(const Index& index) const;
+        
+        bool set_vertex(const Vertex_index& vd, const Eigen::Ref<const Eigen::Vector3d>& vec);
 
         template<typename Index>
         Eigen::RowVector3i get_face_vertices(const Index& index) const;
