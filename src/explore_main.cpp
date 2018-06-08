@@ -42,12 +42,15 @@ int main(int argc, char* argv[])
     double min_angle(10), max_radius(0.03), max_distance(0.5);
     double surf_area(0.01);
 
-    std::shared_ptr<MeshData> true_asteroid = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+    std::shared_ptr<MeshData> true_asteroid =
+        Loader::load("./data/shape_model/CASTALIA/castalia.obj");
 
     RayCaster caster(true_asteroid);
     SurfMesh ellipsoid(axes(0), axes(1), axes(2),
             min_angle, max_radius, max_distance);
-    std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(ellipsoid.get_verts(), ellipsoid.get_faces());
+    std::shared_ptr<ReconstructMesh> rmesh_ptr =
+        std::make_shared<ReconstructMesh>(ellipsoid.get_verts(),
+                ellipsoid.get_faces());
     Controller controller;
 
     Lidar sensor;
@@ -57,7 +60,8 @@ int main(int argc, char* argv[])
     double max_angle( pow(surf_area / (axes[0] * axes[0]), 0.5));
     
     // Create HDF5 file for saving the data
-    std::shared_ptr<HDF5::File> hf = std::make_shared<HDF5::File>(output_file, HDF5::File::Truncate);
+    std::shared_ptr<HDF5::File> hf = std::make_shared<HDF5::File>(output_file,
+            HDF5::File::Truncate);
     
     HDF5::Group reconstructed_vertex_group(hf.get(), "reconstructed_vertex"),
                 reconstructed_weight_group(hf.get(), "reconstructed_weight"),
@@ -73,7 +77,8 @@ int main(int argc, char* argv[])
          .att((Eigen::MatrixXd::Identity(3, 3)))
          .ang_vel((Eigen::RowVector3d() << 0, 0, 0).finished());
     std::shared_ptr<State> state_ptr = std::make_shared<State>(state);
-    std::shared_ptr<State> initial_state_ptr = std::make_shared<State>(initial_state);
+    std::shared_ptr<State> initial_state_ptr =
+        std::make_shared<State>(initial_state);
     std::shared_ptr<State> new_state_ptr = std::make_shared<State>();
 
     state_ptr->update_state(initial_state_ptr);
@@ -100,7 +105,8 @@ int main(int argc, char* argv[])
     for (int ii = 0; ii < 1000; ++ii) {
         
         // compute targets for use in caster (point at the asteroid origin)
-        target = sensor.define_target(state_ptr->get_pos(), state_ptr->get_att(), dist);    
+        target = sensor.define_target(state_ptr->get_pos(),
+                state_ptr->get_att(), dist);    
 
         // perform raycasting on the true mesh (true_asteroid pointer)
         intersection = caster.castray(state_ptr->get_pos(), target);
@@ -113,8 +119,10 @@ int main(int argc, char* argv[])
         // update the state ptr with the newly calculated state
         state_ptr->update_state(new_state_ptr);
         // save the data (raycast interseciton, position of sat, ast estimate, targets) to hdf5
-        reconstructed_vertex_group.write(std::to_string(ii), rmesh_ptr->get_verts());
-        reconstructed_weight_group.write(std::to_string(ii), rmesh_ptr->get_weights());
+        reconstructed_vertex_group.write(std::to_string(ii),
+                rmesh_ptr->get_verts());
+        reconstructed_weight_group.write(std::to_string(ii),
+                rmesh_ptr->get_weights());
         state_group.write(std::to_string(ii), state_ptr->get_state());
         targets_group.write(std::to_string(ii), target);
         intersections_group.write(std::to_string(ii), intersection);
