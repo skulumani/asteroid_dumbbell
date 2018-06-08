@@ -77,8 +77,6 @@ class Asteroid(object):
                 verts, faces = wavefront.read_obj('./data/shape_model/EROS/eros_low.obj')
             elif name == 'cube':
                 verts, faces = wavefront.read_obj('./integration/cube.obj')
-                # translate so center of object is at origin
-                # verts = verts - np.array([0.5, 0.5, 0.5])
             elif name == 'tetrahedron':
                 verts, faces = wavefront.read_obj('./integration/tetrahedron.obj')
             elif name == 'octahedron':
