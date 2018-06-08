@@ -7,21 +7,19 @@
 #include <iostream>
 #include <memory>
 
-void print_polyhedron_vertices(std::shared_ptr<MeshData> mesh) {
-    std::copy (mesh->polyhedron.points_begin(), mesh->polyhedron.points_end(), std::ostream_iterator<CGAL::Simple_cartesian<double>::Point_3>(std::cout, "\n")); 
-}
+namespace Stats {
 
-void print_surface_mesh_vertices(std::shared_ptr<MeshData> mesh) {
-    for (auto ii = mesh->vertex_descriptor.begin(); ii != mesh->vertex_descriptor.end(); ++ii) {
-        std::cout << *ii << " " << mesh->surface_mesh.point(*ii) << std::endl;
+    void print_surface_mesh_vertices(std::shared_ptr<MeshData> mesh) {
+        for (Vertex_index vd : mesh->vertices() ) {
+            std::cout << vd  << " " << mesh->get_vertex(vd )<< std::endl;
+        }
     }
-}
 
-void surface_mesh_stats(std::shared_ptr<MeshData> mesh) {
-    
-    std::cout << "#Vertices : " << mesh->surface_mesh.number_of_vertices() << std::endl;
-    std::cout << "#Faces: " << mesh->surface_mesh.number_of_faces() << std::endl;
-}
+    void surface_mesh_stats(std::shared_ptr<MeshData> mesh) {
+        std::cout << "#Vertices : " << mesh->number_of_vertices() << std::endl;
+        std::cout << "#Faces: " << mesh->number_of_faces() << std::endl;
+    }
+} // end stats namespace
 
 namespace PolyVolume {
     double volume(const Eigen::Ref<const Eigen::MatrixXd> &v,
