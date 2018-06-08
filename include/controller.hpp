@@ -4,11 +4,14 @@
 #include "potential.hpp"
 #include "state.hpp"
 #include "cgal.hpp"
+#include "cgal_types.hpp"
 
 #include <Eigen/Dense>
 
 #include <memory>
 
+// forward declaration
+class MeshData;
 class ReconstructMesh;
 
 /** @class AttitudeController
@@ -91,7 +94,7 @@ class TranslationController {
         RayCaster caster;
         Eigen::MatrixXd controller_vertices;
         Eigen::MatrixXi controller_faces;
-        std::vector<Eigen::VectorXi> mesh_mapping;
+        std::vector<std::vector<Vertex_index> > mesh_mapping;
 
         void generate_controller_mesh( void );
         void build_controller_mesh_mapping(std::shared_ptr<const MeshData> meshdata_ptr,
@@ -176,7 +179,7 @@ class TranslationController {
 
         Eigen::MatrixXd get_controller_vertices( void ) const { return controller_vertices; }
         Eigen::MatrixXi get_controller_faces( void ) const { return controller_faces; }
-        std::vector<Eigen::VectorXi> get_mesh_mapping( void ) const { return mesh_mapping; }
+        std::vector<std::vector<Vertex_index> > get_mesh_mapping( void ) const { return mesh_mapping; }
     protected:
         Eigen::Matrix<double, 3, 1> mposd; /**< Desired position in the asteroid fixed frame */
         Eigen::Matrix<double, 3, 1> mveld; /**< Desired velocity of com wrt to asteroid in asteroid frame */
