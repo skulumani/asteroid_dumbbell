@@ -60,6 +60,6 @@ int main(int argc, char* argv[]) {
     std::string output_file = "/tmp/" + remove_extension(base_name(input_file)) + "_remesh.obj";
     std::cout << "Saving to: " + output_file << std::endl;
 
-    igl::writeOBJ(output_file, mesh->get_surface_mesh_vertices(), mesh->get_surface_mesh_faces());
+    igl::writeOBJ(output_file, mesh->get_verts(), mesh->get_faces());
     return 0;
 }

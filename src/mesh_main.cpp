@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
 
     // compute the volume of the mesh
     double vol;
-    vol = PolyVolume::volume(mesh->vertices, mesh->faces);
+    vol = PolyVolume::volume(mesh->get_verts(), mesh->get_faces());
     std::cout << "Volume: " << vol << std::endl;
     
     /* std::cout << "Vertices: \n" << mesh->vertices << std::endl; */
