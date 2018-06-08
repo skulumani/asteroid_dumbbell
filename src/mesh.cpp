@@ -348,19 +348,19 @@ Eigen::Matrix<int, Eigen::Dynamic, 3> MeshData::get_faces( void ) const {
     return faces;
 }
 
-double MeshData::number_of_vertices( void ) const {
+std::size_t MeshData::number_of_vertices( void ) const {
     return surface_mesh.number_of_vertices();
 }
 
-double MeshData::number_of_edges( void ) const {
+std::size_t MeshData::number_of_edges( void ) const {
     return surface_mesh.number_of_edges();
 }
 
-double MeshData::number_of_faces( void ) const {
+std::size_t MeshData::number_of_faces( void ) const {
     return surface_mesh.number_of_faces();
 }
 
-double MeshData::number_of_halfedges( void ) const {
+std::size_t MeshData::number_of_halfedges( void ) const {
     return surface_mesh.number_of_halfedges();
 }
 
@@ -475,6 +475,13 @@ Eigen::RowVector3d MeshData::get_vertex(const Index& index) const {
     vertex(2) = surface_mesh.point(vd).z();
 
     return vertex;
+}
+
+bool MeshData::set_vertex(const Vertex_index& vd, 
+        const Eigen::Ref<const Eigen::Vector3d>& vec) {
+    
+    Point p = Kernel::Point_3(vec(0), vec(1), vec(2));
+    surface_mesh.point(vd) = p;
 }
 
 template<typename Index>
