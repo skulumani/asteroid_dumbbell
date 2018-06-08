@@ -382,7 +382,7 @@ Mesh::Halfedge_range MeshData::halfedges( void ) const {
 }
 
 template<typename Index>
-Eigen::Vector3d MeshData::get_face_normal(const Index& fd_in) {
+Eigen::Vector3d MeshData::get_face_normal(const Index& fd_in) const {
     Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
     bool found;
     std::tie(face_unit_normal, found) = surface_mesh.property_map<
@@ -393,7 +393,7 @@ Eigen::Vector3d MeshData::get_face_normal(const Index& fd_in) {
 }
 
 template<typename Index>
-Eigen::Vector3d MeshData::get_face_center(const Index& fd_in) {
+Eigen::Vector3d MeshData::get_face_center(const Index& fd_in) const {
     Mesh::Property_map<Face_index, Eigen::Vector3d> face_center;
     bool found;
     std::tie(face_center, found) = surface_mesh.property_map<
@@ -404,7 +404,7 @@ Eigen::Vector3d MeshData::get_face_center(const Index& fd_in) {
 }
 
 template<typename Index>
-Eigen::Matrix3d MeshData::get_face_dyad(const Index& fd_in) {
+Eigen::Matrix3d MeshData::get_face_dyad(const Index& fd_in) const {
     Mesh::Property_map<Face_index, Eigen::Matrix3d> face_dyad;
     bool found;
     std::tie(face_dyad, found) = surface_mesh.property_map<
@@ -415,7 +415,7 @@ Eigen::Matrix3d MeshData::get_face_dyad(const Index& fd_in) {
 }
 
 template<typename Index>
-Eigen::Vector3d MeshData::get_halfedge_normal(const Index& hd_in) {
+Eigen::Vector3d MeshData::get_halfedge_normal(const Index& hd_in) const {
     Mesh::Property_map<Halfedge_index, Eigen::Vector3d> halfedge_unit_normal;
     bool found;
     std::tie(halfedge_unit_normal, found) = surface_mesh.property_map<
@@ -425,7 +425,7 @@ Eigen::Vector3d MeshData::get_halfedge_normal(const Index& hd_in) {
 }
 
 template<typename Index>
-Eigen::Matrix3d MeshData::get_edge_dyad(const Index& ed_in) {
+Eigen::Matrix3d MeshData::get_edge_dyad(const Index& ed_in) const {
     Mesh::Property_map<Edge_index, Eigen::Matrix3d> edge_dyad;
     bool found;
     std::tie(edge_dyad, found) = surface_mesh.property_map<
@@ -435,7 +435,7 @@ Eigen::Matrix3d MeshData::get_edge_dyad(const Index& ed_in) {
 }
 
 template<typename Index>
-double MeshData::get_edge_factor(const Index& ed_in) {
+double MeshData::get_edge_factor(const Index& ed_in) const {
     Mesh::Property_map<Edge_index, double> edge_factor;
     bool found;
     std::tie(edge_factor, found) = surface_mesh.property_map<
@@ -445,7 +445,7 @@ double MeshData::get_edge_factor(const Index& ed_in) {
 }
 
 template<typename Index>
-double MeshData::get_face_factor(const Index& fd_in) {
+double MeshData::get_face_factor(const Index& fd_in) const {
     Mesh::Property_map<Face_index, double> face_factor;
     bool found;
     std::tie(face_factor, found) = surface_mesh.property_map<
@@ -455,7 +455,7 @@ double MeshData::get_face_factor(const Index& fd_in) {
     return face_factor[fd];
 }
 
-double MeshData::get_sum_face_factor( void ) {
+double MeshData::get_sum_face_factor( void ) const {
     double w_face_sum = 0;
     for (Face_index fd : surface_mesh.faces()) {
         w_face_sum += get_face_factor(fd);    
@@ -464,7 +464,7 @@ double MeshData::get_sum_face_factor( void ) {
 }
 
 template<typename Index>
-Eigen::RowVector3d MeshData::get_vertex(const Index& index) {
+Eigen::RowVector3d MeshData::get_vertex(const Index& index) const {
     // form Vertex_index
     Vertex_index vd(index);
     
@@ -478,7 +478,7 @@ Eigen::RowVector3d MeshData::get_vertex(const Index& index) {
 }
 
 template<typename Index>
-Eigen::RowVector3i MeshData::get_face_vertices(const Index& index) {
+Eigen::RowVector3i MeshData::get_face_vertices(const Index& index) const {
     Face_index fd(index);
 
     Eigen::RowVector3i face_vertices;
@@ -491,21 +491,21 @@ Eigen::RowVector3i MeshData::get_face_vertices(const Index& index) {
 }
 
 // Template Specialization
-template Eigen::RowVector3d MeshData::get_vertex<std::size_t>(const std::size_t&);
-template Eigen::RowVector3d MeshData::get_vertex<int>(const int&);
-template Eigen::RowVector3d MeshData::get_vertex<Vertex_index>(const Vertex_index&);
+template Eigen::RowVector3d MeshData::get_vertex<std::size_t>(const std::size_t&) const;
+template Eigen::RowVector3d MeshData::get_vertex<int>(const int&) const;
+template Eigen::RowVector3d MeshData::get_vertex<Vertex_index>(const Vertex_index&) const;
 
-template Eigen::RowVector3i MeshData::get_face_vertices<std::size_t>(const std::size_t&);
-template Eigen::RowVector3i MeshData::get_face_vertices<int>(const int&);
-template Eigen::RowVector3i MeshData::get_face_vertices<Face_index>(const Face_index&);
+template Eigen::RowVector3i MeshData::get_face_vertices<std::size_t>(const std::size_t&) const;
+template Eigen::RowVector3i MeshData::get_face_vertices<int>(const int&) const;
+template Eigen::RowVector3i MeshData::get_face_vertices<Face_index>(const Face_index&) const;
 
-template Eigen::Vector3d MeshData::get_face_normal<Face_index>(const Face_index&);
-template Eigen::Vector3d MeshData::get_face_center<Face_index>(const Face_index&);
-template Eigen::Matrix3d MeshData::get_face_dyad<Face_index>(const Face_index&);
+template Eigen::Vector3d MeshData::get_face_normal<Face_index>(const Face_index&) const;
+template Eigen::Vector3d MeshData::get_face_center<Face_index>(const Face_index&) const;
+template Eigen::Matrix3d MeshData::get_face_dyad<Face_index>(const Face_index&) const;
 
-template Eigen::Vector3d MeshData::get_halfedge_normal<Halfedge_index>(const Halfedge_index&);
+template Eigen::Vector3d MeshData::get_halfedge_normal<Halfedge_index>(const Halfedge_index&) const;
 
-template Eigen::Matrix3d MeshData::get_edge_dyad<Edge_index>(const Edge_index&);
+template Eigen::Matrix3d MeshData::get_edge_dyad<Edge_index>(const Edge_index&) const;
 
-template double MeshData::get_edge_factor<Edge_index>(const Edge_index&);
-template double MeshData::get_face_factor<Face_index>(const Face_index&);
+template double MeshData::get_edge_factor<Edge_index>(const Edge_index&) const;
+template double MeshData::get_face_factor<Face_index>(const Face_index&) const;

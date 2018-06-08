@@ -57,31 +57,31 @@ class MeshData {
         Mesh::Halfedge_range halfedges( void ) const;
 
         template<typename Index>
-        Eigen::RowVector3d get_vertex(const Index& index);
+        Eigen::RowVector3d get_vertex(const Index& index) const;
 
         template<typename Index>
-        Eigen::RowVector3i get_face_vertices(const Index& index);
+        Eigen::RowVector3i get_face_vertices(const Index& index) const;
         
         // Getters for the property maps
         template<typename Index>
-        Eigen::Vector3d get_face_normal(const Index& fd);
+        Eigen::Vector3d get_face_normal(const Index& fd) const;
         template<typename Index>
-        Eigen::Vector3d get_face_center(const Index& fd);
+        Eigen::Vector3d get_face_center(const Index& fd) const;
         template<typename Index>
-        Eigen::Matrix3d get_face_dyad(const Index& fd);
+        Eigen::Matrix3d get_face_dyad(const Index& fd) const;
         
         template<typename Index>
-        Eigen::Vector3d get_halfedge_normal(const Index& hd);
+        Eigen::Vector3d get_halfedge_normal(const Index& hd) const;
         
         template<typename Index>
-        Eigen::Matrix3d get_edge_dyad(const Index& ed);
+        Eigen::Matrix3d get_edge_dyad(const Index& ed) const;
         
         template<typename Index>
-        double get_edge_factor(const Index& ed);
+        double get_edge_factor(const Index& ed) const;
 
         template<typename Index>
-        double get_face_factor(const Index& ed);
-        double get_sum_face_factor( void );
+        double get_face_factor(const Index& ed) const;
+        double get_sum_face_factor( void ) const;
     private:
 
         // build the polyhedron
