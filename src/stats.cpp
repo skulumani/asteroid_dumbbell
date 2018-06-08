@@ -50,7 +50,25 @@ namespace PolyVolume {
     }
 
     double volume(std::shared_ptr<const MeshData> meshdata_ptr) {
-        return volume(meshdata_ptr->get_verts(), meshdata_ptr->get_faces());
+        double volume(0);
+
+        // loop over faces
+        for (Face_index fd : meshdata_ptr->faces()) {
+            Eigen::Matrix<double, 4, 4> tetrahedron_matrix;
+
+            // get vertices of teh face
+            std::size_t row = 0;
+            for (Vertex_index vd : vertices_around_face(meshdata_ptr->surface_mesh.halfedge(fd), 
+                        meshdata_ptr->surface_mesh)){
+                Eigen::Vector3d vec = meshdata_ptr->get_vertex(vd);
+                tetrahedron_matrix.row(row) << vec(0), vec(1), vec(2), 1;
+                ++row;
+            } 
+            tetrahedron_matrix.row(3) << 0, 0, 0, 1;
+
+            volume = volume+tetrahedron_matrix.determinant();
+        }
+        return 1.0/6.0 * volume;
     }
     
     double volume(std::shared_ptr<const Asteroid> ast_ptr) {
