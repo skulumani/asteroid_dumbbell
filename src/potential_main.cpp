@@ -33,10 +33,10 @@ int main(int argc, char* argv[]) {
     Eigen::Vector3d state; 
     state << 1, 2, 3;
     
-    /* /1* start = omp_get_wtime(); *1/ */
+    double start = omp_get_wtime();
     ast.polyhedron_potential(state);
-    /* /1* end = omp_get_wtime() - start; *1/ */
-    /* /1* std::cout << "PolyPotential: " << end << " sec " << std::endl; *1/ */
+    double end = omp_get_wtime() - start;
+    std::cout << "Potential run time: " << end << " sec " << std::endl;
 
     std::cout << "U : " << ast.get_potential() << std::endl; 
     std::cout << "U_grad : " << ast.get_acceleration().transpose() << std::endl;
