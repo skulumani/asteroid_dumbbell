@@ -28,7 +28,7 @@ T remove_extension(T const & filename)
 int main(int argc, char* argv[]) { 
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
-        std::cout << "Usage: refine -i input_file.obj" << std::endl;
+        std::cout << "Usage: remesh -i input_file.obj" << std::endl;
     }
 
     const std::string input_file = input.get_command_option("-i");
@@ -41,7 +41,8 @@ int main(int argc, char* argv[]) {
 
     // define a set of faces to refine
     std::vector<Face_index> faces_to_refine;
-    faces_to_refine.push_back(mesh->face_descriptor[0]);
+    Face_index fd(0);
+    faces_to_refine.push_back(fd);
 
     std::cout << "Old number of vertices: " << mesh->surface_mesh.number_of_vertices() << std::endl;
 
