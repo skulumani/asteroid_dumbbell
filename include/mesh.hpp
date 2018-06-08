@@ -45,10 +45,10 @@ class MeshData {
         Eigen::Matrix<double, Eigen::Dynamic, 3> get_verts( void ) const;
         Eigen::Matrix<int, Eigen::Dynamic, 3> get_faces( void ) const;
 
-        double number_of_vertices( void ) const;
-        double number_of_edges( void ) const;
-        double number_of_faces( void ) const;
-        double number_of_halfedges( void ) const;
+        std::size_t number_of_vertices( void ) const;
+        std::size_t number_of_edges( void ) const;
+        std::size_t number_of_faces( void ) const;
+        std::size_t number_of_halfedges( void ) const;
         
         // Range types for iteration
         Mesh::Vertex_range vertices( void ) const;
