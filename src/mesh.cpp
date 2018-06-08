@@ -25,43 +25,31 @@ void MeshData::build_polyhedron(const Eigen::Ref<const Eigen::MatrixXd> &V,
 void MeshData::build_surface_mesh(const Eigen::Ref<const Eigen::MatrixXd> & V,
         const Eigen::Ref<const Eigen::MatrixXi>& F) {
     // create some vertices
-    Kernel::Point_3 p, p1, p2, p3;
-    Mesh::Vertex_index v, v1, v2, v3;
-
+    std::vector<Vertex_index> vert_indices;
     // build the mesh
     // build vector of vertex descriptors
 
     for (int ii = 0; ii < V.rows(); ++ii) {
-        p = Kernel::Point_3(V(ii, 0), V(ii, 1), V(ii, 2));
-        v = this->surface_mesh.add_vertex(p);
-
-        this->vertex_descriptor.push_back(v);
-
+        Point p = Kernel::Point_3(V(ii, 0), V(ii, 1), V(ii, 2));
+        Vertex_index v = this->surface_mesh.add_vertex(p);
         assert(surface_mesh.is_valid(v));
+        vert_indices.push_back(v);
     }
-    
-
-    std::vector<Vertex_index> face_indices;
 
     for (int ii = 0; ii < F.rows(); ++ii) {
+        Point p1, p2, p3;
         p1 = Kernel::Point_3(V(F(ii, 0), 0), V(F(ii, 0), 1), V(F(ii, 0), 2));
         p2 = Kernel::Point_3(V(F(ii, 1), 0), V(F(ii, 1), 1), V(F(ii, 2), 2));
         p3 = Kernel::Point_3(V(F(ii, 2), 0), V(F(ii, 2), 1), V(F(ii, 2), 2));
+        
+        Vertex_index v1, v2, v3;
 
-        v1 = this->vertex_descriptor[F(ii, 0)];
-        v2 = this->vertex_descriptor[F(ii, 1)];
-        v3 = this->vertex_descriptor[F(ii, 2)];
+        v1 = vert_indices[F(ii, 0)];
+        v2 = vert_indices[F(ii, 1)];
+        v3 = vert_indices[F(ii, 2)];
 
         Face_index f = this->surface_mesh.add_face(v1, v2, v3);
         assert(surface_mesh.is_valid(f));
-
-        face_indices = {v1, v2, v3};
-        this->vertex_in_face_descriptor.push_back(face_indices);
-    }
-    
-    // store face descriptors to an array
-    for(Face_index fd: surface_mesh.faces()) {
-        face_descriptor.push_back(fd);
     }
 
     /* // can also loop over edges */
@@ -72,7 +60,13 @@ void MeshData::build_surface_mesh(const Eigen::Ref<const Eigen::MatrixXd> & V,
     /* } */
 
     assert(surface_mesh.is_valid());
+    /* std::vector<std::string> props = surface_mesh.properties<Face_index>(); */
+    
+    /* BOOST_FOREACH(std::string p, props){ */
+    /*     std::cout << p << std::endl; */
+    /* } */
 
+    /* std::cout << surface_mesh.properties()[0] << std::endl; */
     // face_normal, edge normal, halfedge normal, face dyad, edge dyad
     build_face_properties();
     build_halfedge_properties();
@@ -86,7 +80,7 @@ bool MeshData::build_face_properties( void ) {
     std::tie( face_unit_normal, created ) 
         = surface_mesh.add_property_map<Face_index, Eigen::Vector3d>(
                 "f:face_unit_normal", (Eigen::Vector3d() << 0, 0, 0).finished());
-    assert(created);
+    /* assert(created); */
     
     // Center face property map
     Mesh::Property_map<Face_index, Eigen::Vector3d> face_center;
@@ -94,14 +88,14 @@ bool MeshData::build_face_properties( void ) {
     std::tie(face_center, created) 
         = surface_mesh.add_property_map<Face_index, Eigen::Vector3d>(
                 "f:face_center", (Eigen::Vector3d() << 0 ,0 ,0).finished());
-    assert(created);
+    /* assert(created); */
     
     // Face dyad
     Mesh::Property_map<Face_index, Eigen::Matrix3d> face_dyad;
     std::tie(face_dyad, created)
         = surface_mesh.add_property_map<Face_index, Eigen::Matrix3d>(
                 "f:face_dyad", Eigen::Matrix3d::Zero());
-    assert(created);
+    /* assert(created); */ // true if new, false if exists but returned
 
     // loop over all faces need to dereference the iterators but not the index
     for (Face_index fd: surface_mesh.faces() ){
@@ -146,13 +140,14 @@ bool MeshData::build_halfedge_properties( void ) {
         = surface_mesh.add_property_map<Halfedge_index, Eigen::Vector3d>(
                 "h:halfedge_unit_normal", (Eigen::Vector3d() << 0, 0, 0).finished());
     
-    assert(created);
+    /* assert(created); */
     
     Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
     bool found;
     std::tie(face_unit_normal, found) 
         = surface_mesh.property_map<Face_index, Eigen::Vector3d>(
                 "f:face_unit_normal");
+    assert(found);
 
     for (Halfedge_index hd: surface_mesh.halfedges()) {
         Vertex_index vs, ve;
@@ -180,7 +175,7 @@ bool MeshData::build_edge_properties( void ){
     std::tie(edge_dyad, created)
         = surface_mesh.add_property_map<Edge_index, Eigen::Matrix3d>(
                 "e:edge_dyad", Eigen::Matrix3d::Zero());
-    assert(created);
+    /* assert(created); */
     
     // normal face property map
     Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
@@ -188,14 +183,15 @@ bool MeshData::build_edge_properties( void ){
     std::tie(face_unit_normal, found) 
         = surface_mesh.property_map<Face_index, Eigen::Vector3d>(
                 "f:face_unit_normal");
-    assert(found);
+    /* assert(found); */
 
     // halfedge normal property map
     Mesh::Property_map<Halfedge_index, Eigen::Vector3d> halfedge_unit_normal;
     std::tie(halfedge_unit_normal, found)
         = surface_mesh.property_map<Halfedge_index, Eigen::Vector3d>(
                 "h:halfedge_unit_normal");
-    
+    assert(found);
+
     for (Edge_index ed: surface_mesh.edges()) {
 
         Halfedge_index h1, h2;
@@ -301,19 +297,17 @@ bool MeshData::build_face_factor(const Eigen::Ref<const Eigen::Vector3d>& pos) {
     return true;
 }
 
-void MeshData::update_mesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
+void MeshData::update_mesh(const Eigen::Ref<const Eigen::MatrixXd> &V, 
+        const Eigen::Ref<const Eigen::MatrixXi> &F) {
     // update the polyhedron and surface mesh
-    
     // clear the mesh
     this->surface_mesh.clear();
-    this->polyhedron.clear();
-    
+
     // clear the descriptors
     vertex_descriptor.clear();
     vertex_in_face_descriptor.clear();
     face_descriptor.clear();
-
-    this->build_polyhedron(V, F);
+    
     this->build_surface_mesh(V, F);
 }
 
