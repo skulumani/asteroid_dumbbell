@@ -55,6 +55,8 @@ class MeshData {
         Mesh::Face_range faces( void ) const;
         Mesh::Edge_range edges( void ) const;
         Mesh::Halfedge_range halfedges( void ) const;
+        
+        /* std::shared_ptr<Mesh> get_mesh( void ) const { return std::make_shared<Mesh>(surface_mesh) }; */
 
         template<typename Index>
         Eigen::RowVector3d get_vertex(const Index& index) const;
