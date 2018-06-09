@@ -365,7 +365,6 @@ void Asteroid::init_asteroid( void ) {
 }
 
 void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state) {
-    
     // build L and w
     bool edge_built, face_built;
     #pragma omp parallel if(true)
