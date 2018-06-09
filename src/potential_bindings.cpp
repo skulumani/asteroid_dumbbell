@@ -24,6 +24,10 @@ PYBIND11_MODULE(asteroid, m) {
         .def("get_omega", &Asteroid::get_omega, "Get the omega rotation rate")
         .def("get_verts", &Asteroid::get_verts, "Get the vertices of the mesh")
         .def("get_faces", &Asteroid::get_faces, "Get the faces of the mesh")
+        .def("set_grav_constant", &Asteroid::set_grav_constant, "Set the gravitational constant",
+                pybind11::arg("G (km/kg sec^2)"))
+        .def("set_sigma", &Asteroid::set_sigma, "Set the density of the asteroid",
+                pybind11::arg("Sigma (density  kg/km^3)"))
         .def("polyhedron_potential", &Asteroid::polyhedron_potential, "Compute polyhedron potential",
                 pybind11::arg("state"))
         .def("get_axes", &Asteroid::get_axes, "Return axes of asteroid")
