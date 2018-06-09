@@ -72,39 +72,8 @@ TEST_F(TestMeshData, UpdateMesh) {
     mesh.update_mesh(Ve_true, Fe_true);
     ASSERT_TRUE(mesh.get_verts().isApprox(Ve_true));
     ASSERT_TRUE(mesh.get_faces().isApprox(Fe_true));
-    ASSERT_EQ(mesh.polyhedron.is_valid(), 1);
+    ASSERT_EQ(mesh.surface_mesh.is_valid(), 1);
     
-}
-
-TEST_F(TestMeshData, PolyhedronVertexIndexMatch) {
-    // check to make sure eigen_v.row(n) == Polyhedron vertex(n)
-    // initialize the mesh data object
-    MeshData mesh(Ve_true, Fe_true);
-    // go to a specific vertex and get teh vector
-    Polyhedron::Vertex_iterator pv_iter = mesh.polyhedron.vertices_begin();
-    
-    for (int ii = 0; ii < Ve_true.rows(); ++ii) {
-        EXPECT_EQ(pv_iter->point().x(), Ve_true(ii, 0));
-        EXPECT_EQ(pv_iter->point().y(), Ve_true(ii, 1));
-        EXPECT_EQ(pv_iter->point().z(), Ve_true(ii, 2));
-        std::advance(pv_iter, 1);
-    }
-}
-
-TEST_F(TestMeshData, PolyhedronFaceIndexMatch) {
-    MeshData mesh(Ve_true, Fe_true);
-    std::size_t f_index = 0;    
-    for (Polyhedron::Facet_iterator f_iter = mesh.polyhedron.facets_begin(); f_iter != mesh.polyhedron.facets_end(); ++f_iter) {
-        /* std::advance(f_iter, 1); */
-        Polyhedron::Halfedge_around_facet_const_circulator he = f_iter->facet_begin();
-        // loop over all vertices of the face
-        std::size_t c = 0;
-        do {
-            EXPECT_EQ(he->vertex()->id(), Fe_true(f_index, c));
-            c++;
-        } while (++he != f_iter->facet_begin());
-        f_index++;
-    }
 }
 
 TEST_F(TestMeshData, SurfaceMeshVertexIndexMatch) {

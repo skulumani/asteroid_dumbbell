@@ -11,15 +11,7 @@
 // TODO COMPLETELY REMOVE POLYHEDRON
 // Member methods
 MeshData::MeshData(const Eigen::Ref<const Eigen::MatrixXd> &V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
-    this->build_polyhedron(V, F);
     this->build_surface_mesh(V, F);
-}
-
-void MeshData::build_polyhedron(const Eigen::Ref<const Eigen::MatrixXd> &V, 
-        const Eigen::Ref<const Eigen::MatrixXi> &F) {
-    // only called after initialization
-    eigen_to_polyhedron(V, F, polyhedron);
-    /* igl::copyleft::cgal::mesh_to_polyhedron(vertices, faces, polyhedron); */
 }
 
 void MeshData::build_surface_mesh(const Eigen::Ref<const Eigen::MatrixXd> & V,

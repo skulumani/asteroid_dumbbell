@@ -23,8 +23,6 @@ class MeshData {
         void update_mesh(const Eigen::Ref<const Eigen::MatrixXd> &V, 
                 const Eigen::Ref<const Eigen::MatrixXi> &F);
 
-        Polyhedron polyhedron;
-       
         // Surface mesh shit
         Mesh surface_mesh;
     
@@ -83,10 +81,6 @@ class MeshData {
         double get_sum_face_factor( void ) const;
     private:
 
-        // build the polyhedron
-        void build_polyhedron(
-                const Eigen::Ref<const Eigen::MatrixXd>& V,
-                const Eigen::Ref<const Eigen::MatrixXi>& F);
         void build_surface_mesh(
                 const Eigen::Ref<const Eigen::MatrixXd>& V,
                 const Eigen::Ref<const Eigen::MatrixXi>& F);
