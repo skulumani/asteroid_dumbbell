@@ -362,6 +362,13 @@ bool MeshData::set_vertex(const Vertex_index& vd,
     surface_mesh.point(vd) = p;
 
     // update the mesh properties associated with this vertex index
+    std::vector<Face_index> face_vec = get_faces_with_vertex(vd);
+    std::vector<Halfedge_index> halfedge_vec = get_halfedges_with_vertex(vd);
+    std::vector<Edge_index> edge_vec = get_edges_with_vertex(vd);
+
+    update_face_properties(face_vec);
+    update_halfedge_properties(halfedge_vec);
+    update_edge_properties(edge_vec);
 }
 
 template<typename Index>

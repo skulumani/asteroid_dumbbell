@@ -186,9 +186,41 @@ class MeshData {
         */
         bool compute_halfedge_properties(const Halfedge_index& hd);
         
-         
+        /** @fn bool build_edge_properties( void )
+                
+            Compute edge properties for all edges. This just calls
+            compute_edge_properties for each edge
+
+            @param void 
+            @returns bool true if success
+
+            @author Shankar Kulumani
+            @version 9 June 2018
+        */         
         bool build_edge_properties( void ); 
+
+        /** @fn bool update_edge_properties(const std::vector<Edge_index>& edge_vec)
+                
+            Update the edge properties for each edge in the vector
+
+            @param edge_vec vector of edge indices
+            @returns bool true if success
+
+            @author Shankar Kulumani
+            @version 9 June 2018
+        */
         bool update_edge_properties( const std::vector<Edge_index>& edge_vec);
+
+        /** @fn bool compute_edge_properties(const Edge_index& ed)
+                
+            Cmopute the edge dyad for the given edge index
+
+            @param ed Edge index
+            @returns bool true if success
+
+            @author Shankar Kulumani
+            @version 9 June 2018
+        */
         bool compute_edge_properties(const Edge_index& ed);
 
         /** @fn std::vector<Face_index> get_faces_with_vertex(const Vertex_index& vd)
