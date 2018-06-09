@@ -43,13 +43,14 @@ int main(int argc, char* argv[]) {
     std::vector<Face_index> faces_to_refine;
     Face_index fd(0);
     faces_to_refine.push_back(fd);
+    faces_to_refine.push_back(fd);
 
     std::cout << "Old number of vertices: " << mesh->surface_mesh.number_of_vertices() << std::endl;
 
     double target_edge_length(0.1);
 
     CGAL::Polygon_mesh_processing::isotropic_remeshing(
-            faces_to_refine,
+            faces(mesh->surface_mesh),
             target_edge_length,
             mesh->surface_mesh,
             CGAL::Polygon_mesh_processing::parameters::number_of_iterations(3));

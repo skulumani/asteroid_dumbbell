@@ -43,9 +43,10 @@ int main(int argc, char* argv[]) {
     
     // define a set of faces to refine
     std::vector<Face_index> faces_to_refine;
-    Face_index fd(0);
+    Face_index fd(0), fd1(1), fd2(2);
     faces_to_refine.push_back(fd);
-    
+    faces_to_refine.push_back(fd);
+    faces_to_refine.push_back(fd1); 
     // vectors to store the new faces/vertices
     std::vector<Face_index> new_faces;
     std::vector<Vertex_index> new_vertices;
@@ -61,6 +62,8 @@ int main(int argc, char* argv[]) {
     std::string output_file = "/tmp/" + remove_extension(base_name(input_file)) + "_refine.obj";
     std::cout << "Saving to: " + output_file << std::endl;
     
+    std::cout << mesh->get_face_normal(new_faces[0]) << std::endl;
+
     // take surface mesh and convert to vertices
     igl::writeOBJ(output_file, mesh->get_verts(), mesh->get_faces());
 
