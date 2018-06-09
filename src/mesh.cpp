@@ -10,7 +10,8 @@
 
 // TODO COMPLETELY REMOVE POLYHEDRON
 // Member methods
-MeshData::MeshData(const Eigen::Ref<const Eigen::MatrixXd> &V, const Eigen::Ref<const Eigen::MatrixXi> &F) {
+MeshData::MeshData(const Eigen::Ref<const Eigen::MatrixXd> &V,
+        const Eigen::Ref<const Eigen::MatrixXi> &F) {
     this->build_surface_mesh(V, F);
 }
 
@@ -61,7 +62,7 @@ void MeshData::build_surface_mesh(const Eigen::Ref<const Eigen::MatrixXd> & V,
     /* std::cout << surface_mesh.properties()[0] << std::endl; */
     // face_normal, edge normal, halfedge normal, face dyad, edge dyad
     bool face_built, halfedge_built, edge_built;
-    #pragma omp parallel if (true)
+    #pragma omp parallel if (false)
     {
         #pragma omp single
         {
