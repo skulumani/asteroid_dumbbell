@@ -79,61 +79,11 @@ void MeshData::build_surface_mesh(const Eigen::Ref<const Eigen::MatrixXd> & V,
 }
 
 bool MeshData::build_face_properties( void ) {
-    // Build property maps for the surface mesh
-    Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
-    bool created;
-    std::tie( face_unit_normal, created ) 
-        = surface_mesh.add_property_map<Face_index, Eigen::Vector3d>(
-                "f:face_unit_normal", (Eigen::Vector3d() << 0, 0, 0).finished());
-    /* assert(created); */
-    
-    // Center face property map
-    Mesh::Property_map<Face_index, Eigen::Vector3d> face_center;
-    /* bool created; */
-    std::tie(face_center, created) 
-        = surface_mesh.add_property_map<Face_index, Eigen::Vector3d>(
-                "f:face_center", (Eigen::Vector3d() << 0 ,0 ,0).finished());
-    /* assert(created); */
-    
-    // Face dyad
-    Mesh::Property_map<Face_index, Eigen::Matrix3d> face_dyad;
-    std::tie(face_dyad, created)
-        = surface_mesh.add_property_map<Face_index, Eigen::Matrix3d>(
-                "f:face_dyad", Eigen::Matrix3d::Zero());
-    /* assert(created); */ // true if new, false if exists but returned
 
     // loop over all faces need to dereference the iterators but not the index
     for (Face_index fd: surface_mesh.faces() ){
-        // need to consecutive vertices in face to get teh normal
-        Halfedge_index h1, h2, h3;
-        h1 = surface_mesh.halfedge(fd);
-        h2 = surface_mesh.next(h1);
-        h3 = surface_mesh.next(h2);
-        assert(surface_mesh.next(h3) == h1);
-
-        Vertex_index v1, v2, v3;
-        v1 = surface_mesh.source(h1);
-        v2 = surface_mesh.source(h2);
-        v3 = surface_mesh.source(h3);
-        assert(surface_mesh.target(h1) == v2);
-        assert(surface_mesh.target(h2) == v3);
-        assert(surface_mesh.target(h3) == v1);
-
-        // now extract the point into Eigen arrays
-        Eigen::Vector3d vec1, vec2, vec3;
-        vec1 = get_vertex(v1);
-        vec2 = get_vertex(v2);
-        vec3 = get_vertex(v3);
-
-        Eigen::Vector3d edge1, edge2;
-        edge1 = vec2 - vec1;
-        edge2 = vec3 - vec1;
-
-        face_unit_normal[fd] = edge1.cross(edge2).normalized();
-        face_center[fd] = 1.0 / 3.0 * (vec1 + vec2 + vec3);
-        face_dyad[fd] = face_unit_normal[fd] * face_unit_normal[fd].transpose();
-
-        assert(face_dyad[fd].isApprox(face_dyad[fd].transpose(), 1e-3));
+        bool face_updated = compute_face_properties(fd);
+        assert(face_updated);
     }
     return true;
 }
@@ -474,6 +424,8 @@ bool MeshData::set_vertex(const Vertex_index& vd,
     
     Point p = Kernel::Point_3(vec(0), vec(1), vec(2));
     surface_mesh.point(vd) = p;
+
+    // update the mesh properties associated with this vertex index
 }
 
 template<typename Index>
@@ -489,6 +441,92 @@ Eigen::RowVector3i MeshData::get_face_vertices(const Index& index) const {
     return face_vertices;
 }
 
+std::vector<Face_index> MeshData::get_faces_with_vertex(const Vertex_index& vd) const {
+    // loop around the vertex and get all the faces
+    std::vector<Face_index> face_vec;
+
+    for(Face_index fd : faces_around_target(surface_mesh.halfedge(vd), surface_mesh)) {
+        face_vec.push_back(fd); 
+    }
+    return face_vec;
+}
+
+std::vector<Halfedge_index> MeshData::get_halfedges_with_vertex(
+        const Vertex_index& vd) const {
+    std::vector<Halfedge_index> halfedge_vec;
+
+    for(Halfedge_index hd : halfedges_around_target(vd, surface_mesh)) {
+        halfedge_vec.push_back(hd);
+        halfedge_vec.push_back(surface_mesh.opposite(hd));
+    }
+
+    return halfedge_vec;
+}
+
+bool MeshData::update_face_properties(const std::vector<Face_index>& face_vec) {
+    // loop over the face vec and update the properties of each
+    for (std::size_t ii = 0; ii < face_vec.size(); ++ii) {
+        compute_face_properties(face_vec[ii]);
+    }
+    return true;
+}
+
+bool MeshData::compute_face_properties(const Face_index& fd) {
+    // Build property maps for the surface mesh
+    Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
+    bool created;
+    std::tie( face_unit_normal, created ) 
+        = surface_mesh.add_property_map<Face_index, Eigen::Vector3d>(
+                "f:face_unit_normal", (Eigen::Vector3d() << 0, 0, 0).finished());
+    /* assert(created); */
+    
+    // Center face property map
+    Mesh::Property_map<Face_index, Eigen::Vector3d> face_center;
+    /* bool created; */
+    std::tie(face_center, created) 
+        = surface_mesh.add_property_map<Face_index, Eigen::Vector3d>(
+                "f:face_center", (Eigen::Vector3d() << 0 ,0 ,0).finished());
+    /* assert(created); */
+    
+    // Face dyad
+    Mesh::Property_map<Face_index, Eigen::Matrix3d> face_dyad;
+    std::tie(face_dyad, created)
+        = surface_mesh.add_property_map<Face_index, Eigen::Matrix3d>(
+                "f:face_dyad", Eigen::Matrix3d::Zero());
+    /* assert(created); */ // true if new, false if exists but returned
+    // need to consecutive vertices in face to get teh normal
+    Halfedge_index h1, h2, h3;
+    h1 = surface_mesh.halfedge(fd);
+    h2 = surface_mesh.next(h1);
+    h3 = surface_mesh.next(h2);
+    assert(surface_mesh.next(h3) == h1);
+
+    Vertex_index v1, v2, v3;
+    v1 = surface_mesh.source(h1);
+    v2 = surface_mesh.source(h2);
+    v3 = surface_mesh.source(h3);
+    assert(surface_mesh.target(h1) == v2);
+    assert(surface_mesh.target(h2) == v3);
+    assert(surface_mesh.target(h3) == v1);
+
+    // now extract the point into Eigen arrays
+    Eigen::Vector3d vec1, vec2, vec3;
+    vec1 = get_vertex(v1);
+    vec2 = get_vertex(v2);
+    vec3 = get_vertex(v3);
+
+    Eigen::Vector3d edge1, edge2;
+    edge1 = vec2 - vec1;
+    edge2 = vec3 - vec1;
+
+    face_unit_normal[fd] = edge1.cross(edge2).normalized();
+    face_center[fd] = 1.0 / 3.0 * (vec1 + vec2 + vec3);
+    face_dyad[fd] = face_unit_normal[fd] * face_unit_normal[fd].transpose();
+
+    assert(face_dyad[fd].isApprox(face_dyad[fd].transpose(), 1e-3));
+    return true;
+
+}
 // Template Specialization
 template Eigen::RowVector3d MeshData::get_vertex<std::size_t>(const std::size_t&) const;
 template Eigen::RowVector3d MeshData::get_vertex<int>(const int&) const;
