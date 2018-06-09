@@ -261,6 +261,9 @@ class MeshData {
             @version 9 June 2018
         */
         std::vector<Edge_index> get_edges_with_vertex(const Vertex_index& vd) const;
+
+
+        bool remesh_faces(const std::vector<Face_index>& face_vec);
 };
 
 
