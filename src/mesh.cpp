@@ -60,9 +60,21 @@ void MeshData::build_surface_mesh(const Eigen::Ref<const Eigen::MatrixXd> & V,
 
     /* std::cout << surface_mesh.properties()[0] << std::endl; */
     // face_normal, edge normal, halfedge normal, face dyad, edge dyad
-    build_face_properties();
-    build_halfedge_properties();
-    build_edge_properties();
+    bool face_built, halfedge_built, edge_built;
+    #pragma omp parallel
+    {
+        #pragma omp single
+        {
+            #pragma omp task depend(out:face_built)
+            face_built = build_face_properties();
+
+            #pragma omp task depend(out:halfedge_built)
+            halfedge_built = build_halfedge_properties();
+
+            #pragma omp task depend(in:face_built) depend(in:halfedge_built)
+            edge_built = build_edge_properties();
+        }
+    }
 }
 
 bool MeshData::build_face_properties( void ) {
