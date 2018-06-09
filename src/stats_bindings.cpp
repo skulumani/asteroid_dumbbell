@@ -21,7 +21,6 @@ PYBIND11_MODULE(stats, m) {
             pybind11::arg("vertices"), pybind11::arg("faces"));
     m.def("volume", (double (*)(std::shared_ptr<const MeshData>)) &PolyVolume::volume, "Volume of a polyhedron from meshdata");
     m.def("volume", (double (*)(std::shared_ptr<const Asteroid>)) &PolyVolume::volume, "Volume of a polyhedron from Asteroid");
-    m.def("volume", (double (*)(std::shared_ptr<const MeshParam>)) &PolyVolume::volume, "Volume of a polyhedron from MeshParam");
     m.def("volume", (double (*)(std::shared_ptr<const ReconstructMesh>)) &PolyVolume::volume, "Volume of a polyhedron from ReconstructMesh");
 
 }

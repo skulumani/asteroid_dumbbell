@@ -6,38 +6,34 @@
 #include <iostream>
 #include <cmath>
 
+// Forward declaration
+Eigen::Matrix<double, Eigen::Dynamic, 1> initial_weight(const Eigen::Ref<const Eigen::MatrixXd> &v_in);
+
+// Constructor
 ReconstructMesh::ReconstructMesh( const Eigen::Ref<const Eigen::MatrixXd> &v_in,
                                   const Eigen::Ref<const Eigen::MatrixXi> &f_in,
-                                  const Eigen::Ref<const Eigen::MatrixXd> &w_in) {
-
-    this->weights = w_in;
-
+                                  const Eigen::Ref<const Eigen::VectorXd> &w_in) {
     // need to initialize the meshdata shared_ptr
     this->mesh = std::make_shared<MeshData>(v_in, f_in);
+    
+    set_all_weights(w_in);
 }
 
 // build object with only v and f
 ReconstructMesh::ReconstructMesh( const Eigen::Ref<const Eigen::MatrixXd> &v_in,
                                  const Eigen::Ref<const Eigen::MatrixXi> &f_in) {
-
-    
-    // now define the weights
-    this->weights.resize(v_in.rows(), 1);
-    this->weights << initial_weight(v_in);
-
     // need to initialize the meshdata shared_ptr
     this->mesh = std::make_shared<MeshData>(v_in, f_in);
+    initialize_weight();
 }
 
 ReconstructMesh::ReconstructMesh(std::shared_ptr<MeshData> mesh_in) {
-    
     // save another ptr to object
     this->mesh = mesh_in;
-    // set the weight to the maximum norm length of all vertices
-    this->weights.resize(this->mesh->get_verts().rows(), 1);
-    this->weights << initial_weight(mesh->get_verts());
+    initialize_weight();
 }
 
+// Member functions
 Eigen::MatrixXd ReconstructMesh::get_verts( void ) const {
     return this->mesh->get_verts();
 }
@@ -46,70 +42,56 @@ Eigen::MatrixXi ReconstructMesh::get_faces( void ) const {
     return this->mesh->get_faces();
 }
 
-Eigen::MatrixXd ReconstructMesh::get_weights( void ) const {
-    return this->weights;
-}
-
-template<typename T>
-Eigen::VectorXi vector_find(const Eigen::Ref<const T> &logical_vec) {
-    Eigen::VectorXi index = Eigen::VectorXi::LinSpaced(logical_vec.size(), 0, logical_vec.size() - 1);
-    index.conservativeResize(std::stable_partition(
-                index.data(), index.data() + index.size(), [&logical_vec](int i){return logical_vec(i);}) - index.data());
-    return index;
+Eigen::VectorXd ReconstructMesh::get_weights( void ) const {
+    Eigen::VectorXd weights(mesh->number_of_vertices());
+    Mesh::Property_map<Vertex_index, double> weight_property;
+    bool found;
+    std::tie(weight_property, found) 
+        = mesh->surface_mesh.property_map<Vertex_index, double>(
+                "v:weight");
+    assert(found);
+    std::size_t row = 0;
+    // read the weight property and build a matrix
+    for (Vertex_index vd : mesh->vertices()) {
+        weights(row) = weight_property[vd]; 
+        ++row;
+    }
+    return weights;
 }
 
 void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &pt,
                                     const double &max_angle) {
-    
-    double pt_radius = pt.norm();
-    Eigen::VectorXd vert_radius = this->mesh->vertices.rowwise().norm();
-
+     
     Eigen::Vector3d pt_uvec = pt.normalized();
-    Eigen::Matrix<double, Eigen::Dynamic, 3> vert_uvec(this->mesh->vertices.rows(), 3);
-    vert_uvec = this->mesh->vertices.rowwise().normalized();
-    
-    // compute the angular distance between the pt and each vertex
-    Eigen::Matrix<double, Eigen::Dynamic, 1> delta_sigma(vert_uvec.rows(), 1);
-    delta_sigma = central_angle(pt_uvec, vert_uvec);
+    double pt_radius = pt.norm();
+    // loop over all vertices
+    for (Vertex_index vd : mesh->vertices()){
+        // get a radius vector for this vertex
+        Eigen::Vector3d vert_uvec = mesh->get_vertex(vd).normalized();
+        // compute the central angle between vertex and teh measurement
+        double delta_sigma = single_central_angle(pt_uvec, vert_uvec);
+        // check if central angle is less than the max angle
+        if ( delta_sigma < max_angle) {
+            // if true then compute new radius and new weight
+            double meas_weight = pow(delta_sigma * pt_radius, 2);
+            // modify teh surface mesh with the new data
+            double radius_new = (mesh->get_vertex(vd).norm() * meas_weight 
+                    + pt_radius * get_weight(vd)) / ( get_weight(vd) + meas_weight ) ;
+            double weight_new = (get_weight(vd) * meas_weight) / ( get_weight(vd) + meas_weight);
 
-    Eigen::Array<bool, Eigen::Dynamic, 1> region_condition(this->mesh->vertices.rows());
-    region_condition = delta_sigma.array() < max_angle;
-    
-    Eigen::VectorXi region_index = vector_find<Eigen::Array<bool, Eigen::Dynamic, 1> >(region_condition);
-    
-    auto region_count = region_index.size();
-    
-    Eigen::VectorXd weight(region_count), weight_old(region_count),
-        radius_old(region_count), radius_new(region_count),
-        weight_new(region_count);
-    double &radius_meas = pt_radius;
+            // now update the mesh with new data
+            mesh->set_vertex(vd, radius_new * vert_uvec);
+            set_weight(vd, weight_new);
 
-    Eigen::Matrix<double, Eigen::Dynamic, 3> mesh_region(region_count, 3);
-
-    for (int ii = 0; ii < region_index.size(); ++ii) {
-        weight(ii) = pow(delta_sigma(region_index(ii)) * pt_radius, 2);
-        mesh_region.row(ii) = this->mesh->vertices.row(region_index(ii));
-        weight_old(ii) = this->weights(region_index(ii));
-        radius_old(ii) = vert_radius(region_index(ii));
+        }
     }
-
-    radius_new = (radius_old.array() * weight.array() + radius_meas * weight_old.array()) / (weight_old.array() + weight.array());
-    weight_new = (weight_old.array() * weight.array()) / (weight_old.array() + weight.array());
-    // Now update the mesh->vertices of the object/self
-    for (int ii = 0; ii < region_index.size(); ++ii) {
-        this->mesh->vertices.row(region_index(ii)) = radius_new(ii) * vert_uvec.row(region_index(ii));
-        this->weights(region_index(ii)) = weight_new(ii);
-    }
-    
-    // update the mesh pointer with the new vertices
-    /* mesh->update_mesh(vertices, faces); */ 
 }
 
 void ReconstructMesh::update(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
         const double& max_angle) {
     std::size_t num_pts(pts.rows());
     
-    for (int ii = 0; ii < num_pts; ++ii) {
+    for (std::size_t ii = 0; ii < num_pts; ++ii) {
         single_update(pts.row(ii), max_angle);
     }
 }
@@ -117,6 +99,52 @@ void ReconstructMesh::update(const Eigen::Ref<const Eigen::Matrix<double, Eigen:
 void ReconstructMesh::update_meshdata( void ) {
     // update the data inside the mesh_ptr
     /* this->mesh->update_mesh(this->vertices, this->faces); */
+}
+double ReconstructMesh::maximum_weight(const Eigen::Ref<const Eigen::Vector3d>& v_in) {
+    return pow(kPI * v_in.norm(), 2);
+}
+
+bool ReconstructMesh::initialize_weight( void ) {
+    // created is true if new and false if exisiting
+
+    for (Vertex_index vd : mesh->surface_mesh.vertices() ) {
+        set_weight(vd, maximum_weight(mesh->get_vertex(vd)));
+    }
+
+    return true;
+}
+
+bool ReconstructMesh::set_all_weights(const Eigen::Ref<const Eigen::VectorXd>& w_in) {
+    assert(w_in.rows() == mesh->number_of_vertices());
+    for (Vertex_index vd : mesh->surface_mesh.vertices() ) {
+        set_weight(vd, w_in((int)vd));
+    }
+
+    return true;
+}
+
+bool ReconstructMesh::set_weight(const Vertex_index& vd, const double& w) {
+    Mesh::Property_map<Vertex_index, double> weight_property;
+    bool found;
+    std::tie(weight_property, found) 
+        = mesh->surface_mesh.add_property_map<Vertex_index, double>(
+                "v:weight", 10);
+    /* assert(found); */
+    // created is true if new and false if exisiting
+    weight_property[vd] = w;
+    
+    return true;
+}
+
+double ReconstructMesh::get_weight(const Vertex_index& vd) {
+    Mesh::Property_map<Vertex_index, double> weight_property;
+    bool found;
+    std::tie(weight_property, found) 
+        = mesh->surface_mesh.property_map<Vertex_index, double>(
+                "v:weight");
+    assert(found);
+    
+    return weight_property[vd];
 }
 
 // compute the initial weighting matrix given the vertices
@@ -132,3 +160,12 @@ Eigen::Matrix<double, Eigen::Dynamic, 1> initial_weight(const Eigen::Ref<const E
     return weights;
 }
 
+/* template<typename T> */
+/* Eigen::VectorXi vector_find(const Eigen::Ref<const T> &logical_vec) { */
+/*     Eigen::VectorXi index = Eigen::VectorXi::LinSpaced(logical_vec.size(), 0, logical_vec.size() - 1); */
+/*     index.conservativeResize(std::stable_partition( */
+/*                 index.data(), index.data() + index.size(), [&logical_vec](int i){return logical_vec(i);}) - index.data()); */
+/*     return index; */
+/* } */
+
+// TEMPLATE SPECIALIZATION

@@ -10,9 +10,10 @@ set(PYTHON_INCLUDE_DIR /home/shankar/anaconda3/envs/asteroid/include/python3.5m)
 set(PYTHON_LIBRARY /home/shankar/anaconda3/envs/asteroid/lib/libpython3.5m.so)
 
 set(CMAKE_CXX_FLAGS "-lpthread -pthread")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic")
+# set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wextra -pedantic")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
 # Add -Weffc++ for all sorts of good errors to fix
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3")
 ################################################################################
 # GLOBAL SETUP
 ################################################################################
@@ -184,6 +185,7 @@ set(cgal_src
     ${PROJECT_SOURCE_DIR}/src/utilities.cpp
     ${PROJECT_SOURCE_DIR}/src/surface_mesher.cpp
     ${PROJECT_SOURCE_DIR}/src/potential.cpp
+    ${PROJECT_SOURCE_DIR}/src/wavefront.cpp
     )
 add_library(cgal_cpp SHARED ${cgal_src})
 target_link_libraries(cgal_cpp igl::core igl::cgal fdcl_hdf5)
@@ -201,8 +203,9 @@ target_link_libraries(mesh cgal_cpp input_parser_cpp)
 
 # potential function
 set(potential_main_src src/potential_main.cpp src/potential.cpp)
-add_executable(potential_main ${potential_main_src})
-target_link_libraries(potential_main igl::core cgal_cpp Threads::Threads)
+add_executable(potential ${potential_main_src})
+target_link_libraries(potential igl::core cgal_cpp Threads::Threads
+    input_parser_cpp)
 
 # surface mesher
 set( surface_mesher_src src/surface_mesher_main.cpp )
@@ -289,6 +292,7 @@ set(test_all_src
 	tests/cpp/test_utilities.cpp
     tests/cpp/test_libigl.cpp
     tests/cpp/test_stats.cpp
+    tests/cpp/test_potential.cpp
     src/wavefront.cpp)
 
 add_executable(test_all ${test_all_src})
@@ -306,10 +310,10 @@ target_link_libraries(test_libigl gtest igl::core igl::cgal)
 add_test(NAME test_libigl COMMAND test_libigl
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
-add_executable(test_potential tests/cpp/test_potential.cpp tests/cpp/test_all.cpp src/potential.cpp)
-target_link_libraries(test_potential gtest igl::core cgal_cpp)
-add_test(NAME test_potential COMMAND test_potential,
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+# add_executable(test_potential tests/cpp/test_potential.cpp tests/cpp/test_all.cpp src/potential.cpp)
+# target_link_libraries(test_potential gtest igl::core cgal_cpp)
+# add_test(NAME test_potential COMMAND test_potential,
+#     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 # this will install to /usr/local by default
 # install(TARGETS read_obj DESTINATION bin)

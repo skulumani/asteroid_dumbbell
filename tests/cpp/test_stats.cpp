@@ -3,6 +3,7 @@
 #include "mesh.hpp"
 #include "potential.hpp"
 #include "reconstruct.hpp"
+#include "loader.hpp"
 
 #include <Eigen/Dense>
 
@@ -96,18 +97,17 @@ TEST_F(TestStats, AsteroidVolume) {
     ASSERT_NEAR(volume_verts, volume_ast, 1e-6);
 }
 
-TEST_F(TestStats, MeshParamVolume) {
-    SurfMesh smesh(1, 1, 1, 10, 0.1, 0.1);
-    double volume_verts = PolyVolume::volume(smesh.get_verts(), smesh.get_faces());
-    std::shared_ptr<MeshParam> meshparam_ptr = std::make_shared<MeshParam>(smesh.get_verts(), smesh.get_faces());
-    double volume_mesh = PolyVolume::volume(meshparam_ptr);
-    ASSERT_NEAR(volume_verts, volume_mesh, 1e-6);
-}
-
 TEST_F(TestStats, ReconstructMeshVolume) {
     SurfMesh smesh(1, 1, 1, 10, 0.1, 0.1);
     double volume_verts = PolyVolume::volume(smesh.get_verts(), smesh.get_faces());
     std::shared_ptr<ReconstructMesh> rmesh_ptr = std::make_shared<ReconstructMesh>(smesh.get_verts(), smesh.get_faces()); 
     double volume_rmesh = PolyVolume::volume(rmesh_ptr);
     ASSERT_NEAR(volume_verts, volume_rmesh, 1e-6);
+}
+
+TEST_F(TestStats, MeshDataEqualtoVertices) {
+    std::shared_ptr<MeshData> mesh = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+    double volume_verts = PolyVolume::volume(mesh->get_verts(), mesh->get_faces());
+    double volume_mesh = PolyVolume::volume(mesh);
+    ASSERT_NEAR(volume_verts, volume_mesh, 1e-6);
 }

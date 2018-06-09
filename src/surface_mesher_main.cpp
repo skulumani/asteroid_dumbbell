@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
     }
     
     if (argc != 7) {
-        std::cout << "Insufficient number of inputs: surface_mesher a b c" << std::endl;
+        std::cout << "Insufficient number of inputs:\n surface_mesher a b c min_angle max_radius max_distance" << std::endl;
         return 1;
     }
     // initialize axes
@@ -25,8 +25,7 @@ int main(int argc, char* argv[]) {
 	SurfMesh smesh(atof(argv[1]), atof(argv[2]), atof(argv[3]),
             min_angle, max_radius, max_distance);
 
-	std::cout << "Smesh poly vertices: " << smesh.poly.size_of_vertices() << std::endl;
-	std::cout << "Smesh v vertices: " << smesh.v.rows() << std::endl;
-	std::cout << "Surface mesh faces: " << smesh.get_faces().rows() << std::endl;
+	std::cout << "Surface vertices: " << smesh.get_verts().rows() << std::endl;
+	std::cout << "Surface faces: " << smesh.get_faces().rows() << std::endl;
     return 0;
 }

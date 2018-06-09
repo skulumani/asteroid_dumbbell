@@ -107,44 +107,36 @@ class MeshParam {
 class Asteroid {
     private: 
         // member variables to hold the potential
-        const double G = 6.673e-20; /**< Gravitational constant - km^3/kg/sec^2 */
+        double G = 6.673e-20; /**< Gravitational constant - km^3/kg/sec^2 */
         double sigma; /**< Density - kg/km^3 */
         std::string name; /**< Asteroid name - string */
         double M; /**< Mass - kg */
         Eigen::Vector3d axes; /**< Semi-major axes - km */
         double omega; /**< Rotation rate - rad/sec */
 
-        std::shared_ptr<MeshParam> mesh_param;
+        std::shared_ptr<MeshData> mesh_data;
 
-        double U; 
-        Eigen::Vector3d U_grad;
-        Eigen::Matrix3d U_grad_mat;
-        double Ulaplace;
+        double mU; 
+        Eigen::Vector3d mU_grad;
+        Eigen::Matrix3d mU_grad_mat;
+        double mUlaplace;
 
         void init_asteroid( void );
+        
+        std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> face_contribution(
+                const Eigen::Ref<const Eigen::Vector3d>& state) const;
+        std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> edge_contribution(
+                const Eigen::Ref<const Eigen::Vector3d>& state) const;
 
     public:
         Asteroid ( void ) {};
         virtual ~Asteroid ( void ) {};
         
-        Asteroid(const std::string& name_in, MeshParam& mesh_param);
         Asteroid(const std::string& name_in, 
                  const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
                  const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in);
-        Asteroid(const std::string& name_in, std::shared_ptr<MeshParam> mesh_param);
         Asteroid(const std::string& name_in, std::shared_ptr<ReconstructMesh> rmesh_in);
         Asteroid(const std::string& name_in, std::shared_ptr<MeshData> mesh_in);
-
-        // Functions to compute the potential
-        Eigen::Matrix<double, Eigen::Dynamic, 1> laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v);
-
-        std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> edge_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v);
-
-        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
-                const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> >& w_face);
-
-        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > edge_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
-                const std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd>& L_tuple);
 
         /** @fn void polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state)
                 
@@ -165,18 +157,25 @@ class Asteroid {
         // set the rotation of the asteroid by modifying the connected meshdata
         void update_rotation(const double& time);
 
+        // Setters
+        void set_grav_constant(const double& G_in) { G = G_in;}
+        void set_sigma(const double& sigma_in) { sigma = sigma_in; }
+
         // Getters for the potential variables
-        double get_potential( void ) { return U; }
-        Eigen::Vector3d get_acceleration( void ) { return U_grad; }
-        Eigen::Matrix3d get_gradient_mat( void ) { return U_grad_mat; }
-        double get_laplace( void ) { return Ulaplace; }
+        double get_potential( void ) { return mU; }
+        Eigen::Vector3d get_acceleration( void ) { return mU_grad; }
+        Eigen::Matrix3d get_gradient_mat( void ) { return mU_grad_mat; }
+
+        double get_laplace( void ) { return mUlaplace; }
         double get_omega( void) const { return omega; }
+        double get_grav_constant( void ) const { return G; }
+        double get_sigma( void ) const { return sigma; } 
 
         // member variables
         Eigen::Vector3d get_axes( void ) const { return axes; }
+        Eigen::MatrixXd get_verts( void ) const { return mesh_data->get_verts(); }
+        Eigen::MatrixXi get_faces( void ) const { return mesh_data->get_faces(); }
 
-        Eigen::MatrixXd get_verts( void ) const { return mesh_param->get_verts(); }
-        Eigen::MatrixXi get_faces( void ) const { return mesh_param->get_faces(); }
 
 };
 // declare some shit

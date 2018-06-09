@@ -129,6 +129,6 @@ int main(int argc, char* argv[])
 
     }
     
-    /* /1* hf.close(); *1/ */
+    /* hf.close(); */
     return 0;
 }

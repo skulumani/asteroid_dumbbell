@@ -147,13 +147,9 @@ class TestAsteroid:
     v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj')
     state = np.array([1, 2, 3])
 
-    def test_mesh_param(self):
-        mesh_param = asteroid.MeshParam(self.v, self.f);
-        np.testing.assert_allclose(1, 1);
-
     def test_asteroid_potential(self):
-        mesh_param = asteroid.MeshParam(self.v, self.f);
-        ast = asteroid.Asteroid('castalia', mesh_param)
+        mesh = mesh_data.MeshData(self.v, self.f);
+        ast = asteroid.Asteroid('castalia', mesh)
         ast.polyhedron_potential(self.state)
         np.testing.assert_allclose(ast.get_potential(), 2.4923324e-08, 1e-4)
 
@@ -163,8 +159,8 @@ class TestAsteroid:
 
         ast_python = asteroid_python.Asteroid('castalia', 0, 'obj')
 
-        mesh_param = asteroid.MeshParam(self.v, self.f)
-        ast_cpp = asteroid.Asteroid('castalia', mesh_param)
+        mesh = mesh_data.MeshData(self.v, self.f)
+        ast_cpp = asteroid.Asteroid('castalia', mesh)
     
         for ii in range(10):
             x = np.random.rand()

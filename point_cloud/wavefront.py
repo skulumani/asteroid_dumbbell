@@ -101,7 +101,7 @@ def write_obj(verts, faces, filename, comments=False):
             fname.write('# List of vertices\n')
 
         for v in verts:
-            fname.write('v {} {} {}\n'.format(v[0], v[1], v[2]))
+            fname.write('v {:16.16f} {:16.16f} {:16.16f}\n'.format(v[0], v[1], v[2]))
 
         for f in faces:
             fname.write('f {} {} {}\n'.format(f[0]+1, f[1]+1, f[2]+1))

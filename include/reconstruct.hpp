@@ -23,7 +23,7 @@ class ReconstructMesh {
         
         ReconstructMesh(const Eigen::Ref<const Eigen::MatrixXd> &v_in,
                         const Eigen::Ref<const Eigen::MatrixXi> &f_in,
-                        const Eigen::Ref<const Eigen::MatrixXd> &w_in);
+                        const Eigen::Ref<const Eigen::VectorXd> &w_in);
 
         ReconstructMesh( std::shared_ptr<MeshData> mesh_in);
         
@@ -60,25 +60,38 @@ class ReconstructMesh {
             @author Shankar Kulumani
             @version 31 May 2018
         */
-        void update(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
+        void update(
+                const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
                 const double& max_angle);
 
         // functions to access the private members
         Eigen::MatrixXd get_verts( void ) const;
         Eigen::MatrixXi get_faces( void ) const;
-        Eigen::MatrixXd get_weights( void ) const;
+        Eigen::VectorXd get_weights( void ) const;
+        
+        std::size_t number_of_vertices( void ) const { return mesh->number_of_vertices(); }
+        std::size_t number_of_faces( void ) const { return mesh->number_of_faces(); }
 
         std::shared_ptr<MeshData> get_mesh( void ) const { return mesh; }
         
         void update_meshdata( void );
+
     private:
+        
+        double maximum_weight(const Eigen::Ref<const Eigen::Vector3d>& v_in);
+        bool initialize_weight( void );
+        bool set_all_weights( const Eigen::Ref<const Eigen::VectorXd>& w_in );
+        
+        bool set_weight(const Vertex_index& vd, const double& w);
+        double get_weight(const Vertex_index& vd);
+
         Eigen::VectorXd weights; /**< Weight for each vertex */
 
         std::shared_ptr<MeshData> mesh; /**< MeshData holding vertices */
 };
 
-template<typename T>
-Eigen::VectorXi vector_find(const Eigen::Ref<const T> &);
+/* template<typename T> */
+/* Eigen::VectorXi vector_find(const Eigen::Ref<const T> &); */
 
 // compute the weights 
 Eigen::Matrix<double, Eigen::Dynamic, 1> initial_weight(const Eigen::Ref<const Eigen::MatrixXd> &v_in);

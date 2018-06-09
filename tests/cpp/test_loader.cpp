@@ -7,8 +7,8 @@ TEST(LoaderTest, OBJString) {
     std::string input_filename("./integration/cube.obj");
     std::shared_ptr<MeshData> mesh;
     mesh = Loader::load(input_filename);
-    ASSERT_EQ(mesh->polyhedron.is_valid(), 1);
-    ASSERT_EQ(mesh->vertices.rows(), 8);
+    ASSERT_EQ(mesh->get_faces().rows(), 12);
+    ASSERT_EQ(mesh->get_verts().rows(), 8);
 }
 
 

@@ -6,6 +6,7 @@
 #include "surface_mesher.hpp"
 #include "hdf5.hpp"
 #include "state.hpp"
+#include "mesh.hpp"
 
 #include <igl/dot_row.h>
 #include <igl/slice.h>
@@ -149,12 +150,14 @@ void TranslationController::generate_controller_mesh( void ) {
     controller_vertices = controller_vertices.rowwise().normalized();
 }
 
-void TranslationController::build_controller_mesh_mapping(std::shared_ptr<const MeshData> meshdata_ptr,
-        const double& max_angle) {
+void TranslationController::build_controller_mesh_mapping(
+        std::shared_ptr<const MeshData> meshdata_ptr, const double& max_angle) {
     
+    mesh_mapping.clear();
+    mesh_mapping.resize(meshdata_ptr->number_of_vertices());
     // define some references
-    const Eigen::MatrixXd& highres_vertices = meshdata_ptr->vertices;
-    const Eigen::MatrixXi& highres_faces = meshdata_ptr->faces;
+    const Eigen::MatrixXd highres_vertices = meshdata_ptr->get_verts();
+    const Eigen::MatrixXi highres_faces = meshdata_ptr->get_faces();
     
     Eigen::VectorXd cos_angle(highres_vertices.rows()); 
     Eigen::VectorXd max_angle_vec(highres_vertices.rows());
@@ -167,19 +170,18 @@ void TranslationController::build_controller_mesh_mapping(std::shared_ptr<const 
     Eigen::Array<bool, Eigen::Dynamic, 1> angle_condition(highres_vertices.rows());
     Eigen::VectorXi angle_index;
     
-    mesh_mapping.resize(controller_vertices.rows());
     // loop over the low resolution mesh
     /* #pragma omp parallel for */
     for (int ii = 0; ii < controller_vertices.rows(); ++ii) {
-        controller_uvec = controller_vertices.row(ii).replicate(highres_vertices.rows(), 1);
+        Eigen::Vector3d controller_uvec = controller_vertices.row(ii).normalized();
         
-        // find dot product of this vector with all vectors in highres_vertices
-        cos_angle = igl::dot_row(highres_vertices_uvec, controller_uvec);
-        // for those less than max_angle store the index someplace
-        angle_condition = cos_angle.array() > max_angle_vec.array();
-        angle_index = vector_find<Eigen::Array<bool, Eigen::Dynamic, 1> >(angle_condition);
-        // store in a std::vector<std::vector<Eigen::RowVectorXd> >
-        mesh_mapping[ii] = angle_index;
+        for (Vertex_index vd : meshdata_ptr->vertices()) {
+            double cos_angle = controller_uvec.dot(meshdata_ptr->get_vertex(vd));
+
+            if (cos_angle > max_angle) {
+                mesh_mapping[ii].push_back(vd);
+            }
+        }
     }
     
 }
@@ -312,7 +314,7 @@ void TranslationController::minimize_uncertainty(const double& t,
     pos = Ra.transpose() * state->get_pos();
      
     // compute the potential for each of the states in the controller mesh (controller vertices)
-    Eigen::VectorXd vertex_control_cost(rmesh->get_verts().rows());
+    Eigen::VectorXd vertex_control_cost(rmesh->number_of_vertices());
     vertex_control_cost.setZero();
     Eigen::Matrix<double, Eigen::Dynamic, 3> waypoints(num_waypoints, 3);
     double vcc_low_res = 0;
@@ -327,7 +329,8 @@ void TranslationController::minimize_uncertainty(const double& t,
 
         // now use the mapping to fill for each of the estimated vertices
         for (int jj = 0; jj < mesh_mapping[ii].size(); ++jj) {
-            vertex_control_cost(mesh_mapping[ii](jj)) = vcc_low_res;
+            int index = (int)mesh_mapping[ii][jj];
+            vertex_control_cost(index) = vcc_low_res;
         }
     }
 

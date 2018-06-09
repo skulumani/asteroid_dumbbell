@@ -119,7 +119,7 @@ void MeshParam::face_dyad( void ) {
    	F_face.resize(num_f);
     
     #pragma omp parallel for
-    for (int ii = 0; ii < num_f; ++ii) {
+    for (std::size_t ii = 0; ii < num_f; ++ii) {
         // outer product of normal_face vectors
         F_face[ii] = normal_face.row(ii).transpose() * normal_face.row(ii);
     }
@@ -216,7 +216,7 @@ void MeshParam::edge_dyad( void ) {
     #pragma omp task depend(in:e1_face_map)
     {
         #pragma omp parallel for
-        for (int ii = 0; ii < num_f; ++ii) {
+        for (std::size_t ii = 0; ii < num_f; ++ii) {
             // pick out the normals for the edges of the current face
             nA = normal_face.row(ii);
 
@@ -243,7 +243,7 @@ void MeshParam::edge_dyad( void ) {
     #pragma omp task depend(in:e2_face_map)
     {
         #pragma omp parallel for
-        for (int ii = 0; ii < num_f; ++ii) {
+        for (std::size_t ii = 0; ii < num_f; ++ii) {
             // pick out the normals for the edges of the current face
             nA = normal_face.row(ii);
 
@@ -270,7 +270,7 @@ void MeshParam::edge_dyad( void ) {
     #pragma omp task depend(in:e3_face_map)
     {
         #pragma omp parallel for
-        for (int ii = 0; ii < num_f; ++ii) {
+        for (std::size_t ii = 0; ii < num_f; ++ii) {
             // pick out the normals for the edges of the current face
             nA = normal_face.row(ii);
 
@@ -306,36 +306,26 @@ void MeshParam::update_mesh(const Eigen::Ref<const Eigen::Matrix<double, Eigen::
     edge_dyad();
 }
 // ************************ Asteroid class ************************************
-Asteroid::Asteroid(const std::string& name_in, MeshParam& mesh_param_in) {
-    mesh_param = std::make_shared<MeshParam>(mesh_param_in);
-    name = name_in;
-    init_asteroid();
-}
 
 Asteroid::Asteroid(const std::string& name_in,
                    const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
                    const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in) {
-    mesh_param = std::make_shared<MeshParam>(V_in, F_in);
+    mesh_data = std::make_shared<MeshData>(V_in, F_in);
     name = name_in;
     init_asteroid();
 }
 
-Asteroid::Asteroid(const std::string& name_in, std::shared_ptr<MeshParam> mesh_param_in) {
-    mesh_param = mesh_param_in;
-    name = name_in;
-    init_asteroid();
-}
 
 Asteroid::Asteroid(const std::string& name_in, 
                    std::shared_ptr<ReconstructMesh> rmesh_in) {
-    mesh_param = std::make_shared<MeshParam>(rmesh_in->get_mesh());
+    mesh_data = rmesh_in->get_mesh();
     name = name_in;
     init_asteroid();
 }
 
 Asteroid::Asteroid(const std::string& name_in,
                    std::shared_ptr<MeshData> mesh_in) {
-    mesh_param = std::make_shared<MeshParam>(mesh_in);
+    mesh_data = mesh_in;
     name = name_in;
     init_asteroid();
 }
@@ -375,46 +365,116 @@ void Asteroid::init_asteroid( void ) {
 }
 
 void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state) {
-    
-    // state position should be in the asteroid fixed frame
-    Eigen::Matrix<double, Eigen::Dynamic, 3> r_v = mesh_param->mesh->get_verts().rowwise() - state.transpose();
-    
-    // Compute w_face using laplacian_factor
-    Eigen::Matrix<double, Eigen::Dynamic, 1> w_face = laplacian_factor(r_v);
-    
-    if (std::abs(w_face.sum()) < 1e-10) {
-        std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> L_all =
-            edge_factor(r_v);
-        
-        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav, edge_grav;
-
-        #pragma omp parallel shared(r_v)
+    // build L and w
+    bool edge_built, face_built;
+    #pragma omp parallel if(true)
+    {
+        #pragma omp single
         {
             #pragma omp task
-            {
-                // face contribution
-                face_grav = face_contribution(r_v, w_face);
-            }
+            edge_built = mesh_data->build_edge_factor(state);
+
             #pragma omp task
+            face_built = mesh_data->build_face_factor(state);
+        }
+    }
+    
+    double w_sum = mesh_data->get_sum_face_factor();
+
+    if (w_sum < 1e-10) {
+
+        std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav, edge_grav;
+        // loop over the faces
+        #pragma omp parallel if(true)
+        {
+            #pragma omp single
             {
-            // edge contribution
-            edge_grav = edge_contribution(r_v, L_all);
+            #pragma omp task
+            face_grav = face_contribution(state);
+
+            #pragma omp task
+            edge_grav = edge_contribution(state);
             }
         }
+
+        /* #pragma omp parallel shared(r_v) */
+        /* { */
+        /*     #pragma omp task */
+        /*     { */
+        /*         // face contribution */
+        /*         face_grav = face_contribution(r_v, w_face); */
+        /*     } */
+        /*     #pragma omp task */
+        /*     { */
+        /*     // edge contribution */
+        /*     edge_grav = edge_contribution(r_v, L_all); */
+        /*     } */
+        /* } */
         
-        // combine them both
-        U = 1.0 / 2.0 * G * sigma * (std::get<0>(edge_grav) - std::get<0>(face_grav));
-        U_grad = G * sigma * (-std::get<1>(edge_grav) + std::get<1>(face_grav));
-        U_grad_mat = G * sigma * (std::get<2>(edge_grav) - std::get<2>(face_grav));
-        Ulaplace = -G * sigma * w_face.sum();
-
+        /* // combine them both */
+        mU = 1.0 / 2.0 * G * sigma * (std::get<0>(edge_grav) - std::get<0>(face_grav));
+        mU_grad = G * sigma * (-std::get<1>(edge_grav) + std::get<1>(face_grav));
+        mU_grad_mat = G * sigma * (std::get<2>(edge_grav) - std::get<2>(face_grav));
+        mUlaplace = -G * sigma * w_sum ;
     } else {
-        U = 0;
-        U_grad.setZero();
-        U_grad_mat.setZero();
-        Ulaplace = 0;
+        mU = 0;
+        mU_grad.setZero();
+        mU_grad_mat.setZero();
+        mUlaplace = 0;
     }
+    // TODO int return type for inside/outside
+}
 
+std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> Asteroid::face_contribution(
+        const Eigen::Ref<const Eigen::Vector3d>& state) const {
+
+    double U = 0;
+    Eigen::Vector3d U_grad = Eigen::Vector3d::Zero();
+    Eigen::Matrix3d U_mat = Eigen::Matrix3d::Zero();
+
+    // loop over the faces and compute gravity
+    for (Face_index fd: mesh_data->faces()) {
+        // get a vector from the face
+        Halfedge_index h1 = mesh_data->surface_mesh.halfedge(fd);
+        Vertex_index v1 = mesh_data->surface_mesh.source(h1);
+        Eigen::Vector3d vec1 = mesh_data->get_vertex(v1);
+        // subtract from current state
+        Eigen::Vector3d r = vec1 - state;
+
+        // get a Face dyad and face factor
+        Eigen::Matrix3d F_dyad = mesh_data->get_face_dyad(fd);
+        
+        double w_factor = mesh_data->get_face_factor(fd);
+        // multiply
+        U += (r.transpose() * F_dyad * r * w_factor).value();
+        U_grad += F_dyad * r * w_factor;
+        U_mat += F_dyad * w_factor;
+    }
+    return std::make_tuple(U, U_grad, U_mat);
+}
+
+std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> Asteroid::edge_contribution(
+        const Eigen::Ref<const Eigen::Vector3d>& state) const {
+    double U = 0;
+    Eigen::Vector3d U_grad = Eigen::Vector3d::Zero();
+    Eigen::Matrix3d U_mat = Eigen::Matrix3d::Zero();
+    
+    // loop over the edges
+    for (Edge_index ed: mesh_data->edges()) {
+        // get a vector from the edge
+        Vertex_index v1 = mesh_data->surface_mesh.vertex(ed, 0);
+        Eigen::Vector3d vec1 = mesh_data->get_vertex(v1);
+        // compute difference with state
+        Eigen::Vector3d r = vec1 - state;
+        
+        Eigen::Matrix3d E_dyad = mesh_data->get_edge_dyad(ed);
+        double L_factor = mesh_data->get_edge_factor(ed);
+
+        U += (r.transpose() * E_dyad * r * L_factor).value();
+        U_grad += E_dyad * r * L_factor;
+        U_mat += E_dyad * L_factor;
+    }
+    return std::make_tuple(U, U_grad, U_mat);
 }
 
 Eigen::Matrix<double, Eigen::Dynamic, 3> Asteroid::rotate_vertices(const double& time) const {
@@ -424,8 +484,8 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> Asteroid::rotate_vertices(const double&
     Ra = Eigen::AngleAxis<double>(omega * time, (Eigen::Vector3d() << 0, 0, 1).finished());
     
     // multiply times all the vertices
-    Eigen::Matrix<double, Eigen::Dynamic, 3> nv(mesh_param->num_v, 3);
-    nv = (Ra * mesh_param->mesh->get_verts().transpose()).transpose();
+    Eigen::Matrix<double, Eigen::Dynamic, 3> nv(mesh_data->surface_mesh.number_of_vertices(), 3);
+    nv = (Ra * mesh_data->get_verts().transpose()).transpose();
 
     return nv;
 }
@@ -441,13 +501,13 @@ void Asteroid::update_rotation(const double& time) {
     // get the current Ra
     Eigen::Matrix<double, 3, 3> Ra = rot_ast2int(time);
     // rotate asteroid vertices
-    Eigen::Matrix<double, Eigen::Dynamic, 3> nv(mesh_param->num_v, 3);
-    Eigen::Matrix<int, Eigen::Dynamic, 3> nf(mesh_param->num_f, 3);
+    Eigen::Matrix<double, Eigen::Dynamic, 3> nv(mesh_data->surface_mesh.number_of_vertices(), 3);
+    Eigen::Matrix<int, Eigen::Dynamic, 3> nf(mesh_data->surface_mesh.number_of_vertices(), 3);
 
-    nv = (Ra * mesh_param->get_verts().transpose()).transpose();
-    nf = mesh_param->get_faces();
+    nv = (Ra * mesh_data->get_verts().transpose()).transpose();
+    nf = mesh_data->get_faces();
     // update the meshdata (vertices)
-    mesh_param->update_mesh(nv, nf); 
+    mesh_data->update_mesh(nv, nf); 
     // update meshparam and asteroid parameters
     init_asteroid();
 }
@@ -465,178 +525,7 @@ std::vector<std::vector<int> > vertex_face_map(const Eigen::Ref<const Eigen::Mat
 }
 
 // Start of polyhedron potential function code 
-std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > Asteroid::face_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
-        const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 1> >& w_face) {
-    
-    const Eigen::Matrix<int, Eigen::Dynamic, 1>& Fa = mesh_param->mesh->get_faces().col(0);
 
-    const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& F_face = mesh_param->F_face;
-
-    const int num_f = Fa.rows();
-
-    Eigen::Matrix<double, Eigen::Dynamic, 3> ra(num_f, 3);
-    igl::slice(r_v, Fa, 1, ra);
-    // find ra dot with F_face
-    double U_face = 0;
-    Eigen::Matrix<double, 3, 1> U_grad_face(3);
-    U_grad_face.setZero();
-    Eigen::Matrix<double, 3, 3> U_grad_mat_face(3, 3);
-    U_grad_mat_face.setZero();
-    
-    #pragma omp declare reduction (merge : Eigen::Matrix<double, 3, 1> : omp_out += omp_in)
-    #pragma omp declare reduction (merge : Eigen::Matrix<double, 3, 3> : omp_out += omp_in)
-
-    #pragma omp parallel for reduction(+: U_face) reduction(merge: U_grad_face) reduction(merge: U_grad_mat_face)
-    for (int ii = 0; ii < num_f; ++ii) {
-        U_face += (ra.row(ii) * F_face[ii] * ra.row(ii).transpose() * w_face(ii)).value(); 
-        U_grad_face += F_face[ii] * ra.row(ii).transpose() * w_face(ii); 
-        U_grad_mat_face += F_face[ii] * w_face(ii);
-    }
-    
-    return std::make_tuple(U_face, U_grad_face, U_grad_mat_face);
-}
-
-std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > Asteroid::edge_contribution(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v,
-        const std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd>& L_tuple) {
-
-    // redefine some variables for local use
-    const Eigen::MatrixXi& e_vertex_map = mesh_param->e_vertex_map;
-    const Eigen::MatrixXi& unique_index = mesh_param->unique_index;
-    const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E1_edge = mesh_param->E1_edge;
-    const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E2_edge = mesh_param->E2_edge;
-    const std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > >& E3_edge = mesh_param->E3_edge;
-
-    // edge contribution
-    // combine all the Ei and Li into big vectors then pick out the unique ones
-    std::vector<Eigen::Matrix<double, 3, 3>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 3> > > E_all(3 * std::get<0>(L_tuple).rows());
-    E_all.assign(E1_edge.begin(), E1_edge.end());
-    E_all.insert(E_all.end(), E2_edge.begin(), E2_edge.end());
-    E_all.insert(E_all.end(), E3_edge.begin(), E3_edge.end());
-    
-    Eigen::VectorXd L_all(3 * std::get<0>(L_tuple).rows());
-    L_all << std::get<0>(L_tuple), std::get<1>(L_tuple), std::get<2>(L_tuple);
-        
-    Eigen::Matrix<double, Eigen::Dynamic, 3> re(e_vertex_map.rows(), 3);
-    igl::slice(r_v, e_vertex_map.col(0), 1, re);
-
-    double U_edge = 0;
-    Eigen::Matrix<double, 3, 1> U_grad_edge;
-    U_grad_edge.setZero();
-    Eigen::Matrix<double, 3, 3> U_grad_mat_edge;
-    U_grad_mat_edge.setZero();
-    
-    int index = unique_index(0, 0);
-    #pragma omp declare reduction (merge : Eigen::Matrix<double, 3, 1> : omp_out += omp_in)
-    #pragma omp declare reduction (merge : Eigen::Matrix<double, 3, 3> : omp_out += omp_in)
-
-    #pragma omp parallel for reduction(+: U_edge) reduction(merge: U_grad_edge) reduction(merge: U_grad_mat_edge)
-    for (int ii = 0; ii < unique_index.size(); ++ii) {
-        index = unique_index(ii,0);
-        U_edge += (re.row(ii) * E_all[index] * re.row(ii).transpose() * L_all( index )).value();
-        U_grad_edge += E_all[index] * re.row(ii).transpose() * L_all(index);
-        U_grad_mat_edge += E_all[index] * L_all(index);
-    }
-    
-    return std::make_tuple(U_edge, U_grad_edge, U_grad_mat_edge);
-}
-
-Eigen::Matrix<double, Eigen::Dynamic, 1> Asteroid::laplacian_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v) {
-
-    const Eigen::MatrixXd& V = mesh_param->mesh->get_verts();
-    const Eigen::MatrixXi& F = mesh_param->mesh->get_faces();
-    
-    const int num_f = F.rows();
-
-    // form the ri, rj, rk arrays
-    Eigen::MatrixXd ri(num_f, 3), rj(num_f, 3), rk(num_f, 3), rjrk_cross(num_f, 3);
-    
-    igl::slice(r_v, F.col(0), (Eigen::Vector3d() << 0, 1, 2).finished(), ri);
-    igl::slice(r_v, F.col(1), (Eigen::Vector3d() << 0, 1, 2).finished(), rj);
-    igl::slice(r_v, F.col(2), (Eigen::Vector3d() << 0, 1, 2).finished(), rk);
-    
-    igl::cross(rj, rk, rjrk_cross);
-    
-    Eigen::Matrix<double, Eigen::Dynamic, 1> ri_norm(num_f, 1), rj_norm(num_f, 1), rk_norm(num_f, 1);
-
-    ri_norm = ri.rowwise().norm();
-    rj_norm = rj.rowwise().norm();
-    rk_norm = rk.rowwise().norm();
-    
-    // dot product terms
-    Eigen::MatrixXd rjrk_dot(num_f, 1), rkri_dot(num_f, 1), rirj_dot(num_f, 1);
-
-    rjrk_dot = igl::dot_row(rj, rk);
-    rkri_dot = igl::dot_row(rk, ri);
-    rirj_dot = igl::dot_row(ri, rj);
-    
-    // numerator and denonminator of atan2
-    Eigen::Matrix<double, Eigen::Dynamic, 1> num(num_f, 1), den(num_f, 1);
-    num = (ri.array() * rjrk_cross.array()).rowwise().sum();
-    den = ri_norm.array() * rj_norm.array() * rk_norm.array() + ri_norm.array() * rjrk_dot.array() + rj_norm.array() * rkri_dot.array() + rk_norm.array() * rirj_dot.array();
-    
-    // return by reference
-    Eigen::Matrix<double, Eigen::Dynamic, 1> w_face(num_f, 1);
-    w_face = 2.0 * num.binaryExpr(den, [] (double a, double b) { return std::atan2(a,b);} );
-    /* w_face = 2.0 * num.binaryExpr(den, std::ptr_fun(::atan2)); */
-
-    return w_face;
-    
-}
-
-
-// This is slower than numpy
-std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd> Asteroid::edge_factor(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& r_v) {
-    
-    std::tuple<Eigen::Matrix<double, Eigen::Dynamic, 3>,
-               Eigen::Matrix<double, Eigen::Dynamic, 3>,
-               Eigen::Matrix<double, Eigen::Dynamic, 3> > edges = mesh_edges(mesh_param->mesh->get_verts(), mesh_param->mesh->get_faces());
-    
-    const Eigen::Matrix<double, Eigen::Dynamic, 3>& e1 = std::get<0>(edges);
-    const Eigen::Matrix<double, Eigen::Dynamic, 3>& e2 = std::get<1>(edges);
-    const Eigen::Matrix<double, Eigen::Dynamic, 3>& e3 = std::get<2>(edges);
-
-    const Eigen::Matrix<int, Eigen::Dynamic, 2>& e1_vertex_map = mesh_param->e1_vertex_map;
-    const Eigen::Matrix<int, Eigen::Dynamic, 2>& e2_vertex_map = mesh_param->e2_vertex_map;
-    const Eigen::Matrix<int, Eigen::Dynamic, 2>& e3_vertex_map = mesh_param->e3_vertex_map;
-    
-    const int num_f = e1_vertex_map.rows();
-
-    Eigen::MatrixXd r1i(num_f, 3), r1j(num_f, 3),
-                    r2i(num_f, 3), r2j(num_f, 3),
-                    r3i(num_f, 3), r3j(num_f, 3);
-    
-    igl::slice(r_v, e1_vertex_map.col(0), 1, r1i);
-    igl::slice(r_v, e1_vertex_map.col(1), 1, r1j);
-    
-    igl::slice(r_v, e2_vertex_map.col(0), 1, r2i);
-    igl::slice(r_v, e2_vertex_map.col(1), 1, r2j);
-
-    igl::slice(r_v, e3_vertex_map.col(0), 1, r3i);
-    igl::slice(r_v, e3_vertex_map.col(1), 1, r3j);
-    
-    Eigen::VectorXd L1_edge(num_f), L2_edge(num_f), L3_edge(num_f);
-
-    Eigen::VectorXd r1i_norm(num_f), r1j_norm(num_f), e1_norm(num_f);
-
-    r1i_norm = r1i.rowwise().norm();
-    r1j_norm = r1j.rowwise().norm();
-    e1_norm  = e1.rowwise().norm();
-    L1_edge = Eigen::log((r1i_norm.array() + r1j_norm.array() + e1_norm.array()) / (r1i_norm.array() + r1j_norm.array() - e1_norm.array()));
-
-    Eigen::Matrix<double, Eigen::Dynamic, 1> r2i_norm(num_f), r2j_norm(num_f), e2_norm(num_f);
-    r2i_norm = r2i.rowwise().norm();
-    r2j_norm = r2j.rowwise().norm();
-    e2_norm  = e2.rowwise().norm();
-    L2_edge = Eigen::log((r2i_norm.array() + r2j_norm.array() + e2_norm.array()) / (r2i_norm.array() + r2j_norm.array() - e2_norm.array()));
-
-    Eigen::Matrix<double, Eigen::Dynamic, 1> r3i_norm(num_f), r3j_norm(num_f), e3_norm(num_f);
-    r3i_norm = r3i.matrix().rowwise().norm();
-    r3j_norm = r3j.matrix().rowwise().norm();
-    e3_norm  = e3.matrix().rowwise().norm();
-    L3_edge = Eigen::log((r3i_norm.array() + r3j_norm.array() + e3_norm.array()) / (r3i_norm.array() + r3j_norm.array() - e3_norm.array()));
-
-    return std::make_tuple(L1_edge, L2_edge, L3_edge);
-}
 
 std::tuple<Eigen::VectorXi, Eigen::VectorXi> search_index(const Eigen::Ref<const Eigen::VectorXi>& a, const Eigen::Ref<const Eigen::VectorXi>& b) {
     std::size_t lena(a.size()), lenb(b.size());

@@ -70,7 +70,7 @@ int read(const std::string input_filename, std::vector<std::vector<double>> &V, 
     // check to make sure the file is opened properly
     if (!input_stream.fail()) {
         int read_flag = read(input_stream, V, F);
-        return 0;
+        return read_flag;
     } else {
         std::cout << "Error opening file filename" << std::endl;
         return 1;

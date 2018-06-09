@@ -7,21 +7,19 @@
 #include <iostream>
 #include <memory>
 
-void print_polyhedron_vertices(std::shared_ptr<MeshData> mesh) {
-    std::copy (mesh->polyhedron.points_begin(), mesh->polyhedron.points_end(), std::ostream_iterator<CGAL::Simple_cartesian<double>::Point_3>(std::cout, "\n")); 
-}
+namespace Stats {
 
-void print_surface_mesh_vertices(std::shared_ptr<MeshData> mesh) {
-    for (auto ii = mesh->vertex_descriptor.begin(); ii != mesh->vertex_descriptor.end(); ++ii) {
-        std::cout << *ii << " " << mesh->surface_mesh.point(*ii) << std::endl;
+    void print_surface_mesh_vertices(std::shared_ptr<MeshData> mesh) {
+        for (Vertex_index vd : mesh->vertices() ) {
+            std::cout << vd  << " " << mesh->get_vertex(vd )<< std::endl;
+        }
     }
-}
 
-void surface_mesh_stats(std::shared_ptr<MeshData> mesh) {
-    
-    std::cout << "#Vertices : " << mesh->surface_mesh.number_of_vertices() << std::endl;
-    std::cout << "#Faces: " << mesh->surface_mesh.number_of_faces() << std::endl;
-}
+    void surface_mesh_stats(std::shared_ptr<MeshData> mesh) {
+        std::cout << "#Vertices : " << mesh->number_of_vertices() << std::endl;
+        std::cout << "#Faces: " << mesh->number_of_faces() << std::endl;
+    }
+} // end stats namespace
 
 namespace PolyVolume {
     double volume(const Eigen::Ref<const Eigen::MatrixXd> &v,
@@ -50,7 +48,25 @@ namespace PolyVolume {
     }
 
     double volume(std::shared_ptr<const MeshData> meshdata_ptr) {
-        return volume(meshdata_ptr->get_verts(), meshdata_ptr->get_faces());
+        double volume(0);
+
+        // loop over faces
+        for (Face_index fd : meshdata_ptr->faces()) {
+            Eigen::Matrix<double, 4, 4> tetrahedron_matrix;
+
+            // get vertices of teh face
+            std::size_t row = 0;
+            for (Vertex_index vd : vertices_around_face(meshdata_ptr->surface_mesh.halfedge(fd), 
+                        meshdata_ptr->surface_mesh)){
+                Eigen::Vector3d vec = meshdata_ptr->get_vertex(vd);
+                tetrahedron_matrix.row(row) << vec(0), vec(1), vec(2), 1;
+                ++row;
+            } 
+            tetrahedron_matrix.row(3) << 0, 0, 0, 1;
+
+            volume = volume+tetrahedron_matrix.determinant();
+        }
+        return 1.0/6.0 * volume;
     }
     
     double volume(std::shared_ptr<const Asteroid> ast_ptr) {

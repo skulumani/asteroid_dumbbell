@@ -12,9 +12,9 @@ RayCaster::RayCaster( void ) {
 RayCaster::RayCaster(std::shared_ptr<const MeshData> mesh_in) {
     // assign copy of pointer to object instance
     this->mesh = mesh_in;
-    this->tree.insert(faces(this->mesh->polyhedron).first,
-            faces(this->mesh->polyhedron).second,
-            this->mesh->polyhedron);
+    this->tree.insert(faces(this->mesh->surface_mesh).first,
+            faces(this->mesh->surface_mesh).second,
+            this->mesh->surface_mesh);
     tree.accelerate_distance_queries();
 }
 
@@ -23,26 +23,26 @@ RayCaster::RayCaster(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic
     // create mesh pionter
     mesh = std::make_shared<MeshData>(V_in, F_in);
     // update caster objects
-    this->tree.insert(faces(this->mesh->polyhedron).first,
-            faces(this->mesh->polyhedron).second,
-            this->mesh->polyhedron);
+    this->tree.insert(faces(this->mesh->surface_mesh).first,
+            faces(this->mesh->surface_mesh).second,
+            this->mesh->surface_mesh);
     tree.accelerate_distance_queries();
 }
 
 void RayCaster::init_mesh(std::shared_ptr<const MeshData> mesh_in) {
     mesh = mesh_in;
-    this->tree.insert(faces(this->mesh->polyhedron).first,
-            faces(this->mesh->polyhedron).second,
-            this->mesh->polyhedron);
+    this->tree.insert(faces(this->mesh->surface_mesh).first,
+            faces(this->mesh->surface_mesh).second,
+            this->mesh->surface_mesh);
 }
 
 void RayCaster::init_mesh(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& V_in,
                           const Eigen::Ref<const Eigen::Matrix<int, Eigen::Dynamic, 3> >& F_in) {
     mesh = std::make_shared<MeshData>(V_in, F_in);
     // update caster objects
-    this->tree.insert(faces(this->mesh->polyhedron).first,
-            faces(this->mesh->polyhedron).second,
-            this->mesh->polyhedron);
+    this->tree.insert(faces(this->mesh->surface_mesh).first,
+            faces(this->mesh->surface_mesh).second,
+            this->mesh->surface_mesh);
 }
 
 void RayCaster::accelerate( void ) {
@@ -53,9 +53,9 @@ void RayCaster::update_mesh(std::shared_ptr<const MeshData> mesh_in) {
     this->mesh.reset();
     mesh = mesh_in;
     this->tree.clear();
-    this->tree.insert(faces(this->mesh->polyhedron).first,
-            faces(this->mesh->polyhedron).second,
-            this->mesh->polyhedron);
+    this->tree.insert(faces(this->mesh->surface_mesh).first,
+            faces(this->mesh->surface_mesh).second,
+            this->mesh->surface_mesh);
     tree.accelerate_distance_queries();
 }
 
@@ -67,9 +67,9 @@ void RayCaster::update_mesh(const Eigen::Ref<const Eigen::Matrix<double, Eigen::
 
     // update caster
     this->tree.clear();
-    this->tree.insert(faces(this->mesh->polyhedron).first,
-            faces(this->mesh->polyhedron).second,
-            this->mesh->polyhedron);
+    this->tree.insert(faces(this->mesh->surface_mesh).first,
+            faces(this->mesh->surface_mesh).second,
+            this->mesh->surface_mesh);
     tree.accelerate_distance_queries();
 }
 
@@ -139,7 +139,6 @@ void RayCaster::minimum_primitive(const Eigen::Ref<const Eigen::Vector3d> &pt) {
 }
 
 // MeshDistance class
-// Raycaster class
 MeshDistance::MeshDistance(std::shared_ptr<MeshData> mesh_in) {
     // assign copy of pointer to object instance
     this->mesh = mesh_in;

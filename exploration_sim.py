@@ -56,8 +56,7 @@ def initialize(output_filename):
     v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj')
 
     true_ast_meshdata = mesh_data.MeshData(v, f)
-    true_ast_meshparam = asteroid.MeshParam(true_ast_meshdata)
-    true_ast = asteroid.Asteroid('castalia', true_ast_meshparam)
+    true_ast = asteroid.Asteroid('castalia', true_ast_meshdata)
 
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
     
@@ -70,8 +69,10 @@ def initialize(output_filename):
 
     ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0], true_ast.get_axes()[1], true_ast.get_axes()[2],
                                       min_angle, max_radius, max_distance)
-
-    est_ast_meshdata = mesh_data.MeshData(ellipsoid.get_verts(), ellipsoid.get_faces())
+    
+    v_est = ellipsoid.get_verts()
+    f_est = ellipsoid.get_faces()
+    est_ast_meshdata = mesh_data.MeshData(v_est, f_est)
     est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
     est_ast = asteroid.Asteroid("castalia", est_ast_rmesh)
 
@@ -147,7 +148,7 @@ def simulate(output_filename="/tmp/exploration_sim.hdf5"):
     (true_ast_meshdata, true_ast, complete_controller,
         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
         AbsTol, RelTol) = initialize(output_filename)
-
+    
     with h5py.File(output_filename, 'a') as hf:
         hf.create_dataset('time', data=time, compression=compression,
                           compression_opts=compression_opts)
