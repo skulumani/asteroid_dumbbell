@@ -148,6 +148,9 @@ class MeshData {
         bool compute_face_properties(const Face_index& fd);
 
         bool build_halfedge_properties( void );
+        bool update_halfedge_properties(const std::vector<Halfedge_index>& halfedge_vec);
+        bool compute_halfedge_properteis(const Halfedge_index& hd);
+
         bool build_edge_properties( void ); 
 
         /** @fn std::vector<Face_index> get_faces_with_vertex(const Vertex_index& vd)
