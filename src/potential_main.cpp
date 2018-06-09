@@ -43,9 +43,28 @@ int main(int argc, char* argv[]) {
     std::cout << "U_grad_mat : \n" << ast.get_gradient_mat() << std::endl;
     std::cout << "U_laplace : " << ast.get_laplace() << std::endl;
 
-    // loop over the vertices
-    for (Vertex_index vd : mesh_data->vertices()) {
-        std::cout << vd << std::endl;
-    }
+    /* // loop over the vertices */
+    /* #pragma omp parallel */
+    /* { */
+    /*     #pragma omp single */
+    /*     { */
+    /*         #pragma omp task */
+    /*         { */
+    /*         for (Mesh::Vertex_range::iterator vb = mesh_data->vertices().begin(); */
+    /*                 vb != mesh_data->vertices().end(); */
+    /*                 ++vb) { */
+    /*             std::cout << *vb << std::endl; */
+    /*         } */
+    /*         } */
+
+    /*         #pragma omp task */
+    /*         { */
+
+    /*             for (Face_index fd : mesh_data->faces()) { */
+    /*                 std::cout << fd << std::endl; */
+    /*             } */
+    /*         } */
+    /*     } */
+    /* } */
     return 0;
 }
