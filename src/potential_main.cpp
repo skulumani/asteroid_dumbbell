@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     std::shared_ptr<MeshData> mesh_data = Loader::load(input_file);
-    
+        
     Asteroid ast(name, mesh_data);
     Eigen::Vector3d state; 
     state << 1, 2, 3;
@@ -42,5 +42,10 @@ int main(int argc, char* argv[]) {
     std::cout << "U_grad : " << ast.get_acceleration().transpose() << std::endl;
     std::cout << "U_grad_mat : \n" << ast.get_gradient_mat() << std::endl;
     std::cout << "U_laplace : " << ast.get_laplace() << std::endl;
+
+    // loop over the vertices
+    for (Vertex_index vd : mesh_data->vertices()) {
+        std::cout << vd << std::endl;
+    }
     return 0;
 }
