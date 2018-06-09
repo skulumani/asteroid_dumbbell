@@ -6,6 +6,7 @@
 
 #include <omp.h>
 #include <iostream>
+#include <chrono>
 
 int main(int argc, char* argv[]) {
     InputParser input(argc, argv);
@@ -33,10 +34,12 @@ int main(int argc, char* argv[]) {
     Eigen::Vector3d state; 
     state << 1, 2, 3;
     
-    double start = omp_get_wtime();
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     ast.polyhedron_potential(state);
-    double end = omp_get_wtime() - start;
-    std::cout << "Potential run time: " << end << " sec " << std::endl;
+    std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
+
+    std::cout << "Potential time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << " microsecond" << std::endl;
+    std::cout << "Potential time: " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << " nanosecond " << std::endl;
 
     std::cout << "U : " << ast.get_potential() << std::endl; 
     std::cout << "U_grad : " << ast.get_acceleration().transpose() << std::endl;

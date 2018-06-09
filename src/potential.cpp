@@ -367,8 +367,18 @@ void Asteroid::init_asteroid( void ) {
 void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state) {
     
     // build L and w
-    mesh_data->build_edge_factor(state);
-    mesh_data->build_face_factor(state);
+    bool edge_built, face_built;
+    #pragma omp parallel if(true)
+    {
+        #pragma omp single
+        {
+            #pragma omp task
+            edge_built = mesh_data->build_edge_factor(state);
+
+            #pragma omp task
+            face_built = mesh_data->build_face_factor(state);
+        }
+    }
     
     double w_sum = mesh_data->get_sum_face_factor();
 
@@ -376,8 +386,17 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
 
         std::tuple<double, Eigen::Matrix<double, 3, 1>, Eigen::Matrix<double, 3, 3> > face_grav, edge_grav;
         // loop over the faces
-        face_grav = face_contribution(state);
-        edge_grav = edge_contribution(state);
+        #pragma omp parallel if(true)
+        {
+            #pragma omp single
+            {
+            #pragma omp task
+            face_grav = face_contribution(state);
+
+            #pragma omp task
+            edge_grav = edge_contribution(state);
+            }
+        }
 
         /* #pragma omp parallel shared(r_v) */
         /* { */

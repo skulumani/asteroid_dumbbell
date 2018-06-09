@@ -61,18 +61,18 @@ void MeshData::build_surface_mesh(const Eigen::Ref<const Eigen::MatrixXd> & V,
     /* std::cout << surface_mesh.properties()[0] << std::endl; */
     // face_normal, edge normal, halfedge normal, face dyad, edge dyad
     bool face_built, halfedge_built, edge_built;
-    #pragma omp parallel
+    #pragma omp parallel if (true)
     {
         #pragma omp single
         {
             #pragma omp task depend(out:face_built)
-            face_built = build_face_properties();
+            {face_built = build_face_properties();}
 
             #pragma omp task depend(out:halfedge_built)
-            halfedge_built = build_halfedge_properties();
+            {halfedge_built = build_halfedge_properties();}
 
             #pragma omp task depend(in:face_built) depend(in:halfedge_built)
-            edge_built = build_edge_properties();
+            {edge_built = build_edge_properties();}
         }
     }
 }
@@ -218,16 +218,8 @@ bool MeshData::build_edge_factor( const Eigen::Ref<const Eigen::Vector3d>& pos )
     // test if property map exists if not then create
     Mesh::Property_map<Edge_index, double> edge_factor;
     bool found, created;
-    std::tie(edge_factor, found) = surface_mesh.property_map<
+    std::tie(edge_factor, found) = surface_mesh.add_property_map<
         Edge_index, double>("e:edge_factor");
-
-    if (!found) { // need to create
-        // create a property map
-        std::tie(edge_factor, created)
-            = surface_mesh.add_property_map<Edge_index, double>(
-                    "e:edge_factor", 0);
-        assert(created);
-    }
 
     // loop over edges
     for (Edge_index ed : surface_mesh.edges()) {
