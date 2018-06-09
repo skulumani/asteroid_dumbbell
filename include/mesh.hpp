@@ -102,6 +102,7 @@ class MeshData {
 
         template<typename Index>
         double get_face_factor(const Index& ed) const;
+
         double get_sum_face_factor( void ) const;
 
     private:

@@ -83,10 +83,8 @@ void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &
             mesh->set_vertex(vd, radius_new * vert_uvec);
             set_weight(vd, weight_new);
 
-            // need to ensure we update the mesh properties
         }
     }
-
 }
 
 void ReconstructMesh::update(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
