@@ -146,12 +146,50 @@ class MeshData {
             @version 9 June 2018
         */
         bool compute_face_properties(const Face_index& fd);
+        
+        /** @fn bool build_halfedge_properties( void )
+                
+            Compute the halfedge normals for all halfedges. This basically
+            calls compute_halfedge_properties on every halfedge
 
+            @param void 
+            @returns bool true if success
+
+            @author Shankar Kulumani
+            @version 9 June 22018
+        */
         bool build_halfedge_properties( void );
-        bool update_halfedge_properties(const std::vector<Halfedge_index>& halfedge_vec);
-        bool compute_halfedge_properteis(const Halfedge_index& hd);
+        
+        /** @fn bool update_halfedge_properties(
+         *      const std::vector<Halfedge_index>& halfedge_vec)
+                
+            Update the properties for each  halfedge in the vector by calling
+            compute_halfedge_properties on each
 
+            @param halfedge_vec std::vector of halfedges to update
+            @returns bool true if success
+
+            @author Shankar Kulumani
+            @version 9 Juen 2018
+        */
+        bool update_halfedge_properties(const std::vector<Halfedge_index>& halfedge_vec);
+
+        /** @fn bool compute_halfedge_properties(const Halfedge_index& hd)
+                
+            Compute the halfedge normal 
+
+            @param hd Halfedge_index
+            @returns bool true if success
+
+            @author Shankar Kulumani
+            @version 9 June 2018
+        */
+        bool compute_halfedge_properties(const Halfedge_index& hd);
+        
+         
         bool build_edge_properties( void ); 
+        bool update_edge_properties( const std::vector<Edge_index>& edge_vec);
+        bool compute_edge_properties(const Edge_index& ed);
 
         /** @fn std::vector<Face_index> get_faces_with_vertex(const Vertex_index& vd)
                 
@@ -179,6 +217,17 @@ class MeshData {
         */
         std::vector<Halfedge_index> get_halfedges_with_vertex(const Vertex_index& vd) const;
         
+        /** @fn std::vector<Edge_index> get_edges_with_vertex(const Vertex_index& vd) const
+                
+            Get all edges that are associated with this vertex
+
+            @param vd Vertex index
+            @returns edge_vec vector of edge indices
+
+            @author Shankar Kulumani
+            @version 9 June 2018
+        */
+        std::vector<Edge_index> get_edges_with_vertex(const Vertex_index& vd) const;
 };
 
 

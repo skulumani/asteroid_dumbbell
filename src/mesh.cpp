@@ -79,7 +79,6 @@ void MeshData::build_surface_mesh(const Eigen::Ref<const Eigen::MatrixXd> & V,
 }
 
 bool MeshData::build_face_properties( void ) {
-
     // loop over all faces need to dereference the iterators but not the index
     for (Face_index fd: surface_mesh.faces() ){
         bool face_updated = compute_face_properties(fd);
@@ -89,78 +88,15 @@ bool MeshData::build_face_properties( void ) {
 }
 
 bool MeshData::build_halfedge_properties( void ) {
-    Mesh::Property_map<Halfedge_index, Eigen::Vector3d> halfedge_unit_normal;
-    bool created;
-    std::tie(halfedge_unit_normal, created) 
-        = surface_mesh.add_property_map<Halfedge_index, Eigen::Vector3d>(
-                "h:halfedge_unit_normal", (Eigen::Vector3d() << 0, 0, 0).finished());
-    
-    /* assert(created); */
-    
-    Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
-    bool found;
-    std::tie(face_unit_normal, found) 
-        = surface_mesh.property_map<Face_index, Eigen::Vector3d>(
-                "f:face_unit_normal");
-    assert(found);
-
     for (Halfedge_index hd: surface_mesh.halfedges()) {
-        Vertex_index vs, ve;
-        vs = surface_mesh.source(hd);
-        ve = surface_mesh.target(hd);
-
-        Eigen::Vector3d vec_start, vec_end, vec_edge, face_normal;
-        vec_start = get_vertex(vs);
-        vec_end = get_vertex(ve);
-        vec_edge = vec_end - vec_start;
-
-        Face_index fd;
-        fd = surface_mesh.face(hd);
-        face_normal = face_unit_normal[fd];
-
-        halfedge_unit_normal[hd] = vec_edge.cross(face_normal).normalized();
+        compute_halfedge_properties(hd);
     }
     return true;
 }
 
 bool MeshData::build_edge_properties( void ){
-    // edge dyad
-    Mesh::Property_map<Edge_index, Eigen::Matrix3d> edge_dyad;
-    bool created;
-    std::tie(edge_dyad, created)
-        = surface_mesh.add_property_map<Edge_index, Eigen::Matrix3d>(
-                "e:edge_dyad", Eigen::Matrix3d::Zero());
-    /* assert(created); */
-    
-    // normal face property map
-    Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
-    bool found;
-    std::tie(face_unit_normal, found) 
-        = surface_mesh.property_map<Face_index, Eigen::Vector3d>(
-                "f:face_unit_normal");
-    /* assert(found); */
-
-    // halfedge normal property map
-    Mesh::Property_map<Halfedge_index, Eigen::Vector3d> halfedge_unit_normal;
-    std::tie(halfedge_unit_normal, found)
-        = surface_mesh.property_map<Halfedge_index, Eigen::Vector3d>(
-                "h:halfedge_unit_normal");
-    assert(found);
-
     for (Edge_index ed: surface_mesh.edges()) {
-
-        Halfedge_index h1, h2;
-        h1 = surface_mesh.halfedge(ed, 0);
-        h2 = surface_mesh.halfedge(ed, 1);
-        
-        Face_index f1, f2;
-        f1 = surface_mesh.face(h1);
-        f2 = surface_mesh.face(h2);
-
-        edge_dyad[ed] = face_unit_normal[f1] * halfedge_unit_normal[h1].transpose() 
-            + face_unit_normal[f2] * halfedge_unit_normal[h2].transpose();
-        // doesn't work for matrices close to zero
-        /* assert((edge_dyad[ed] - edge_dyad[ed].transpose()).isApprox(Eigen::Matrix3d::Zero(), 1e-3)); */
+        compute_edge_properties(ed);
     }
     return true;
 }
@@ -463,10 +399,19 @@ std::vector<Halfedge_index> MeshData::get_halfedges_with_vertex(
     return halfedge_vec;
 }
 
+std::vector<Edge_index> MeshData::get_edges_with_vertex(const Vertex_index& vd) const {
+    std::vector<Edge_index> edge_vec;
+
+    for(Halfedge_index hd : halfedges_around_target(vd, surface_mesh)) {
+        edge_vec.push_back(surface_mesh.edge(hd));
+    }
+    return edge_vec;
+}
+
 bool MeshData::update_face_properties(const std::vector<Face_index>& face_vec) {
     // loop over the face vec and update the properties of each
-    for (std::size_t ii = 0; ii < face_vec.size(); ++ii) {
-        compute_face_properties(face_vec[ii]);
+    for (Face_index fd : face_vec) {
+        compute_face_properties(fd);
     }
     return true;
 }
@@ -525,8 +470,95 @@ bool MeshData::compute_face_properties(const Face_index& fd) {
 
     assert(face_dyad[fd].isApprox(face_dyad[fd].transpose(), 1e-3));
     return true;
-
 }
+
+bool MeshData::update_halfedge_properties(const std::vector<Halfedge_index>& halfedge_vec) {
+    for (Halfedge_index hd : halfedge_vec) {
+        compute_halfedge_properties(hd); 
+    }
+    return true;
+}
+
+bool MeshData::compute_halfedge_properties(const Halfedge_index& hd) {
+    Mesh::Property_map<Halfedge_index, Eigen::Vector3d> halfedge_unit_normal;
+    bool created;
+    std::tie(halfedge_unit_normal, created) 
+        = surface_mesh.add_property_map<Halfedge_index, Eigen::Vector3d>(
+                "h:halfedge_unit_normal", (Eigen::Vector3d() << 0, 0, 0).finished());
+    
+    /* assert(created); */
+    
+    Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
+    bool found;
+    std::tie(face_unit_normal, found) 
+        = surface_mesh.property_map<Face_index, Eigen::Vector3d>(
+                "f:face_unit_normal");
+    assert(found);
+
+    Vertex_index vs, ve;
+    vs = surface_mesh.source(hd);
+    ve = surface_mesh.target(hd);
+
+    Eigen::Vector3d vec_start, vec_end, vec_edge, face_normal;
+    vec_start = get_vertex(vs);
+    vec_end = get_vertex(ve);
+    vec_edge = vec_end - vec_start;
+
+    Face_index fd;
+    fd = surface_mesh.face(hd);
+    face_normal = face_unit_normal[fd];
+
+    halfedge_unit_normal[hd] = vec_edge.cross(face_normal).normalized();
+    
+    return true;
+}
+
+bool MeshData::update_edge_properties(const std::vector<Edge_index>& edge_vec) {
+    for(Edge_index ed : edge_vec) {
+        compute_edge_properties(ed);
+    }
+    return true;
+}
+
+bool MeshData::compute_edge_properties(const Edge_index& ed) {
+    // edge dyad
+    Mesh::Property_map<Edge_index, Eigen::Matrix3d> edge_dyad;
+    bool created;
+    std::tie(edge_dyad, created)
+        = surface_mesh.add_property_map<Edge_index, Eigen::Matrix3d>(
+                "e:edge_dyad", Eigen::Matrix3d::Zero());
+    /* assert(created); */
+    
+    // normal face property map
+    Mesh::Property_map<Face_index, Eigen::Vector3d> face_unit_normal;
+    bool found;
+    std::tie(face_unit_normal, found) 
+        = surface_mesh.property_map<Face_index, Eigen::Vector3d>(
+                "f:face_unit_normal");
+    /* assert(found); */
+
+    // halfedge normal property map
+    Mesh::Property_map<Halfedge_index, Eigen::Vector3d> halfedge_unit_normal;
+    std::tie(halfedge_unit_normal, found)
+        = surface_mesh.property_map<Halfedge_index, Eigen::Vector3d>(
+                "h:halfedge_unit_normal");
+    assert(found);
+
+    Halfedge_index h1, h2;
+    h1 = surface_mesh.halfedge(ed, 0);
+    h2 = surface_mesh.halfedge(ed, 1);
+
+    Face_index f1, f2;
+    f1 = surface_mesh.face(h1);
+    f2 = surface_mesh.face(h2);
+
+    edge_dyad[ed] = face_unit_normal[f1] * halfedge_unit_normal[h1].transpose() 
+        + face_unit_normal[f2] * halfedge_unit_normal[h2].transpose();
+    // doesn't work for matrices close to zero
+    /* assert((edge_dyad[ed] - edge_dyad[ed].transpose()).isApprox(Eigen::Matrix3d::Zero(), 1e-3)); */
+    return true;
+}
+
 // Template Specialization
 template Eigen::RowVector3d MeshData::get_vertex<std::size_t>(const std::size_t&) const;
 template Eigen::RowVector3d MeshData::get_vertex<int>(const int&) const;
