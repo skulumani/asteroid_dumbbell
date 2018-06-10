@@ -80,7 +80,17 @@ class MeshData {
         */
         bool set_vertex(const Vertex_index& vd,
                 const Eigen::Ref<const Eigen::Vector3d>& vec);
+        
+        /** @fn Eigen::RowVector3i get_face_vertices(const Index& index) const;
+                
+            Get the vertex indecies of all vertices in the face
 
+            @param index A face index (basically an integer)
+            @returns row a row vector of indices
+
+            @author Shankar Kulumani
+            @version 6 June 2018
+        */
         template<typename Index>
         Eigen::RowVector3i get_face_vertices(const Index& index) const;
         // Getters for the property maps
