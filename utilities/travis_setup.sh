@@ -109,61 +109,61 @@ wget https://cmake.org/files/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.${CMAKE_BU
 chmod +x install_cmake.sh
 sudo ./install_cmake.sh --prefix=/usr/local --skip-license
 ## EIGEN
-#echo "We're going to download Eigen ${EIGEN_VER} and install to ${EIGEN_INSTALL_DIR}"
-#cd ${TEMP_DIR}
-#mkdir ${EIGEN_VER}
-#wget ${EIGEN_RELEASE_URL} -O ${TEMP_DIR}/${EIGEN_VER}.tar.gz
-#tar -xvzf ${EIGEN_VER}.tar.gz -C ./${EIGEN_VER} --strip-components=1
+echo "We're going to download Eigen ${EIGEN_VER} and install to ${EIGEN_INSTALL_DIR}"
+cd ${TEMP_DIR}
+mkdir ${EIGEN_VER}
+wget ${EIGEN_RELEASE_URL} -O ${TEMP_DIR}/${EIGEN_VER}.tar.gz
+tar -xvzf ${EIGEN_VER}.tar.gz -C ./${EIGEN_VER} --strip-components=1
 
-#echo "Going to install Eigen using CMake"
-#cd ${EIGEN_VER}
-#mkdir build
-#cd build
-#cmake ..
-#sudo make install
+echo "Going to install Eigen using CMake"
+cd ${EIGEN_VER}
+mkdir build
+cd build
+cmake ..
+sudo make install
 
-#echo "Eigen installed"
+echo "Eigen installed"
 
 ## HDF5
-#echo "We're going to download HDF5 ${HDF5_VER} and install to ${HDF5_INSTALL_DIR}"
-#cd ${TEMP_DIR}
-#mkdir ${HDF5_VER}
-#wget ${HDF5_RELEASE_URL} -O ${TEMP_DIR}/${HDF5_VER}.tar.gz
-#tar -xvzf ${HDF5_VER}.tar.gz -C ./${HDF5_VER} --strip-components=1
+echo "We're going to download HDF5 ${HDF5_VER} and install to ${HDF5_INSTALL_DIR}"
+cd ${TEMP_DIR}
+mkdir ${HDF5_VER}
+wget ${HDF5_RELEASE_URL} -O ${TEMP_DIR}/${HDF5_VER}.tar.gz
+tar -xvzf ${HDF5_VER}.tar.gz -C ./${HDF5_VER} --strip-components=1
 
-#echo "Going to install HDF5 using the configure script"
-#cd ${HDF5_VER}
-#bash ./configure --prefix=/usr/local/hdf5 --enable-cxx 
-#make -j5
-## make check
-#sudo make install
+echo "Going to install HDF5 using the configure script"
+cd ${HDF5_VER}
+bash ./configure --prefix=/usr/local/hdf5 --enable-cxx 
+make -j5
+# make check
+sudo make install
 
-#echo "Finished installing HDF5"
+echo "Finished installing HDF5"
 
 ## BOOST
-#echo "Now downloading Boost"
-#cd ${TEMP_DIR}
-#mkdir boost
-#wget ${BOOST_URL} -O ${TEMP_DIR}/boost.tar.gz
-## verify sha256 sum
-#if ! echo "${BOOST_SHA256_SUM} boost.tar.gz" | sha256sum -c; then
-#    echo "Checksum does not match. Aborting!!"
-#    exit 1
-#fi
+echo "Now downloading Boost"
+cd ${TEMP_DIR}
+mkdir boost
+wget ${BOOST_URL} -O ${TEMP_DIR}/boost.tar.gz
+# verify sha256 sum
+if ! echo "${BOOST_SHA256_SUM} boost.tar.gz" | sha256sum -c; then
+    echo "Checksum does not match. Aborting!!"
+    exit 1
+fi
 
-#tar -xzf boost.tar.gz -C ./boost --strip-components=1
+tar -xzf boost.tar.gz -C ./boost --strip-components=1
 
-#echo "Remove old boost"
-#sudo rm -rf /usr/include/boost
-#sudo rm /usr/local/lib/libboost*
+echo "Remove old boost"
+sudo rm -rf /usr/include/boost
+sudo rm /usr/local/lib/libboost*
 
-#echo "Now installing Boost and compiled libraries"
-#cd boost
-#./bootstrap.sh --prefix=${BOOST_INSTALL_DIR} --with-libraries=all --with-python=$HOME/anaconda3/bin/python3
+echo "Now installing Boost and compiled libraries"
+cd boost
+./bootstrap.sh --prefix=${BOOST_INSTALL_DIR} --with-libraries=all --with-python=$HOME/anaconda3/bin/python3
 
-#sudo ./b2 -j 4 install
+sudo ./b2 -j 4 install
 
-#echo "Boost and Boost-Python are installed to $BOOST_INSTALL_DIR"
+echo "Boost and Boost-Python are installed to $BOOST_INSTALL_DIR"
 
 ## CGAL
 #echo "Now installing CGAL"
