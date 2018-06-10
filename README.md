@@ -137,3 +137,12 @@ Some additional information:
     * Runs pytest
 
 2. Figure out how to get TOX/Create a seperate build script for travis
+
+## Doxygen
+
+Install
+
+~~~
+sudo apt-get install -y doxygen graphviz
+~~~
+
