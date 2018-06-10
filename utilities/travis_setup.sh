@@ -51,7 +51,7 @@ trap cleanup EXIT
 echo "Installing some dependencies"
 sudo apt-get -qq update
 sudo apt-get install -y build-essential g++ libicu-dev libbz2-dev autotools-dev
-sudo apt-get install -y build-essential libgmp-dev libmpfr-dev zlib1g-dev libgmp-dev libmpc3 libmpfr4
+sudo apt-get install -y build-essential libgmp-dev libmpfr-dev libgmp-dev libmpc3 libmpfr4
 sudo apt-get install -y libgl1 libstdc++6 libgcc1 libc6 libntl-dev 
 
 #echo "Downloading and Installing Miniconda"
