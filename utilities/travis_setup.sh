@@ -53,6 +53,8 @@ sudo apt-get -qq update
 sudo apt-get install -y build-essential g++ libicu-dev libbz2-dev autotools-dev
 sudo apt-get install -y build-essential libgmp-dev libmpfr-dev zlib1g-dev libgmp-dev libmpc3 libmpfr4
 sudo apt-get install -y libstdc++6 libgcc1 libc6 libntl-dev 
+sudo apt-get purge -y cmake
+sudo apt-get remove -y cmake
 
 echo "Downloading and Installing Miniconda"
 ## get miniconda installed
@@ -99,17 +101,13 @@ echo "Anaconda Setup is complete"
 
 #CMAKE
 sudo apt-get -y purge cmake
+sudo apt-get -y remove cmake
+
 echo "Now going to download cmake v$CMAKE_VERSION.$CMAKE_BUILD"
 cd ${TEMP_DIR}
-wget https://cmake.org/files/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.$CMAKE_BUILD.tar.gz
-tar -xzvf cmake-$CMAKE_VERSION.$CMAKE_BUILD.tar.gz
-cd cmake-$CMAKE_VERSION.$CMAKE_BUILD/
-echo "Now going to configure cmake"
-./bootstrap
-echo "Now build cmake"
-make -j 4
-sudo make install
-
+wget https://cmake.org/files/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.$CMAKE_BUILD-Linux-x86_64_sh -O install_cmake.sh
+chmod +x install_cmake.sh
+sudo ./install_cmake --prefix=/usr/local --skip-license
 ## EIGEN
 #echo "We're going to download Eigen ${EIGEN_VER} and install to ${EIGEN_INSTALL_DIR}"
 #cd ${TEMP_DIR}
