@@ -1,6 +1,9 @@
 #include "mesh.hpp"
 #include "polyhedron.hpp"
 
+#include <CGAL/Polygon_mesh_processing/refine.h>
+#include <CGAL/Polygon_mesh_processing/remesh.h>
+
 #include <igl/copyleft/cgal/mesh_to_polyhedron.h>
 #include <igl/copyleft/cgal/polyhedron_to_mesh.h>
 
@@ -371,6 +374,20 @@ bool MeshData::set_vertex(const Vertex_index& vd,
     update_edge_properties(edge_vec);
 }
 
+bool MeshData::refine_faces(const std::vector<Face_index>& face_vec,
+        std::vector<Face_index>& new_faces,
+        std::vector<Vertex_index>& new_vertices,
+        const int& density) {
+    
+    CGAL::Polygon_mesh_processing::refine(
+            surface_mesh,
+            face_vec,
+            std::back_inserter(new_faces),
+            std::back_inserter(new_vertices),
+            CGAL::Polygon_mesh_processing::parameters::density_control_factor(density));
+
+    // update the properties for the new faces/edges/halfedges/vertices
+}
 template<typename Index>
 Eigen::RowVector3i MeshData::get_face_vertices(const Index& index) const {
     Face_index fd(index);

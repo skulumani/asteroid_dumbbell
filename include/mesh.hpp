@@ -61,6 +61,28 @@ class MeshData {
         Mesh::Halfedge_range halfedges( void ) const;
         
         /* std::shared_ptr<Mesh> get_mesh( void ) const { return std::make_shared<Mesh>(surface_mesh) }; */
+    
+        /** @fn bool refine_faces(const std::vector<Face_index>& face_vec,
+         *              std::vector<Face_index>& new_faces,
+         *              std::vector<Vertex_index>& new_vertices,
+         *              const int& density = 4.0)
+                
+            Given a set of faces, this will refine them by adding new faces/
+            vertices within them. The new faces and vertices are returned.
+            The surface mesh member variable is updated
+
+            @param face_vec Vector of faces to refine
+            @param density integer defining the density control factor
+            @returns new_faces Vector of new faces
+            @returns new_vertices Vector of new vertices
+
+            @author Shankar Kulumani
+            @version 10 June 2018
+        */
+        bool refine_faces(const std::vector<Face_index>& face_vec, 
+                std::vector<Face_index>& new_faces,
+                std::vector<Vertex_index>& new_vertices,
+                const int& density = 4.0);
 
         template<typename Index>
         Eigen::RowVector3d get_vertex(const Index& index) const;
@@ -114,7 +136,7 @@ class MeshData {
         double get_face_factor(const Index& ed) const;
 
         double get_sum_face_factor( void ) const;
-
+                
     private:
 
         void build_surface_mesh(
