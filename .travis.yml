@@ -1,5 +1,5 @@
 language: generic
-sudo: false
+sudo: required
 python: 
     - 3.5.4
 # cache: apt
