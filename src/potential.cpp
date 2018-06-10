@@ -425,6 +425,26 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
     // TODO int return type for inside/outside
 }
 
+bool Asteroid::surface_slope( void ) {
+    // compute the surface slope at the centroid of each face
+    // loop over each face
+    for (Face_index fd : mesh_data->faces()) {
+    // get the normal face vector and the center vector
+        Eigen::Vector3d face_normal = mesh_data->get_face_normal(fd);
+        Eigen::Vector3d face_center = mesh_data->get_face_center(fd);
+        // compute acceleration vector at teh  center vector (plus a little bit  outside?)
+        // find angle between teh two
+        // save as another mesh property
+    }
+}
+
+double Asteroid::compute_face_slope(const Face_index& fd) {
+    Eigen::Vector3d face_normal = mesh_data->get_face_normal(fd);
+    Eigen::Vector3d face_center = mesh_data->get_face_center(fd);
+
+    double slope = 0;
+    return slope;
+}
 std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> Asteroid::face_contribution(
         const Eigen::Ref<const Eigen::Vector3d>& state) const {
 
