@@ -65,7 +65,7 @@ class AttitudeController {
         void body_fixed_pointing_attitude(const double& time, 
                 const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_in);
         
-        /** @fn void body_fixed_pointing_attitude(const double& time,
+        /** @fn void inertial_pointing_attitude(const double& time,
          *          const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_in,
          *          const Eigen::Ref<const Eigen::Vector3d>& desired_vector)
                 
@@ -79,7 +79,7 @@ class AttitudeController {
             @author Shankar Kulumani
             @version 10 June 2018
         */
-        void body_fixed_pointing_attitude(const double& time,
+        void inertial_pointing_attitude(const double& time,
                 const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_in,
                 const Eigen::Ref<const Eigen::Vector3d>& desired_vec);
 
