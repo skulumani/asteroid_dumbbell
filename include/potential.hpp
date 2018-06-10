@@ -150,6 +150,18 @@ class Asteroid {
         */
         void polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& state);
         
+        /** @fn bool surface_slope( void )
+                
+            Compute the surface slope for each face of the surface mesh
+
+            @param void none
+            @returns bool true if success
+
+            @author Shankar Kulumani
+            @version 10 June 2018
+        */
+        void surface_slope( void ) ;
+
         Eigen::Matrix<double, Eigen::Dynamic, 3> rotate_vertices(const double& time) const;
 
         Eigen::Matrix<double, 3, 3> rot_ast2int(const double& time);
