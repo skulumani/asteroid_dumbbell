@@ -387,6 +387,11 @@ bool MeshData::refine_faces(const std::vector<Face_index>& face_vec,
             CGAL::Polygon_mesh_processing::parameters::density_control_factor(density));
 
     // update the properties for the new faces/edges/halfedges/vertices
+    update_face_properties(new_faces);
+    
+    for (Vertex_index vd: new_vertices) {
+        std::vector<Face_index> updated_faces = get_faces_with_vertex()
+    }
 }
 template<typename Index>
 Eigen::RowVector3i MeshData::get_face_vertices(const Index& index) const {
