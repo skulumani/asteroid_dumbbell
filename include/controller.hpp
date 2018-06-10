@@ -79,10 +79,14 @@ class AttitudeController {
             @author Shankar Kulumani
             @version 10 June 2018
         */
+        void inertial_pointing_attitude(
+            std::shared_ptr<const State> state_in,
+            const Eigen::Ref<const Eigen::Vector3d>& desired_vec);
+
         void inertial_pointing_attitude(const double& time,
                 const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state_in,
                 const Eigen::Ref<const Eigen::Vector3d>& desired_vec);
-
+        
         // getters for the desired attitude state
         Eigen::Matrix<double, 3, 3> get_Rd() const; /**< SC Body to asteroid frame  */
         Eigen::Matrix<double, 3, 3> get_Rd_dot() const; /**< Derivative of SC body to asteroid frame */
