@@ -166,11 +166,11 @@ sudo ./b2 -j 4 install
 echo "Boost and Boost-Python are installed to $BOOST_INSTALL_DIR"
 
 ## CGAL
-#echo "Now installing CGAL"
-#cd ${TEMP_DIR}
-#wget ${CGAL_RELEASE_URL} $TEMP_DIR
-#tar xf ${CGAL_VER}.tar.* 
-#cd $CGAL_VER
-#cmake -DWITH_examples=ON -DWITH_demos=ON -DWITH_CGAL_Qt5=OFF .
-#make -j 4
-#sudo make install
+echo "Now installing CGAL"
+cd ${TEMP_DIR}
+wget ${CGAL_RELEASE_URL} $TEMP_DIR
+tar xf ${CGAL_VER}.tar.* 
+cd $CGAL_VER
+cmake -DWITH_examples=ON -DWITH_demos=ON -DWITH_CGAL_Qt5=OFF .
+make -j 4
+sudo make install
