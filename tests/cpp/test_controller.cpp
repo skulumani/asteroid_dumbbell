@@ -87,6 +87,29 @@ TEST_F(TestAttitudeController, ZAxisAlignedWithPositivePole) {
     ASSERT_LE(angle, kPI / 2);
 }
 
+TEST_F(TestAttitudeController, InertialPointingRotationMatrixSO3) {
+    //  desired  inertial vector to point at in the inertial frame
+    Eigen::Vector3d desired_vec;
+    desired_vec << 1, 1, 1;
+    AttitudeController att_controller;
+    att_controller.inertial_pointing_attitude(state_ptr, desired_vec);
+    ASSERT_TRUE(assert_SO3(att_controller.get_Rd()));
+}
+
+TEST_F(TestAttitudeController, InertialPointingXAxisAntiAligned) {
+    Eigen::Vector3d desired_vec;
+    desired_vec = Eigen::Vector3d::Random();
+
+    AttitudeController att_controller;
+    att_controller.inertial_pointing_attitude(state_ptr, desired_vec);
+    EXPECT_TRUE(assert_SO3(att_controller.get_Rd()));
+
+    double dot_product =
+        att_controller.get_Rd().col(0).dot((state_ptr->get_pos() -
+                    desired_vec).normalized()); 
+    EXPECT_NEAR(dot_product, -1, 1e-6);
+}
+
 TEST(TestController, Inheritance) { 
     Controller controller;
     
