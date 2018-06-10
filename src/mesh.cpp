@@ -390,9 +390,18 @@ bool MeshData::refine_faces(const std::vector<Face_index>& face_vec,
     update_face_properties(new_faces);
     
     for (Vertex_index vd: new_vertices) {
-        std::vector<Face_index> updated_faces = get_faces_with_vertex()
+        std::vector<Face_index> updated_faces = get_faces_with_vertex( vd );
+        std::vector<Halfedge_index> updated_halfedges = get_halfedges_with_vertex(vd);
+        std::vector<Edge_index> updated_edges = get_edges_with_vertex(vd);
+
+        update_face_properties(updated_faces);
+        update_halfedge_properties(updated_halfedges);
+        update_edge_properties(updated_edges);
     }
+
+    return true;
 }
+
 template<typename Index>
 Eigen::RowVector3i MeshData::get_face_vertices(const Index& index) const {
     Face_index fd(index);
