@@ -105,9 +105,9 @@ sudo apt-get -y remove cmake
 
 echo "Now going to download cmake v$CMAKE_VERSION.$CMAKE_BUILD"
 cd ${TEMP_DIR}
-wget https://cmake.org/files/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.$CMAKE_BUILD-Linux-x86_64_sh -O install_cmake.sh
+wget https://cmake.org/files/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.${CMAKE_BUILD}-Linux-x86_64.sh -O install_cmake.sh
 chmod +x install_cmake.sh
-sudo ./install_cmake --prefix=/usr/local --skip-license
+sudo ./install_cmake.sh --prefix=/usr/local --skip-license
 ## EIGEN
 #echo "We're going to download Eigen ${EIGEN_VER} and install to ${EIGEN_INSTALL_DIR}"
 #cd ${TEMP_DIR}
