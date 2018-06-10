@@ -54,61 +54,61 @@ sudo apt-get install -y build-essential g++ libicu-dev libbz2-dev autotools-dev
 sudo apt-get install -y build-essential libgmp-dev libmpfr-dev zlib1g-dev libgmp-dev libmpc3 libmpfr4
 sudo apt-get install -y libstdc++6 libgcc1 libc6 libntl-dev 
 
-#echo "Downloading and Installing Miniconda"
+echo "Downloading and Installing Miniconda"
 ## get miniconda installed
 ## check if anaconda3 directory exists
-#if [ -f "$HOME/anaconda3/bin/conda" ]; then
-#    echo "Anaconda already installed"
-#else
-#    echo "Anaconda not installed"
-#    wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/miniconda.sh
-#    bash $HOME/miniconda.sh -b -u -p $HOME/anaconda3
-#fi
+if [ -f "$HOME/anaconda3/bin/conda" ]; then
+    echo "Anaconda already installed"
+else
+    echo "Anaconda not installed"
+    wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/miniconda.sh
+    bash $HOME/miniconda.sh -b -u -p $HOME/anaconda3
+fi
 
-#export PATH="$HOME/anaconda3/bin:$PATH"
-#hash -r
+export PATH="$HOME/anaconda3/bin:$PATH"
+hash -r
 
-#echo "Configuring Conda settings"
+echo "Configuring Conda settings"
 ## configure conda
-#conda config --set always_yes yes --set changeps1 no
-#conda update conda
-#echo ". /home/travis/anaconda3/etc/profile.d/conda.sh" >> ~/.bashrc
-#export PATH="$HOME/anaconda3/bin:$PATH"
-#hash -r 
-#source $HOME/anaconda3/bin/activate
+conda config --set always_yes yes --set changeps1 no
+conda update conda
+echo ". /home/travis/anaconda3/etc/profile.d/conda.sh" >> ~/.bashrc
+export PATH="$HOME/anaconda3/bin:$PATH"
+hash -r 
+source $HOME/anaconda3/bin/activate
 
-#echo "Downloading the shape models"
+echo "Downloading the shape models"
 ## download the shape model
-#wget https://github.com/skulumani/asteroid_dumbbell/releases/download/v0.3/shape_model.tar.gz -O ./data/shape_model/shape_model.tar.gz
-#tar xf ./data/shape_model/shape_model.tar.gz -C ./data/shape_model
+wget https://github.com/skulumani/asteroid_dumbbell/releases/download/v0.3/shape_model.tar.gz -O ./data/shape_model/shape_model.tar.gz
+tar xf ./data/shape_model/shape_model.tar.gz -C ./data/shape_model
 
-#echo "Creating the asteroid environment"
-## setup development enviornment
-#if [ -d "$HOME/anaconda3/envs/asteroid" ]; then
-#    echo "asteroid enviornment exists. Just update"
-#    conda env update --name asteroid --file ./utilities/asteroid.yml
-#else
-#    echo "No asteroid enviornment"
-#    conda env create --name asteroid --file ./utilities/asteroid.yml
+echo "Creating the asteroid environment"
+# setup development enviornment
+if [ -d "$HOME/anaconda3/envs/asteroid" ]; then
+    echo "asteroid enviornment exists. Just update"
+    conda env update --name asteroid --file ./utilities/asteroid.yml
+else
+    echo "No asteroid enviornment"
+    conda env create --name asteroid --file ./utilities/asteroid.yml
 
-#fi
+fi
 
-#conda activate asteroid
+conda activate asteroid
 
-#echo "Anaconda Setup is complete"
+echo "Anaconda Setup is complete"
 
-##CMAKE
-#sudo apt-get -y purge cmake
-#echo "Now going to download cmake v$CMAKE_VERSION.$CMAKE_BUILD"
-#cd ${TEMP_DIR}
-#wget https://cmake.org/files/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.$CMAKE_BUILD.tar.gz
-#tar -xzvf cmake-$CMAKE_VERSION.$CMAKE_BUILD.tar.gz
-#cd cmake-$CMAKE_VERSION.$CMAKE_BUILD/
-#echo "Now going to configure cmake"
-#./bootstrap
-#echo "Now build cmake"
-#make -j 4
-#sudo make install
+#CMAKE
+sudo apt-get -y purge cmake
+echo "Now going to download cmake v$CMAKE_VERSION.$CMAKE_BUILD"
+cd ${TEMP_DIR}
+wget https://cmake.org/files/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.$CMAKE_BUILD.tar.gz
+tar -xzvf cmake-$CMAKE_VERSION.$CMAKE_BUILD.tar.gz
+cd cmake-$CMAKE_VERSION.$CMAKE_BUILD/
+echo "Now going to configure cmake"
+./bootstrap
+echo "Now build cmake"
+make -j 4
+sudo make install
 
 ## EIGEN
 #echo "We're going to download Eigen ${EIGEN_VER} and install to ${EIGEN_INSTALL_DIR}"
