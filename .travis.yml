@@ -22,9 +22,11 @@ before_install:
     - conda activate asteroid
     - pip install --user cpp-coveralls
 install:
-    - echo "Now try building"
-    - mkdir build && cd build && cmake -DCOVERAGE=1 ..
-    - make -j4 all
+    - echo "Now try building FDCL-HDF5"
+    - cd extern/fdcl-hdf5 && mkdir build && cmake .. 
+    - make && make install
+    # - mkdir build && cd build && cmake -DCOVERAGE=1 ..
+    # - make -j4 all
 script:
     - cd ..
     - ./bin/test_all
