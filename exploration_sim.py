@@ -717,9 +717,6 @@ def landing(output_filename, input_filename):
 
     initial_state = explore_state
     
-    # perform remeshing over the landing area and take a bunch of measurements 
-    # of the surface
-
     with h5py.File(output_filename, 'w-') as hf:
         # save data to HDF5 file
         hf.create_dataset('time', data=time, compression=compression,
