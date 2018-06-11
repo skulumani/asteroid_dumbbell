@@ -386,19 +386,11 @@ bool MeshData::refine_faces(const std::vector<Face_index>& face_vec,
             std::back_inserter(new_vertices),
             CGAL::Polygon_mesh_processing::parameters::density_control_factor(density));
 
-    // update the properties for the new faces/edges/halfedges/vertices
-    update_face_properties(new_faces);
-    
-    for (Vertex_index vd: new_vertices) {
-        std::vector<Face_index> updated_faces = get_faces_with_vertex( vd );
-        std::vector<Halfedge_index> updated_halfedges = get_halfedges_with_vertex(vd);
-        std::vector<Edge_index> updated_edges = get_edges_with_vertex(vd);
-
-        update_face_properties(updated_faces);
-        update_halfedge_properties(updated_halfedges);
-        update_edge_properties(updated_edges);
-    }
-
+    surface_mesh.collect_garbage();
+    build_face_properties();
+    build_halfedge_properties();
+    build_edge_properties();
+    surface_mesh.collect_garbage();
     return true;
 }
 
@@ -413,6 +405,7 @@ bool MeshData::remesh_faces(const std::vector<Face_index>& face_vec,
             CGAL::Polygon_mesh_processing::parameters::number_of_iterations(number_of_iterations));
 
     // now need to update all the face, edge, halfedge properties
+    surface_mesh.collect_garbage();
     build_face_properties();
     build_halfedge_properties();
     build_edge_properties();
