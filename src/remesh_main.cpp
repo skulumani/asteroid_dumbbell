@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
 
     // define a set of faces to refine
     Eigen::Vector3d pos(1, 0, 0);
-    std::vector<Face_index> faces_to_refine = mesh->faces_in_fov(pos, 0.52);
+    std::vector<Face_index> faces_to_refine = mesh->faces_in_fov(pos, 1.7);
     
     std::cout << "Old number of vertices: " << mesh->surface_mesh.number_of_vertices() << std::endl;
     double target_edge_length(0.1);
