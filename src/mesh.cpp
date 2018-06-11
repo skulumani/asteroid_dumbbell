@@ -284,6 +284,18 @@ Eigen::Vector3d MeshData::get_face_center(const Index& fd_in) const {
     return face_center[fd];
 }
 
+Eigen::Matrix<double, Eigen::Dynamic, 3> MeshData::get_face_center(
+        const std::vector<Face_index>& face_vec) const {
+    
+    Eigen::Matrix<double, Eigen::Dynamic, 3> face_centers(face_vec.size(), 3);
+    
+    std::size_t index = 0;
+    for (Face_index fd: face_vec) {
+        face_centers.row(index) = get_face_center(fd).transpose();
+        ++index;
+    }
+    return face_centers;
+}
 template<typename Index>
 Eigen::Matrix3d MeshData::get_face_dyad(const Index& fd_in) const {
     Mesh::Property_map<Face_index, Eigen::Matrix3d> face_dyad;

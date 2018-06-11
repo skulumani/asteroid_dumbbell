@@ -143,6 +143,8 @@ class MeshData {
         Eigen::Vector3d get_face_normal(const Index& fd) const;
         template<typename Index>
         Eigen::Vector3d get_face_center(const Index& fd) const;
+        Eigen::Matrix<double, Eigen::Dynamic, 3> get_face_center(const std::vector<Face_index>& face_vec) const;
+
         template<typename Index>
         Eigen::Matrix3d get_face_dyad(const Index& fd) const;
         
@@ -160,7 +162,6 @@ class MeshData {
 
         double get_sum_face_factor( void ) const;
         
-        Eigen::Matrix<double, Eigen::Dynamic, 3> get_face_centers(const std::vector<Face_index>& face_vec) const;
     private:
 
         void build_surface_mesh(
