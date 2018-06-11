@@ -69,8 +69,11 @@ class MeshData {
                 
             Given a set of faces, this will refine them by adding new faces/
             vertices within them. The new faces and vertices are returned.
-            The surface mesh member variable is updated
+            The surface mesh member variable is updated.
 
+            This tends to make a very craggly shape. Better to use remesh
+            instead
+            
             @param face_vec Vector of faces to refine
             @param density integer defining the density control factor
             @returns new_faces Vector of new faces
@@ -84,6 +87,10 @@ class MeshData {
                 std::vector<Vertex_index>& new_vertices,
                 const int& density = 4.0);
         
+        bool remesh_faces(const std::vector<Face_index>& face_vec,
+                const double& target_edge_length,
+                const int& number_of_iterations=3);
+
         /** @fn std::vector<Face_index> faces_in_fov(
          *      const Eigen::Ref<const Eigen::Vector3d>& pos,
          *      const double& max_fov=0.52)

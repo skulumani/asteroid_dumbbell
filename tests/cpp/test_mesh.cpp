@@ -211,6 +211,22 @@ TEST_F(TestMeshData, FacesInViewCube) {
     ASSERT_EQ(faces_in_view[1], fd7);
 }
 
+TEST_F(TestMeshData, RefineFacesCube) {
+    MeshData mesh(Ve_true, Fe_true);
+    Eigen::Vector3d pos;
+    pos << 1, 0, 0;
+    std::vector<Face_index> faces_in_view = 
+        mesh.faces_in_fov(pos, 0.52);
+
+    // now refine these faces
+    std::vector<Face_index> new_faces;
+    std::vector<Vertex_index> new_vertices;
+    mesh.refine_faces(faces_in_view, new_faces, new_vertices, 8.0);
+
+    ASSERT_EQ(new_vertices.size(), 2);
+    ASSERT_EQ(new_faces.size(), 4);
+}
+
 TEST(TestMeshDataCastalia, OutwardFaceNormals) {
     std::shared_ptr<MeshData> mesh = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
     for (Face_index fd: mesh->surface_mesh.faces() ) {

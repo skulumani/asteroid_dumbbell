@@ -42,28 +42,20 @@ int main(int argc, char* argv[]) {
     std::shared_ptr<MeshData> mesh = Loader::load(input_file);
     
     // define a set of faces to refine
-    std::vector<Face_index> faces_to_refine;
-    Face_index fd(0), fd1(1), fd2(2);
-    faces_to_refine.push_back(fd);
-    faces_to_refine.push_back(fd);
-    faces_to_refine.push_back(fd1); 
+    Eigen::Vector3d pos(1, 0, 0);
+    std::vector<Face_index> faces_to_refine = mesh->faces_in_fov(pos, 1.65);
+
     // vectors to store the new faces/vertices
     std::vector<Face_index> new_faces;
     std::vector<Vertex_index> new_vertices;
-    CGAL::Polygon_mesh_processing::refine(
-            mesh->surface_mesh,
-            faces_to_refine, // faces(mesh->surface_mesh)
-            std::back_inserter(new_faces),
-            std::back_inserter(new_vertices),
-            CGAL::Polygon_mesh_processing::parameters::density_control_factor(4.0));
     
+    mesh->refine_faces(faces_to_refine, new_faces, new_vertices, 8.0);
+
     std::cout << "Refinement added " << new_vertices.size() << " vertices." << std::endl;
     // write to OBJ
     std::string output_file = "/tmp/" + remove_extension(base_name(input_file)) + "_refine.obj";
     std::cout << "Saving to: " + output_file << std::endl;
     
-    std::cout << mesh->get_face_normal(new_faces[0]) << std::endl;
-
     // take surface mesh and convert to vertices
     igl::writeOBJ(output_file, mesh->get_verts(), mesh->get_faces());
 
