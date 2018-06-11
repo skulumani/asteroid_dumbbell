@@ -1,6 +1,7 @@
 #include "potential.hpp"
 #include "mesh.hpp"
 #include "reconstruct.hpp"
+#include "geodesic.hpp"
 
 #include <igl/sort.h>
 #include <igl/unique_rows.h>
@@ -425,26 +426,33 @@ void Asteroid::polyhedron_potential(const Eigen::Ref<const Eigen::Vector3d>& sta
     // TODO int return type for inside/outside
 }
 
-bool Asteroid::surface_slope( void ) {
+Eigen::VectorXd Asteroid::surface_slope( void ) {
     // compute the surface slope at the centroid of each face
+    Eigen::VectorXd face_slope(mesh_data->number_of_faces());
     // loop over each face
+    std::size_t row = 0;
     for (Face_index fd : mesh_data->faces()) {
-    // get the normal face vector and the center vector
-        Eigen::Vector3d face_normal = mesh_data->get_face_normal(fd);
-        Eigen::Vector3d face_center = mesh_data->get_face_center(fd);
-        // compute acceleration vector at teh  center vector (plus a little bit  outside?)
-        // find angle between teh two
-        // save as another mesh property
+        // get the normal face vector and the center vector
+        face_slope(row) = compute_face_slope(fd);
     }
+    return face_slope;
 }
 
 double Asteroid::compute_face_slope(const Face_index& fd) {
     Eigen::Vector3d face_normal = mesh_data->get_face_normal(fd);
-    Eigen::Vector3d face_center = mesh_data->get_face_center(fd);
+    Eigen::Vector3d face_center = mesh_data->get_face_center(fd) + 
+        0.0001 * mesh_data->get_face_center(fd).normalized();
+    
+    // compute potential plus the rotational component
+    polyhedron_potential(face_center );
+    Eigen::Vector3d modified_potential = mU_grad +  omega * omega 
+        * (Eigen::Vector3d()<< face_center(0), face_center(1), 0).finished();
+    // take dot product and arccose
+    double slope = kPI - std::acos(face_normal.dot(modified_potential.normalized()));
 
-    double slope = 0;
     return slope;
 }
+
 std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> Asteroid::face_contribution(
         const Eigen::Ref<const Eigen::Vector3d>& state) const {
 

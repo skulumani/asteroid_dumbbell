@@ -160,7 +160,7 @@ class Asteroid {
             @author Shankar Kulumani
             @version 10 June 2018
         */
-        bool surface_slope( void ) ;
+        Eigen::VectorXd surface_slope( void ) ;
         double compute_face_slope(const Face_index& fd);
 
         Eigen::Matrix<double, Eigen::Dynamic, 3> rotate_vertices(const double& time) const;
