@@ -86,7 +86,7 @@ class MeshData {
                 std::vector<Face_index>& new_faces,
                 std::vector<Vertex_index>& new_vertices,
                 const int& density = 4.0);
-        
+         
         bool remesh_faces(const std::vector<Face_index>& face_vec,
                 const double& target_edge_length,
                 const int& number_of_iterations=3);

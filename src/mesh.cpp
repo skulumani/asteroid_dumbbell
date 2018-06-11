@@ -402,6 +402,25 @@ bool MeshData::refine_faces(const std::vector<Face_index>& face_vec,
     return true;
 }
 
+bool MeshData::remesh_faces(const std::vector<Face_index>& face_vec,
+        const double& target_edge_length,
+        const int& number_of_iterations) {
+
+    CGAL::Polygon_mesh_processing::isotropic_remeshing(
+            face_vec,
+            target_edge_length,
+            surface_mesh,
+            CGAL::Polygon_mesh_processing::parameters::number_of_iterations(number_of_iterations));
+
+    // now need to update all the face, edge, halfedge properties
+    build_face_properties();
+    build_halfedge_properties();
+    build_edge_properties();
+
+    surface_mesh.collect_garbage();
+    return true;
+}
+
 std::vector<Face_index> MeshData::faces_in_fov(
         const Eigen::Ref<const Eigen::Vector3d>& pos,
         const double& max_fov) {
