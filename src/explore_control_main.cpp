@@ -129,6 +129,49 @@ int main(int argc, char* argv[])
 
     }
     
+    // now lets remesh a specific area and point and take some more measurements
+    state_ptr->update_state(initial_state_ptr);
+    
+    std::vector<Face_index> faces_to_remesh = est_meshdata_ptr->faces_in_fov(state_ptr->get_pos(),
+            0.52);
+
+    std::cout << est_meshdata_ptr->number_of_faces() << std::endl;
+    std::vector<Face_index> new_faces;
+    std::vector<Vertex_index> new_vertices;
+    est_meshdata_ptr->refine_faces(faces_to_remesh,new_faces, new_vertices, 4.0);
+    std::cout << est_meshdata_ptr->number_of_faces() << std::endl;
+
+    /* // now point at each of these new faces and take a measurement and update the mesh */
+    /* std::vector<Face_index> faces_to_measure = est_meshdata_ptr->faces_in_fov( */
+    /*         state_ptr->get_pos(), */
+    /*         0.52); */
+        
+    std::size_t index = max_steps;
+    for (Face_index fd : new_faces) {
+        /* // update state to point at the center of the face */
+        target = sensor.define_target(state_ptr->get_pos(), state_ptr->get_att(), dist);
+        intersection = caster.castray(state_ptr->get_pos(), target);
+        est_rmesh_ptr->single_update(intersection, max_angle);
+
+        controller.inertial_fixed_state(initial_state_ptr);
+        controller.inertial_pointing_attitude(state_ptr,
+                est_meshdata_ptr->get_face_center(fd));
+        std::cout << est_meshdata_ptr->get_face_center(fd).transpose() << std::endl;
+        new_state_ptr = controller.get_desired_state();
+        state_ptr->update_state(new_state_ptr);
+
+
+        /* reconstructed_vertex_group.write(std::to_string(index), est_rmesh_ptr->get_verts()); */
+        /* reconstructed_weight_group.write(std::to_string(index), est_rmesh_ptr->get_weights()); */
+        /* state_group.write(std::to_string(index), state_ptr->get_state()); */
+        /* targets_group.write(std::to_string(index), target); */
+        /* intersections_group.write(std::to_string(index), intersection); */
+        
+        /* ++index; */
+    }
+
+    // now save to HDF5
+    
     /* hf.close(); */
     return 0;
 }
