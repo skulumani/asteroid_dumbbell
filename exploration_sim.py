@@ -38,7 +38,7 @@ from visualization import graphics, animation, publication
 
 compression = 'gzip'
 compression_opts = 9
-max_steps = 1000
+max_steps = 10
 
 def initialize(output_filename):
     """Initialize all the things for the simulation
@@ -340,13 +340,27 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
                                                         compression_opts=compression_opts)
             
             ii += 1
-
+        
+        logger.info("Exploration complete")
+        logger.info("Estimated asteroid has {} vertices and {} faces".format(
+            est_ast_rmesh.get_verts().shape[0],
+            est_ast_rmesh.get_faces().shape[1]))
+            
+        logger.info("Now refining the faces close to the landing site")
         # perform remeshing over the landing area and take a bunch of measurements 
         # of the surface. Assume everything happens without the asteroid rotating 
-        new_face_centers = est_ast_meshdata.refine_faces_in_view(initial_state[0:3], np.deg2rad(15))
-
+        new_face_centers = est_ast_meshdata.refine_faces_in_view(state[0:3], np.deg2rad(15))
+        logger.info("Refinement added {} faces".format(new_face_centers.shape[0]))
+        logger.info("Estimated asteroid has {} vertices and {} faces".format(
+            est_ast_rmesh.get_verts().shape[0],
+            est_ast_rmesh.get_faces().shape[1]))
+        
+        logger.info("Now looping over the new faces and raycasting")
         # now take measurements of each facecenter
         for ii, vec in enumerate(new_face_centers):
+            logger.info("Step: {} Uncertainty: {}".format(ii + max_steps, 
+                                                                   np.sum(est_ast_rmesh.get_weights())))
+
             targets = lidar.define_targets(state[0:3], state[6:15].reshape((3, 3)),
                                            np.linalg.norm(state[0:3]))
             intersections = caster.castarray(state[0:3], targets)
@@ -366,9 +380,10 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
             est_ast_rmesh.update(ast_ints, max_angle)
             
             # use the controller to update the state
-            complete_controller.inertial_fixed_state(inertial_state);
-            complete_controller.inertial_pointing_attitude(state,
-                                                  vec);
+            complete_controller.inertial_fixed_state(max_steps, state, initial_pos);
+            complete_controller.inertial_pointing_attitude(max_steps,
+                                                           state,
+                                                           vec);
             # update the state
             state = np.hstack((complete_controller.get_posd(), 
                                complete_controller.get_veld(),
@@ -393,6 +408,8 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
             asteroid_intersections_group.create_dataset(str(max_steps + ii), data=ast_ints, compression=compression,
                                                         compression_opts=compression_opts)
 
+    
+    logger.info("All done")
 
 def save_animation(filename, move_cam=False, mesh_weight=False):
     """Given a HDF5 file from simulate this will animate teh motion
