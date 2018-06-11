@@ -441,7 +441,7 @@ Eigen::VectorXd Asteroid::surface_slope( void ) {
 double Asteroid::compute_face_slope(const Face_index& fd) {
     Eigen::Vector3d face_normal = mesh_data->get_face_normal(fd);
     Eigen::Vector3d face_center = mesh_data->get_face_center(fd) + 
-        0.0001 * mesh_data->get_face_center(fd).normalized();
+        0.001 * mesh_data->get_face_center(fd).normalized();
     
     // compute potential plus the rotational component
     polyhedron_potential(face_center );
