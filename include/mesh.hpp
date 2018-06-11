@@ -159,7 +159,8 @@ class MeshData {
         double get_face_factor(const Index& ed) const;
 
         double get_sum_face_factor( void ) const;
-                
+        
+        Eigen::Matrix<double, Eigen::Dynamic, 3> get_face_centers(const std::vector<Face_index>& face_vec) const;
     private:
 
         void build_surface_mesh(
