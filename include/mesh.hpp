@@ -83,6 +83,22 @@ class MeshData {
                 std::vector<Face_index>& new_faces,
                 std::vector<Vertex_index>& new_vertices,
                 const int& density = 4.0);
+        
+        /** @fn std::vector<Face_index> faces_in_fov(
+         *      const Eigen::Ref<const Eigen::Vector3d>& pos,
+         *      const double& max_fov=0.52)
+                
+            Find the faces that are within a FOV of the current position
+
+            @param pos Position of spacecraft in the asteroid fixed frame
+            @returns face_vec Vector of face indices
+
+            @author Shankar Kulumani
+            @version 11 June 2018
+        */
+        std::vector<Face_index> faces_in_fov(
+                const Eigen::Ref<const Eigen::Vector3d>& pos,
+                const double& max_fov=0.52);
 
         template<typename Index>
         Eigen::RowVector3d get_vertex(const Index& index) const;

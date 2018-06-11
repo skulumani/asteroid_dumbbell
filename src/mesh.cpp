@@ -402,6 +402,18 @@ bool MeshData::refine_faces(const std::vector<Face_index>& face_vec,
     return true;
 }
 
+std::vector<Face_index> MeshData::faces_in_fov(
+        const Eigen::Ref<const Eigen::Vector3d>& pos,
+        const double& max_fov) {
+    
+    Eigen::Vector3d pos_uvec = pos.normalized();
+    // loop over all the faces 
+    for (Face_index fd : surface_mesh.faces()){
+    // find the angle of each face normal with the position vector
+    double angle = 
+    // store index to Array
+    }
+}
 template<typename Index>
 Eigen::RowVector3i MeshData::get_face_vertices(const Index& index) const {
     Face_index fd(index);
