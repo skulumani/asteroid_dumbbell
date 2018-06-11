@@ -434,6 +434,7 @@ Eigen::VectorXd Asteroid::surface_slope( void ) {
     for (Face_index fd : mesh_data->faces()) {
         // get the normal face vector and the center vector
         face_slope(row) = compute_face_slope(fd);
+        ++row;
     }
     return face_slope;
 }
