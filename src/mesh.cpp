@@ -442,6 +442,22 @@ std::vector<Face_index> MeshData::faces_in_fov(
     return faces_in_view;
 }
 
+Eigen::Matrix<double, Eigen::Dynamic, 3> MeshData::refine_faces_in_view(
+        const Eigen::Ref<const Eigen::Vector3d>& pos,
+        const double& max_fov) {
+    // find current faces in fov
+    std::vector<Face_index> faces_to_refine = faces_in_fov(pos, max_fov);
+    // remesh those faces
+    std::vector<Face_index> new_faces;
+    std::vector<Vertex_index> new_vertices;
+    refine_faces(faces_to_refine, new_faces, new_vertices, 4.0);
+    // get the face centers
+    Eigen::Matrix<double, Eigen::Dynamic, 3> new_face_centers;
+    new_face_centers = get_face_center(new_faces);
+    // return 
+    return new_face_centers;
+}
+
 template<typename Index>
 Eigen::RowVector3i MeshData::get_face_vertices(const Index& index) const {
     Face_index fd(index);

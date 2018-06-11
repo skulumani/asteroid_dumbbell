@@ -648,7 +648,7 @@ def landing(output_filename, input_filename):
         explore_true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
         explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
 
-    num_steps = int(7200) # 2 hours to go from home pos to the surface
+    num_steps = int(3600) # 2 hours to go from home pos to the surface
     time = np.arange(explore_tf, explore_tf + num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -664,6 +664,9 @@ def landing(output_filename, input_filename):
 
     initial_state = explore_state
     
+    # perform remeshing over the landing area and take a bunch of measurements 
+    # of the surface
+
     with h5py.File(output_filename, 'w-') as hf:
         # save data to HDF5 file
         hf.create_dataset('time', data=time, compression=compression,

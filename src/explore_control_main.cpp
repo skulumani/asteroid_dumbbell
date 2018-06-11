@@ -132,20 +132,12 @@ int main(int argc, char* argv[])
     
     // now lets remesh a specific area and point and take some more measurements
     state_ptr->update_state(initial_state_ptr);
-    
-    std::vector<Face_index> faces_to_remesh = est_meshdata_ptr->faces_in_fov(state_ptr->get_pos(),
+    std::cout << est_meshdata_ptr->number_of_faces() << std::endl;
+    Eigen::Matrix<double, Eigen::Dynamic, 3> new_face_centers;
+    new_face_centers = est_meshdata_ptr->refine_faces_in_view(state_ptr->get_pos(),
             0.52);
-
-    std::cout << est_meshdata_ptr->number_of_faces() << std::endl;
-    std::vector<Face_index> new_faces;
-    std::vector<Vertex_index> new_vertices;
-    est_meshdata_ptr->refine_faces(faces_to_remesh,new_faces, new_vertices, 4.0);
     std::cout << est_meshdata_ptr->number_of_faces() << std::endl;
     
-    // get the new face centers to point at
-    Eigen::Matrix<double, Eigen::Dynamic, 3> new_face_centers = est_meshdata_ptr->get_face_center(
-            new_faces);
-
     std::size_t index = max_steps;
     for (int ii = 0; ii < new_face_centers.rows(); ++ii) {
         /* // update state to point at the center of the face */

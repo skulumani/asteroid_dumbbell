@@ -21,7 +21,11 @@ PYBIND11_MODULE(controller, m) {
         .def("get_Rd", &AttitudeController::get_Rd, "Get the rotation matrix")
         .def("get_Rd_dot", &AttitudeController::get_Rd_dot, "Get teh rotation matrix derivative")
         .def("get_ang_vel_d", &AttitudeController::get_ang_vel_d, "Get the angular velocity")
-        .def("get_ang_vel_d_dot", &AttitudeController::get_ang_vel_d, "Get the angular velocity derivative");
+        .def("get_ang_vel_d_dot", &AttitudeController::get_ang_vel_d, "Get the angular velocity derivative")
+        .def("inertial_pointing_attitude",( void (AttitudeController::*)(const double&,
+                        const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >&,
+                        const Eigen::Ref<const Eigen::Vector3d>&)) &AttitudeController::inertial_pointing_attitude, "Point at a desired point in intertial space",
+            pybind11::arg("time"), pybind11::arg("inertial state"), pybind11::arg("desired pointing vector in inertial space"));
 
     pybind11::class_<TranslationController, std::shared_ptr<TranslationController>>(m, "TranslationController")
         .def(pybind11::init<>(), "Translation Controller constructor")
