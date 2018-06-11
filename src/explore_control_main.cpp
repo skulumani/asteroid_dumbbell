@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
         
     }
 
-    // now save to HDF5
+    // find the face with the lowest slope and go to it
     
     /* hf.close(); */
     return 0;
