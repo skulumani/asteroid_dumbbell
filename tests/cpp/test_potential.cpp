@@ -95,3 +95,11 @@ TEST(TestAsteroid, CastaliaGravity) {
     ASSERT_NEAR(ast.get_laplace(), Ulaplace_true, 1e-7);
 
 }
+
+TEST(TestAsteroid, CubeSurfaceSlope) {
+    std::shared_ptr<MeshData> mesh_data = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+    Asteroid ast("cube", mesh_data);
+
+    Eigen::VectorXd face_slope = ast.surface_slope( );
+    std::cout << face_slope << std::endl;
+}
