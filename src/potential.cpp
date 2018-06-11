@@ -439,6 +439,7 @@ Eigen::VectorXd Asteroid::surface_slope( void ) {
     return face_slope;
 }
 
+// TODO Think about storing this as a property of the mesh
 double Asteroid::compute_face_slope(const Face_index& fd) {
     Eigen::Vector3d face_normal = mesh_data->get_face_normal(fd);
     Eigen::Vector3d face_center = mesh_data->get_face_center(fd) + 
