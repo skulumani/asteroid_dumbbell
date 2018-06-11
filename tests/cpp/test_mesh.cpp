@@ -197,6 +197,20 @@ TEST_F(TestMeshData, FaceFactorCube) {
     }
 }
 
+TEST_F(TestMeshData, FacesInViewCube) {
+    MeshData mesh(Ve_true, Fe_true);
+    Eigen::Vector3d pos;
+    pos << 1, 0, 0;
+
+    std::vector<Face_index> faces_in_view = 
+        mesh.faces_in_fov(pos, 0.52);
+    
+    Face_index fd6(6), fd7(7);
+
+    ASSERT_EQ(faces_in_view[0], fd6);
+    ASSERT_EQ(faces_in_view[1], fd7);
+}
+
 TEST(TestMeshDataCastalia, OutwardFaceNormals) {
     std::shared_ptr<MeshData> mesh = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
     for (Face_index fd: mesh->surface_mesh.faces() ) {
@@ -241,3 +255,4 @@ TEST(TestMeshDataItokawa, SymmetricEdgeDyad) {
                 .isApprox(Eigen::Matrix3d::Zero(), 1e-3));
     }
 }
+
