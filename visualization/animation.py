@@ -174,6 +174,10 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
     pc_sources = pc_points.mlab_source
     
     with h5py.File(hdf5_file, 'r') as hf:
+        # oriignal vertices
+        est_initial_vertices = hf['simulation_parameters/estimate_asteroid/initial_vertices'][()]
+        num_vert = est_initial_vertices.shape[0]
+
         rv_group = hf['reconstructed_vertex']
         rf_group = hf['reconstructed_face']
         rw_group = hf['reconstructed_weight']
@@ -194,19 +198,31 @@ def inertial_asteroid_trajectory_cpp(time, state, inertial_intersections,
             new_vertices = Ra.dot(rv_group[key][()].T).T
             new_faces = rf_group[key][()]
             new_weight = np.squeeze(rw_group[key][()])
-
+            
+            # store value for number of vertices
             # add current time 
             time_text.trait_set(text="t: {:8.1f}".format(t))
             weight_text.trait_set(text="w: {:8.1f}".format(np.sum(new_weight)))
 
             # update asteroid
             if mesh_weight:
-                ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
-                         z=new_vertices[:,2], triangles=new_faces,
-                         scalars=new_weight)
+                # check if size is different than the last mesh
+                if num_vert != new_vertices.shape[0]:
+                    ms.reset(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                            z=new_vertices[:,2], triangles=new_faces,
+                            scalars=new_weight)
+                    num_vert = new_vertices.shape[0]
+                else:
+                    ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                            z=new_vertices[:,2], triangles=new_faces,
+                            scalars=new_weight)
             else:
-                ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
-                       z=new_vertices[:,2], triangles=new_faces)
+                if num_vert != new_vertices.shape[0]:
+                    ms.reset(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                        z=new_vertices[:,2], triangles=new_faces)
+                else:
+                    ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                        z=new_vertices[:,2], triangles=new_faces)
 
             # update the satellite
             ts.set(x=pos[0], y=pos[1], z=pos[2])
