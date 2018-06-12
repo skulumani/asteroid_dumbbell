@@ -162,6 +162,8 @@ class Asteroid {
         */
         Eigen::VectorXd surface_slope( void ) ;
         double compute_face_slope(const Face_index& fd);
+        Eigen::Vector3d land_in_view(const Eigen::Ref<const Eigen::Vector3d>& cur_ast_pos,
+                const double& max_fov=0.52);
 
         Eigen::Matrix<double, Eigen::Dynamic, 3> rotate_vertices(const double& time) const;
 

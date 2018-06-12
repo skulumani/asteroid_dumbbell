@@ -702,7 +702,9 @@ def landing(output_filename, input_filename):
     # TODO Look at blender_sim
     # get all the terminal states from the exploration stage
     with h5py.File(input_filename, 'r') as hf:
-        explore_tf = hf['time'][()][-1]
+        state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
+        # explore_tf = hf['time'][()][-1]
+        explore_tf = int(state_keys[-1])
         explore_state = hf['state/' + str(explore_tf)][()]
         explore_Ra = hf['Ra/' + str(explore_tf)][()]
         explore_v = hf['reconstructed_vertex/' + str(explore_tf)][()]
@@ -720,7 +722,7 @@ def landing(output_filename, input_filename):
         explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
     
     num_steps = int(3600) # 2 hours to go from home pos to the surface
-    time = np.arange(explore_tf, explore_tf + num_steps)
+    time = np.arange(max_steps,max_steps  + num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
     
@@ -731,18 +733,13 @@ def landing(output_filename, input_filename):
     est_ast_meshdata = mesh_data.MeshData(explore_v, explore_f)
     est_ast = asteroid.Asteroid('castalia', est_ast_meshdata)
 
-    # find the face with teh lowest slope
-    face_slope = est_ast.surface_slope()
-    min_face = np.argmin(face_slope)
-    # find desired position
-    desired_asteroid_pos = 1 / 3 * (explore_v[explore_f[min_face, 0], :] 
-                           + explore_v[explore_f[min_face, 1], :]
-                           + explore_v[explore_f[min_face, 2], :])
+    # find the face with the lowest slope in our landing region
+    initial_ast_pos = explore_Ra.dot(explore_state[0:3])
+    desired_asteroid_pos = est_ast.land_in_view(initial_ast_pos, np.deg2rad(15))
 
     dum = dumbbell.Dumbbell(m1=explore_m1, m2=explore_m2, l=explore_l)
 
     initial_state = explore_state
-    
     with h5py.File(output_filename, 'w-') as hf:
         # save data to HDF5 file
         hf.create_dataset('time', data=time, compression=compression,

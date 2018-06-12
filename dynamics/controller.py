@@ -581,7 +581,7 @@ def translation_land_controller(time, state, ext_force, dum, ast,
     # final_pos = np.array([0.734214, 0, 0])
     final_pos = desired_asteroid_pos
     initial_pos = np.array([1.5, 0, 0])
-    descent_tf = 7200
+    descent_tf = 3600
 
     # extract the state
     pos = state[0:3] # location of the center of mass in the inertial frame

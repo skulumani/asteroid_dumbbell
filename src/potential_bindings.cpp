@@ -37,6 +37,8 @@ PYBIND11_MODULE(asteroid, m) {
                 pybind11::arg("time"))
         .def("update_rotation", &Asteroid::update_rotation, "Rotate the asteroid and update all data",
                 pybind11::arg("time"))
-        .def("surface_slope", &Asteroid::surface_slope, "Compute and return the surface slope for all faces");
+        .def("surface_slope", &Asteroid::surface_slope, "Compute and return the surface slope for all faces")
+        .def("land_in_view", &Asteroid::land_in_view, "Find a face center with lowest slope with the current FOV",
+                pybind11::arg("current position in asteroid frame"), pybind11::arg("FOV in radians"));
 
 }

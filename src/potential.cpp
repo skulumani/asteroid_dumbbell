@@ -455,6 +455,24 @@ double Asteroid::compute_face_slope(const Face_index& fd) {
     return slope;
 }
 
+Eigen::Vector3d  Asteroid::land_in_view(const Eigen::Ref<const Eigen::Vector3d>& cur_ast_pos,
+        const double& max_fov) {
+    
+    // find faces in view
+    std::vector<Face_index> faces_in_view = mesh_data->faces_in_fov(cur_ast_pos, max_fov);
+
+    Face_index min_fd;
+    double min_slope = 100;
+    for (Face_index fd: faces_in_view) {
+        double face_slope = compute_face_slope(fd);
+        if ( face_slope < min_slope) {
+            min_slope = face_slope;
+            min_fd = fd;
+        }
+    }
+    return mesh_data->get_face_center(min_fd);
+}
+
 std::tuple<double, Eigen::Vector3d, Eigen::Matrix3d> Asteroid::face_contribution(
         const Eigen::Ref<const Eigen::Vector3d>& state) const {
 
