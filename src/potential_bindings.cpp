@@ -36,6 +36,7 @@ PYBIND11_MODULE(asteroid, m) {
         .def("rot_ast2int", &Asteroid::rot_ast2int, "Return the asteroid rotation asteroid to inertial",
                 pybind11::arg("time"))
         .def("update_rotation", &Asteroid::update_rotation, "Rotate the asteroid and update all data",
-                pybind11::arg("time"));
+                pybind11::arg("time"))
+        .def("surface_slope", &Asteroid::surface_slope, "Compute and return the surface slope for all faces");
 
 }
