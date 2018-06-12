@@ -572,12 +572,14 @@ def attitude_land_controller(time, state,  ext_moment, dum, ast):
                 R.T.dot(Rd).dot(ang_vel_d_dot)) - ext_moment)
     return u_m
 
-def translation_land_controller(time, state, ext_force, dum, ast):
+def translation_land_controller(time, state, ext_force, dum, ast,
+                                desired_asteroid_pos):
     """Land vertically on the surface
 
     """
     # final position in the asteroid fixed frame (for castalia)
-    final_pos = np.array([0.734214, 0, 0])
+    # final_pos = np.array([0.734214, 0, 0])
+    final_pos = desired_asteroid_pos
     initial_pos = np.array([1.5, 0, 0])
     descent_tf = 7200
 

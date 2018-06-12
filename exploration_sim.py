@@ -507,10 +507,11 @@ def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
     # TODO Animate the changing of the mesh itself as a function of time
     with h5py.File(filename, 'r') as hf:
         # get the inertial state and asteroid mesh object
-        time = hf['time'][()]
+        # time = hf['time'][()]
         state_group = hf['state']
         state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
-        
+        time = [int(t) for t in state_keys];
+
         intersections_group = hf['inertial_intersections']
 
         # extract out the entire state and intersections
@@ -717,7 +718,7 @@ def landing(output_filename, input_filename):
         
         explore_true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
         explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
-
+    
     num_steps = int(3600) # 2 hours to go from home pos to the surface
     time = np.arange(explore_tf, explore_tf + num_steps)
     t0, tf = time[0], time[-1]
@@ -729,6 +730,14 @@ def landing(output_filename, input_filename):
     
     est_ast_meshdata = mesh_data.MeshData(explore_v, explore_f)
     est_ast = asteroid.Asteroid('castalia', est_ast_meshdata)
+
+    # find the face with teh lowest slope
+    face_slope = est_ast.surface_slope()
+    min_face = np.argmin(face_slope)
+    # find desired position
+    desired_asteroid_pos = 1 / 3 * (explore_v[explore_f[min_face, 0], :] 
+                           + explore_v[explore_f[min_face, 1], :]
+                           + explore_v[explore_f[min_face, 2], :])
 
     dum = dumbbell.Dumbbell(m1=explore_m1, m2=explore_m2, l=explore_l)
 
@@ -754,7 +763,7 @@ def landing(output_filename, input_filename):
         system = integrate.ode(eoms.eoms_controlled_land_pybind)
         system.set_integrator("lsoda", atol=explore_AbsTol, rtol=explore_RelTol,  nsteps=10000)
         system.set_initial_value(initial_state, t0)
-        system.set_f_params(true_ast, dum, est_ast)
+        system.set_f_params(true_ast, dum, est_ast, desired_asteroid_pos)
         
         ii = 1
         while system.successful() and system.t < tf:
