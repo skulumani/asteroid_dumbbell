@@ -127,7 +127,7 @@ def initialize(output_filename):
             est_ast_rmesh, est_ast, lidar, caster, max_angle, 
             dum, AbsTol, RelTol)
 
-def initialize_itokawa(output_filename):
+def initialize_eros(output_filename):
     """Initialize all the things for the simulation around Itokwawa
 
     Output_file : the actual HDF5 file to save the data/parameters to
@@ -153,6 +153,93 @@ def initialize_itokawa(output_filename):
     min_angle = 10
     max_distance = 0.5
     max_radius = 0.03
+
+    ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0], true_ast.get_axes()[1], true_ast.get_axes()[2],
+                                      min_angle, max_radius, max_distance)
+    
+    v_est = ellipsoid.get_verts()
+    f_est = ellipsoid.get_faces()
+    est_ast_meshdata = mesh_data.MeshData(v_est, f_est)
+    est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
+    est_ast = asteroid.Asteroid("itokawa", est_ast_rmesh)
+
+    # controller functions 
+    complete_controller = controller_cpp.Controller()
+    
+    # lidar object
+    lidar = cgal.Lidar()
+    lidar = lidar.view_axis(np.array([1, 0, 0]))
+    lidar = lidar.up_axis(np.array([0, 0, 1]))
+    lidar = lidar.fov(np.deg2rad(np.array([7, 7]))).dist(2).num_steps(3)
+
+    # raycaster from c++
+    caster = cgal.RayCaster(v, f)
+    
+    # save a bunch of parameters to the HDF5 file
+    with h5py.File(output_filename, 'w-') as hf:
+        sim_group = hf.create_group("simulation_parameters")
+        sim_group['AbsTol'] = AbsTol
+        sim_group['RelTol'] = RelTol
+        dumbbell_group = sim_group.create_group("dumbbell")
+        dumbbell_group["m1"] = 500
+        dumbbell_group["m2"] = 500
+        dumbbell_group['l'] = 0.003
+        
+        true_ast_group = sim_group.create_group("true_asteroid")
+        true_ast_group.create_dataset("vertices", data=v, compression=compression,
+                                    compression_opts=compression_opts)
+        true_ast_group.create_dataset("faces", data=f, compression=compression,
+                                    compression_opts=compression_opts)
+        true_ast_group['name'] = 'castalia.obj'
+        
+        est_ast_group = sim_group.create_group("estimate_asteroid")
+        est_ast_group['surf_area'] = surf_area
+        est_ast_group['max_angle'] = max_angle
+        est_ast_group['min_angle'] = min_angle
+        est_ast_group['max_distance'] = max_distance
+        est_ast_group['max_radius'] = max_radius
+        est_ast_group.create_dataset('initial_vertices', data=est_ast_rmesh.get_verts(), compression=compression,
+                                    compression_opts=compression_opts)
+        est_ast_group.create_dataset("initial_faces", data=est_ast_rmesh.get_faces(), compression=compression,
+                                    compression_opts=compression_opts)
+        est_ast_group.create_dataset("initial_weight", data=est_ast_rmesh.get_weights(), compression=compression,
+                                    compression_opts=compression_opts)
+
+        lidar_group = sim_group.create_group("lidar")
+        lidar_group.create_dataset("view_axis", data=lidar.get_view_axis())
+        lidar_group.create_dataset("up_axis", data=lidar.get_up_axis())
+        lidar_group.create_dataset("fov", data=lidar.get_fov())
+    
+    return (true_ast_meshdata, true_ast, complete_controller, est_ast_meshdata, 
+            est_ast_rmesh, est_ast, lidar, caster, max_angle, 
+            dum, AbsTol, RelTol)
+
+def initialize_itokawa(output_filename):
+    """Initialize all the things for the simulation around Itokwawa
+
+    Output_file : the actual HDF5 file to save the data/parameters to
+
+    """
+    logger = logging.getLogger(__name__)
+    logger.info('Initialize asteroid and dumbbell objects')
+
+    AbsTol = 1e-9
+    RelTol = 1e-9
+    
+    # true asteroid and dumbbell
+    v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
+
+    true_ast_meshdata = mesh_data.MeshData(v, f)
+    true_ast = asteroid.Asteroid('itokawa', true_ast_meshdata)
+
+    dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
+    
+    # estimated asteroid (starting as an ellipse)
+    surf_area = 0.01
+    max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
+    min_angle = 10
+    max_distance = 0.1
+    max_radius = 0.006
 
     ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0], true_ast.get_axes()[1], true_ast.get_axes()[2],
                                       min_angle, max_radius, max_distance)
@@ -332,6 +419,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
     dt = time[1] - time[0]
 
     # define the initial condition in the inertial frame
+    # initial_pos = np.array([1.5, 0, 0]) # castalia
     initial_pos = np.array([1.5, 0, 0])
     initial_vel = np.array([0, 0, 0])
     initial_R = attitude.rot3(np.pi / 2).reshape(-1)
@@ -1084,12 +1172,13 @@ def landing_site_plots(filename):
     lat = spherical_vertices[:, 1]
     long = spherical_vertices[:, 2]
     # interpolate and create a surface plot/contour
-    rad_func = interpolate.interp2d(lat, long, r, kind='cubic')
     fig, ax = plt.subplots(1, 1)
-    xx, yy = np.meshgrid(np.linspace(-np.pi, np.pi, 100), np.linspace(-np.pi/2, np.pi/2, 100))
-    radius_interp = rad_func(xx, yy)
-
-    ax.contour(xx, yy, radius_interp)
+    grid_long, grid_lat = np.mgrid[-np.pi:np.pi:100j, -np.pi/2:np.pi/2:100j]
+    grid_z0 = interpolate.griddata(np.vstack((long, lat)).T, r, (grid_long, grid_lat), method='nearest')
+    ax.scatter(long, lat,c=r)
+    ax.imshow(grid_z0.T)
+    pdb.set_trace()
+    plt.show()
 
 if __name__ == "__main__":
     logging_file = tempfile.mkstemp(suffix='.txt.')[1]
