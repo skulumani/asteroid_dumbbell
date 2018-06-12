@@ -675,7 +675,6 @@ def save_animation(filename, move_cam=False, mesh_weight=False):
             os.remove(file_path)
     os.rmdir(output_path)
 
-
 def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
     """Given a HDF5 file from simulate this will animate teh motion
     """
@@ -1176,8 +1175,8 @@ def landing_site_plots(filename):
     grid_long, grid_lat = np.mgrid[-np.pi:np.pi:100j, -np.pi/2:np.pi/2:100j]
     grid_z0 = interpolate.griddata(np.vstack((long, lat)).T, r, (grid_long, grid_lat), method='nearest')
     ax.scatter(long, lat,c=r)
-    ax.imshow(grid_z0.T)
-    pdb.set_trace()
+    # ax.contour(grid_long, grid_lat, grid_z0)
+    ax.imshow(grid_z0.T, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
     plt.show()
 
 if __name__ == "__main__":
