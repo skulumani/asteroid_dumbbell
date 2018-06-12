@@ -101,7 +101,8 @@ void ReconstructMesh::update_meshdata( void ) {
     /* this->mesh->update_mesh(this->vertices, this->faces); */
 }
 double ReconstructMesh::maximum_weight(const Eigen::Ref<const Eigen::Vector3d>& v_in) {
-    return pow(kPI * v_in.norm(), 2);
+    /* return pow(kPI * v_in.norm(), 2); */
+    return 6.0;
 }
 
 bool ReconstructMesh::initialize_weight( void ) {
