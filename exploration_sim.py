@@ -22,7 +22,7 @@ import subprocess
 
 import h5py
 import numpy as np
-from scipy import integrate
+from scipy import integrate, interpolate
 import matplotlib.pyplot as plt
 
 from lib import asteroid, surface_mesh, cgal, mesh_data, reconstruct
@@ -38,7 +38,7 @@ from visualization import graphics, animation, publication
 
 compression = 'gzip'
 compression_opts = 9
-max_steps = 15000
+max_steps = 10
 
 def initialize(output_filename):
     """Initialize all the things for the simulation
@@ -127,7 +127,7 @@ def initialize(output_filename):
             est_ast_rmesh, est_ast, lidar, caster, max_angle, 
             dum, AbsTol, RelTol)
 
-def initialize_itokwawa(output_filename):
+def initialize_itokawa(output_filename):
     """Initialize all the things for the simulation around Itokwawa
 
     Output_file : the actual HDF5 file to save the data/parameters to
@@ -1067,6 +1067,29 @@ def plot_volume(filename):
         true_volume = stats.volume(true_vertices, true_faces)
 
     publication.plot_volume(t_array, vol_array, true_volume)
+
+def landing_site_plots(filename):
+    """Given the exploration reconstruction data (after all the exploration)
+    
+    This function will select a specific area and generate surface slope/roughness 
+    plots
+    """
+
+    # generate a surface slope map for each face of an asteroid
+    # load a asteroid
+    vertices, faces = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj');
+    # compute radius of each vertex and lat/long 
+    spherical_vertices = wavefront.cartesian2spherical(vertices)
+    r = spherical_vertices[:, 0]
+    lat = spherical_vertices[:, 1]
+    long = spherical_vertices[:, 2]
+    # interpolate and create a surface plot/contour
+    rad_func = interpolate.interp2d(lat, long, r, kind='cubic')
+    fig, ax = plt.subplots(1, 1)
+    xx, yy = np.meshgrid(np.linspace(-np.pi, np.pi, 100), np.linspace(-np.pi/2, np.pi/2, 100))
+    radius_interp = rad_func(xx, yy)
+
+    ax.contour(xx, yy, radius_interp)
 
 if __name__ == "__main__":
     logging_file = tempfile.mkstemp(suffix='.txt.')[1]
