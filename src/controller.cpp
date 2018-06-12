@@ -295,9 +295,9 @@ void TranslationController::minimize_uncertainty(const double& t,
     const int num_waypoints = 1;
     
     // weighting for each of the cost components
-    double weighting_factor(0.5); /**< Weighting factor between distance and ucnertainty */
-    double sigma_factor(0.49);
-    double control_factor(0.01);
+    double weighting_factor(0.3); /**< Weighting factor between distance and ucnertainty */
+    double sigma_factor(0.6);
+    double control_factor(0.1);
     
     // Rotate the position to the asteroid fixed frame
     Eigen::Vector3d pos = state->get_pos();
