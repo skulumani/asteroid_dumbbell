@@ -30,6 +30,7 @@ from lib import asteroid, surface_mesh, cgal, mesh_data, reconstruct
 from lib import surface_mesh
 from lib import controller as controller_cpp
 from lib import stats
+from lib import geodesic
 
 from dynamics import dumbbell, eoms, controller
 from point_cloud import wavefront
@@ -1478,7 +1479,19 @@ def landing_site_plots(input_filename):
     
     # build an image of the distance from the explore_state to each point on the surface
     # compute geodesic distance to each face center 
-
+    geodesic_distance = geodesic.central_angle(explore_state[0:3], face_center)
+    grid_dist = interpolate.griddata(np.vstack((spherical_face_center[:, 2],
+                                                spherical_face_center[:, 1])).T,
+                                     geodesic_distance,
+                                     (grid_long, grid_lat),
+                                     method="nearest")
+    fig_dist, ax_dist = plt.subplots(1, 1)
+    img_dist = ax_dist.imshow(grid_dist, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                              origin="lower")
+    ax_dist.set_title("Distance to surface")
+    ax_dist.set_xlabel("Longitude")
+    ax_dist.set_ylabel("Latitude")
+    fig_dist.colorbar(img_dist)
     # build an image of random science value over entire surface
     plt.show()
 
