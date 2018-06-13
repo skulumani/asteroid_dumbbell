@@ -24,6 +24,7 @@ import h5py
 import numpy as np
 from scipy import integrate, interpolate
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from lib import asteroid, surface_mesh, cgal, mesh_data, reconstruct
 from lib import surface_mesh
@@ -913,7 +914,7 @@ def landing(output_filename, input_filename):
     est_ast_meshdata = mesh_data.MeshData(explore_v, explore_f)
     est_ast = asteroid.Asteroid('castalia', est_ast_meshdata)
 
-    # find the face with the lowest slope in our landing region
+    # TODO Make this a seperate function to find best landing spot in region/view
     initial_ast_pos = explore_Ra.dot(explore_state[0:3])
     desired_asteroid_pos = est_ast.land_in_view(initial_ast_pos, np.deg2rad(15))
 
@@ -1173,6 +1174,7 @@ def landing_site_plots(input_filename):
     with h5py.File(input_filename, 'r') as hf:
         state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
         # explore_tf = hf['time'][()][-1]
+        explore_name = hf['simulation_parameters/true_asteroid/name'][()]
         explore_tf = int(state_keys[-1])
         explore_state = hf['state/' + str(explore_tf)][()]
         explore_Ra = hf['Ra/' + str(explore_tf)][()]
@@ -1191,28 +1193,75 @@ def landing_site_plots(input_filename):
         explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
     
 
-
+    # chose step size based on spacecraft landing footprint
+    max_radius = 1.6/2 # for castalia
+    delta_angle = 0.01 / max_radius
+    grid_long, grid_lat = np.mgrid[-np.pi:np.pi:20j, -np.pi/2:np.pi/2:20j]
     # interpolate and create a radius plot
-    fig, ax = plt.subplots(1, 1)
+    fig_radius, ax_radius = plt.subplots(3, 1)
     # compute radius of each vertex and lat/long 
     spherical_vertices = wavefront.cartesian2spherical(explore_v)
     r = spherical_vertices[:, 0]
     lat = spherical_vertices[:, 1]
     long = spherical_vertices[:, 2]
-    grid_long, grid_lat = np.mgrid[-np.pi:np.pi:100j, -np.pi/2:np.pi/2:100j]
     grid_r = interpolate.griddata(np.vstack((long, lat)).T, r, (grid_long, grid_lat), method='nearest')
     # ax.scatter(long, lat,c=r)
     # ax.imshow(grid_r.T, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
-    ax.contour(grid_long, grid_lat, grid_r)
-    ax.set_title('Radius (km)')
-    ax.set_xlabel('Longitude (rad)')
-    ax.set_ylabel('Latitude (rad)')
+    ax_radius[0].contour(grid_long, grid_lat, grid_r)
+    ax_radius[0].set_title('Radius (km)')
+    ax_radius[0].set_xlabel('Longitude (rad)')
+    ax_radius[0].set_ylabel('Latitude (rad)')
+
+    ax_radius[1].imshow(grid_r.T, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
+    ax_radius[1].set_title('Radius (km)')
+    ax_radius[1].set_xlabel('Longitude (rad)')
+    ax_radius[1].set_ylabel('Latitude (rad)')
     
+    fig_density, ax_density = plt.subplots(1, 1)
+    # divider = make_axes_locatable(ax_density)
+    # cax = divider.append_axes('right', size='5%', pad=0.05)
+    ax_density.plot(long, lat, 'k.', ms=1)
+    d = ax_density.hist2d(long, lat, 20)[3]
+    # fig_density.colorbar(d, cax=cax, orientation='vertical')
+    fig_density.colorbar(d, cax=ax_density, orientation='vertical')
+    ax_density.set_title('Vertex density')
+    ax_density.set_xlabel('Longitude')
+    ax_density.set_ylabel('Latitude')
+    
+
     # plot of surface slope
-    # build meshdata and asteroid from the terminal estimate
+    build meshdata and asteroid from the terminal estimate
     est_meshdata = mesh_data.MeshData(explore_v, explore_f)
-    est_ast = asteroid.Asteroid(ast_name
+    est_ast = asteroid.Asteroid(explore_name, est_meshdata)
     # get the surface slope(ast) and all face centers(mesh)
+    face_center = est_meshdata.get_all_face_center()
+    face_slope = est_ast.surface_slope()
+    # interpolate and plot
+    spherical_face_center = wavefront.cartesian2spherical(face_center)
+    grid_slope = interpolate.gridddate(np.vstack((spherical_face_center[:, 2],
+                                                  spherical_face_center[:, 1])).T,
+                                                 face_slope,
+                                                 (grid_long, grid_lat),
+                                                 method='nearest')
+    fig_slope, ax_slope = plt.subplots(1, 1)
+    ax_slope.contour(grid_long, grid_lat, grid_slope)
+    ax_slope.set_title('Surface Slope')
+    ax_slope.set_xlabel('Longitude')
+    ax_slope.set_ylabel('Latitude')
+
+    # plot of face area
+    face_area = est_meshdata.get_all_face_area()
+    grid_area = interpolate.gridddate(np.vstack((spherical_face_center[:, 2],
+                                                  spherical_face_center[:, 1])).T,
+                                                 face_area,
+                                                 (grid_long, grid_lat),
+                                                 method='nearest')
+    fig_area, ax_area = plt.subplots(1, 1)
+    ax_area.contour(grid_long, grid_lat, grid_area)
+    ax_area.set_title('Surface slope')
+    ax_area.set_xlabel('Longitude')
+    ax_area.set_ylabel('Latitude')
+
     plt.show()
 
 if __name__ == "__main__":
