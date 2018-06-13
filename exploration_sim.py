@@ -1230,7 +1230,7 @@ def landing_site_plots(input_filename):
     
 
     # plot of surface slope
-    build meshdata and asteroid from the terminal estimate
+    # build meshdata and asteroid from the terminal estimate
     est_meshdata = mesh_data.MeshData(explore_v, explore_f)
     est_ast = asteroid.Asteroid(explore_name, est_meshdata)
     # get the surface slope(ast) and all face centers(mesh)
