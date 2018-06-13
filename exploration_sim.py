@@ -148,7 +148,7 @@ def initialize_eros(output_filename):
     v, f = wavefront.read_obj('./data/shape_model/EROS/eros_low.obj')
 
     true_ast_meshdata = mesh_data.MeshData(v, f)
-    true_ast = asteroid.Asteroid('itokawa', true_ast_meshdata)
+    true_ast = asteroid.Asteroid(ast_name, true_ast_meshdata)
 
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
     
@@ -156,8 +156,8 @@ def initialize_eros(output_filename):
     surf_area = 0.01
     max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
     min_angle = 10
-    max_distance = 0.5
-    max_radius = 0.03
+    max_distance = 0.2
+    max_radius = 0.01
 
     ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0], true_ast.get_axes()[1], true_ast.get_axes()[2],
                                       min_angle, max_radius, max_distance)
@@ -427,7 +427,8 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
 
     # define the initial condition in the inertial frame
     # initial_pos = np.array([1.5, 0, 0]) # castalia
-    initial_pos = np.array([1.5, 0, 0])
+    # initial_pos = np.array([1.5, 0, 0]) # itokawa
+    initial_pos = np.array([15, 0 , 0]) # eros
     initial_vel = np.array([0, 0, 0])
     initial_R = attitude.rot3(np.pi / 2).reshape(-1)
     initial_w = np.array([0, 0, 0])
@@ -436,7 +437,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
     # initialize the simulation objects
     (true_ast_meshdata, true_ast, complete_controller,
         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
-        AbsTol, RelTol) = initialize_itokawa(output_filename)
+        AbsTol, RelTol) = initialize_eros(output_filename)
 
     with h5py.File(output_filename, 'a') as hf:
         hf.create_dataset('time', data=time, compression=compression,
