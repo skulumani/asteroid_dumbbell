@@ -313,7 +313,7 @@ Eigen::VectorXd MeshData::get_all_face_area( void ) const {
     Eigen::VectorXd face_area(number_of_faces(), 1);
     std::size_t index = 0;
     for (Face_index fd: surface_mesh.faces()) {
-        face_area(index) = CGAL::Polygon_mesh_processing::area(fd, 
+        face_area(index) = CGAL::Polygon_mesh_processing::face_area(fd, 
                 surface_mesh);
         ++index;
     }

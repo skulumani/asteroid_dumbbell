@@ -351,6 +351,7 @@ void Asteroid::init_asteroid( void ) {
         M = 4.463e-4 / G;
         sigma = 2.67;
         axes << 34.4, 11.7, 11.7;
+        axes = axes.array() / 2.0;
         omega = 2 * kPI / 5.27 / 3600;
     } else if (name.compare("cube") == 0) {
         M = 1;
