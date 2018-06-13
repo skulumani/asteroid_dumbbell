@@ -146,20 +146,21 @@ def initialize_eros(output_filename):
     ast_name = "eros"
     file_name = "eros_low.obj"
     v, f = wavefront.read_obj('./data/shape_model/EROS/eros_low.obj')
-
     true_ast_meshdata = mesh_data.MeshData(v, f)
     true_ast = asteroid.Asteroid(ast_name, true_ast_meshdata)
 
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
     
     # estimated asteroid (starting as an ellipse)
-    surf_area = 0.01
+    surf_area = 0.1
     max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
     min_angle = 10
-    max_distance = 0.2
-    max_radius = 0.01
+    max_distance = 0.01
+    max_radius = 0.2
 
-    ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0], true_ast.get_axes()[1], true_ast.get_axes()[2],
+    ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0],
+                                      true_ast.get_axes()[1],
+                                      true_ast.get_axes()[2],
                                       min_angle, max_radius, max_distance)
     
     v_est = ellipsoid.get_verts()
@@ -428,7 +429,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5"):
     # define the initial condition in the inertial frame
     # initial_pos = np.array([1.5, 0, 0]) # castalia
     # initial_pos = np.array([1.5, 0, 0]) # itokawa
-    initial_pos = np.array([15, 0 , 0]) # eros
+    initial_pos = np.array([19, 0 , 0]) # eros
     initial_vel = np.array([0, 0, 0])
     initial_R = attitude.rot3(np.pi / 2).reshape(-1)
     initial_w = np.array([0, 0, 0])
