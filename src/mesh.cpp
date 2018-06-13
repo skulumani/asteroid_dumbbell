@@ -317,7 +317,7 @@ Eigen::VectorXd MeshData::get_all_face_area( void ) const {
                 surface_mesh);
         ++index;
     }
-    return face_area
+    return face_area;
 }
 
 template<typename Index>
