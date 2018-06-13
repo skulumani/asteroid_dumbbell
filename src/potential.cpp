@@ -358,6 +358,12 @@ void Asteroid::init_asteroid( void ) {
         sigma = 1;
         axes << 1, 1, 1;
         omega = 1;
+    } else if (name.compare("phobos") == 0) {
+        M = 1.0659e16; 
+        sigma = 1.876; // gram/cm^3
+        axes << 27, 22, 18;
+        axes = axes.array() / 2.0;
+        omega = 2 * kPI / 7.6533 / 3600.0;
     } else {
         throw std::invalid_argument( "Invalid asteroid name" );
     }

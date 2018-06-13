@@ -185,6 +185,7 @@ class Asteroid {
         double get_omega( void) const { return omega; }
         double get_grav_constant( void ) const { return G; }
         double get_sigma( void ) const { return sigma; } 
+        std::string get_name( void ) const { return name; }
 
         // member variables
         Eigen::Vector3d get_axes( void ) const { return axes; }
