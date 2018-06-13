@@ -342,9 +342,10 @@ void TranslationController::minimize_uncertainty(const double& t,
     
     if (rmesh->get_weights().sum() < 1e-2) {
         caster.update_mesh(rmesh->get_mesh());
-        mposd = (Eigen::Vector3d() << 1.5, 0 ,0).finished();
+        double desired_radius = ast_est->get_axes().maxCoeff() + 1.0;
+        mposd = (Eigen::Vector3d() << desired_radius, 0 ,0).finished();
     } else {
-        double desired_radius = 1.5;
+        double desired_radius = ast_est->get_axes().maxCoeff() + 1.0;
         mposd = des_vector.normalized() * desired_radius;
     }
     // check for intersection only if angle is large to the des_vector
