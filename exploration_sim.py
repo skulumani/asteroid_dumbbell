@@ -39,7 +39,7 @@ from visualization import graphics, animation, publication
 
 compression = 'gzip'
 compression_opts = 9
-max_steps = 100
+max_steps = 15000
 
 def initialize_castalia(output_filename):
     """Initialize all the things for the simulation
@@ -421,7 +421,7 @@ def initialize_lutetia(output_filename):
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
     
     # estimated asteroid (starting as an ellipse)
-    surf_area = 0.1
+    surf_area = 1
     max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
     min_angle = 10
     max_distance = 1
@@ -737,7 +737,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5",
         logger.info("Now refining the faces close to the landing site")
         # perform remeshing over the landing area and take a bunch of measurements 
         # of the surface. Assume everything happens without the asteroid rotating 
-        new_face_centers = est_ast_meshdata.refine_faces_in_view(state[0:3], np.deg2rad(15))
+        new_face_centers = est_ast_meshdata.refine_faces_in_view(state[0:3], np.deg2rad(5))
         logger.info("Refinement added {} faces".format(new_face_centers.shape[0]))
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
@@ -1398,13 +1398,13 @@ def landing_site_plots(input_filename):
         explore_true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
         explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
     
-
     # build meshdata and asteroid from the terminal estimate
     est_meshdata = mesh_data.MeshData(explore_v, explore_f)
     est_ast = asteroid.Asteroid(explore_name, est_meshdata)
     # chose step size based on spacecraft landing footprint
-    max_radius = 1.6/2 # for castalia
-    delta_angle = 0.1 / max_radius
+
+    max_radius = np.max(est_ast.get_axes()) # for castalia
+    delta_angle = 0.05 / max_radius
     grid_long, grid_lat = np.meshgrid(np.arange(-np.pi, np.pi, delta_angle),
                                       np.arange(-np.pi/2, np.pi/2, delta_angle))
     # interpolate and create a radius plot
@@ -1423,16 +1423,17 @@ def landing_site_plots(input_filename):
     ax_radius.set_ylabel('Latitude (rad)')
     
     fig_radius_img, ax_radius_img = plt.subplots(1, 1)
-    ax_radius_img.imshow(grid_r.T, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
+    img = ax_radius_img.imshow(grid_r, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
     ax_radius_img.set_title('Radius (km)')
     ax_radius_img.set_xlabel('Longitude (rad)')
     ax_radius_img.set_ylabel('Latitude (rad)')
+    fig_radius_img.colorbar(img)
     
     fig_density, ax_density = plt.subplots(1, 1)
     # divider = make_axes_locatable(ax_density)
     # cax = divider.append_axes('right', size='5%', pad=0.05)
     ax_density.plot(long, lat, 'k.', ms=1)
-    d = ax_density.hist2d(long, lat, 20)[3]
+    d = ax_density.hist2d(long, lat, grid_long.shape )[3]
     # fig_density.colorbar(d, cax=cax, orientation='vertical')
     fig_density.colorbar(d, orientation='vertical')
     ax_density.set_title('Vertex density')
@@ -1449,12 +1450,15 @@ def landing_site_plots(input_filename):
                                                   spherical_face_center[:, 1])).T,
                                                  face_slope,
                                                  (grid_long, grid_lat),
-                                                 method='nearest')
+                                                 method='nearest') * 180/np.pi
     fig_slope, ax_slope = plt.subplots(1, 1)
-    ax_slope.contour(grid_long, grid_lat, grid_slope)
-    ax_slope.set_title('Surface Slope')
+    # ax_slope.contour(grid_long, grid_lat, grid_slope)
+    img_slope = ax_slope.imshow(grid_slope, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                    origin="lower")
+    ax_slope.set_title('Surface Slope (deg)')
     ax_slope.set_xlabel('Longitude')
     ax_slope.set_ylabel('Latitude')
+    fig_slope.colorbar(img_slope)
 
     # plot of face area
     face_area = est_meshdata.get_all_face_area()
@@ -1462,14 +1466,20 @@ def landing_site_plots(input_filename):
                                                   spherical_face_center[:, 1])).T,
                                                  face_area,
                                                  (grid_long, grid_lat),
-                                                 method='nearest')
+                                                 method='nearest') * 1e6 # convert to meters
     fig_area, ax_area = plt.subplots(1, 1)
-    contour = ax_area.contour(grid_long, grid_lat, grid_area)
-    ax_area.set_title('Face area')
+    # contour = ax_area.contour(grid_long, grid_lat, grid_area*1e6)
+    img_area = ax_area.imshow(grid_area, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                   origin="lower")
+    ax_area.set_title('Face area (square meters)')
     ax_area.set_xlabel('Longitude')
     ax_area.set_ylabel('Latitude')
-    fig_area.colorbar(contour)
+    fig_area.colorbar(img_area)
+    
+    # build an image of the distance from the explore_state to each point on the surface
+    # compute geodesic distance to each face center 
 
+    # build an image of random science value over entire surface
     plt.show()
 
 if __name__ == "__main__":
@@ -1522,6 +1532,8 @@ if __name__ == "__main__":
                        nargs=1, action="store")
     group.add_argument("-lsa", "--landing_save_animation", help="Save landing animation to a video",
                        action="store", nargs=1)
+    group.add_argument("-lp", "--landing_plots", help="Generate plots to select landing site",
+                       action="store_true")
 
     args = parser.parse_args()
                                                                 
@@ -1553,5 +1565,7 @@ if __name__ == "__main__":
     elif args.landing_animation:
         animate_landing(args.landing_animation[0], move_cam=args.move_cam, mesh_weight=args.mesh_weight)
     elif args.landing_save_animation:
-        save_animate_landing(args.landing_save_animation[0], move_cam=args.move_cam, mesh_weight=args.mesh_weight) 
+        save_animate_landing(args.landing_save_animation[0], move_cam=args.move_cam, mesh_weight=args.mesh_weight)
+    elif args.landing_plots:
+        landing_site_plots(args.simulation_data)
 
