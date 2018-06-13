@@ -342,7 +342,7 @@ void TranslationController::minimize_uncertainty(const double& t,
     
     if (rmesh->get_weights().sum() < 1e-2) {
         caster.update_mesh(rmesh->get_mesh());
-        double desired_radius = ast_est->get_axes().maxCoeff() * 1.2
+        double desired_radius = ast_est->get_axes().maxCoeff() * 1.2;
         mposd = (Eigen::Vector3d() << desired_radius, 0 ,0).finished();
     } else {
         double desired_radius = ast_est->get_axes().maxCoeff() * 1.2;
