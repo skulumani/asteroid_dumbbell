@@ -22,7 +22,7 @@ import subprocess
 
 import h5py
 import numpy as np
-from scipy import integrate, interpolate
+from scipy import integrate, interpolate, ndimage
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -1416,6 +1416,7 @@ def landing_site_plots(input_filename):
     lat = spherical_vertices[:, 1]
     long = spherical_vertices[:, 2]
     grid_r = interpolate.griddata(np.vstack((long, lat)).T, r, (grid_long, grid_lat), method='nearest')
+    grid_r_smooth = ndimage.gaussian_filter(grid_r, sigma=10*delta_angle)
     # ax.scatter(long, lat,c=r)
     # ax.imshow(grid_r.T, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
     ax_radius.contour(grid_long, grid_lat, grid_r)
@@ -1426,7 +1427,6 @@ def landing_site_plots(input_filename):
     fig_radius_img, ax_radius_img = plt.subplots(1, 1)
     img = ax_radius_img.imshow(grid_r, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
     ax_radius_img.set_title('Radius (km)')
-    ax_radius_img.set_xlabel('Longitude (rad)')
     ax_radius_img.set_ylabel('Latitude (rad)')
     fig_radius_img.colorbar(img)
     
@@ -1452,15 +1452,18 @@ def landing_site_plots(input_filename):
                                                  face_slope,
                                                  (grid_long, grid_lat),
                                                  method='nearest') * 180/np.pi
-    fig_slope, ax_slope = plt.subplots(1, 1)
+    grid_slope_smooth = ndimage.gaussian_filter(grid_slope, sigma=10*delta_angle)
+    fig_slope, ax_slope = plt.subplots(2, 1)
     # ax_slope.contour(grid_long, grid_lat, grid_slope)
-    img_slope = ax_slope.imshow(grid_slope, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+    img_slope = ax_slope[0].imshow(grid_slope, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
                     origin="lower")
-    ax_slope.set_title('Surface Slope (deg)')
-    ax_slope.set_xlabel('Longitude')
-    ax_slope.set_ylabel('Latitude')
-    fig_slope.colorbar(img_slope)
-
+    ax_slope[0].set_title('Surface Slope (deg)')
+    ax_slope[0].set_xlabel('Longitude')
+    ax_slope[0].set_ylabel('Latitude')
+    fig_slope.colorbar(img_slope, ax=ax_slope[0])
+    
+    ax_slope[1].imshow(grid_slope_smooth, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                       origin="lower")
     # plot of face area
     face_area = est_meshdata.get_all_face_area()
     grid_area = interpolate.griddata(np.vstack((spherical_face_center[:, 2],
@@ -1468,6 +1471,7 @@ def landing_site_plots(input_filename):
                                                  face_area,
                                                  (grid_long, grid_lat),
                                                  method='nearest') * 1e6 # convert to meters
+    grid_area_smooth = ndimage.gaussian_filter(grid_area, sigma=10*delta_angle)
     fig_area, ax_area = plt.subplots(1, 1)
     # contour = ax_area.contour(grid_long, grid_lat, grid_area*1e6)
     img_area = ax_area.imshow(grid_area, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
@@ -1494,6 +1498,38 @@ def landing_site_plots(input_filename):
     fig_dist.colorbar(img_dist)
 
     # build an image of random science value over entire surface
+    np.random.seed(2)
+    grid_science = np.random.rand(grid_dist.shape[0], grid_dist.shape[1])
+    grid_science = ndimage.gaussian_filter(grid_science, 50*delta_angle)
+    fig_science, ax_science = plt.subplots(1, 1)
+    ax_science.imshow(grid_science, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                      origin="lower")
+    ax_science.set_title("Science Value")
+    ax_science.set_xlabel("Longitude")
+    ax_science.set_ylabel("Latitude")
+    # normalize all the cost arrays, sum and plot together then find the minimum
+    total_cost = (-grid_science / np.max(grid_science) 
+                  + 2 * grid_dist / np.max(grid_dist)
+                  + grid_slope / np.max(grid_slope)) / 3
+    total_cost_smooth = ndimage.gaussian_filter(total_cost, 10*delta_angle)
+    # find minimum
+    min_index = np.unravel_index(total_cost_smooth.argmin(),
+                                 total_cost_smooth.shape)
+    desired_pos_spherical = np.array([grid_r[min_index[0], min_index[1]],
+                                      grid_lat[min_index[0], min_index[1]],
+                                      grid_long[min_index[0], min_index[1]]])
+    desired_pos_cartesian = wavefront.spherical2cartesian(desired_pos_spherical)
+    print("Desired Landing site: {} ".format(desired_pos_cartesian))
+    fig_cost, ax_cost = plt.subplots(1, 1)
+    img_cost = ax_cost.imshow(total_cost_smooth, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                               origin="lower")
+    ax_cost.set_title("Landing cost")
+    ax_cost.set_xlabel("Longitude")
+    ax_cost.set_ylabel("Latitude")
+    fig_cost.colorbar(img_cost)
+    ax_cost.plot(grid_long[min_index[0], min_index[1]],
+                 grid_lat[min_index[0], min_index[1]],
+                 marker='o', color='blue')
 
     plt.show()
 
