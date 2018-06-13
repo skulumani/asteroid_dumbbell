@@ -38,7 +38,7 @@ from visualization import graphics, animation, publication
 
 compression = 'gzip'
 compression_opts = 9
-max_steps = 10
+max_steps = 15000
 
 def initialize(output_filename):
     """Initialize all the things for the simulation
@@ -52,11 +52,13 @@ def initialize(output_filename):
     AbsTol = 1e-9
     RelTol = 1e-9
     
+    ast_name = "castalia"
+    file_name = "castalia.obj"
     # true asteroid and dumbbell
     v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj')
 
     true_ast_meshdata = mesh_data.MeshData(v, f)
-    true_ast = asteroid.Asteroid('castalia', true_ast_meshdata)
+    true_ast = asteroid.Asteroid(ast_name, true_ast_meshdata)
 
     dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
     
@@ -74,7 +76,7 @@ def initialize(output_filename):
     f_est = ellipsoid.get_faces()
     est_ast_meshdata = mesh_data.MeshData(v_est, f_est)
     est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
-    est_ast = asteroid.Asteroid("castalia", est_ast_rmesh)
+    est_ast = asteroid.Asteroid(ast_name, est_ast_rmesh)
 
     # controller functions 
     complete_controller = controller_cpp.Controller()
@@ -103,7 +105,7 @@ def initialize(output_filename):
                                     compression_opts=compression_opts)
         true_ast_group.create_dataset("faces", data=f, compression=compression,
                                     compression_opts=compression_opts)
-        true_ast_group['name'] = 'castalia.obj'
+        true_ast_group['name'] = file_name
         
         est_ast_group = sim_group.create_group("estimate_asteroid")
         est_ast_group['surf_area'] = surf_area
@@ -140,7 +142,9 @@ def initialize_eros(output_filename):
     RelTol = 1e-9
     
     # true asteroid and dumbbell
-    v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
+    ast_name = "eros"
+    file_name = "eros_low.obj"
+    v, f = wavefront.read_obj('./data/shape_model/EROS/eros_low.obj')
 
     true_ast_meshdata = mesh_data.MeshData(v, f)
     true_ast = asteroid.Asteroid('itokawa', true_ast_meshdata)
@@ -161,7 +165,7 @@ def initialize_eros(output_filename):
     f_est = ellipsoid.get_faces()
     est_ast_meshdata = mesh_data.MeshData(v_est, f_est)
     est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
-    est_ast = asteroid.Asteroid("itokawa", est_ast_rmesh)
+    est_ast = asteroid.Asteroid(ast_name, est_ast_rmesh)
 
     # controller functions 
     complete_controller = controller_cpp.Controller()
@@ -190,7 +194,7 @@ def initialize_eros(output_filename):
                                     compression_opts=compression_opts)
         true_ast_group.create_dataset("faces", data=f, compression=compression,
                                     compression_opts=compression_opts)
-        true_ast_group['name'] = 'castalia.obj'
+        true_ast_group['name'] = file_name
         
         est_ast_group = sim_group.create_group("estimate_asteroid")
         est_ast_group['surf_area'] = surf_area
@@ -226,6 +230,8 @@ def initialize_itokawa(output_filename):
     AbsTol = 1e-9
     RelTol = 1e-9
     
+    ast_name = "itokawa"
+    file_name = "itokawa_low.obj"
     # true asteroid and dumbbell
     v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
 
@@ -248,7 +254,7 @@ def initialize_itokawa(output_filename):
     f_est = ellipsoid.get_faces()
     est_ast_meshdata = mesh_data.MeshData(v_est, f_est)
     est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
-    est_ast = asteroid.Asteroid("itokawa", est_ast_rmesh)
+    est_ast = asteroid.Asteroid(ast_name, est_ast_rmesh)
 
     # controller functions 
     complete_controller = controller_cpp.Controller()
@@ -277,7 +283,7 @@ def initialize_itokawa(output_filename):
                                     compression_opts=compression_opts)
         true_ast_group.create_dataset("faces", data=f, compression=compression,
                                     compression_opts=compression_opts)
-        true_ast_group['name'] = 'castalia.obj'
+        true_ast_group['name'] = file_name
         
         est_ast_group = sim_group.create_group("estimate_asteroid")
         est_ast_group['surf_area'] = surf_area
@@ -1155,7 +1161,7 @@ def plot_volume(filename):
 
     publication.plot_volume(t_array, vol_array, true_volume)
 
-def landing_site_plots(filename):
+def landing_site_plots(input_filename):
     """Given the exploration reconstruction data (after all the exploration)
     
     This function will select a specific area and generate surface slope/roughness 
@@ -1164,19 +1170,49 @@ def landing_site_plots(filename):
 
     # generate a surface slope map for each face of an asteroid
     # load a asteroid
-    vertices, faces = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj');
+    with h5py.File(input_filename, 'r') as hf:
+        state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
+        # explore_tf = hf['time'][()][-1]
+        explore_tf = int(state_keys[-1])
+        explore_state = hf['state/' + str(explore_tf)][()]
+        explore_Ra = hf['Ra/' + str(explore_tf)][()]
+        explore_v = hf['reconstructed_vertex/' + str(explore_tf)][()]
+        explore_f = hf['reconstructed_face/' + str(explore_tf)][()]
+        explore_w = hf['reconstructed_weight/' + str(explore_tf)][()]
+        
+        explore_name = hf['simulation_parameters/true_asteroid/name'][()][:-4]
+        explore_m1 = hf['simulation_parameters/dumbbell/m1'][()]
+        explore_m2 = hf['simulation_parameters/dumbbell/m2'][()]
+        explore_l = hf['simulation_parameters/dumbbell/l'][()]
+        explore_AbsTol = hf['simulation_parameters/AbsTol'][()]
+        explore_RelTol = hf['simulation_parameters/RelTol'][()]
+        
+        explore_true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
+        explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
+    
+
+
+    # interpolate and create a radius plot
+    fig, ax = plt.subplots(1, 1)
     # compute radius of each vertex and lat/long 
-    spherical_vertices = wavefront.cartesian2spherical(vertices)
+    spherical_vertices = wavefront.cartesian2spherical(explore_v)
     r = spherical_vertices[:, 0]
     lat = spherical_vertices[:, 1]
     long = spherical_vertices[:, 2]
-    # interpolate and create a surface plot/contour
-    fig, ax = plt.subplots(1, 1)
     grid_long, grid_lat = np.mgrid[-np.pi:np.pi:100j, -np.pi/2:np.pi/2:100j]
-    grid_z0 = interpolate.griddata(np.vstack((long, lat)).T, r, (grid_long, grid_lat), method='nearest')
-    ax.scatter(long, lat,c=r)
-    # ax.contour(grid_long, grid_lat, grid_z0)
-    ax.imshow(grid_z0.T, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
+    grid_r = interpolate.griddata(np.vstack((long, lat)).T, r, (grid_long, grid_lat), method='nearest')
+    # ax.scatter(long, lat,c=r)
+    # ax.imshow(grid_r.T, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
+    ax.contour(grid_long, grid_lat, grid_r)
+    ax.set_title('Radius (km)')
+    ax.set_xlabel('Longitude (rad)')
+    ax.set_ylabel('Latitude (rad)')
+    
+    # plot of surface slope
+    # build meshdata and asteroid from the terminal estimate
+    est_meshdata = mesh_data.MeshData(explore_v, explore_f)
+    est_ast = asteroid.Asteroid(ast_name
+    # get the surface slope(ast) and all face centers(mesh)
     plt.show()
 
 if __name__ == "__main__":
