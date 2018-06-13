@@ -149,6 +149,18 @@ class MeshData {
         Eigen::Vector3d get_face_center(const Index& fd) const;
         Eigen::Matrix<double, Eigen::Dynamic, 3> get_face_center(const std::vector<Face_index>& face_vec) const;
         Eigen::Matrix<double, Eigen::Dynamic, 3> get_all_face_center( void ) const; 
+        
+        /** @fn Eigen::VectorXd get_all_face_area( void ) const
+                
+            Get the area of each face of the mesh
+
+            @param void none
+            @returns Vector of all face areas
+
+            @author Shankar Kulumani
+            @version 12 June 2018
+        */
+        Eigen::VectorXd get_all_face_area( void ) const;
 
         template<typename Index>
         Eigen::Matrix3d get_face_dyad(const Index& fd) const;

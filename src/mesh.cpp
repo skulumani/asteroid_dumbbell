@@ -3,6 +3,7 @@
 
 #include <CGAL/Polygon_mesh_processing/refine.h>
 #include <CGAL/Polygon_mesh_processing/remesh.h>
+#include <CGAL/Polygon_mesh_processing/measure.h>
 
 #include <igl/copyleft/cgal/mesh_to_polyhedron.h>
 #include <igl/copyleft/cgal/polyhedron_to_mesh.h>
@@ -306,6 +307,17 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> MeshData::get_all_face_center( void ) c
         ++index;
     }
     return face_centers;
+}
+
+Eigen::VectorXd MeshData::get_all_face_area( void ) const {
+    Eigen::VectorXd face_area(number_of_faces(), 1);
+    std::size_t index = 0;
+    for (Face_index fd: surface_mesh.faces()) {
+        face_area(index) = CGAL::Polygon_mesh_processing::area(fd, 
+                surface_mesh);
+        ++index;
+    }
+    return face_area
 }
 
 template<typename Index>
