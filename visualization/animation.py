@@ -376,6 +376,8 @@ def inertial_asteroid_trajectory_cpp_save(time, state, inertial_intersections,
         rf_group = hf['reconstructed_face']
         rw_group = hf['reconstructed_weight']
         Ra_group = hf['Ra']
+        est_initial_vertices = hf['simulation_parameters/estimate_asteroid/initial_vertices'][()]
+        num_vert = est_initial_vertices.shape[0]
 
         rv_keys = np.array(utilities.sorted_nicely(list(rv_group.keys())))
         
@@ -399,12 +401,23 @@ def inertial_asteroid_trajectory_cpp_save(time, state, inertial_intersections,
 
             # update asteroid
             if mesh_weight:
-                ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
-                         z=new_vertices[:,2], triangles=new_faces,
-                         scalars=new_weight)
+                # check if size is different than the last mesh
+                if num_vert != new_vertices.shape[0]:
+                    ms.reset(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                            z=new_vertices[:,2], triangles=new_faces,
+                            scalars=new_weight)
+                    num_vert = new_vertices.shape[0]
+                else:
+                    ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                            z=new_vertices[:,2], triangles=new_faces,
+                            scalars=new_weight)
             else:
-                ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
-                       z=new_vertices[:,2], triangles=new_faces)
+                if num_vert != new_vertices.shape[0]:
+                    ms.reset(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                        z=new_vertices[:,2], triangles=new_faces)
+                else:
+                    ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                        z=new_vertices[:,2], triangles=new_faces)
 
             # update the satellite
             ts.set(x=pos[0], y=pos[1], z=pos[2])
