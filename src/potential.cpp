@@ -364,6 +364,12 @@ void Asteroid::init_asteroid( void ) {
         axes << 27, 22, 18;
         axes = axes.array() / 2.0;
         omega = 2 * kPI / 7.6533 / 3600.0;
+    } else if (name.compare("lutetia") == 0) {
+        M = 1.7e18;
+        sigma = 3.4;
+        axes << 121, 101, 75;
+        axes = axes.array() / 2.0;
+        omega = 2 * kPI / 8.1655/ 3600.0;
     } else {
         throw std::invalid_argument( "Invalid asteroid name" );
     }
