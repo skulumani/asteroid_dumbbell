@@ -296,6 +296,18 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> MeshData::get_face_center(
     }
     return face_centers;
 }
+
+Eigen::Matrix<double, Eigen::Dynamic, 3> MeshData::get_all_face_center( void ) const {
+    Eigen::Matrix<double, Eigen::Dynamic, 3> face_centers(number_of_faces(), 3);
+
+    std::size_t index = 0;
+    for (Face_index fd: surface_mesh.faces()) {
+        face_centers.row(index) = get_face_center(fd).transpose();
+        ++index;
+    }
+    return face_centers;
+}
+
 template<typename Index>
 Eigen::Matrix3d MeshData::get_face_dyad(const Index& fd_in) const {
     Mesh::Property_map<Face_index, Eigen::Matrix3d> face_dyad;
