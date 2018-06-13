@@ -6,23 +6,21 @@ dependencies:
   - python=3.5.4 # needed for work with blender
   # - cgal
   - ipython
-  - numpy>=1.14
+  - numpy
   - scipy>=1
-  - matplotlib
   - seaborn
   - pip
   - pytest
   - pytest-cov
   - sympy>=1
+  - matplotlib
+  - h5py>=2.8
+  - pyqt=4
+  - mayavi
+  # - mayavi>=4.6
   - pip:
-    - h5py==2.8.0rc1
     - astro
     - kinematics
-    - vtk
-    - traits
-    - traitsui
     # - pydistmesh # only makes solid meshes and not surface mesh
-    - mayavi
-    - PyQt5
 prefix: /home/shankar/anaconda3/envs/asteroid
 
