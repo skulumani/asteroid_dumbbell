@@ -6,7 +6,7 @@ dependencies:
   - python=3.5.4 # needed for work with blender
   # - cgal
   - ipython
-  - numpy
+  - numpy>=1.14
   - scipy>=1
   - seaborn
   - pip
@@ -15,12 +15,10 @@ dependencies:
   - sympy>=1
   - matplotlib
   - h5py>=2.8
-  - pyqt=4
-  - mayavi
-  # - mayavi>=4.6
   - pip:
     - astro
     - kinematics
+    - mayavi
     # - pydistmesh # only makes solid meshes and not surface mesh
 prefix: /home/shankar/anaconda3/envs/asteroid
 
