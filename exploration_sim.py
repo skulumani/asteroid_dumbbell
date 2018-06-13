@@ -1492,7 +1492,9 @@ def landing_site_plots(input_filename):
     ax_dist.set_xlabel("Longitude")
     ax_dist.set_ylabel("Latitude")
     fig_dist.colorbar(img_dist)
+
     # build an image of random science value over entire surface
+
     plt.show()
 
 if __name__ == "__main__":
