@@ -52,7 +52,7 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
             ]
         }
 
-matplotlib.rcParams.update(pgf_with_latex)
+# matplotlib.rcParams.update(pgf_with_latex)
 sns.set_style('whitegrid', pgf_with_latex)
 sns.color_palette('bright')
 time_label = r'Normalized Time'
