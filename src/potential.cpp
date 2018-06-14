@@ -376,12 +376,18 @@ void Asteroid::init_asteroid( void ) {
         axes << 5, 2, 2.1;
         axes = axes / 2.0;
         omega = 2 * kPI / 5.220 / 3600.0;
-    } else if (name.compare("golevka") == 0 ) {
+    } else if (name.compare("bacchus") == 0 ) {
         M = 1e12;
         axes << 1.11, 0.53, 0.5;
         axes = axes /2.0;
         sigma = 2.1;
         omega = 2 * kPI / 14.544/ 3600.0;
+    } else if (name.compare("golevka") == 0) {
+        M = 1e12;
+        axes << 1.5, 1.5, 1.5;
+        axes = axes /2.0;
+        sigma = 2.7;
+        omega = 2 * kPI / 6.026/ 3600.0;
     } else if (name.compare("ky26") == 0 ){
         M = 1e12;
         axes << 0.4, 0.4, 0.4;
