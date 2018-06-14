@@ -40,7 +40,149 @@ from visualization import graphics, animation, publication
 
 compression = 'gzip'
 compression_opts = 9
-max_steps = 15000
+max_steps = 100
+
+def initialize_asteroid(output_filename, ast_name="castalia"):
+    """Initialize all the things for the simulation
+
+    Output_file : the actual HDF5 file to save the data/parameters to
+
+    """
+    logger = logging.getLogger(__name__)
+    logger.info('Initialize asteroid and dumbbell objects')
+
+    AbsTol = 1e-9
+    RelTol = 1e-9
+    logger.info("Initializing Asteroid: {} ".format(ast_name))    
+
+    # switch based on asteroid name
+    if ast_name == "castalia":
+        file_name = "castalia.obj"
+        v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj')
+    elif ast_name == "itokawa":
+        file_name = "itokawa_low.obj"
+        v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
+    elif ast_name == "eros":
+        file_name = "eros_low.obj"
+        v, f = wavefront.read_obj('./data/shape_model/EROS/eros_low.obj')
+    elif ast_name == "phobos":
+        file_name = "phobos_low.obj"
+        v, f = wavefront.read_obj('./data/shape_model/PHOBOS/phobos_low.obj')
+    elif ast_name == "lutetia":
+        file_name = "lutetia_low.obj"
+        v, f = wavefront.read_obj('./data/shape_model/LUTETIA/lutetia_low.obj')
+    elif ast_name == "geographos":
+        file_name = "1620geographos.obj"
+        v, f = wavefront.read_obj('./data/shape_model/RADAR/1620geographos.obj')
+    elif ast_name == "bacchus":
+        file_name = "2063bacchus.obj"
+        v, f = wavefront.read_obj('./data/shape_model/RADAR/2063bacchus.obj')
+    elif ast_name == "golevka":
+        file_name = "6489golevka.obj"
+        v, f = wavefront.read_obj('./data/shape_model/RADAR/6489golevka.obj')
+    elif ast_name == "52760":
+        file_name = "52760.obj"
+        v, f = wavefront.read_obj('./data/shape_model/RADAR/52760.obj')
+    else:
+        print("Incorrect asteroid name")
+        return 1
+    # true asteroid and dumbbell
+
+    true_ast_meshdata = mesh_data.MeshData(v, f)
+    true_ast = asteroid.Asteroid(ast_name, true_ast_meshdata)
+
+    dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
+    
+    # estimated asteroid (starting as an ellipse)
+    if (ast_name == "castalia" or ast_name == "itokawa"
+            or ast_name == "geographos" or ast_name == "bacchus"
+            or ast_name == "golevka" or ast_name == "52760"):
+        surf_area = 0.01
+        max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
+        min_angle = 10
+        max_distance = 0.5
+        max_radius = 0.03
+    elif (ast_name == "phobos"):
+        surf_area = 0.1
+        max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
+        min_angle = 10
+        max_distance = 0.1
+        max_radius = 0.006
+    elif (ast_name == "lutetia"):
+        surf_area = 1
+        max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
+        min_angle = 10
+        max_distance = 1
+        max_radius = 1
+    elif (ast_name == "eros"):
+        surf_area = 0.1
+        max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
+        min_angle = 10
+        max_distance = 0.01
+        max_radius = 0.2
+
+
+    ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0],
+                                      true_ast.get_axes()[1],
+                                      true_ast.get_axes()[2], min_angle,
+                                      max_radius, max_distance)
+    
+    v_est = ellipsoid.get_verts()
+    f_est = ellipsoid.get_faces()
+    est_ast_meshdata = mesh_data.MeshData(v_est, f_est)
+    est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
+    est_ast = asteroid.Asteroid(ast_name, est_ast_rmesh)
+
+    # controller functions 
+    complete_controller = controller_cpp.Controller()
+    
+    # lidar object
+    lidar = cgal.Lidar()
+    lidar = lidar.view_axis(np.array([1, 0, 0]))
+    lidar = lidar.up_axis(np.array([0, 0, 1]))
+    lidar = lidar.fov(np.deg2rad(np.array([7, 7]))).dist(2).num_steps(3)
+
+    # raycaster from c++
+    caster = cgal.RayCaster(v, f)
+    
+    # save a bunch of parameters to the HDF5 file
+    with h5py.File(output_filename, 'w-') as hf:
+        sim_group = hf.create_group("simulation_parameters")
+        sim_group['AbsTol'] = AbsTol
+        sim_group['RelTol'] = RelTol
+        dumbbell_group = sim_group.create_group("dumbbell")
+        dumbbell_group["m1"] = 500
+        dumbbell_group["m2"] = 500
+        dumbbell_group['l'] = 0.003
+        
+        true_ast_group = sim_group.create_group("true_asteroid")
+        true_ast_group.create_dataset("vertices", data=v, compression=compression,
+                                    compression_opts=compression_opts)
+        true_ast_group.create_dataset("faces", data=f, compression=compression,
+                                    compression_opts=compression_opts)
+        true_ast_group['name'] = file_name
+        
+        est_ast_group = sim_group.create_group("estimate_asteroid")
+        est_ast_group['surf_area'] = surf_area
+        est_ast_group['max_angle'] = max_angle
+        est_ast_group['min_angle'] = min_angle
+        est_ast_group['max_distance'] = max_distance
+        est_ast_group['max_radius'] = max_radius
+        est_ast_group.create_dataset('initial_vertices', data=est_ast_rmesh.get_verts(), compression=compression,
+                                    compression_opts=compression_opts)
+        est_ast_group.create_dataset("initial_faces", data=est_ast_rmesh.get_faces(), compression=compression,
+                                    compression_opts=compression_opts)
+        est_ast_group.create_dataset("initial_weight", data=est_ast_rmesh.get_weights(), compression=compression,
+                                    compression_opts=compression_opts)
+
+        lidar_group = sim_group.create_group("lidar")
+        lidar_group.create_dataset("view_axis", data=lidar.get_view_axis())
+        lidar_group.create_dataset("up_axis", data=lidar.get_up_axis())
+        lidar_group.create_dataset("fov", data=lidar.get_fov())
+    
+    return (true_ast_meshdata, true_ast, complete_controller, est_ast_meshdata, 
+            est_ast_rmesh, est_ast, lidar, caster, max_angle, 
+            dum, AbsTol, RelTol)
 
 def initialize_castalia(output_filename):
     """Initialize all the things for the simulation
@@ -70,363 +212,6 @@ def initialize_castalia(output_filename):
     min_angle = 10
     max_distance = 0.5
     max_radius = 0.03
-
-    ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0], true_ast.get_axes()[1], true_ast.get_axes()[2],
-                                      min_angle, max_radius, max_distance)
-    
-    v_est = ellipsoid.get_verts()
-    f_est = ellipsoid.get_faces()
-    est_ast_meshdata = mesh_data.MeshData(v_est, f_est)
-    est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
-    est_ast = asteroid.Asteroid(ast_name, est_ast_rmesh)
-
-    # controller functions 
-    complete_controller = controller_cpp.Controller()
-    
-    # lidar object
-    lidar = cgal.Lidar()
-    lidar = lidar.view_axis(np.array([1, 0, 0]))
-    lidar = lidar.up_axis(np.array([0, 0, 1]))
-    lidar = lidar.fov(np.deg2rad(np.array([7, 7]))).dist(2).num_steps(3)
-
-    # raycaster from c++
-    caster = cgal.RayCaster(v, f)
-    
-    # save a bunch of parameters to the HDF5 file
-    with h5py.File(output_filename, 'w-') as hf:
-        sim_group = hf.create_group("simulation_parameters")
-        sim_group['AbsTol'] = AbsTol
-        sim_group['RelTol'] = RelTol
-        dumbbell_group = sim_group.create_group("dumbbell")
-        dumbbell_group["m1"] = 500
-        dumbbell_group["m2"] = 500
-        dumbbell_group['l'] = 0.003
-        
-        true_ast_group = sim_group.create_group("true_asteroid")
-        true_ast_group.create_dataset("vertices", data=v, compression=compression,
-                                    compression_opts=compression_opts)
-        true_ast_group.create_dataset("faces", data=f, compression=compression,
-                                    compression_opts=compression_opts)
-        true_ast_group['name'] = file_name
-        
-        est_ast_group = sim_group.create_group("estimate_asteroid")
-        est_ast_group['surf_area'] = surf_area
-        est_ast_group['max_angle'] = max_angle
-        est_ast_group['min_angle'] = min_angle
-        est_ast_group['max_distance'] = max_distance
-        est_ast_group['max_radius'] = max_radius
-        est_ast_group.create_dataset('initial_vertices', data=est_ast_rmesh.get_verts(), compression=compression,
-                                    compression_opts=compression_opts)
-        est_ast_group.create_dataset("initial_faces", data=est_ast_rmesh.get_faces(), compression=compression,
-                                    compression_opts=compression_opts)
-        est_ast_group.create_dataset("initial_weight", data=est_ast_rmesh.get_weights(), compression=compression,
-                                    compression_opts=compression_opts)
-
-        lidar_group = sim_group.create_group("lidar")
-        lidar_group.create_dataset("view_axis", data=lidar.get_view_axis())
-        lidar_group.create_dataset("up_axis", data=lidar.get_up_axis())
-        lidar_group.create_dataset("fov", data=lidar.get_fov())
-    
-    return (true_ast_meshdata, true_ast, complete_controller, est_ast_meshdata, 
-            est_ast_rmesh, est_ast, lidar, caster, max_angle, 
-            dum, AbsTol, RelTol)
-
-def initialize_eros(output_filename):
-    """Initialize all the things for the simulation around Itokwawa
-
-    Output_file : the actual HDF5 file to save the data/parameters to
-
-    """
-    logger = logging.getLogger(__name__)
-    logger.info('Initialize asteroid and dumbbell objects')
-
-    AbsTol = 1e-9
-    RelTol = 1e-9
-    
-    # true asteroid and dumbbell
-    ast_name = "eros"
-    file_name = "eros_low.obj"
-    v, f = wavefront.read_obj('./data/shape_model/EROS/eros_low.obj')
-    true_ast_meshdata = mesh_data.MeshData(v, f)
-    true_ast = asteroid.Asteroid(ast_name, true_ast_meshdata)
-
-    dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
-    
-    # estimated asteroid (starting as an ellipse)
-    surf_area = 0.1
-    max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
-    min_angle = 10
-    max_distance = 0.01
-    max_radius = 0.2
-
-    ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0],
-                                      true_ast.get_axes()[1],
-                                      true_ast.get_axes()[2],
-                                      min_angle, max_radius, max_distance)
-    
-    v_est = ellipsoid.get_verts()
-    f_est = ellipsoid.get_faces()
-    est_ast_meshdata = mesh_data.MeshData(v_est, f_est)
-    est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
-    est_ast = asteroid.Asteroid(ast_name, est_ast_rmesh)
-
-    # controller functions 
-    complete_controller = controller_cpp.Controller()
-    
-    # lidar object
-    lidar = cgal.Lidar()
-    lidar = lidar.view_axis(np.array([1, 0, 0]))
-    lidar = lidar.up_axis(np.array([0, 0, 1]))
-    lidar = lidar.fov(np.deg2rad(np.array([7, 7]))).dist(2).num_steps(3)
-
-    # raycaster from c++
-    caster = cgal.RayCaster(v, f)
-    
-    # save a bunch of parameters to the HDF5 file
-    with h5py.File(output_filename, 'w-') as hf:
-        sim_group = hf.create_group("simulation_parameters")
-        sim_group['AbsTol'] = AbsTol
-        sim_group['RelTol'] = RelTol
-        dumbbell_group = sim_group.create_group("dumbbell")
-        dumbbell_group["m1"] = 500
-        dumbbell_group["m2"] = 500
-        dumbbell_group['l'] = 0.003
-        
-        true_ast_group = sim_group.create_group("true_asteroid")
-        true_ast_group.create_dataset("vertices", data=v, compression=compression,
-                                    compression_opts=compression_opts)
-        true_ast_group.create_dataset("faces", data=f, compression=compression,
-                                    compression_opts=compression_opts)
-        true_ast_group['name'] = file_name
-        
-        est_ast_group = sim_group.create_group("estimate_asteroid")
-        est_ast_group['surf_area'] = surf_area
-        est_ast_group['max_angle'] = max_angle
-        est_ast_group['min_angle'] = min_angle
-        est_ast_group['max_distance'] = max_distance
-        est_ast_group['max_radius'] = max_radius
-        est_ast_group.create_dataset('initial_vertices', data=est_ast_rmesh.get_verts(), compression=compression,
-                                    compression_opts=compression_opts)
-        est_ast_group.create_dataset("initial_faces", data=est_ast_rmesh.get_faces(), compression=compression,
-                                    compression_opts=compression_opts)
-        est_ast_group.create_dataset("initial_weight", data=est_ast_rmesh.get_weights(), compression=compression,
-                                    compression_opts=compression_opts)
-
-        lidar_group = sim_group.create_group("lidar")
-        lidar_group.create_dataset("view_axis", data=lidar.get_view_axis())
-        lidar_group.create_dataset("up_axis", data=lidar.get_up_axis())
-        lidar_group.create_dataset("fov", data=lidar.get_fov())
-    
-    return (true_ast_meshdata, true_ast, complete_controller, est_ast_meshdata, 
-            est_ast_rmesh, est_ast, lidar, caster, max_angle, 
-            dum, AbsTol, RelTol)
-
-def initialize_itokawa(output_filename):
-    """Initialize all the things for the simulation around Itokwawa
-
-    Output_file : the actual HDF5 file to save the data/parameters to
-
-    """
-    logger = logging.getLogger(__name__)
-    logger.info('Initialize asteroid and dumbbell objects')
-
-    AbsTol = 1e-9
-    RelTol = 1e-9
-    
-    ast_name = "itokawa"
-    file_name = "itokawa_low.obj"
-    # true asteroid and dumbbell
-    v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
-
-    true_ast_meshdata = mesh_data.MeshData(v, f)
-    true_ast = asteroid.Asteroid('itokawa', true_ast_meshdata)
-
-    dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
-    
-    # estimated asteroid (starting as an ellipse)
-    surf_area = 0.01
-    max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
-    min_angle = 10
-    max_distance = 0.1
-    max_radius = 0.006
-
-    ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0], true_ast.get_axes()[1], true_ast.get_axes()[2],
-                                      min_angle, max_radius, max_distance)
-    
-    v_est = ellipsoid.get_verts()
-    f_est = ellipsoid.get_faces()
-    est_ast_meshdata = mesh_data.MeshData(v_est, f_est)
-    est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
-    est_ast = asteroid.Asteroid(ast_name, est_ast_rmesh)
-
-    # controller functions 
-    complete_controller = controller_cpp.Controller()
-    
-    # lidar object
-    lidar = cgal.Lidar()
-    lidar = lidar.view_axis(np.array([1, 0, 0]))
-    lidar = lidar.up_axis(np.array([0, 0, 1]))
-    lidar = lidar.fov(np.deg2rad(np.array([7, 7]))).dist(2).num_steps(3)
-
-    # raycaster from c++
-    caster = cgal.RayCaster(v, f)
-    
-    # save a bunch of parameters to the HDF5 file
-    with h5py.File(output_filename, 'w-') as hf:
-        sim_group = hf.create_group("simulation_parameters")
-        sim_group['AbsTol'] = AbsTol
-        sim_group['RelTol'] = RelTol
-        dumbbell_group = sim_group.create_group("dumbbell")
-        dumbbell_group["m1"] = 500
-        dumbbell_group["m2"] = 500
-        dumbbell_group['l'] = 0.003
-        
-        true_ast_group = sim_group.create_group("true_asteroid")
-        true_ast_group.create_dataset("vertices", data=v, compression=compression,
-                                    compression_opts=compression_opts)
-        true_ast_group.create_dataset("faces", data=f, compression=compression,
-                                    compression_opts=compression_opts)
-        true_ast_group['name'] = file_name
-        
-        est_ast_group = sim_group.create_group("estimate_asteroid")
-        est_ast_group['surf_area'] = surf_area
-        est_ast_group['max_angle'] = max_angle
-        est_ast_group['min_angle'] = min_angle
-        est_ast_group['max_distance'] = max_distance
-        est_ast_group['max_radius'] = max_radius
-        est_ast_group.create_dataset('initial_vertices', data=est_ast_rmesh.get_verts(), compression=compression,
-                                    compression_opts=compression_opts)
-        est_ast_group.create_dataset("initial_faces", data=est_ast_rmesh.get_faces(), compression=compression,
-                                    compression_opts=compression_opts)
-        est_ast_group.create_dataset("initial_weight", data=est_ast_rmesh.get_weights(), compression=compression,
-                                    compression_opts=compression_opts)
-
-        lidar_group = sim_group.create_group("lidar")
-        lidar_group.create_dataset("view_axis", data=lidar.get_view_axis())
-        lidar_group.create_dataset("up_axis", data=lidar.get_up_axis())
-        lidar_group.create_dataset("fov", data=lidar.get_fov())
-    
-    return (true_ast_meshdata, true_ast, complete_controller, est_ast_meshdata, 
-            est_ast_rmesh, est_ast, lidar, caster, max_angle, 
-            dum, AbsTol, RelTol)
-
-def initialize_phobos(output_filename):
-    """Initialize all the things for the simulation around Phobos
-
-    Output_file : the actual HDF5 file to save the data/parameters to
-
-    """
-    logger = logging.getLogger(__name__)
-    logger.info('Initialize asteroid and dumbbell objects')
-
-    AbsTol = 1e-9
-    RelTol = 1e-9
-    
-    ast_name = "phobos"
-    file_name = "phobos_low.obj"
-    # true asteroid and dumbbell
-    v, f = wavefront.read_obj('./data/shape_model/PHOBOS/phobos_low.obj')
-
-    true_ast_meshdata = mesh_data.MeshData(v, f)
-    true_ast = asteroid.Asteroid(ast_name, true_ast_meshdata)
-
-    dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
-    
-    # estimated asteroid (starting as an ellipse)
-    surf_area = 0.1
-    max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
-    min_angle = 10
-    max_distance = 0.1
-    max_radius = 0.006
-
-    ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0], true_ast.get_axes()[1], true_ast.get_axes()[2],
-                                      min_angle, max_radius, max_distance)
-    
-    v_est = ellipsoid.get_verts()
-    f_est = ellipsoid.get_faces()
-    est_ast_meshdata = mesh_data.MeshData(v_est, f_est)
-    est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
-    est_ast = asteroid.Asteroid(ast_name, est_ast_rmesh)
-
-    # controller functions 
-    complete_controller = controller_cpp.Controller()
-    
-    # lidar object
-    lidar = cgal.Lidar()
-    lidar = lidar.view_axis(np.array([1, 0, 0]))
-    lidar = lidar.up_axis(np.array([0, 0, 1]))
-    lidar = lidar.fov(np.deg2rad(np.array([7, 7]))).dist(2).num_steps(3)
-
-    # raycaster from c++
-    caster = cgal.RayCaster(v, f)
-    
-    # save a bunch of parameters to the HDF5 file
-    with h5py.File(output_filename, 'w-') as hf:
-        sim_group = hf.create_group("simulation_parameters")
-        sim_group['AbsTol'] = AbsTol
-        sim_group['RelTol'] = RelTol
-        dumbbell_group = sim_group.create_group("dumbbell")
-        dumbbell_group["m1"] = 500
-        dumbbell_group["m2"] = 500
-        dumbbell_group['l'] = 0.003
-        
-        true_ast_group = sim_group.create_group("true_asteroid")
-        true_ast_group.create_dataset("vertices", data=v, compression=compression,
-                                    compression_opts=compression_opts)
-        true_ast_group.create_dataset("faces", data=f, compression=compression,
-                                    compression_opts=compression_opts)
-        true_ast_group['name'] = file_name
-        
-        est_ast_group = sim_group.create_group("estimate_asteroid")
-        est_ast_group['surf_area'] = surf_area
-        est_ast_group['max_angle'] = max_angle
-        est_ast_group['min_angle'] = min_angle
-        est_ast_group['max_distance'] = max_distance
-        est_ast_group['max_radius'] = max_radius
-        est_ast_group.create_dataset('initial_vertices', data=est_ast_rmesh.get_verts(), compression=compression,
-                                    compression_opts=compression_opts)
-        est_ast_group.create_dataset("initial_faces", data=est_ast_rmesh.get_faces(), compression=compression,
-                                    compression_opts=compression_opts)
-        est_ast_group.create_dataset("initial_weight", data=est_ast_rmesh.get_weights(), compression=compression,
-                                    compression_opts=compression_opts)
-
-        lidar_group = sim_group.create_group("lidar")
-        lidar_group.create_dataset("view_axis", data=lidar.get_view_axis())
-        lidar_group.create_dataset("up_axis", data=lidar.get_up_axis())
-        lidar_group.create_dataset("fov", data=lidar.get_fov())
-    
-    return (true_ast_meshdata, true_ast, complete_controller, est_ast_meshdata, 
-            est_ast_rmesh, est_ast, lidar, caster, max_angle, 
-            dum, AbsTol, RelTol)
-
-def initialize_lutetia(output_filename):
-    """Initialize all the things for the simulation around Phobos
-
-    Output_file : the actual HDF5 file to save the data/parameters to
-
-    """
-    logger = logging.getLogger(__name__)
-    logger.info('Initialize asteroid and dumbbell objects')
-
-    AbsTol = 1e-9
-    RelTol = 1e-9
-    
-    ast_name = "lutetia"
-    file_name = "lutetia_low.obj"
-    # true asteroid and dumbbell
-    v, f = wavefront.read_obj('./data/shape_model/LUTETIA/lutetia_low.obj')
-
-    true_ast_meshdata = mesh_data.MeshData(v, f)
-    true_ast = asteroid.Asteroid(ast_name, true_ast_meshdata)
-
-    dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
-    
-    # estimated asteroid (starting as an ellipse)
-    surf_area = 1
-    max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
-    min_angle = 10
-    max_distance = 1
-    max_radius = 1
 
     ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0], true_ast.get_axes()[1], true_ast.get_axes()[2],
                                       min_angle, max_radius, max_distance)
@@ -607,26 +392,9 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5",
     dt = time[1] - time[0]
 
     # initialize the simulation objects
-    if asteroid_name=="castalia":
-        (true_ast_meshdata, true_ast, complete_controller,
-         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
-         AbsTol, RelTol) = initialize_castalia(output_filename)
-    elif asteroid_name=="itokawa":
-        (true_ast_meshdata, true_ast, complete_controller,
-         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
-         AbsTol, RelTol) = initialize_itokawa(output_filename)
-    elif asteroid_name=="eros":
-        (true_ast_meshdata, true_ast, complete_controller,
-         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
-         AbsTol, RelTol) = initialize_eros(output_filename)
-    elif asteroid_name=="phobos":
-        (true_ast_meshdata, true_ast, complete_controller,
-         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
-         AbsTol, RelTol) = initialize_phobos(output_filename)
-    elif asteroid_name=="lutetia":
-        (true_ast_meshdata, true_ast, complete_controller,
-         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
-         AbsTol, RelTol) = initialize_lutetia(output_filename)
+    (true_ast_meshdata, true_ast, complete_controller,
+        est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
+        AbsTol, RelTol) = initialize_asteroid(output_filename, asteroid_name)
 
     # change the initial condition based on the asteroid name
     if true_ast.get_name() == "itokawa": 
@@ -639,7 +407,11 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5",
         initial_pos = np.array([70, 0, 0])
     elif true_ast.get_name() == "lutetia":
         initial_pos = np.array([70, 0, 0])
-
+    elif true_ast.get_name() == "geographos":
+        initial_pos = np.array([5, 0, 0])
+    else:
+        print("Incorrect asteroid selected")
+        return 1
     # define the initial condition in the inertial frame
     initial_vel = np.array([0, 0, 0])
     initial_R = attitude.rot3(np.pi / 2).reshape(-1)
@@ -731,71 +503,6 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5",
             ii += 1
         
         logger.info("Exploration complete")
-        logger.info("Estimated asteroid has {} vertices and {} faces".format(
-            est_ast_rmesh.get_verts().shape[0],
-            est_ast_rmesh.get_faces().shape[1]))
-            
-        # logger.info("Now refining the faces close to the landing site")
-        # # perform remeshing over the landing area and take a bunch of measurements 
-        # # of the surface. Assume everything happens without the asteroid rotating 
-        # new_face_centers = est_ast_meshdata.refine_faces_in_view(state[0:3], np.deg2rad(5))
-        # logger.info("Refinement added {} faces".format(new_face_centers.shape[0]))
-        # logger.info("Estimated asteroid has {} vertices and {} faces".format(
-        #     est_ast_rmesh.get_verts().shape[0],
-        #     est_ast_rmesh.get_faces().shape[1]))
-        
-        # logger.info("Now looping over the new faces and raycasting")
-        # # now take measurements of each facecenter
-        # for ii, vec in enumerate(new_face_centers):
-        #     logger.info("Step: {} Uncertainty: {}".format(ii + max_steps, 
-        #                                                            np.sum(est_ast_rmesh.get_weights())))
-
-        #     targets = lidar.define_targets(state[0:3], state[6:15].reshape((3, 3)),
-        #                                    np.linalg.norm(state[0:3]))
-        #     intersections = caster.castarray(state[0:3], targets)
-        #     ast_ints = []
-        #     for pt in intersections:
-        #         if np.linalg.norm(pt) < 1e-9:
-        #             logger.info("No intersection for this point")
-        #             pt_ast = np.array([np.nan, np.nan, np.nan])
-        #         else:
-        #             pt_ast = Ra.T.dot(pt)
-
-        #         ast_ints.append(pt_ast)
-            
-        #     ast_ints = np.array(ast_ints)
-
-        #     # this updates the estimated asteroid mesh used in both rmesh and est_ast
-        #     est_ast_rmesh.update(ast_ints, max_angle)
-            
-        #     # use the controller to update the state
-        #     complete_controller.inertial_fixed_state(max_steps, state, initial_pos);
-        #     complete_controller.inertial_pointing_attitude(max_steps,
-        #                                                    state,
-        #                                                    vec);
-        #     # update the state
-        #     state = np.hstack((complete_controller.get_posd(), 
-        #                        complete_controller.get_veld(),
-        #                        complete_controller.get_Rd().reshape(-1),
-        #                        complete_controller.get_ang_vel_d()))
-
-        #     v_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_verts(), compression=compression,
-        #                            compression_opts=compression_opts)
-        #     f_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_faces(), compression=compression,
-        #                            compression_opts=compression_opts)
-        #     w_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_weights(), compression=compression,
-        #                            compression_opts=compression_opts)
-
-        #     state_group.create_dataset(str(max_steps + ii), data=state, compression=compression,
-        #                                compression_opts=compression_opts)
-        #     targets_group.create_dataset(str(max_steps + ii), data=targets, compression=compression,
-        #                                  compression_opts=compression_opts)
-        #     Ra_group.create_dataset(str(max_steps + ii), data=Ra, compression=compression,
-        #                             compression_opts=compression_opts)
-        #     inertial_intersections_group.create_dataset(str(max_steps + ii), data=intersections, compression=compression,
-        #                                                 compression_opts=compression_opts)
-        #     asteroid_intersections_group.create_dataset(str(max_steps + ii), data=ast_ints, compression=compression,
-        #                                                 compression_opts=compression_opts)
 
     
     logger.info("All done")
@@ -1078,6 +785,76 @@ def save_animate_landing(filename, move_cam=False, mesh_weight=False):
             os.remove(file_path)
     os.rmdir(output_path)
 
+def refine_landing_area(output_filename):
+    """Called after exploration is completed"""
+    logger = logging.getLogger(__name__)
+
+    logger.info("Estimated asteroid has {} vertices and {} faces".format(
+        est_ast_rmesh.get_verts().shape[0],
+        est_ast_rmesh.get_faces().shape[1]))
+        
+    logger.info("Now refining the faces close to the landing site")
+    # perform remeshing over the landing area and take a bunch of measurements 
+    # of the surface. Assume everything happens without the asteroid rotating 
+    new_face_centers = est_ast_meshdata.refine_faces_in_view(state[0:3], np.deg2rad(5))
+    logger.info("Refinement added {} faces".format(new_face_centers.shape[0]))
+    logger.info("Estimated asteroid has {} vertices and {} faces".format(
+        est_ast_rmesh.get_verts().shape[0],
+        est_ast_rmesh.get_faces().shape[1]))
+    
+    logger.info("Now looping over the new faces and raycasting")
+    # now take measurements of each facecenter
+    for ii, vec in enumerate(new_face_centers):
+        logger.info("Step: {} Uncertainty: {}".format(ii + max_steps, 
+                                                               np.sum(est_ast_rmesh.get_weights())))
+
+        targets = lidar.define_targets(state[0:3], state[6:15].reshape((3, 3)),
+                                       np.linalg.norm(state[0:3]))
+        intersections = caster.castarray(state[0:3], targets)
+        ast_ints = []
+        for pt in intersections:
+            if np.linalg.norm(pt) < 1e-9:
+                logger.info("No intersection for this point")
+                pt_ast = np.array([np.nan, np.nan, np.nan])
+            else:
+                pt_ast = Ra.T.dot(pt)
+
+            ast_ints.append(pt_ast)
+        
+        ast_ints = np.array(ast_ints)
+
+        # this updates the estimated asteroid mesh used in both rmesh and est_ast
+        est_ast_rmesh.update(ast_ints, max_angle)
+        
+        # use the controller to update the state
+        complete_controller.inertial_fixed_state(max_steps, state, initial_pos);
+        complete_controller.inertial_pointing_attitude(max_steps,
+                                                       state,
+                                                       vec);
+        # update the state
+        state = np.hstack((complete_controller.get_posd(), 
+                           complete_controller.get_veld(),
+                           complete_controller.get_Rd().reshape(-1),
+                           complete_controller.get_ang_vel_d()))
+
+        v_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_verts(), compression=compression,
+                               compression_opts=compression_opts)
+        f_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_faces(), compression=compression,
+                               compression_opts=compression_opts)
+        w_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_weights(), compression=compression,
+                               compression_opts=compression_opts)
+
+        state_group.create_dataset(str(max_steps + ii), data=state, compression=compression,
+                                   compression_opts=compression_opts)
+        targets_group.create_dataset(str(max_steps + ii), data=targets, compression=compression,
+                                     compression_opts=compression_opts)
+        Ra_group.create_dataset(str(max_steps + ii), data=Ra, compression=compression,
+                                compression_opts=compression_opts)
+        inertial_intersections_group.create_dataset(str(max_steps + ii), data=intersections, compression=compression,
+                                                    compression_opts=compression_opts)
+        asteroid_intersections_group.create_dataset(str(max_steps + ii), data=ast_ints, compression=compression,
+                                                    compression_opts=compression_opts)
+    pass
 
 def landing(output_filename, input_filename):
     """Open the HDF5 file and continue the simulation from the terminal state
