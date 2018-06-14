@@ -577,13 +577,14 @@ def mayavi_axes(fig, extent, tube_radius=None, line_width=2, **kwargs):
 def mayavi_savefig(fig, filename, magnification=4, **kwargs):
     r"""Save mayavi figure
 
-    mayavi_savefig(fig, magnification=4, **kwargs)
+    mayavi_savefig(fig, filename, magnification=4, **kwargs)
 
     Parameters
     ----------
 
     fig : mayavi figure
         Figure to save
+    filename : filename to save
     magnification : float
         Scale for the image
 
