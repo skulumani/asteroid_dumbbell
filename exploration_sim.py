@@ -40,7 +40,7 @@ from visualization import graphics, animation, publication
 
 compression = 'gzip'
 compression_opts = 9
-max_steps = 100
+max_steps = 15000
 
 def initialize_asteroid(output_filename, ast_name="castalia"):
     """Initialize all the things for the simulation
@@ -95,31 +95,42 @@ def initialize_asteroid(output_filename, ast_name="castalia"):
     
     # estimated asteroid (starting as an ellipse)
     if (ast_name == "castalia" or ast_name == "itokawa"
-            or ast_name == "geographos" or ast_name == "bacchus"
             or ast_name == "golevka" or ast_name == "52760"):
         surf_area = 0.01
         max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
         min_angle = 10
-        max_distance = 0.5
         max_radius = 0.03
+        max_distance = 0.5
+    elif ast_name == "geographos":
+        surf_area = 0.01
+        max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
+        min_angle = 10
+        max_radius = 0.05
+        max_distance = 0.5
+    elif ast_name == "bacchus":
+        surf_area = 0.01
+        max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
+        min_angle = 10
+        max_radius = 0.02
+        max_distance = 0.5
     elif (ast_name == "phobos"):
         surf_area = 0.1
         max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
         min_angle = 10
-        max_distance = 0.1
         max_radius = 0.006
+        max_distance = 0.1
     elif (ast_name == "lutetia"):
         surf_area = 1
         max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
         min_angle = 10
-        max_distance = 1
         max_radius = 1
+        max_distance = 1
     elif (ast_name == "eros"):
         surf_area = 0.1
         max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
         min_angle = 10
-        max_distance = 0.01
         max_radius = 0.2
+        max_distance = 0.01
 
 
     ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0],
@@ -409,6 +420,8 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5",
         initial_pos = np.array([70, 0, 0])
     elif true_ast.get_name() == "geographos":
         initial_pos = np.array([5, 0, 0])
+    elif true_ast.get_name() == "bacchus":
+        initial_pos = np.array([1.5, 0, 0])
     else:
         print("Incorrect asteroid selected")
         return 1
@@ -448,8 +461,9 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5",
             # TODO Make sure the asteroid (est and truth) are being rotated by ROT3(t)
             state = system.integrate(system.t + dt)
 
-            logger.info("Step: {} Time: {} Uncertainty: {}".format(ii, t, 
-                                                                   np.sum(est_ast_rmesh.get_weights())))
+            logger.info("Step: {} Time: {} Pos: {} Uncertainty: {}".format(ii, t,
+                                                                           state[0:3],
+                                                                           np.sum(est_ast_rmesh.get_weights())))
 
             if not (np.floor(t) % 1):
                 targets = lidar.define_targets(state[0:3],
@@ -785,76 +799,125 @@ def save_animate_landing(filename, move_cam=False, mesh_weight=False):
             os.remove(file_path)
     os.rmdir(output_path)
 
-def refine_landing_area(output_filename):
+def refine_landing_area(filename):
     """Called after exploration is completed"""
     logger = logging.getLogger(__name__)
-
-    logger.info("Estimated asteroid has {} vertices and {} faces".format(
-        est_ast_rmesh.get_verts().shape[0],
-        est_ast_rmesh.get_faces().shape[1]))
-        
-    logger.info("Now refining the faces close to the landing site")
-    # perform remeshing over the landing area and take a bunch of measurements 
-    # of the surface. Assume everything happens without the asteroid rotating 
-    new_face_centers = est_ast_meshdata.refine_faces_in_view(state[0:3], np.deg2rad(5))
-    logger.info("Refinement added {} faces".format(new_face_centers.shape[0]))
-    logger.info("Estimated asteroid has {} vertices and {} faces".format(
-        est_ast_rmesh.get_verts().shape[0],
-        est_ast_rmesh.get_faces().shape[1]))
     
-    logger.info("Now looping over the new faces and raycasting")
-    # now take measurements of each facecenter
-    for ii, vec in enumerate(new_face_centers):
-        logger.info("Step: {} Uncertainty: {}".format(ii + max_steps, 
-                                                               np.sum(est_ast_rmesh.get_weights())))
-
-        targets = lidar.define_targets(state[0:3], state[6:15].reshape((3, 3)),
-                                       np.linalg.norm(state[0:3]))
-        intersections = caster.castarray(state[0:3], targets)
-        ast_ints = []
-        for pt in intersections:
-            if np.linalg.norm(pt) < 1e-9:
-                logger.info("No intersection for this point")
-                pt_ast = np.array([np.nan, np.nan, np.nan])
-            else:
-                pt_ast = Ra.T.dot(pt)
-
-            ast_ints.append(pt_ast)
+    # open the file and recreate the objects
+    with h5py.File(filename, 'r+') as hf:
+        state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
+        # explore_tf = hf['time'][()][-1]
+        explore_tf = int(state_keys[-1])
+        explore_state = hf['state/' + str(explore_tf)][()]
+        explore_Ra = hf['Ra/' + str(explore_tf)][()]
+        explore_v = hf['reconstructed_vertex/' + str(explore_tf)][()]
+        explore_f = hf['reconstructed_face/' + str(explore_tf)][()]
+        explore_w = hf['reconstructed_weight/' + str(explore_tf)][()]
         
-        ast_ints = np.array(ast_ints)
-
-        # this updates the estimated asteroid mesh used in both rmesh and est_ast
-        est_ast_rmesh.update(ast_ints, max_angle)
+        explore_name = hf['simulation_parameters/true_asteroid/name'][()][:-4]
+        explore_m1 = hf['simulation_parameters/dumbbell/m1'][()]
+        explore_m2 = hf['simulation_parameters/dumbbell/m2'][()]
+        explore_l = hf['simulation_parameters/dumbbell/l'][()]
+        explore_AbsTol = hf['simulation_parameters/AbsTol'][()]
+        explore_RelTol = hf['simulation_parameters/RelTol'][()]
         
-        # use the controller to update the state
-        complete_controller.inertial_fixed_state(max_steps, state, initial_pos);
-        complete_controller.inertial_pointing_attitude(max_steps,
-                                                       state,
-                                                       vec);
-        # update the state
-        state = np.hstack((complete_controller.get_posd(), 
-                           complete_controller.get_veld(),
-                           complete_controller.get_Rd().reshape(-1),
-                           complete_controller.get_ang_vel_d()))
+        explore_true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
+        explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
+        
+        # groups to save the refined data
+        v_group = hf.create_group("refinement/reconstructed_vertex")
+        f_group = hf.create_group("refinement/reconstructed_face")
+        w_group = hf.create_group("refinement/reconstructed_weight")
+        state_group = hf.create_group("refinement/state")
+        targets_group = hf.create_group("refinement/targets")
+        Ra_group = hf.create_group("refinement/Ra")
+        inertial_intersections_group = hf.create_group("refinement/inertial_intersections")
+        asteroid_intersections_group = hf.create_group("refinement/asteroid_intersections")
 
-        v_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_verts(), compression=compression,
-                               compression_opts=compression_opts)
-        f_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_faces(), compression=compression,
-                               compression_opts=compression_opts)
-        w_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_weights(), compression=compression,
-                               compression_opts=compression_opts)
+        # create the estimated asteroid
+        est_ast_meshdata = mesh_data.MeshData(explore_v, explore_f)
+        est_ast_rmesh = reconstruct.ReconstructMesh(explore_v, explore_f, explore_w) 
+        est_ast = asteroid.Asteroid('castalia', est_ast_meshdata)
+        complete_controller = controller_cpp.Controller()
 
-        state_group.create_dataset(str(max_steps + ii), data=state, compression=compression,
-                                   compression_opts=compression_opts)
-        targets_group.create_dataset(str(max_steps + ii), data=targets, compression=compression,
-                                     compression_opts=compression_opts)
-        Ra_group.create_dataset(str(max_steps + ii), data=Ra, compression=compression,
+        logger.info("Estimated asteroid has {} vertices and {} faces".format(
+            est_ast_rmesh.get_verts().shape[0],
+            est_ast_rmesh.get_faces().shape[1]))
+            
+        logger.info("Now refining the faces close to the landing site")
+        # perform remeshing over the landing area and take a bunch of measurements 
+        # of the surface. Assume everything happens without the asteroid rotating 
+        new_face_centers = est_ast_meshdata.refine_faces_in_view(state[0:3], np.deg2rad(5))
+        logger.info("Refinement added {} faces".format(new_face_centers.shape[0]))
+        logger.info("Estimated asteroid has {} vertices and {} faces".format(
+            est_ast_rmesh.get_verts().shape[0],
+            est_ast_rmesh.get_faces().shape[1]))
+        
+        logger.info("Now looping over the new faces and raycasting")
+        # now take measurements of each facecenter
+        for ii, vec in enumerate(new_face_centers):
+            logger.info("Step: {} Uncertainty: {}".format(ii + max_steps,
+                                                        np.sum(est_ast_rmesh.get_weights())))
+
+            targets = lidar.define_targets(state[0:3], state[6:15].reshape((3, 3)),
+                                        np.linalg.norm(state[0:3]))
+            intersections = caster.castarray(state[0:3], targets)
+            ast_ints = []
+            for pt in intersections:
+                if np.linalg.norm(pt) < 1e-9:
+                    logger.info("No intersection for this point")
+                    pt_ast = np.array([np.nan, np.nan, np.nan])
+                else:
+                    pt_ast = Ra.T.dot(pt)
+
+                ast_ints.append(pt_ast)
+            
+            ast_ints = np.array(ast_ints)
+
+            # this updates the estimated asteroid mesh used in both rmesh and est_ast
+            est_ast_rmesh.update(ast_ints, max_angle)
+            
+            # use the controller to update the state
+            complete_controller.inertial_fixed_state(max_steps, state, initial_pos);
+            complete_controller.inertial_pointing_attitude(max_steps,
+                                                        state,
+                                                        vec);
+            # update the state
+            state = np.hstack((complete_controller.get_posd(), 
+                            complete_controller.get_veld(),
+                            complete_controller.get_Rd().reshape(-1),
+                            complete_controller.get_ang_vel_d()))
+
+            v_group.create_dataset(str(ii),
+                                data=est_ast_rmesh.get_verts(),
+                                compression=compression,
                                 compression_opts=compression_opts)
-        inertial_intersections_group.create_dataset(str(max_steps + ii), data=intersections, compression=compression,
-                                                    compression_opts=compression_opts)
-        asteroid_intersections_group.create_dataset(str(max_steps + ii), data=ast_ints, compression=compression,
-                                                    compression_opts=compression_opts)
-    pass
+            f_group.create_dataset(str(ii),
+                                data=est_ast_rmesh.get_faces(),
+                                compression=compression,
+                                compression_opts=compression_opts)
+            w_group.create_dataset(str(ii),
+                                data=est_ast_rmesh.get_weights(),
+                                compression=compression,
+                                compression_opts=compression_opts)
+
+            state_group.create_dataset(str(ii), data=state,
+                                    compression=compression,
+                                    compression_opts=compression_opts)
+            targets_group.create_dataset(str(ii), data=targets,
+                                        compression=compression,
+                                        compression_opts=compression_opts)
+            Ra_group.create_dataset(str(ii), data=Ra,
+                                    compression=compression,
+                                    compression_opts=compression_opts)
+            inertial_intersections_group.create_dataset(str(ii),
+                                                        data=intersections,
+                                                        compression=compression,
+                                                        compression_opts=compression_opts)
+            asteroid_intersections_group.create_dataset(str(ii),
+                                                        data=ast_ints,
+                                                        compression=compression,
+                                                        compression_opts=compression_opts)
 
 def landing(output_filename, input_filename):
     """Open the HDF5 file and continue the simulation from the terminal state
