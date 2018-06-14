@@ -1427,9 +1427,9 @@ if __name__ == "__main__":
     group.add_argument("-sa", "--save_animation", help="Save the animation as a sequence of images",
                        action="store_true")
     group.add_argument("-l" , "--landing", help="Continue from the end of exploration to the surface",
-                       nargs=1, action="store")
+                       nargs=0, action="store_true")
     group.add_argument("-la", "--landing_animation", help="Landing animation",
-                       nargs=1, action="store")
+                       nargs=0, action="store_true")
     group.add_argument("-lsa", "--landing_save_animation", help="Save landing animation to a video",
                        action="store", nargs=1)
     group.add_argument("-lp", "--landing_plots", help="Generate plots to select landing site",
@@ -1461,11 +1461,11 @@ if __name__ == "__main__":
         save_animation(args.simulation_data, move_cam=args.move_cam,
                        mesh_weight=args.mesh_weight)
     elif args.landing:
-        landing(args.landing[0], args.simulation_data)
+        landing(args.simulation_data)
     elif args.landing_animation:
-        animate_landing(args.landing_animation[0], move_cam=args.move_cam, mesh_weight=args.mesh_weight)
+        animate_landing(args.simulation_data, move_cam=args.move_cam, mesh_weight=args.mesh_weight)
     elif args.landing_save_animation:
-        save_animate_landing(args.landing_save_animation[0], move_cam=args.move_cam, mesh_weight=args.mesh_weight)
+        save_animate_landing(args.simulation_data, move_cam=args.move_cam, mesh_weight=args.mesh_weight)
     elif args.landing_plots:
         landing_site_plots(args.simulation_data)
 
