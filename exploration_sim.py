@@ -634,7 +634,7 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5",
     elif true_ast.get_name() == "castalia":
         initial_pos = np.array([1.5, 0, 0]) # itokawa
     elif true_ast.get_name() == "eros":
-        initial_pos = np.array([19, 0 , 0]) # eros
+        initial_pos = np.array([19, 0 , 0]) # eros needs more time (greater than 15000
     elif true_ast.get_name() == "phobos":
         initial_pos = np.array([70, 0, 0])
     elif true_ast.get_name() == "lutetia":
@@ -735,67 +735,67 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5",
             est_ast_rmesh.get_verts().shape[0],
             est_ast_rmesh.get_faces().shape[1]))
             
-        logger.info("Now refining the faces close to the landing site")
-        # perform remeshing over the landing area and take a bunch of measurements 
-        # of the surface. Assume everything happens without the asteroid rotating 
-        new_face_centers = est_ast_meshdata.refine_faces_in_view(state[0:3], np.deg2rad(5))
-        logger.info("Refinement added {} faces".format(new_face_centers.shape[0]))
-        logger.info("Estimated asteroid has {} vertices and {} faces".format(
-            est_ast_rmesh.get_verts().shape[0],
-            est_ast_rmesh.get_faces().shape[1]))
+        # logger.info("Now refining the faces close to the landing site")
+        # # perform remeshing over the landing area and take a bunch of measurements 
+        # # of the surface. Assume everything happens without the asteroid rotating 
+        # new_face_centers = est_ast_meshdata.refine_faces_in_view(state[0:3], np.deg2rad(5))
+        # logger.info("Refinement added {} faces".format(new_face_centers.shape[0]))
+        # logger.info("Estimated asteroid has {} vertices and {} faces".format(
+        #     est_ast_rmesh.get_verts().shape[0],
+        #     est_ast_rmesh.get_faces().shape[1]))
         
-        logger.info("Now looping over the new faces and raycasting")
-        # now take measurements of each facecenter
-        for ii, vec in enumerate(new_face_centers):
-            logger.info("Step: {} Uncertainty: {}".format(ii + max_steps, 
-                                                                   np.sum(est_ast_rmesh.get_weights())))
+        # logger.info("Now looping over the new faces and raycasting")
+        # # now take measurements of each facecenter
+        # for ii, vec in enumerate(new_face_centers):
+        #     logger.info("Step: {} Uncertainty: {}".format(ii + max_steps, 
+        #                                                            np.sum(est_ast_rmesh.get_weights())))
 
-            targets = lidar.define_targets(state[0:3], state[6:15].reshape((3, 3)),
-                                           np.linalg.norm(state[0:3]))
-            intersections = caster.castarray(state[0:3], targets)
-            ast_ints = []
-            for pt in intersections:
-                if np.linalg.norm(pt) < 1e-9:
-                    logger.info("No intersection for this point")
-                    pt_ast = np.array([np.nan, np.nan, np.nan])
-                else:
-                    pt_ast = Ra.T.dot(pt)
+        #     targets = lidar.define_targets(state[0:3], state[6:15].reshape((3, 3)),
+        #                                    np.linalg.norm(state[0:3]))
+        #     intersections = caster.castarray(state[0:3], targets)
+        #     ast_ints = []
+        #     for pt in intersections:
+        #         if np.linalg.norm(pt) < 1e-9:
+        #             logger.info("No intersection for this point")
+        #             pt_ast = np.array([np.nan, np.nan, np.nan])
+        #         else:
+        #             pt_ast = Ra.T.dot(pt)
 
-                ast_ints.append(pt_ast)
+        #         ast_ints.append(pt_ast)
             
-            ast_ints = np.array(ast_ints)
+        #     ast_ints = np.array(ast_ints)
 
-            # this updates the estimated asteroid mesh used in both rmesh and est_ast
-            est_ast_rmesh.update(ast_ints, max_angle)
+        #     # this updates the estimated asteroid mesh used in both rmesh and est_ast
+        #     est_ast_rmesh.update(ast_ints, max_angle)
             
-            # use the controller to update the state
-            complete_controller.inertial_fixed_state(max_steps, state, initial_pos);
-            complete_controller.inertial_pointing_attitude(max_steps,
-                                                           state,
-                                                           vec);
-            # update the state
-            state = np.hstack((complete_controller.get_posd(), 
-                               complete_controller.get_veld(),
-                               complete_controller.get_Rd().reshape(-1),
-                               complete_controller.get_ang_vel_d()))
+        #     # use the controller to update the state
+        #     complete_controller.inertial_fixed_state(max_steps, state, initial_pos);
+        #     complete_controller.inertial_pointing_attitude(max_steps,
+        #                                                    state,
+        #                                                    vec);
+        #     # update the state
+        #     state = np.hstack((complete_controller.get_posd(), 
+        #                        complete_controller.get_veld(),
+        #                        complete_controller.get_Rd().reshape(-1),
+        #                        complete_controller.get_ang_vel_d()))
 
-            v_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_verts(), compression=compression,
-                                   compression_opts=compression_opts)
-            f_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_faces(), compression=compression,
-                                   compression_opts=compression_opts)
-            w_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_weights(), compression=compression,
-                                   compression_opts=compression_opts)
+        #     v_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_verts(), compression=compression,
+        #                            compression_opts=compression_opts)
+        #     f_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_faces(), compression=compression,
+        #                            compression_opts=compression_opts)
+        #     w_group.create_dataset(str(max_steps + ii), data=est_ast_rmesh.get_weights(), compression=compression,
+        #                            compression_opts=compression_opts)
 
-            state_group.create_dataset(str(max_steps + ii), data=state, compression=compression,
-                                       compression_opts=compression_opts)
-            targets_group.create_dataset(str(max_steps + ii), data=targets, compression=compression,
-                                         compression_opts=compression_opts)
-            Ra_group.create_dataset(str(max_steps + ii), data=Ra, compression=compression,
-                                    compression_opts=compression_opts)
-            inertial_intersections_group.create_dataset(str(max_steps + ii), data=intersections, compression=compression,
-                                                        compression_opts=compression_opts)
-            asteroid_intersections_group.create_dataset(str(max_steps + ii), data=ast_ints, compression=compression,
-                                                        compression_opts=compression_opts)
+        #     state_group.create_dataset(str(max_steps + ii), data=state, compression=compression,
+        #                                compression_opts=compression_opts)
+        #     targets_group.create_dataset(str(max_steps + ii), data=targets, compression=compression,
+        #                                  compression_opts=compression_opts)
+        #     Ra_group.create_dataset(str(max_steps + ii), data=Ra, compression=compression,
+        #                             compression_opts=compression_opts)
+        #     inertial_intersections_group.create_dataset(str(max_steps + ii), data=intersections, compression=compression,
+        #                                                 compression_opts=compression_opts)
+        #     asteroid_intersections_group.create_dataset(str(max_steps + ii), data=ast_ints, compression=compression,
+        #                                                 compression_opts=compression_opts)
 
     
     logger.info("All done")
