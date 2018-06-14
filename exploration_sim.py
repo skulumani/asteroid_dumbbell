@@ -1229,9 +1229,9 @@ def landing_site_plots(input_filename):
     # load a asteroid
     with h5py.File(input_filename, 'r') as hf:
         state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
-        # explore_tf = hf['time'][()][-1]
+        explore_tf = hf['time'][()][-1]
         explore_name = hf['simulation_parameters/true_asteroid/name'][()]
-        explore_tf = int(state_keys[-1])
+        # explore_tf = int(state_keys[-1])
         explore_state = hf['state/' + str(explore_tf)][()]
         explore_Ra = hf['Ra/' + str(explore_tf)][()]
         explore_v = hf['reconstructed_vertex/' + str(explore_tf)][()]
