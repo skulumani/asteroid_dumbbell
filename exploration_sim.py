@@ -944,6 +944,7 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
             est_ast_rmesh.get_faces().shape[1]))
         
         logger.info("Now looping over the new faces and raycasting")
+        # TODO Need to add dynamic simulation here
         # now take measurements of each facecenter
         for ii, vec in enumerate(new_face_centers):
             logger.info("Step: {} Uncertainty: {}".format(ii + max_steps,
