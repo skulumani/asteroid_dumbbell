@@ -928,7 +928,7 @@ def refine_landing_area(filename):
                                                         compression=compression,
                                                         compression_opts=compression_opts)
 
-def landing(output_filename, input_filename):
+def landing(filename):
     """Open the HDF5 file and continue the simulation from the terminal state
     to landing on the surface over an additional few hours
     """
@@ -938,7 +938,7 @@ def landing(output_filename, input_filename):
     
     # TODO Look at blender_sim
     # get all the terminal states from the exploration stage
-    with h5py.File(input_filename, 'r') as hf:
+    with h5py.File(filename, 'r') as hf:
         state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
         # explore_tf = hf['time'][()][-1]
         explore_tf = int(state_keys[-1])
@@ -977,21 +977,21 @@ def landing(output_filename, input_filename):
     dum = dumbbell.Dumbbell(m1=explore_m1, m2=explore_m2, l=explore_l)
 
     initial_state = explore_state
-    with h5py.File(output_filename, 'w-') as hf:
+    with h5py.File(filename, 'r+') as hf:
         # save data to HDF5 file
-        hf.create_dataset('time', data=time, compression=compression,
+        hf.create_dataset('landing/time', data=time, compression=compression,
                           compression_opts=compression_opts)
-        hf.create_dataset("initial_state", data=initial_state, compression=compression,
+        hf.create_dataset("landing/initial_state", data=initial_state, compression=compression,
                           compression_opts=compression_opts)
-        hf.create_dataset("vertices", data=explore_v, compression=compression,
+        hf.create_dataset("landing/vertices", data=explore_v, compression=compression,
                           compression_opts=compression_opts)
-        hf.create_dataset("faces", data=explore_f, compression=compression,
+        hf.create_dataset("landing/faces", data=explore_f, compression=compression,
                           compression_opts=compression_opts)
-        hf.create_dataset("weight", data=explore_w, compression=compression,
+        hf.create_dataset("landing/weight", data=explore_w, compression=compression,
                           compression_opts=compression_opts)
 
-        state_group = hf.create_group("state")
-        Ra_group = hf.create_group("Ra")
+        state_group = hf.create_group("landing/state")
+        Ra_group = hf.create_group("landing/Ra")
 
         # define the system EOMS and simulate
         system = integrate.ode(eoms.eoms_controlled_land_pybind)
