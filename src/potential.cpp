@@ -370,6 +370,30 @@ void Asteroid::init_asteroid( void ) {
         axes << 121, 101, 75;
         axes = axes.array() / 2.0;
         omega = 2 * kPI / 8.1655/ 3600.0;
+    } else if (name.compare("geographos") == 0 ) {
+        M = 1e12;
+        sigma = 2.1;
+        axes << 5, 2, 2.1;
+        axes = axes / 2.0;
+        omega = 2 * kPI / 5.220 / 3600.0;
+    } else if (name.compare("golevka") == 0 ) {
+        M = 1e12;
+        axes << 1.11, 0.53, 0.5;
+        axes = axes /2.0;
+        sigma = 2.1;
+        omega = 2 * kPI / 14.544/ 3600.0;
+    } else if (name.compare("ky26") == 0 ){
+        M = 1e12;
+        axes << 0.4, 0.4, 0.4;
+        axes = axes / 2.0;
+        sigma = 2.1;
+        omega = 2 * kPI / 0.1782 / 3600.0;
+    } else if (name.compare("52760") == 0 ) {
+        M = 1e12;
+        axes << 1.1, 1.1, 1.1;
+        axes = axes / 2.0;
+        sigma = 2.1;
+        omega = 2 * kPI / 14.98 / 3600.0;
     } else {
         throw std::invalid_argument( "Invalid asteroid name" );
     }
