@@ -1427,9 +1427,9 @@ if __name__ == "__main__":
     group.add_argument("-sa", "--save_animation", help="Save the animation as a sequence of images",
                        action="store_true")
     group.add_argument("-l" , "--landing", help="Continue from the end of exploration to the surface",
-                       nargs=0, action="store_true")
+                       action="store_true")
     group.add_argument("-la", "--landing_animation", help="Landing animation",
-                       nargs=0, action="store_true")
+                       action="store_true")
     group.add_argument("-lsa", "--landing_save_animation", help="Save landing animation to a video",
                        action="store", nargs=1)
     group.add_argument("-lp", "--landing_plots", help="Generate plots to select landing site",
