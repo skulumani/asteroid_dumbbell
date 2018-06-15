@@ -102,7 +102,7 @@ def initialize_asteroid(output_filename, ast_name="castalia"):
         max_radius = 0.03
         max_distance = 0.5
     elif ast_name == "geographos":
-        surf_area = 0.01
+        surf_area = 0.05
         max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
         min_angle = 10
         max_radius = 0.05
