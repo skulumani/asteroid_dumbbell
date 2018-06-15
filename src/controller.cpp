@@ -295,7 +295,7 @@ void TranslationController::minimize_uncertainty(const double& t,
     const int num_waypoints = 1;
     
     // weighting for each of the cost components
-    double weighting_factor(0.3); /**< Weighting factor between distance and ucnertainty */
+    double weighting_factor(0.4); /**< Weighting factor between distance and ucnertainty */
     double sigma_factor(0.6);
     double control_factor(0.1);
     
@@ -342,10 +342,10 @@ void TranslationController::minimize_uncertainty(const double& t,
     
     if (rmesh->get_weights().sum() < 1e-2) {
         caster.update_mesh(rmesh->get_mesh());
-        double desired_radius = ast_est->get_axes().maxCoeff() * 1.2;
+        double desired_radius = ast_est->get_axes().maxCoeff() * 2.0;
         mposd = (Eigen::Vector3d() << desired_radius, 0 ,0).finished();
     } else {
-        double desired_radius = ast_est->get_axes().maxCoeff() * 1.2;
+        double desired_radius = ast_est->get_axes().maxCoeff() * 2.0;
         mposd = des_vector.normalized() * desired_radius;
     }
     // check for intersection only if angle is large to the des_vector
