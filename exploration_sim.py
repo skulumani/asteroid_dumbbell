@@ -936,15 +936,16 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
             
         logger.info("Now refining the faces close to the landing site")
         # perform remeshing over the landing area and take a bunch of measurements 
-        # of the surface. Assume everything happens without the asteroid rotating 
+        # TODO Use isotropic remeshing here instead of refinement
         new_face_centers = est_ast_meshdata.refine_faces_in_view(desired_landing_site, np.deg2rad(10))
         logger.info("Refinement added {} faces".format(new_face_centers.shape[0]))
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
             est_ast_rmesh.get_faces().shape[1]))
         
-        logger.info("Now looping over the new faces and raycasting")
+        logger.info("Now starting dynamic simulation and taking measurements again again")
         # TODO Need to add dynamic simulation here
+        # make sure that at this point the new faces have a high weight
         # now take measurements of each facecenter
         for ii, vec in enumerate(new_face_centers):
             logger.info("Step: {} Uncertainty: {}".format(ii + max_steps,
