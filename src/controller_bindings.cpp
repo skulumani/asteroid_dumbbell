@@ -54,7 +54,16 @@ PYBIND11_MODULE(controller, m) {
                                                        std::shared_ptr<const ReconstructMesh>,
                                                        std::shared_ptr<Asteroid>)) &Controller::explore_asteroid,
                 "Explore asteroid with a control cost component",
-                pybind11::arg("time"), pybind11::arg("state"), pybind11::arg("reconstruct_mesh"), pybind11::arg("asteroid"));
+                pybind11::arg("time"), pybind11::arg("state"), pybind11::arg("reconstruct_mesh"), pybind11::arg("asteroid"))
+        .def("refinement", (void (Controller::*)(
+                        const double&,
+                        const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >&,
+                        std::shared_ptr<const ReconstructMesh>,
+                        std::shared_ptr<Asteroid> ast_est,
+                        const Eigen::Ref<const Eigen::Vector3d>& )) &Controller::refinement,
+                "Refine specific area by rotating camera and pointing",
+                pybind11::arg("time"), pybind11::arg("state"), pybind11::arg("reconstruct mesh"), 
+                pybind11::arg("asteroid estimate"), pybind11::arg("desired landing site in asteroid frame"));
     
     // TODO Add overload for explore asteroid function then add here as well
 }
