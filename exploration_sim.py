@@ -922,14 +922,17 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
     # open the file and recreate the objects
     with h5py.File(filename, 'r+') as hf:
         # groups to save the refined data
-        v_group = hf.create_group("refinement/reconstructed_vertex")
-        f_group = hf.create_group("refinement/reconstructed_face")
-        w_group = hf.create_group("refinement/reconstructed_weight")
-        state_group = hf.create_group("refinement/state")
-        targets_group = hf.create_group("refinement/targets")
-        Ra_group = hf.create_group("refinement/Ra")
-        inertial_intersections_group = hf.create_group("refinement/inertial_intersections")
-        asteroid_intersections_group = hf.create_group("refinement/asteroid_intersections")
+        refinement_group = hf.create_group("refinement")
+        refinement_group.create_dataset("time", data=time, compression=compression,
+                                        compression_opts=compression_opts)
+        v_group = refinement_group.create_group("reconstructed_vertex")
+        f_group = refinement_group.create_group("reconstructed_face")
+        w_group = refinement_group.create_group("reconstructed_weight")
+        state_group = refinement_group.create_group("state")
+        targets_group = refinement_group.create_group("targets")
+        Ra_group = refinement_group.create_group("Ra")
+        inertial_intersections_group = refinement_group.create_group("inertial_intersections")
+        asteroid_intersections_group = refinement_group.create_group("asteroid_intersections")
 
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
@@ -943,7 +946,6 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
             est_ast_rmesh.get_faces().shape[1]))
-        
         logger.info("Now starting dynamic simulation and taking measurements again again")
         # TODO Need to add dynamic simulation here
         # make sure that at this point the new faces have a high weight
