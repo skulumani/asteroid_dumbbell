@@ -972,7 +972,7 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
     """
     logger = logging.getLogger(__name__)
     
-    num_steps = int(3600)
+    num_steps = int(100)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -997,7 +997,6 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
     # open the file and recreate the objects
     with h5py.File(filename, 'r+') as hf:
         # groups to save the refined data
-        pdb.set_trace()
         if "refinement" in hf:
             del hf['refinement']
 
@@ -1022,7 +1021,7 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
         logger.info("Now refining the faces close to the landing site")
         # perform remeshing over the landing area and take a bunch of measurements 
         est_ast_meshdata.remesh_faces_in_view(desired_landing_site, np.deg2rad(30),
-                                              0.005)
+                                              0.01)
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
             est_ast_rmesh.get_faces().shape[0]))
