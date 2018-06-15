@@ -26,7 +26,9 @@ class ReconstructMesh {
                         const Eigen::Ref<const Eigen::VectorXd> &w_in);
 
         ReconstructMesh( std::shared_ptr<MeshData> mesh_in);
-        
+        ReconstructMesh( std::shared_ptr<MeshData> mesh_in,
+                const Eigen::Ref<const Eigen::VectorXd> &w_in);
+
         ReconstructMesh(const Eigen::Ref<const Eigen::MatrixXd> &v_in,
                         const Eigen::Ref<const Eigen::MatrixXi> &f_in);
         

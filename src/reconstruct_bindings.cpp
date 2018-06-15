@@ -15,6 +15,10 @@ PYBIND11_MODULE(reconstruct, m) {
     pybind11::class_<ReconstructMesh, std::shared_ptr<ReconstructMesh>>(m, "ReconstructMesh")
         .def(pybind11::init<std::shared_ptr<MeshData>>(), "ReconstructMesh constructor",
                 pybind11::arg("shared_ptr to MeshData object"))
+        .def(pybind11::init<std::shared_ptr<MeshData>,
+                const Eigen::Ref<const Eigen::VectorXd> &>(),
+                "ReconstructMesh from meshdata and weights",
+                pybind11::arg("meshdata pointer"), pybind11::arg("weights"))
         .def(pybind11::init<const Eigen::Ref<const Eigen::MatrixXd> &, 
                             const Eigen::Ref<const Eigen::MatrixXi> &,
                             const Eigen::Ref<const Eigen::MatrixXd> &>(),

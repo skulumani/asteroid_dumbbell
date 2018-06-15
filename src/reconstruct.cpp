@@ -33,6 +33,12 @@ ReconstructMesh::ReconstructMesh(std::shared_ptr<MeshData> mesh_in) {
     initialize_weight();
 }
 
+ReconstructMesh::ReconstructMesh(std::shared_ptr<MeshData> mesh_in,
+        const Eigen::Ref<const Eigen::VectorXd> &w_in) {
+    this->mesh = mesh_in;
+    set_all_weights(w_in);
+}
+
 // Member functions
 Eigen::MatrixXd ReconstructMesh::get_verts( void ) const {
     return this->mesh->get_verts();
