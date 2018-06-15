@@ -481,10 +481,12 @@ void Controller::refinement(const double& t,
         std::shared_ptr<Asteroid> ast_est,
         const Eigen::Ref<const Eigen::Vector3d>& desired_landing_site) {
 
+    Eigen::Matrix<double, 3, 3> Ra = ast_est->rot_ast2int(t);
+    Eigen::Vector3d pos = Ra.transpose() * state->get_pos();
     // find the location of the largest vertex
     // find vertices in view and only look at those
     std::vector<Vertex_index> vertices_in_view = rmesh->get_mesh()->vertices_in_fov(
-            state->get_pos(), 0.32);
+            pos, 0.32);
 
     int index = (int)t % vertices_in_view.size();
 
@@ -493,7 +495,6 @@ void Controller::refinement(const double& t,
     /* weights.maxCoeff(&max_weight_index); */
     /* Eigen::Vector3d desired_asteroid_pointing_vector = rmesh->get_vertex(vertices_in_view[max_weight_index]); */
     Eigen::Vector3d desired_asteroid_pointing_vector = rmesh->get_vertex(vertices_in_view[index]);
-    Eigen::Matrix<double, 3, 3> Ra = ast_est->rot_ast2int(t);
     Eigen::Vector3d inertial_landing_site = Ra * desired_landing_site;
 
     // go to a point directly above teh landing site
