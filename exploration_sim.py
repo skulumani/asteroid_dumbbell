@@ -261,7 +261,7 @@ def initialize_refinement(output_filename, ast_name="castalia"):
         max_distance = 0.5
 
     est_ast_meshdata = mesh_data.MeshData(explore_v, explore_f)
-    est_ast_rmesh = reconstruct.ReconstructMesh(explore_v, explore_f, explore_w)
+    est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata, explore_w)
     est_ast = asteroid.Asteroid(ast_name, est_ast_rmesh)
 
     # controller functions 
@@ -771,6 +771,79 @@ def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
                                                mesh_weight=mesh_weight)
     graphics.mlab.show()
 
+def animate_refinement(filename, move_cam=False, mesh_weight=False, save_animation=False):
+    """Given a HDF5 file from simulate this will animate teh motion
+    """
+    # TODO Animate the changing of the mesh itself as a function of time
+    with h5py.File(filename, 'r') as hf:
+        # get the inertial state and asteroid mesh object
+        # time = hf['time'][()]
+        state_group = hf['refinement/state']
+        state_keys = np.array(utilities.sorted_nicely(list(hf['refinement/state'].keys())))
+        time = [int(t) for t in state_keys];
+
+        intersections_group = hf['refinement/inertial_intersections']
+
+        # extract out the entire state and intersections
+        state = []
+        inertial_intersections = []
+        for key in state_keys:
+            state.append(state_group[key][()])
+            inertial_intersections.append(intersections_group[key][()])
+        
+        state = np.array(state)
+        inertial_intersections = np.array(inertial_intersections)
+        # get the true asteroid from the HDF5 file
+        true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
+        true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
+        true_name = hf['simulation_parameters/true_asteroid/name'][()]
+        
+        est_initial_vertices = hf['simulation_parameters/estimate_asteroid/initial_vertices'][()]
+        est_initial_faces = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
+            
+        # think about a black background as well
+        mfig = graphics.mayavi_figure(size=(800,600))
+        
+        if mesh_weight:
+            mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces,
+                                           scalars=np.squeeze(hf['simulation_parameters/estimate_asteroid/initial_weight'][()]),
+                                           color=None, colormap='viridis')
+        else:
+            mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces)
+
+        xaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([2, 0, 0]), color=(1, 0, 0)) 
+        yaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 2, 0]), color=(0, 1, 0)) 
+        zaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 0, 2]), color=(0, 0, 1)) 
+        ast_axes = (xaxis, yaxis, zaxis)
+        # initialize a dumbbell object
+        dum = dumbbell.Dumbbell(hf['simulation_parameters/dumbbell/m1'][()], 
+                                hf['simulation_parameters/dumbbell/m2'][()],
+                                hf['simulation_parameters/dumbbell/l'][()])
+        # com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
+        if move_cam:
+            com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
+                                           color=(1, 0, 0), radius=0.02,
+                                           opacity=0.5)
+        else:
+            com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
+                                           color=(1, 0, 0), radius=0.1)
+
+        pc_points = graphics.mayavi_points3d(mfig, inertial_intersections[0], 
+                                             color=(0, 0, 1), scale_factor=0.05)
+        
+        # add some text objects
+        time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
+                                       color=(0, 0, 0), width=0.05)
+        weight_text = graphics.mlab.text(0.1, 0.2, "w: {:8.1f}".format(0), figure=mfig,
+                                         color=(0, 0, 0), width=0.05)
+        # mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
+        mayavi_objects = (mesh, com, pc_points, time_text, weight_text)
+    
+    animation.inertial_asteroid_refinement_cpp(time, state, inertial_intersections,
+                                               filename, mayavi_objects, move_cam=move_cam,
+                                               mesh_weight=mesh_weight)
+    graphics.mlab.show()
+
 def animate_landing(filename, move_cam=False, mesh_weight=False):
     """Animation for the landing portion of simulation
     """
@@ -899,30 +972,36 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
     """
     logger = logging.getLogger(__name__)
     
-    num_steps = int(max_steps)
+    num_steps = int(3600)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
     
-    pdb.set_trace()
     # intialize the simulation objects
     (true_ast_meshdata, true_ast, complete_controller,
         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
         AbsTol, RelTol) = initialize_refinement(filename, asteroid_name)
     
     # define the initial condition as teh terminal state of the exploration sim
-    with h5py.File(output_filename, 'r') as hf:
+    with h5py.File(filename, 'r') as hf:
         state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
         explore_tf = hf['time'][()][-1]
         explore_state = hf['state/' + str(explore_tf)][()]
         explore_Ra = hf['Ra/' + str(explore_tf)][()]
     
+        explore_AbsTol = hf["simulation_parameters/AbsTol"][()]
+        explore_RelTol = hf["simulation_parameters/RelTol"][()]
+
     initial_state = explore_state
 
     # open the file and recreate the objects
     with h5py.File(filename, 'r+') as hf:
         # groups to save the refined data
+        if "refinement" in hf:
+            del hf['refinement']
+
         refinement_group = hf.create_group("refinement")
+
         refinement_group.create_dataset("time", data=time, compression=compression,
                                         compression_opts=compression_opts)
         refinement_group.create_dataset("initial_state", data=initial_state)
@@ -937,14 +1016,15 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
 
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
-            est_ast_rmesh.get_faces().shape[1]))
+            est_ast_rmesh.get_faces().shape[0]))
             
         logger.info("Now refining the faces close to the landing site")
         # perform remeshing over the landing area and take a bunch of measurements 
-        new_face_centers = est_ast_meshdata.refine_faces_in_view(desired_landing_site, np.deg2rad(10))
+        est_ast_meshdata.remesh_faces_in_view(desired_landing_site, np.deg2rad(30),
+                                              0.005)
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
-            est_ast_rmesh.get_faces().shape[1]))
+            est_ast_rmesh.get_faces().shape[0]))
         logger.info("Now starting dynamic simulation and taking measurements again again")
 
         system = integrate.ode(eoms.eoms_controlled_inertial_refinement_pybind)
@@ -991,12 +1071,6 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
             # this updates the estimated asteroid mesh used in both rmesh and est_ast
             est_ast_rmesh.update(ast_ints, max_angle)
             
-            # use the controller to update the state
-            complete_controller.inertial_fixed_state(max_steps, state, initial_pos);
-            complete_controller.inertial_pointing_attitude(max_steps,
-                                                        state,
-                                                        vec);
-
             v_group.create_dataset(str(ii), data=est_ast_rmesh.get_verts(), compression=compression,
                                    compression_opts=compression_opts)
             f_group.create_dataset(str(ii), data=est_ast_rmesh.get_faces(), compression=compression,

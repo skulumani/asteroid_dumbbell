@@ -303,6 +303,102 @@ def inertial_asteroid_landing_cpp(time, state, filename, mayavi_objects,
             mesh.scene.disable_render = False
             yield
 
+@mlab.animate(delay=10)
+def inertial_asteroid_refinement_cpp(time, state, inertial_intersections,
+                                     hdf5_file, mayavi_objects, 
+                                     move_cam=False, mesh_weight=False):
+    """Animate the rotation of an asteroid and the motion of SC
+
+    This assumes an asteroid object from C++ and using the exploration sim
+    """
+    # pdb.set_trace()
+    # mesh, ast_axes, com, dum_axes, pc_lines = mayavi_objects
+    mesh, com, pc_points, time_text, weight_text = mayavi_objects
+
+    f = mlab.gcf()
+    camera = f.scene.camera
+    # get all the keys for the reconstructed vertices and faces
+
+    # animate the rotation fo the asteroid
+    ms = mesh.mlab_source
+    ts = com.mlab_source
+    # ast_xs = ast_axes[0].mlab_source
+    # ast_ys = ast_axes[1].mlab_source
+    # ast_zs = ast_axes[2].mlab_source
+
+    # dum_xs = dum_axes[0].mlab_source
+    # dum_ys = dum_axes[1].mlab_source
+    # dum_zs = dum_axes[2].mlab_source
+    
+    pc_sources = pc_points.mlab_source
+    
+    with h5py.File(hdf5_file, 'r') as hf:
+        # oriignal vertices
+        est_initial_vertices = hf['simulation_parameters/estimate_asteroid/initial_vertices'][()]
+        num_vert = est_initial_vertices.shape[0]
+
+        rv_group = hf['refinement/reconstructed_vertex']
+        rf_group = hf['refinement/reconstructed_face']
+        rw_group = hf['refinement/reconstructed_weight']
+        Ra_group = hf['refinement/Ra']
+
+        rv_keys = np.array(utilities.sorted_nicely(list(rv_group.keys())))
+        
+        for (t, pos, Rb2i, ints, key) in zip(time, state[:, 0:3], state[:, 6:15],
+                                            inertial_intersections,
+                                            rv_keys):
+            # rotate teh asteroid
+            # Ra = ast.rot_ast2int(t)
+            mesh.scene.disable_render = True
+            Ra = Ra_group[key][()]
+            Rb2i = Rb2i.reshape((3,3))
+            # parse out the vertices x, y, z
+            # rotate the asteroid
+            new_vertices = Ra.dot(rv_group[key][()].T).T
+            new_faces = rf_group[key][()]
+            new_weight = np.squeeze(rw_group[key][()])
+            
+            # store value for number of vertices
+            # add current time 
+            time_text.trait_set(text="t: {:8.1f}".format(t))
+            weight_text.trait_set(text="w: {:8.1f}".format(np.sum(new_weight)))
+
+            # update asteroid
+            if mesh_weight:
+                # check if size is different than the last mesh
+                if num_vert != new_vertices.shape[0]:
+                    ms.reset(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                            z=new_vertices[:,2], triangles=new_faces,
+                            scalars=new_weight)
+                    num_vert = new_vertices.shape[0]
+                else:
+                    ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                            z=new_vertices[:,2], triangles=new_faces,
+                            scalars=new_weight)
+            else:
+                if num_vert != new_vertices.shape[0]:
+                    ms.reset(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                        z=new_vertices[:,2], triangles=new_faces)
+                else:
+                    ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                        z=new_vertices[:,2], triangles=new_faces)
+
+            # update the satellite
+            ts.set(x=pos[0], y=pos[1], z=pos[2])
+            
+            # update the camera view to be right behind the satellite
+            if move_cam:
+                pos_sph = wavefront.cartesian2spherical(pos)
+                graphics.mayavi_view(f, azimuth=np.rad2deg(pos_sph[2]),
+                                     elevation=90-np.rad2deg(pos_sph[1]),
+                                     distance=pos_sph[0]+0.5,
+                                     focalpoint=[0, 0, 0])
+
+            pc_sources.set(x=ints[:, 0], y=ints[:, 1], z=ints[:, 2])
+
+            mesh.scene.disable_render = False
+            yield
+
 def inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects, 
                                        move_cam=False, mesh_weight=False,
                                        output_path="/tmp/landing", magnification=1):
