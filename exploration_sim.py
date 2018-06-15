@@ -254,7 +254,7 @@ def initialize_refinement(output_filename, ast_name="castalia"):
     # estimated asteroid (starting as an ellipse)
     if (ast_name == "castalia" or ast_name == "itokawa"
             or ast_name == "golevka" or ast_name == "52760"):
-        surf_area = 0.001
+        surf_area = 0.01
         max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
         min_angle = 10
         max_radius = 0.03
@@ -1675,7 +1675,8 @@ if __name__ == "__main__":
         landing_site_plots(args.simulation_data)
     elif args.landing_refine:
         # landing location in the asteroid fixed frame
-        desired_landing_spot = landing_site_plots(args.simulation_data)
+        # desired_landing_spot = landing_site_plots(args.simulation_data)
+        desired_landing_spot = np.array([0.47180473, -0.01972284, 0.36729988])
         refine_landing_area(args.simulation_data, args.name, desired_landing_spot)
     elif args.landing_refine_animation:
         animate_refinement(args.simulation_data, move_cam=args.move_cam, mesh_weight=args.mesh_weight)
