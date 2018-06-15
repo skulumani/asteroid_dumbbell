@@ -448,19 +448,32 @@ void Controller::explore_asteroid(const double& t,
     body_fixed_pointing_attitude(new_state);
 }
 
-void refinement(const double& t,
+void Controller::refinement(const double& t,
         std::shared_ptr<const State> state,
         std::shared_ptr<const ReconstructMesh> rmesh,
         std::shared_ptr<Asteroid> ast_est,
         const Eigen::Ref<const Eigen::Vector3d>& desired_landing_site) {
     
+    Eigen::Matrix<double, 3, 3> Ra = ast_est->rot_ast2int(t);
+    Eigen::Vector3d inertial_landing_site = Ra * desired_landing_site;
+    
     // go to a point directly above teh landing site
+    Eigen::Vector3d desired_inertial_pos = inertial_landing_site.normalized() * (2.0 * desired_landing_site.norm() );
+    std::shared_ptr<State> des_state_ptr = std::make_shared<State>();
+    des_state_ptr->pos(desired_inertial_pos);
+    inertial_fixed_state(t, des_state_ptr); 
 
     // find the location of the largest vertex
+    Eigen::VectorXd weights = rmesh->get_weights();
+    Eigen::MatrixXd::Index max_weight_index;
+    weights.maxCoeff(&max_weight_index);
+    Eigen::Vector3d desired_asteroid_pointing_vector = rmesh->get_verts().row(max_weight_index);
+
     // transform to inertial frame and point body at it
+    inertial_pointing_attitude(state, Ra * desired_asteroid_pointing_vector); 
 }
 
-void refinement(const double& t,
+void Controller::refinement(const double& t,
         const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
         std::shared_ptr<const ReconstructMesh> rmesh,
         std::shared_ptr<Asteroid> ast_est,
