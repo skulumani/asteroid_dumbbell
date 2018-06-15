@@ -202,55 +202,54 @@ def initialize_asteroid(output_filename, ast_name="castalia"):
             dum, AbsTol, RelTol)
 
 def initialize_refinement(output_filename, ast_name="castalia"):
-    """Initialize all the things for the simulation
+    """Initialize all the things for the simulation to refine the landing site
 
     Output_file : the actual HDF5 file to save the data/parameters to
-
+    
+    This will load the estimated asteroid shape, the true asteroid and a bumpy
+    version for use with the raycaster
     """
     logger = logging.getLogger(__name__)
     logger.info('Initialize asteroid and dumbbell objects')
 
     AbsTol = 1e-9
     RelTol = 1e-9
-    logger.info("Initializing Asteroid: {} ".format(ast_name))    
+    logger.info("Initializing Refinement : {} ".format(ast_name))    
+
+    # open the file and recreate the objects
+    with h5py.File(output_filename, 'r') as hf:
+        state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
+        explore_tf = hf['time'][()][-1]
+        # explore_tf = int(state_keys[-1])
+        explore_state = hf['state/' + str(explore_tf)][()]
+        explore_Ra = hf['Ra/' + str(explore_tf)][()]
+        explore_v = hf['reconstructed_vertex/' + str(explore_tf)][()]
+        explore_f = hf['reconstructed_face/' + str(explore_tf)][()]
+        explore_w = hf['reconstructed_weight/' + str(explore_tf)][()]
+        
+        explore_name = hf['simulation_parameters/true_asteroid/name'][()][:-4]
+        explore_m1 = hf['simulation_parameters/dumbbell/m1'][()]
+        explore_m2 = hf['simulation_parameters/dumbbell/m2'][()]
+        explore_l = hf['simulation_parameters/dumbbell/l'][()]
+        explore_AbsTol = hf['simulation_parameters/AbsTol'][()]
+        explore_RelTol = hf['simulation_parameters/RelTol'][()]
+        
+        explore_true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
+        explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
 
     # switch based on asteroid name
     if ast_name == "castalia":
-        file_name = "castalia.obj"
-        v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia.obj')
-    elif ast_name == "itokawa":
-        file_name = "itokawa_low.obj"
-        v, f = wavefront.read_obj('./data/shape_model/ITOKAWA/itokawa_low.obj')
-    elif ast_name == "eros":
-        file_name = "eros_low.obj"
-        v, f = wavefront.read_obj('./data/shape_model/EROS/eros_low.obj')
-    elif ast_name == "phobos":
-        file_name = "phobos_low.obj"
-        v, f = wavefront.read_obj('./data/shape_model/PHOBOS/phobos_low.obj')
-    elif ast_name == "lutetia":
-        file_name = "lutetia_low.obj"
-        v, f = wavefront.read_obj('./data/shape_model/LUTETIA/lutetia_low.obj')
-    elif ast_name == "geographos":
-        file_name = "1620geographos.obj"
-        v, f = wavefront.read_obj('./data/shape_model/RADAR/1620geographos.obj')
-    elif ast_name == "bacchus":
-        file_name = "2063bacchus.obj"
-        v, f = wavefront.read_obj('./data/shape_model/RADAR/2063bacchus.obj')
-    elif ast_name == "golevka":
-        file_name = "6489golevka.obj"
-        v, f = wavefront.read_obj('./data/shape_model/RADAR/6489golevka.obj')
-    elif ast_name == "52760":
-        file_name = "52760.obj"
-        v, f = wavefront.read_obj('./data/shape_model/RADAR/52760.obj')
+        refine_file_name = "castalia_bump.obj"
+        v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia_bump.obj')
     else:
         print("Incorrect asteroid name")
         return 1
     # true asteroid and dumbbell
 
-    true_ast_meshdata = mesh_data.MeshData(v, f)
-    true_ast = asteroid.Asteroid(ast_name, true_ast_meshdata)
+    true_ast_meshdata = mesh_data.MeshData(explore_true_vertices, explore_true_faces)
+    true_ast = asteroid.Asteroid(explore_name, true_ast_meshdata)
 
-    dum = dumbbell.Dumbbell(m1=500, m2=500, l=0.003)
+    dum = dumbbell.Dumbbell(m1=explore_m1, m2=explore_m2, l=explore_l)
     
     # estimated asteroid (starting as an ellipse)
     if (ast_name == "castalia" or ast_name == "itokawa"
@@ -260,53 +259,9 @@ def initialize_refinement(output_filename, ast_name="castalia"):
         min_angle = 10
         max_radius = 0.03
         max_distance = 0.5
-    elif ast_name == "geographos":
-        surf_area = 0.01
-        max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
-        min_angle = 10
-        max_radius = 0.05
-        max_distance = 0.5
-    elif ast_name == "bacchus":
-        surf_area = 0.01
-        max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
-        min_angle = 10
-        max_radius = 0.02
-        max_distance = 0.5
-    elif ast_name == "52760":
-        surf_area = 0.01
-        max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
-        min_angle = 10
-        max_radius = 0.035
-        max_distance = 0.5
-    elif (ast_name == "phobos"):
-        surf_area = 0.1
-        max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
-        min_angle = 10
-        max_radius = 0.006
-        max_distance = 0.1
-    elif (ast_name == "lutetia"):
-        surf_area = 1
-        max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
-        min_angle = 10
-        max_radius = 1
-        max_distance = 1
-    elif (ast_name == "eros"):
-        surf_area = 0.1
-        max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
-        min_angle = 10
-        max_radius = 0.2
-        max_distance = 0.01
 
-
-    ellipsoid = surface_mesh.SurfMesh(true_ast.get_axes()[0],
-                                      true_ast.get_axes()[1],
-                                      true_ast.get_axes()[2], min_angle,
-                                      max_radius, max_distance)
-    
-    v_est = ellipsoid.get_verts()
-    f_est = ellipsoid.get_faces()
-    est_ast_meshdata = mesh_data.MeshData(v_est, f_est)
-    est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata)
+    est_ast_meshdata = mesh_data.MeshData(explore_v, explore_f)
+    est_ast_rmesh = reconstruct.ReconstructMesh(explore_v, explore_f, explore_w)
     est_ast = asteroid.Asteroid(ast_name, est_ast_rmesh)
 
     # controller functions 
@@ -318,43 +273,8 @@ def initialize_refinement(output_filename, ast_name="castalia"):
     lidar = lidar.up_axis(np.array([0, 0, 1]))
     lidar = lidar.fov(np.deg2rad(np.array([7, 7]))).dist(2).num_steps(3)
 
-    # raycaster from c++
-    caster = cgal.RayCaster(v, f)
-    
-    # save a bunch of parameters to the HDF5 file
-    with h5py.File(output_filename, 'w-') as hf:
-        sim_group = hf.create_group("simulation_parameters")
-        sim_group['AbsTol'] = AbsTol
-        sim_group['RelTol'] = RelTol
-        dumbbell_group = sim_group.create_group("dumbbell")
-        dumbbell_group["m1"] = 500
-        dumbbell_group["m2"] = 500
-        dumbbell_group['l'] = 0.003
-        
-        true_ast_group = sim_group.create_group("true_asteroid")
-        true_ast_group.create_dataset("vertices", data=v, compression=compression,
-                                    compression_opts=compression_opts)
-        true_ast_group.create_dataset("faces", data=f, compression=compression,
-                                    compression_opts=compression_opts)
-        true_ast_group['name'] = file_name
-        
-        est_ast_group = sim_group.create_group("estimate_asteroid")
-        est_ast_group['surf_area'] = surf_area
-        est_ast_group['max_angle'] = max_angle
-        est_ast_group['min_angle'] = min_angle
-        est_ast_group['max_distance'] = max_distance
-        est_ast_group['max_radius'] = max_radius
-        est_ast_group.create_dataset('initial_vertices', data=est_ast_rmesh.get_verts(), compression=compression,
-                                    compression_opts=compression_opts)
-        est_ast_group.create_dataset("initial_faces", data=est_ast_rmesh.get_faces(), compression=compression,
-                                    compression_opts=compression_opts)
-        est_ast_group.create_dataset("initial_weight", data=est_ast_rmesh.get_weights(), compression=compression,
-                                    compression_opts=compression_opts)
-
-        lidar_group = sim_group.create_group("lidar")
-        lidar_group.create_dataset("view_axis", data=lidar.get_view_axis())
-        lidar_group.create_dataset("up_axis", data=lidar.get_up_axis())
-        lidar_group.create_dataset("fov", data=lidar.get_fov())
+    # raycaster from c++ using the bumpy asteroid
+    caster = cgal.RayCaster(v, f) 
     
     return (true_ast_meshdata, true_ast, complete_controller, est_ast_meshdata, 
             est_ast_rmesh, est_ast, lidar, caster, max_angle, 
@@ -967,38 +887,39 @@ def save_animate_landing(filename, move_cam=False, mesh_weight=False):
             os.remove(file_path)
     os.rmdir(output_path)
 
-def refine_landing_area(filename):
-    """Called after exploration is completed"""
+def refine_landing_area(filename, asteroid_name, desired_landing_site):
+    """Called after exploration is completed
+    
+    We'll refine the area near the landing site.
+
+    Then using a bumpy model we'll take lots of measurements and try to recreate the bumpy terrain
+    using a mixed resolution mesh
+
+    Then in a differetn function we'll go and land
+    """
     logger = logging.getLogger(__name__)
     
-    num_steps = int(max_steps/2)
+    num_steps = int(max_steps)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
     
     # intialize the simulation objects
+    (true_ast_meshdata, true_ast, complete_controller,
+        est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
+        AbsTol, RelTol) = initialize_refinment(filename, asteroid_name)
+    
+    # define the initial condition as teh terminal state of the exploration sim
+    with h5py.File(output_filename, 'r') as hf:
+        state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
+        explore_tf = hf['time'][()][-1]
+        explore_state = hf['state/' + str(explore_tf)][()]
+        explore_Ra = hf['Ra/' + str(explore_tf)][()]
+    
+    initial_state = explore_state
 
     # open the file and recreate the objects
     with h5py.File(filename, 'r+') as hf:
-        state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
-        explore_tf = hf['time'][()][-1]
-        # explore_tf = int(state_keys[-1])
-        explore_state = hf['state/' + str(explore_tf)][()]
-        explore_Ra = hf['Ra/' + str(explore_tf)][()]
-        explore_v = hf['reconstructed_vertex/' + str(explore_tf)][()]
-        explore_f = hf['reconstructed_face/' + str(explore_tf)][()]
-        explore_w = hf['reconstructed_weight/' + str(explore_tf)][()]
-        
-        explore_name = hf['simulation_parameters/true_asteroid/name'][()][:-4]
-        explore_m1 = hf['simulation_parameters/dumbbell/m1'][()]
-        explore_m2 = hf['simulation_parameters/dumbbell/m2'][()]
-        explore_l = hf['simulation_parameters/dumbbell/l'][()]
-        explore_AbsTol = hf['simulation_parameters/AbsTol'][()]
-        explore_RelTol = hf['simulation_parameters/RelTol'][()]
-        
-        explore_true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
-        explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
-        
         # groups to save the refined data
         v_group = hf.create_group("refinement/reconstructed_vertex")
         f_group = hf.create_group("refinement/reconstructed_face")
@@ -1009,26 +930,22 @@ def refine_landing_area(filename):
         inertial_intersections_group = hf.create_group("refinement/inertial_intersections")
         asteroid_intersections_group = hf.create_group("refinement/asteroid_intersections")
 
-        # create the estimated asteroid
-        est_ast_meshdata = mesh_data.MeshData(explore_v, explore_f)
-        est_ast_rmesh = reconstruct.ReconstructMesh(explore_v, explore_f, explore_w) 
-        est_ast = asteroid.Asteroid('castalia', est_ast_meshdata)
-        complete_controller = controller_cpp.Controller()
-
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
             est_ast_rmesh.get_faces().shape[1]))
             
         logger.info("Now refining the faces close to the landing site")
         # perform remeshing over the landing area and take a bunch of measurements 
-        # of the surface. Assume everything happens without the asteroid rotating 
-        new_face_centers = est_ast_meshdata.refine_faces_in_view(state[0:3], np.deg2rad(5))
+        # TODO Use isotropic remeshing here instead of refinement
+        new_face_centers = est_ast_meshdata.refine_faces_in_view(desired_landing_site, np.deg2rad(10))
         logger.info("Refinement added {} faces".format(new_face_centers.shape[0]))
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
             est_ast_rmesh.get_faces().shape[1]))
         
-        logger.info("Now looping over the new faces and raycasting")
+        logger.info("Now starting dynamic simulation and taking measurements again again")
+        # TODO Need to add dynamic simulation here
+        # make sure that at this point the new faces have a high weight
         # now take measurements of each facecenter
         for ii, vec in enumerate(new_face_centers):
             logger.info("Step: {} Uncertainty: {}".format(ii + max_steps,
