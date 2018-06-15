@@ -445,7 +445,6 @@ bool MeshData::remesh_faces(const std::vector<Face_index>& face_vec,
     build_face_properties();
     build_halfedge_properties();
     build_edge_properties();
-
     surface_mesh.collect_garbage();
     return true;
 }
@@ -474,13 +473,20 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> MeshData::refine_faces_in_view(
     // remesh those faces
     std::vector<Face_index> new_faces;
     std::vector<Vertex_index> new_vertices;
-    /* refine_faces(faces_to_refine, new_faces, new_vertices, 4.0); */
-    remesh_faces(faces_to_refine, 0.1, 3);
+    refine_faces(faces_to_refine, new_faces, new_vertices, 4.0);
+    /* remesh_faces(faces_to_refine, 0.01, 3); */
     // get the face centers
     Eigen::Matrix<double, Eigen::Dynamic, 3> new_face_centers;
     new_face_centers = get_face_center(new_faces);
     // return 
     return new_face_centers;
+}
+
+bool MeshData::remesh_faces_in_view(
+        const Eigen::Ref<const Eigen::Vector3d>& pos,
+        const double& max_fov, const double& edge_length) {
+    std::vector<Face_index> faces_to_remesh = faces_in_fov(pos, max_fov);
+    return remesh_faces(faces_to_remesh, edge_length, 3);
 }
 
 template<typename Index>

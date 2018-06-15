@@ -18,6 +18,9 @@ PYBIND11_MODULE(mesh_data, m) {
                 py::arg("vertices"), py::arg("faces"))
         .def("refine_faces_in_view", &MeshData::refine_faces_in_view, "Refine and return new face centers to view",
                 py::arg("asteroid frame position"), py::arg("maximum fov angle (radians)"))
+        .def("remesh_faces_in_view", &MeshData::remesh_faces_in_view, "Remesh and return new face centers to view",
+                py::arg("asteroid frame position"), py::arg("maximum fov angle (radians)"),
+                py::arg("desired edge length (km)"))
         .def("get_all_face_center", &MeshData::get_all_face_center, "Get all the face centers")
         .def("get_all_face_area", &MeshData::get_all_face_area, "Get all the face areas");
 
