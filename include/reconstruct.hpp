@@ -70,7 +70,7 @@ class ReconstructMesh {
         Eigen::MatrixXd get_verts( void ) const;
         Eigen::MatrixXi get_faces( void ) const;
         Eigen::VectorXd get_weights( void ) const;
-        Eigen::VectorXd get_weights( const std::vector<Vertex_index>& vertices) const;
+        Eigen::VectorXd get_vertex_weights( const std::vector<Vertex_index>& vertices) const;
         
         Eigen::Vector3d get_vertex( const Vertex_index& vd) const;
 

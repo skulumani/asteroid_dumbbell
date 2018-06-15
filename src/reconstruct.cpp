@@ -69,7 +69,7 @@ Eigen::VectorXd ReconstructMesh::get_weights( void ) const {
     return weights;
 }
 
-Eigen::VectorXd ReconstructMesh::get_weights( const std::vector<Vertex_index>& vertices) const {
+Eigen::VectorXd ReconstructMesh::get_vertex_weights( const std::vector<Vertex_index>& vertices) const {
     Eigen::VectorXd weights(vertices.size());
     std::size_t row = 0;
     for (Vertex_index vd : vertices) {
