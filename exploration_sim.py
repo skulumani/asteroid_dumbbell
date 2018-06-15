@@ -908,7 +908,7 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
     # intialize the simulation objects
     (true_ast_meshdata, true_ast, complete_controller,
         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
-        AbsTol, RelTol) = initialize_refinment(filename, asteroid_name)
+        AbsTol, RelTol) = initialize_refinement(filename, asteroid_name)
     
     # define the initial condition as teh terminal state of the exploration sim
     with h5py.File(output_filename, 'r') as hf:
@@ -1307,6 +1307,8 @@ def landing_site_plots(input_filename):
     
     This function will select a specific area and generate surface slope/roughness 
     plots
+
+    It returns the desired landing location on the surface in the asteroid fixed frame
     """
 
     # generate a surface slope map for each face of an asteroid
@@ -1502,6 +1504,8 @@ def landing_site_plots(input_filename):
                  marker='o', color='blue')
 
     plt.show()
+    
+    return desired_pos_cartesian
 
 if __name__ == "__main__":
     logging_file = tempfile.mkstemp(suffix='.txt.')[1]
@@ -1561,7 +1565,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
                                                                 
     if args.control_sim:
-        simulate_control(args.simulation_data, args.name[0])
+        simulate_control(args.simulation_data, args.name)
     elif args.reconstruct:
         output_path = tempfile.mkdtemp()
         reconstruct_images(args.simulation_data, output_path)
