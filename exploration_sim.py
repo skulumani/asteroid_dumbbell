@@ -609,7 +609,8 @@ def simulate_control(output_filename="/tmp/exploration_sim.hdf5",
     
     logger.info("All done")
 
-def save_animation(filename, move_cam=False, mesh_weight=False):
+def save_animation(filename, move_cam=False, mesh_weight=False,
+                   output_path=tempfile.mkdtemp()):
     """Given a HDF5 file from simulate this will animate teh motion
     """
     # TODO Animate the changing of the mesh itself as a function of time
@@ -676,7 +677,6 @@ def save_animation(filename, move_cam=False, mesh_weight=False):
         # mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
         mayavi_objects = (mesh, com, pc_points, time_text, weight_text)
     
-        output_path = tempfile.mkdtemp()
         print("Images will be saved to {}".format(output_path))
 
     animation.inertial_asteroid_trajectory_cpp_save(time, state, inertial_intersections,
@@ -1557,7 +1557,7 @@ if __name__ == "__main__":
     group.add_argument("-v", "--volume", help="Generate plot of volume",
                        action="store_true")
     group.add_argument("-sa", "--save_animation", help="Save the animation as a sequence of images",
-                       action="store_true")
+                       action="store", type=str)
     group.add_argument("-l" , "--landing", help="Continue from the end of exploration to the surface",
                        action="store_true")
     group.add_argument("-la", "--landing_animation", help="Landing animation",
@@ -1590,7 +1590,7 @@ if __name__ == "__main__":
         animate_uncertainty(args.simulation_data)
     elif args.save_animation:
         save_animation(args.simulation_data, move_cam=args.move_cam,
-                       mesh_weight=args.mesh_weight)
+                       mesh_weight=args.mesh_weight, output_path=args.save_animation)
     elif args.landing:
         landing(args.simulation_data)
     elif args.landing_animation:
