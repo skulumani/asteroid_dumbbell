@@ -448,6 +448,30 @@ void Controller::explore_asteroid(const double& t,
     body_fixed_pointing_attitude(new_state);
 }
 
+void refinement(const double& t,
+        std::shared_ptr<const State> state,
+        std::shared_ptr<const ReconstructMesh> rmesh,
+        std::shared_ptr<Asteroid> ast_est,
+        const Eigen::Ref<const Eigen::Vector3d>& desired_landing_site) {
+    
+    // go to a point directly above teh landing site
+
+    // find the location of the largest vertex
+    // transform to inertial frame and point body at it
+}
+
+void refinement(const double& t,
+        const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+        std::shared_ptr<const ReconstructMesh> rmesh,
+        std::shared_ptr<Asteroid> ast_est,
+        const Eigen::Ref<const Eigen::Vector3d>& desired_landing_site) {
+    
+    // create a state object
+    std::shared_ptr<State> state_ptr = std::make_shared<State>(t, state);
+
+    refinement(t, state_ptr, rmesh, ast_est, desired_landing_site);
+}
+
 std::shared_ptr<State> Controller::get_desired_state() {
     
     std::shared_ptr<State> state_ptr = std::make_shared<State>();

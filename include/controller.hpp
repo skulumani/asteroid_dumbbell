@@ -274,6 +274,17 @@ class Controller: public TranslationController, public AttitudeController {
                 const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
                 std::shared_ptr<const ReconstructMesh> rmesh,
                 std::shared_ptr<Asteroid> ast_est);
+        
+        void refinement(const double& t,
+                std::shared_ptr<const State> state,
+                std::shared_ptr<const ReconstructMesh> rmesh,
+                std::shared_ptr<Asteroid> ast_est,
+                const Eigen::Ref<const Eigen::Vector3d>& desired_landing_site);
+        void refinement(const double& t,
+                const Eigen::Ref<const Eigen::Matrix<double, 1, 18> >& state,
+                std::shared_ptr<const ReconstructMesh> rmesh,
+                std::shared_ptr<Asteroid> ast_est,
+                const Eigen::Ref<const Eigen::Vector3d>& desired_landing_site);
         /** @fn Output a state object with the desired state
 
           Output a state object with the desired state
