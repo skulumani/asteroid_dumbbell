@@ -1093,7 +1093,7 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
 
     logger.infor("Refinement complete")
 
-def landing(filename):
+def landing(filename, desired_landing_site):
     """Open the HDF5 file and continue the simulation from the terminal state
     to landing on the surface over an additional few hours
     """
@@ -1104,14 +1104,13 @@ def landing(filename):
     # TODO Look at blender_sim
     # get all the terminal states from the exploration stage
     with h5py.File(filename, 'r') as hf:
-        state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
-        # explore_tf = hf['time'][()][-1]
-        explore_tf = int(state_keys[-1])
-        explore_state = hf['state/' + str(explore_tf)][()]
-        explore_Ra = hf['Ra/' + str(explore_tf)][()]
-        explore_v = hf['reconstructed_vertex/' + str(explore_tf)][()]
-        explore_f = hf['reconstructed_face/' + str(explore_tf)][()]
-        explore_w = hf['reconstructed_weight/' + str(explore_tf)][()]
+        state_keys = np.array(utilities.sorted_nicely(list(hf['refinement/state'].keys())))
+        explore_tf = hf['refinement/time'][()][-1]
+        explore_state = hf['refinement/state/' + str(explore_tf)][()]
+        explore_Ra = hf['refinement/Ra/' + str(explore_tf)][()]
+        explore_v = hf['refinement/reconstructed_vertex/' + str(explore_tf)][()]
+        explore_f = hf['refinement/reconstructed_face/' + str(explore_tf)][()]
+        explore_w = hf['refinement/reconstructed_weight/' + str(explore_tf)][()]
         
         explore_name = hf['simulation_parameters/true_asteroid/name'][()][:-4]
         explore_m1 = hf['simulation_parameters/dumbbell/m1'][()]
@@ -1134,10 +1133,6 @@ def landing(filename):
     
     est_ast_meshdata = mesh_data.MeshData(explore_v, explore_f)
     est_ast = asteroid.Asteroid('castalia', est_ast_meshdata)
-
-    # TODO Make this a seperate function to find best landing spot in region/view
-    initial_ast_pos = explore_Ra.dot(explore_state[0:3])
-    desired_asteroid_pos = est_ast.land_in_view(initial_ast_pos, np.deg2rad(15))
 
     dum = dumbbell.Dumbbell(m1=explore_m1, m2=explore_m2, l=explore_l)
 
@@ -1162,7 +1157,7 @@ def landing(filename):
         system = integrate.ode(eoms.eoms_controlled_land_pybind)
         system.set_integrator("lsoda", atol=explore_AbsTol, rtol=explore_RelTol,  nsteps=10000)
         system.set_initial_value(initial_state, t0)
-        system.set_f_params(true_ast, dum, est_ast, desired_asteroid_pos)
+        system.set_f_params(true_ast, dum, est_ast, desired_landing_site)
         
         ii = 1
         while system.successful() and system.t < tf:
