@@ -474,7 +474,8 @@ Eigen::Matrix<double, Eigen::Dynamic, 3> MeshData::refine_faces_in_view(
     // remesh those faces
     std::vector<Face_index> new_faces;
     std::vector<Vertex_index> new_vertices;
-    refine_faces(faces_to_refine, new_faces, new_vertices, 4.0);
+    /* refine_faces(faces_to_refine, new_faces, new_vertices, 4.0); */
+    remesh_faces(faces_to_refine, 0.1, 3);
     // get the face centers
     Eigen::Matrix<double, Eigen::Dynamic, 3> new_face_centers;
     new_face_centers = get_face_center(new_faces);
