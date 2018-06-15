@@ -44,6 +44,10 @@ Eigen::MatrixXd ReconstructMesh::get_verts( void ) const {
     return this->mesh->get_verts();
 }
 
+Eigen::Vector3d ReconstructMesh::get_vertex( const Vertex_index& vd) const {
+    return mesh->get_vertex(vd);
+}
+
 Eigen::MatrixXi ReconstructMesh::get_faces( void ) const {
     return this->mesh->get_faces();
 }
@@ -65,6 +69,15 @@ Eigen::VectorXd ReconstructMesh::get_weights( void ) const {
     return weights;
 }
 
+Eigen::VectorXd ReconstructMesh::get_weights( const std::vector<Vertex_index>& vertices) const {
+    Eigen::VectorXd weights(vertices.size());
+    std::size_t row = 0;
+    for (Vertex_index vd : vertices) {
+        weights(row) = get_weight(vd);
+        ++row;
+    }
+    return weights;
+}
 void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &pt,
                                     const double &max_angle) {
      
@@ -143,7 +156,7 @@ bool ReconstructMesh::set_weight(const Vertex_index& vd, const double& w) {
     return true;
 }
 
-double ReconstructMesh::get_weight(const Vertex_index& vd) {
+double ReconstructMesh::get_weight(const Vertex_index& vd) const {
     Mesh::Property_map<Vertex_index, double> weight_property;
     bool found;
     std::tie(weight_property, found) 

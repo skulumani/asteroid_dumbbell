@@ -106,7 +106,10 @@ class MeshData {
         std::vector<Face_index> faces_in_fov(
                 const Eigen::Ref<const Eigen::Vector3d>& pos,
                 const double& max_fov=0.52);
-        
+        std::vector<Vertex_index> vertices_in_fov(
+                const Eigen::Ref<const Eigen::Vector3d>& pos,
+                const double& max_fov=0.52);
+
         Eigen::Matrix<double, Eigen::Dynamic, 3> refine_faces_in_view(
                 const Eigen::Ref<const Eigen::Vector3d>& pos,
                 const double& max_fov=0.52);

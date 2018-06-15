@@ -70,7 +70,10 @@ class ReconstructMesh {
         Eigen::MatrixXd get_verts( void ) const;
         Eigen::MatrixXi get_faces( void ) const;
         Eigen::VectorXd get_weights( void ) const;
+        Eigen::VectorXd get_weights( const std::vector<Vertex_index>& vertices) const;
         
+        Eigen::Vector3d get_vertex( const Vertex_index& vd) const;
+
         std::size_t number_of_vertices( void ) const { return mesh->number_of_vertices(); }
         std::size_t number_of_faces( void ) const { return mesh->number_of_faces(); }
 
@@ -85,7 +88,7 @@ class ReconstructMesh {
         bool set_all_weights( const Eigen::Ref<const Eigen::VectorXd>& w_in );
         
         bool set_weight(const Vertex_index& vd, const double& w);
-        double get_weight(const Vertex_index& vd);
+        double get_weight(const Vertex_index& vd) const;
 
         Eigen::VectorXd weights; /**< Weight for each vertex */
 

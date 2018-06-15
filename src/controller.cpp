@@ -454,23 +454,31 @@ void Controller::refinement(const double& t,
         std::shared_ptr<Asteroid> ast_est,
         const Eigen::Ref<const Eigen::Vector3d>& desired_landing_site) {
     
+    // find the location of the largest vertex
+    // find vertices in view and only look at those
+    std::vector<Vertex_index> vertices_in_view = rmesh->get_mesh()->vertices_in_fov(
+            state->get_pos(), 0.52);
+
+    Eigen::VectorXd weights = rmesh->get_weights( vertices_in_view);
+    Eigen::MatrixXd::Index max_weight_index;
+    weights.maxCoeff(&max_weight_index);
+    Eigen::Vector3d desired_asteroid_pointing_vector = rmesh->get_vertex(vertices_in_view[max_weight_index]);
+
     Eigen::Matrix<double, 3, 3> Ra = ast_est->rot_ast2int(t);
     Eigen::Vector3d inertial_landing_site = Ra * desired_landing_site;
     
     // go to a point directly above teh landing site
-    Eigen::Vector3d desired_inertial_pos = inertial_landing_site.normalized() * (2.0 * desired_landing_site.norm() );
-    std::shared_ptr<State> des_state_ptr = std::make_shared<State>();
-    des_state_ptr->pos(desired_inertial_pos);
-    inertial_fixed_state(des_state_ptr); 
+    /* Eigen::Vector3d desired_inertial_pos = inertial_landing_site.normalized() * (2.0 * desired_landing_site.norm() ); */
+    Eigen::Vector3d desired_inertial_pos = Ra * desired_landing_site.normalized() * (2.0 * desired_landing_site.norm());
 
-    // find the location of the largest vertex
-    Eigen::VectorXd weights = rmesh->get_weights();
-    Eigen::MatrixXd::Index max_weight_index;
-    weights.maxCoeff(&max_weight_index);
-    Eigen::Vector3d desired_asteroid_pointing_vector = rmesh->get_verts().row(max_weight_index);
+    mposd = desired_inertial_pos.transpose();
+    mveld.setZero(3);
+    macceld.setZero(3);
 
+    std::shared_ptr<State> des_state_ptr = get_desired_state();
     // transform to inertial frame and point body at it
     inertial_pointing_attitude(state, Ra * desired_asteroid_pointing_vector); 
+    /* body_fixed_pointing_attitude(des_state_ptr); */
 }
 
 void Controller::refinement(const double& t,

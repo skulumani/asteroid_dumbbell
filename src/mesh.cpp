@@ -465,6 +465,20 @@ std::vector<Face_index> MeshData::faces_in_fov(
     return faces_in_view;
 }
 
+std::vector<Vertex_index> MeshData::vertices_in_fov(
+        const Eigen::Ref<const Eigen::Vector3d>& pos,
+        const double& max_fov) {
+    std::vector<Vertex_index> vertices_in_view;
+    Eigen::Vector3d pos_uvec = pos.normalized();
+    for (Vertex_index vd : surface_mesh.vertices()) {
+        double angle = std::acos(pos_uvec.dot(get_vertex(vd).normalized()));
+        if (angle < max_fov) {
+            vertices_in_view.push_back(vd);
+        }
+    }
+    return vertices_in_view;
+}
+
 Eigen::Matrix<double, Eigen::Dynamic, 3> MeshData::refine_faces_in_view(
         const Eigen::Ref<const Eigen::Vector3d>& pos,
         const double& max_fov) {
