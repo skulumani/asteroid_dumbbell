@@ -461,7 +461,7 @@ void Controller::refinement(const double& t,
     Eigen::Vector3d desired_inertial_pos = inertial_landing_site.normalized() * (2.0 * desired_landing_site.norm() );
     std::shared_ptr<State> des_state_ptr = std::make_shared<State>();
     des_state_ptr->pos(desired_inertial_pos);
-    inertial_fixed_state(t, des_state_ptr); 
+    inertial_fixed_state(des_state_ptr); 
 
     // find the location of the largest vertex
     Eigen::VectorXd weights = rmesh->get_weights();
