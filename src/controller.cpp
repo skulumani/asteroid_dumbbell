@@ -502,24 +502,26 @@ void Controller::refinement(const double& t,
     // get the desired vector
     Eigen::RowVector3d des_vector;
     des_vector = rmesh->get_verts().row(min_cost_index);
+    double desired_radius = desired_landing_site.norm() * 2.0;
+    mposd = desired_landing_site.normalized() * desired_radius;
     
-    if (rmesh->get_weights().sum() < 1e-2) {
-        caster.update_mesh(rmesh->get_mesh());
-        double desired_radius = desired_landing_site.norm() * 2.0;
-        mposd = desired_landing_site.normalized() * desired_radius;
-    } else {
-        double desired_radius = ast_est->get_axes().maxCoeff() * 2.0;
-        mposd = des_vector.normalized() * desired_radius;
-    }
-    // check for intersection only if angle is large to the des_vector
-    if (std::acos(mposd.dot(pos) / pos.norm() / mposd.norm()) > kPI/4.0) {
-        caster.update_mesh(rmesh->get_mesh());
-        if (caster.intersection(pos,  mposd)) {
-            Eigen::Matrix<double, Eigen::Dynamic, 3> wp(5, 3);
-            wp = sphere_waypoint(pos, mposd, 5);
-            mposd = wp.row(1);
-        }
-    }
+    /* if (rmesh->get_weights().sum() < 1e-2) { */
+    /*     caster.update_mesh(rmesh->get_mesh()); */
+    /*     double desired_radius = desired_landing_site.norm() * 2.0; */
+    /*     mposd = desired_landing_site.normalized() * desired_radius; */
+    /* } else { */
+    /*     double desired_radius = ast_est->get_axes().maxCoeff() * 2.0; */
+    /*     mposd = des_vector.normalized() * desired_radius; */
+    /* } */
+    /* // check for intersection only if angle is large to the des_vector */
+    /* if (std::acos(mposd.dot(pos) / pos.norm() / mposd.norm()) > kPI/4.0) { */
+    /*     caster.update_mesh(rmesh->get_mesh()); */
+    /*     if (caster.intersection(pos,  mposd)) { */
+    /*         Eigen::Matrix<double, Eigen::Dynamic, 3> wp(5, 3); */
+    /*         wp = sphere_waypoint(pos, mposd, 5); */
+    /*         mposd = wp.row(1); */
+    /*     } */
+    /* } */
     // check if the total uncertainty is low enough and if so go the first
     // waypoint towards a desired position
     mveld.setZero(3);
@@ -555,9 +557,9 @@ void Controller::refinement(const double& t,
     std::shared_ptr<State> des_state_ptr = get_desired_state();
     /* des_state_ptr->time(t); */
     // transform to inertial frame and point body at it
-    /* inertial_pointing_attitude(state, Ra * desired_asteroid_pointing_vector); */ 
+    inertial_pointing_attitude(state, Ra * des_vector.transpose()); 
     /* random_sweep_attitude(state); */
-    body_fixed_pointing_attitude(des_state_ptr);
+    /* body_fixed_pointing_attitude(des_state_ptr); */
 }
 
 void Controller::refinement(const double& t,
