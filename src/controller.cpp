@@ -475,35 +475,41 @@ void Controller::explore_asteroid(const double& t,
     body_fixed_pointing_attitude(new_state);
 }
 
+void Controller::set_vertices_in_view( std::shared_ptr<const ReconstructMesh> rmesh,
+        const Eigen::Ref<const Eigen::Vector3d>& pos,
+        const double& max_angle) {
+    vertices_in_view = rmesh->get_mesh()->vertices_in_fov(
+            pos, max_angle);
+    num_vertices_in_view = vertices_in_view.size();
+}
+
 void Controller::refinement(const double& t,
         std::shared_ptr<const State> state,
         std::shared_ptr<const ReconstructMesh> rmesh,
         std::shared_ptr<Asteroid> ast_est,
         const Eigen::Ref<const Eigen::Vector3d>& desired_landing_site) {
 
-    double max_weight = rmesh->get_weights().maxCoeff();
-    double max_sigma = kPI;
-    double min_axis = ast_est->get_axes().minCoeff();
-    ast_est->polyhedron_potential((Eigen::Vector3d() << 0, 0, min_axis).finished());
-    double max_accel = ast_est->get_acceleration().norm();
+    /* double max_weight = rmesh->get_weights().maxCoeff(); */
+    /* double max_sigma = kPI; */
+    /* double min_axis = ast_est->get_axes().minCoeff(); */
+    /* ast_est->polyhedron_potential((Eigen::Vector3d() << 0, 0, min_axis).finished()); */
+    /* double max_accel = ast_est->get_acceleration().norm(); */
 
     // Rotate the position to the asteroid fixed frame
     Eigen::Matrix<double, 3, 3> Ra = ast_est->rot_ast2int(t);
     Eigen::Vector3d pos = state->get_pos();
     pos = Ra.transpose() * state->get_pos();
      
-    // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex
-    Eigen::VectorXd sigma = central_angle(pos.normalized(),rmesh->get_verts().rowwise().normalized() );
-    Eigen::VectorXd cost = - 0.5 *rmesh->get_weights().array()/max_weight + 0.5 * sigma.array()/max_sigma;
+    /* // Cost of each vertex as weighted sum of vertex weight and sigma of each vertex */
+    /* Eigen::VectorXd sigma = central_angle(pos.normalized(),rmesh->get_verts().rowwise().normalized() ); */
+    /* Eigen::VectorXd cost = - 0.5 *rmesh->get_weights().array()/max_weight + 0.5 * sigma.array()/max_sigma; */
     
-    // now find min index of cost
-    Eigen::MatrixXd::Index min_cost_index;
-    cost.minCoeff(&min_cost_index);
-    // get the desired vector
-    Eigen::RowVector3d des_vector;
-    des_vector = rmesh->get_verts().row(min_cost_index);
-    double desired_radius = desired_landing_site.norm() * 2.0;
-    mposd = Ra * desired_landing_site.normalized() * desired_radius;
+    /* // now find min index of cost */
+    /* Eigen::MatrixXd::Index min_cost_index; */
+    /* cost.minCoeff(&min_cost_index); */
+    /* // get the desired vector */
+    /* Eigen::RowVector3d des_vector; */
+    /* des_vector = rmesh->get_verts().row(min_cost_index); */
     
     /* if (rmesh->get_weights().sum() < 1e-2) { */
     /*     caster.update_mesh(rmesh->get_mesh()); */
@@ -524,24 +530,15 @@ void Controller::refinement(const double& t,
     /* } */
     // check if the total uncertainty is low enough and if so go the first
     // waypoint towards a desired position
-    mveld.setZero(3);
-    macceld.setZero(3);
 
-    /* Eigen::Matrix<double, 3, 3> Ra = ast_est->rot_ast2int(t); */
-    /* Eigen::Vector3d pos = Ra.transpose() * state->get_pos(); */
-    /* // find the location of the largest vertex */
-    /* // find vertices in view and only look at those */
-    /* /1* std::vector<Vertex_index> vertices_in_view = rmesh->get_mesh()->vertices_in_fov( *1/ */
-    /* /1*         pos, 0.52); *1/ */
-
-    /* /1* int index = (int)t % vertices_in_view.size(); *1/ */
+    int index = (int)t % num_vertices_in_view;
 
     /* Eigen::VectorXd weights = rmesh->get_weights(); */
     /* Eigen::MatrixXd::Index max_weight_index; */
     /* weights.maxCoeff(&max_weight_index); */
     /* Vertex_index vd((int)max_weight_index); */
     /* Eigen::Vector3d desired_asteroid_pointing_vector = rmesh->get_vertex((Vertex_index)max_weight_index); */
-    /* /1* Eigen::Vector3d desired_asteroid_pointing_vector = rmesh->get_vertex(vertices_in_view[index]); *1/ */
+    Eigen::Vector3d des_vector = rmesh->get_vertex(vertices_in_view[index]);
     /* Eigen::Vector3d inertial_landing_site = Ra * desired_landing_site; */
 
     /* // go to a point directly above teh landing site */
@@ -550,14 +547,15 @@ void Controller::refinement(const double& t,
     /* Eigen::Vector3d desired_inertial_pos = Ra * desired_asteroid_pointing_vector.normalized() * (2.0 * desired_landing_site.norm()); */
     /* /1* Eigen::Vector3d desired_inertial_pos = Ra * rmesh->get_vertex(vertices_in_view[max_weight_index]).normalized() * (2.0 * desired_landing_site.norm()); *1/ */
 
-    /* mposd = desired_inertial_pos.transpose(); */
-    /* mveld.setZero(3); */
-    /* macceld.setZero(3); */
-
+    double desired_radius = desired_landing_site.norm() * 2.0;
+    /* mposd = desired_landing_site.normalized() * desired_radius; */
+    mposd = des_vector.normalized() * desired_radius;
+    mveld.setZero(3);
+    macceld.setZero(3);
     std::shared_ptr<State> des_state_ptr = get_desired_state();
     /* des_state_ptr->time(t); */
     // transform to inertial frame and point body at it
-    inertial_pointing_attitude(state, Ra * des_vector.transpose()); 
+    inertial_pointing_attitude(state, Ra * des_vector); 
     /* random_sweep_attitude(state); */
     /* body_fixed_pointing_attitude(des_state_ptr); */
 }

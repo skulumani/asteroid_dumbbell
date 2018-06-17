@@ -63,7 +63,10 @@ PYBIND11_MODULE(controller, m) {
                         const Eigen::Ref<const Eigen::Vector3d>& )) &Controller::refinement,
                 "Refine specific area by rotating camera and pointing",
                 pybind11::arg("time"), pybind11::arg("state"), pybind11::arg("reconstruct mesh"), 
-                pybind11::arg("asteroid estimate"), pybind11::arg("desired landing site in asteroid frame"));
+                pybind11::arg("asteroid estimate"), pybind11::arg("desired landing site in asteroid frame"))
+        .def("set_vertices_in_view", &Controller::set_vertices_in_view, "Set the vertices that are in view of a specific point",
+                pybind11::arg("ReconstructMesh shared ptr"), pybind11::arg("pos in asteroid frame"), pybind11::arg("max angle in radians"));
+
     
     // TODO Add overload for explore asteroid function then add here as well
 }

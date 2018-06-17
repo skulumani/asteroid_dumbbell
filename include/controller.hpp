@@ -222,6 +222,9 @@ class TranslationController {
     @version 31 May 2018
 */
 class Controller: public TranslationController, public AttitudeController {
+    private:
+        std::vector<Vertex_index> vertices_in_view;
+        int num_vertices_in_view;
     public:
         Controller( void );
         virtual ~Controller( void ) {};
@@ -287,6 +290,11 @@ class Controller: public TranslationController, public AttitudeController {
                 std::shared_ptr<const ReconstructMesh> rmesh,
                 std::shared_ptr<Asteroid> ast_est,
                 const Eigen::Ref<const Eigen::Vector3d>& desired_landing_site);
+        
+        // pos should be in the asteroid fixed frame
+        void set_vertices_in_view(std::shared_ptr<const ReconstructMesh> rmesh,
+                const Eigen::Ref<const Eigen::Vector3d>&  pos,
+                const double& max_angle);
         /** @fn Output a state object with the desired state
 
           Output a state object with the desired state
