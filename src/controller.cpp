@@ -503,7 +503,7 @@ void Controller::refinement(const double& t,
     Eigen::RowVector3d des_vector;
     des_vector = rmesh->get_verts().row(min_cost_index);
     double desired_radius = desired_landing_site.norm() * 2.0;
-    mposd = desired_landing_site.normalized() * desired_radius;
+    mposd = Ra * desired_landing_site.normalized() * desired_radius;
     
     /* if (rmesh->get_weights().sum() < 1e-2) { */
     /*     caster.update_mesh(rmesh->get_mesh()); */
@@ -558,8 +558,8 @@ void Controller::refinement(const double& t,
     /* des_state_ptr->time(t); */
     // transform to inertial frame and point body at it
     /* inertial_pointing_attitude(state, Ra * des_vector.transpose()); */ 
-    random_sweep_attitude(state);
-    /* body_fixed_pointing_attitude(des_state_ptr); */
+    /* random_sweep_attitude(state); */
+    body_fixed_pointing_attitude(des_state_ptr);
 }
 
 void Controller::refinement(const double& t,
