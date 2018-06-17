@@ -456,8 +456,10 @@ std::vector<Face_index> MeshData::faces_in_fov(
     Eigen::Vector3d pos_uvec = pos.normalized();
     // loop over all the faces 
     for (Face_index fd : surface_mesh.faces()){
-        // find the angle of each face normal with the position vector
-        double angle = std::acos(pos_uvec.dot(get_face_normal(fd)));
+        // get a vertex in this face
+        Halfedge_index hd = surface_mesh.halfedge(fd);
+        Vertex_index vd = surface_mesh.source(hd);
+        double angle = std::acos(pos_uvec.dot(get_vertex(vd).normalized()));
         if (angle < max_fov) {
             faces_in_view.push_back(fd);
         }
