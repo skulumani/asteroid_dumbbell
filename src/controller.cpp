@@ -557,9 +557,9 @@ void Controller::refinement(const double& t,
     std::shared_ptr<State> des_state_ptr = get_desired_state();
     /* des_state_ptr->time(t); */
     // transform to inertial frame and point body at it
-    /* inertial_pointing_attitude(state, Ra * des_vector.transpose()); */ 
+    inertial_pointing_attitude(state, Ra * des_vector.transpose()); 
     /* random_sweep_attitude(state); */
-    body_fixed_pointing_attitude(des_state_ptr);
+    /* body_fixed_pointing_attitude(des_state_ptr); */
 }
 
 void Controller::refinement(const double& t,
