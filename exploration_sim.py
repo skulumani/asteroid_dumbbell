@@ -254,7 +254,7 @@ def initialize_refinement(output_filename, ast_name="castalia"):
     # estimated asteroid (starting as an ellipse)
     if (ast_name == "castalia" or ast_name == "itokawa"
             or ast_name == "golevka" or ast_name == "52760"):
-        surf_area = 0.1
+        surf_area = 0.01
         max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
         min_angle = 10
         max_radius = 0.03
@@ -1244,7 +1244,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
         logger.info("Now refining the faces close to the landing site")
         # perform remeshing over the landing area and take a bunch of measurements 
         est_ast_meshdata.remesh_faces_in_view(desired_landing_site, np.deg2rad(40),
-                                              0.02)
+                                              0.04)
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
             est_ast_rmesh.get_faces().shape[0]))
