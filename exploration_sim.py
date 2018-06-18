@@ -1160,26 +1160,23 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
         logger.info("Now starting dynamic simulation and taking measurements again again")
         complete_controller.set_vertices_in_view(est_ast_rmesh, desired_landing_site,
                                                  np.deg2rad(40))
+        state = initial_state;
+        for ii, t in time:
+            # compute next state to go to
+            complete_controller.refinement(t, state, est_ast_rmesh, est_ast, desired_landing_site)
+            # update the state
+            state[0:3] = complete_controller.get_posd()
+            state[4:6] = complete_controller.get_veld()
+            state[6:15] = complete_controller.get_Rd().reshape(-1)
+            state[15:18] = complete_controller.get_ang_vel_d()
 
-        system = integrate.ode(eoms.eoms_controlled_inertial_refinement_pybind)
-        # system = integrate.ode(eoms.eoms_controlled_inertial_control_cost_pybind)
-        system.set_integrator("lsoda", atol=explore_AbsTol, rtol=explore_RelTol, nsteps=10000)
-        system.set_initial_value(initial_state, t0)
-        system.set_f_params(true_ast, dum, complete_controller, est_ast_rmesh, 
-                            est_ast, desired_landing_site)
-        # system.set_f_params(true_ast, dum, complete_controller, est_ast_rmesh, est_ast)
-        # TODO make sure that at this point the new faces have a high weight
-        ii = 1
-        while system.successful() and system.t < tf:
-            t = system.t + dt
-            state = system.integrate(system.t + dt)
             logger.info("Step: {} Time: {} Pos: {} Uncertainty: {}".format(ii, t,
                                                                            state[0:3],
                                                                            np.sum(est_ast_rmesh.get_weights())))
 
             targets = lidar.define_targets(state[0:3],
-                                            state[6:15].reshape((3, 3)),
-                                            np.linalg.norm(state[0:3]))
+                                           state[6:15].reshape((3, 3)),
+                                           np.linalg.norm(state[0:3]))
 
             # update the asteroid inside the caster
             nv = true_ast.rotate_vertices(t)
@@ -1225,7 +1222,6 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
             asteroid_intersections_group.create_dataset(str(ii), data=ast_ints, compression=compression,
                                                         compression_opts=compression_opts)
             
-            ii += 1
 
     logger.info("Refinement complete")
 def landing(filename, desired_landing_site):
