@@ -960,6 +960,95 @@ def save_animate_landing(filename, move_cam=False, mesh_weight=False):
             os.remove(file_path)
     os.rmdir(output_path)
 
+def save_animate_refinement(filename, move_cam=False, mesh_weight=False, save_animation=False):
+    """Save the refinement animation
+    """
+    # TODO Animate the changing of the mesh itself as a function of time
+    with h5py.File(filename, 'r') as hf:
+        # get the inertial state and asteroid mesh object
+        # time = hf['time'][()]
+        state_group = hf['refinement/state']
+        state_keys = np.array(utilities.sorted_nicely(list(hf['refinement/state'].keys())))
+        time = [int(t) for t in state_keys];
+
+        intersections_group = hf['refinement/inertial_intersections']
+
+        # extract out the entire state and intersections
+        state = []
+        inertial_intersections = []
+        for key in state_keys:
+            state.append(state_group[key][()])
+            inertial_intersections.append(intersections_group[key][()])
+        
+        state = np.array(state)
+        inertial_intersections = np.array(inertial_intersections)
+        # get the true asteroid from the HDF5 file
+        true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
+        true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
+        true_name = hf['simulation_parameters/true_asteroid/name'][()]
+        
+        est_initial_vertices = hf['simulation_parameters/estimate_asteroid/initial_vertices'][()]
+        est_initial_faces = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
+            
+        # think about a black background as well
+        mfig = graphics.mayavi_figure(size=(800,600), offscreen=True)
+        
+        if mesh_weight:
+            mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces,
+                                           scalars=np.squeeze(hf['simulation_parameters/estimate_asteroid/initial_weight'][()]),
+                                           color=None, colormap='viridis')
+        else:
+            mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces)
+
+        xaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([2, 0, 0]), color=(1, 0, 0)) 
+        yaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 2, 0]), color=(0, 1, 0)) 
+        zaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 0, 2]), color=(0, 0, 1)) 
+        ast_axes = (xaxis, yaxis, zaxis)
+        # initialize a dumbbell object
+        dum = dumbbell.Dumbbell(hf['simulation_parameters/dumbbell/m1'][()], 
+                                hf['simulation_parameters/dumbbell/m2'][()],
+                                hf['simulation_parameters/dumbbell/l'][()])
+        # com, dum_axes = graphics.draw_dumbbell_mayavi(state[0, :], dum, mfig)
+        if move_cam:
+            com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
+                                           color=(1, 0, 0), radius=0.02,
+                                           opacity=0.5)
+        else:
+            com = graphics.mayavi_addPoint(mfig, state[0, 0:3],
+                                           color=(1, 0, 0), radius=0.1)
+
+        pc_points = graphics.mayavi_points3d(mfig, inertial_intersections[0], 
+                                             color=(0, 0, 1), scale_factor=0.05)
+        
+        # add some text objects
+        time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
+                                       color=(0, 0, 0), width=0.05)
+        weight_text = graphics.mlab.text(0.1, 0.2, "w: {:8.1f}".format(0), figure=mfig,
+                                         color=(0, 0, 0), width=0.05)
+        # mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
+        mayavi_objects = (mesh, com, pc_points, time_text, weight_text)
+        
+    output_path = tempfile.mkdtemp()
+    print("Images will be saved to {}".format(output_path))
+    animation.inertial_asteroid_refinement_cpp_save(time, state, inertial_intersections,
+                                                    filename, mayavi_objects, move_cam=move_cam,
+                                                    mesh_weight=mesh_weight,
+                                                    output_path=output_path)
+    # now call ffmpeg
+    fps = 60
+    name = 'refinement'
+    ffmpeg_fname = os.path.join(output_path, '%07d.jpg')
+    cmd = "ffmpeg -framerate {} -i {} -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' {}.mp4".format(fps, ffmpeg_fname, name)
+    print(cmd)
+    subprocess.check_output(['bash', '-c', cmd])
+
+    # remove folder now
+    for file in os.listdir(output_path): 
+        file_path = os.path.join(output_path, file)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+    os.rmdir(output_path)
+
 def refine_landing_area(filename, asteroid_name, desired_landing_site):
     """Called after exploration is completed
     
@@ -1224,6 +1313,8 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
             
 
     logger.info("Refinement complete")
+
+
 def landing(filename, desired_landing_site):
     """Open the HDF5 file and continue the simulation from the terminal state
     to landing on the surface over an additional few hours
@@ -1770,6 +1861,8 @@ if __name__ == "__main__":
                        action="store_true")
     group.add_argument("-lra", "--landing_refine_animation", help="Animate the refinement process",
                        action="store_true")
+    group.add_argument("-lrsa", "--landing_refine_save_animation", help="Save the refinment animation",
+                        action="store_true")
 
     args = parser.parse_args()
                                                                 
@@ -1808,4 +1901,6 @@ if __name__ == "__main__":
         refine_landing_area(args.simulation_data, args.name, desired_landing_spot)
     elif args.landing_refine_animation:
         animate_refinement(args.simulation_data, move_cam=args.move_cam, mesh_weight=args.mesh_weight)
-
+    elif args.landing_refine_save_animation:
+        save_animate_refinement(args.simulation_data, move_cam=args.move_cam,
+                                mesh_weight=args.mesh_weight)
