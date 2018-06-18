@@ -1246,7 +1246,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
         logger.info("Now refining the faces close to the landing site")
         # perform remeshing over the landing area and take a bunch of measurements 
         est_ast_meshdata.remesh_faces_in_view(desired_landing_site, np.deg2rad(20),
-                                              0.005)
+                                              0.009)
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
             est_ast_rmesh.get_faces().shape[0]))
