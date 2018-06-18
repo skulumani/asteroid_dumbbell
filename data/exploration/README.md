@@ -16,6 +16,17 @@ component of the cost function. Plots results using `dissertation/explore_plots.
     python exploration_sim.py -a <name of hdf5>
     ~~~
 
+## Exploration data
+
+Good exploration files are in exploration subdirectory
+
+~~~
+20180615_exploration_castalia_15000.hdf5
+20180615_exploration_52760_15000.hdf5
+~~~
+
+Copy these and then run the refinement, followed by the landing
+
 ## Splitting large files
 
 To split:
