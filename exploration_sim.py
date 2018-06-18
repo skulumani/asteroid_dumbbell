@@ -1294,7 +1294,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
             
             ast_ints = np.array(ast_ints)
             # this updates the estimated asteroid mesh used in both rmesh and est_ast
-            est_ast_rmesh.update(ast_ints, max_angle, meas_weight=0.05, vert_weight=1.0)
+            est_ast_rmesh.update(ast_ints, max_angle, meas_weight=0.01, vert_weight=1.0)
             # intersection = caster.castray(state[0:3], target)
             # ast_int = Ra.T.dot(intersection)            
             # est_ast_rmesh.single_update(ast_int, max_angle) 
