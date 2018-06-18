@@ -531,7 +531,7 @@ def inertial_asteroid_trajectory_cpp_save(time, state, inertial_intersections,
             mesh.scene.disable_render = False
             graphics.mlab.savefig(filename, magnification=magnification)
 
-def inertial_asteroid_refinment_cpp_save(time, state, inertial_intersections,
+def inertial_asteroid_refinement_cpp_save(time, state, inertial_intersections,
                                          hdf5_file, mayavi_objects,
                                          move_cam=False, mesh_weight=False,
                                          output_path="/tmp/refinement",
