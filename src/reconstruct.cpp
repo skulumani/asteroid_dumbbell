@@ -79,7 +79,9 @@ Eigen::VectorXd ReconstructMesh::get_vertex_weights( const std::vector<Vertex_in
     return weights;
 }
 void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &pt,
-                                    const double &max_angle) {
+                                    const double &max_angle,
+                                    const double& mw,
+                                    const double& vw) {
      
     Eigen::Vector3d pt_uvec = pt.normalized();
     double pt_radius = pt.norm();
@@ -92,11 +94,12 @@ void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &
         // check if central angle is less than the max angle
         if ( delta_sigma < max_angle) {
             // if true then compute new radius and new weight
-            double meas_weight = pow(delta_sigma * pt_radius, 2);
+            double meas_weight = mw *pow(delta_sigma * pt_radius, 2);
+            double vertex_weight = vw * get_weight(vd);
             // modify teh surface mesh with the new data
             double radius_new = (mesh->get_vertex(vd).norm() * meas_weight 
-                    + pt_radius * get_weight(vd)) / ( get_weight(vd) + meas_weight ) ;
-            double weight_new = (get_weight(vd) * meas_weight) / ( get_weight(vd) + meas_weight);
+                    + pt_radius * vertex_weight) / ( vertex_weight + meas_weight ) ;
+            double weight_new = (vertex_weight * meas_weight) / ( vertex_weight + meas_weight);
 
             // now update the mesh with new data
             mesh->set_vertex(vd, radius_new * vert_uvec);
@@ -107,11 +110,12 @@ void ReconstructMesh::single_update(const Eigen::Ref<const Eigen::RowVector3d> &
 }
 
 void ReconstructMesh::update(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
-        const double& max_angle) {
+        const double& max_angle, const double& meas_weight,
+        const double& vert_weight) {
     std::size_t num_pts(pts.rows());
     
     for (std::size_t ii = 0; ii < num_pts; ++ii) {
-        single_update(pts.row(ii), max_angle);
+        single_update(pts.row(ii), max_angle, meas_weight, vert_weight);
     }
 }
 

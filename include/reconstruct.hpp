@@ -47,7 +47,9 @@ class ReconstructMesh {
             @version 31 May 2018
         */
         void single_update(const Eigen::Ref<const Eigen::RowVector3d> &pt_in,
-                        const double &max_angle);
+                        const double &max_angle,
+                        const double& meas_weight=1.0,
+                        const double& vert_weight=1.0);
         /** @fn void update(const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
          *                  const double& max_angle)
                 
@@ -64,7 +66,9 @@ class ReconstructMesh {
         */
         void update(
                 const Eigen::Ref<const Eigen::Matrix<double, Eigen::Dynamic, 3> >& pts,
-                const double& max_angle);
+                const double& max_angle,
+                const double& meas_weight=1.0,
+                const double& vert_weight=1.0);
 
         // functions to access the private members
         Eigen::MatrixXd get_verts( void ) const;
