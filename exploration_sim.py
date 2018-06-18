@@ -1250,12 +1250,13 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
         complete_controller.set_vertices_in_view(est_ast_rmesh, desired_landing_site,
                                                  np.deg2rad(40))
         state = initial_state;
-        for ii, t in time:
+        for ii, t in enumerate(time):
+            Ra = true_ast.rot_ast2int(t)
             # compute next state to go to
             complete_controller.refinement(t, state, est_ast_rmesh, est_ast, desired_landing_site)
             # update the state
-            state[0:3] = complete_controller.get_posd()
-            state[4:6] = complete_controller.get_veld()
+            state[0:3] = Ra.dot(desired_landing_site)
+            state[3:6] = complete_controller.get_veld()
             state[6:15] = complete_controller.get_Rd().reshape(-1)
             state[15:18] = complete_controller.get_ang_vel_d()
 
@@ -1269,7 +1270,6 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
 
             # update the asteroid inside the caster
             nv = true_ast.rotate_vertices(t)
-            Ra = true_ast.rot_ast2int(t)
             
             caster.update_mesh(nv, true_ast.get_faces())
 
@@ -1859,6 +1859,8 @@ if __name__ == "__main__":
                        action="store_true")
     group.add_argument("-lr", "--landing_refine", help="Determine best landing spot and refine prior to using -l",
                        action="store_true")
+    group.add_argument("-lkr", "--landing_kinematic_refine", help="Landing refinement using a kinematics only model",
+                       action="store_true")
     group.add_argument("-lra", "--landing_refine_animation", help="Animate the refinement process",
                        action="store_true")
     group.add_argument("-lrsa", "--landing_refine_save_animation", help="Save the refinment animation",
@@ -1904,3 +1906,6 @@ if __name__ == "__main__":
     elif args.landing_refine_save_animation:
         save_animate_refinement(args.simulation_data, move_cam=args.move_cam,
                                 mesh_weight=args.mesh_weight)
+    elif args.landing_kinematic_refine:
+        desired_landing_spot = np.array([0.47180473, -0.01972284, 0.36729988])
+        kinematics_refine_landing_area(args.simulation_data, args.name, desired_landing_spot)
