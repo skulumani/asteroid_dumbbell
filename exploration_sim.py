@@ -254,7 +254,7 @@ def initialize_refinement(output_filename, ast_name="castalia"):
     # estimated asteroid (starting as an ellipse)
     if (ast_name == "castalia" or ast_name == "itokawa"
             or ast_name == "golevka" or ast_name == "52760"):
-        surf_area = 0.01
+        surf_area = 0.1
         max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
         min_angle = 10
         max_radius = 0.03
@@ -1202,7 +1202,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
     (true_ast_meshdata, true_ast, complete_controller,
         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
         AbsTol, RelTol) = initialize_refinement(filename, asteroid_name)
-    
+    v_bumpy, f_bumpy = wavefront.read_obj('./data/shape_model/CASTALIA/castalia_bump.obj') 
     # define the initial condition as teh terminal state of the exploration sim
     with h5py.File(filename, 'r') as hf:
         state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
@@ -1255,7 +1255,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
             # compute next state to go to
             complete_controller.refinement(t, state, est_ast_rmesh, est_ast, desired_landing_site)
             # update the state
-            state[0:3] = Ra.dot(desired_landing_site)
+            state[0:3] = Ra.dot(desired_landing_site) * 4
             state[3:6] = complete_controller.get_veld()
             state[6:15] = complete_controller.get_Rd().reshape(-1)
             state[15:18] = complete_controller.get_ang_vel_d()
@@ -1269,7 +1269,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
                                            np.linalg.norm(state[0:3]))
 
             # update the asteroid inside the caster
-            nv = true_ast.rotate_vertices(t)
+            nv = Ra.dot(v_bumpy.T).T
             
             caster.update_mesh(nv, true_ast.get_faces())
 
