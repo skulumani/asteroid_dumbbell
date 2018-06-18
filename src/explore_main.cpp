@@ -40,10 +40,10 @@ int main(int argc, char* argv[])
 
     // initialize all the objects
     double min_angle(10), max_radius(0.03), max_distance(0.5);
-    double surf_area(0.01);
+    double surf_area(0.005);
 
     std::shared_ptr<MeshData> true_asteroid =
-        Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+        Loader::load("./data/shape_model/CASTALIA/castalia_bump.obj");
 
     RayCaster caster(true_asteroid);
     SurfMesh ellipsoid(axes(0), axes(1), axes(2),

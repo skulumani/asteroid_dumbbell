@@ -254,13 +254,15 @@ def initialize_refinement(output_filename, ast_name="castalia"):
     # estimated asteroid (starting as an ellipse)
     if (ast_name == "castalia" or ast_name == "itokawa"
             or ast_name == "golevka" or ast_name == "52760"):
-        surf_area = 0.01
+        surf_area = 0.05
         max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
         min_angle = 10
         max_radius = 0.03
         max_distance = 0.5
 
     est_ast_meshdata = mesh_data.MeshData(explore_v, explore_f)
+    # set the weight of everything to a big number
+    # new_w = np.full_like(explore_w, 10)
     est_ast_rmesh = reconstruct.ReconstructMesh(est_ast_meshdata, explore_w)
     est_ast = asteroid.Asteroid(ast_name, est_ast_rmesh)
 
@@ -1244,7 +1246,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
         logger.info("Now refining the faces close to the landing site")
         # perform remeshing over the landing area and take a bunch of measurements 
         est_ast_meshdata.remesh_faces_in_view(desired_landing_site, np.deg2rad(40),
-                                              0.04)
+                                              0.05)
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
             est_ast_rmesh.get_faces().shape[0]))
@@ -1258,6 +1260,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
             complete_controller.refinement(t, state, est_ast_rmesh, est_ast, desired_landing_site)
             # update the state
             state[0:3] = Ra.dot(desired_landing_site) * 4
+            # state[0:3] = complete_controller.get_posd()
             state[3:6] = complete_controller.get_veld()
             state[6:15] = complete_controller.get_Rd().reshape(-1)
             state[15:18] = complete_controller.get_ang_vel_d()
@@ -1269,6 +1272,8 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
             targets = lidar.define_targets(state[0:3],
                                            state[6:15].reshape((3, 3)),
                                            np.linalg.norm(state[0:3]))
+            # target = lidar.define_target(state[0:3], state[6:15].reshape((3, 3)),
+            #                              np.linalg.norm(state[0:3]))
 
             # update the asteroid inside the caster
             nv = Ra.dot(v_bumpy.T).T
@@ -1277,9 +1282,6 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
 
             # do the raycasting
             intersections = caster.castarray(state[0:3], targets)
-
-            # reconstruct the mesh with new measurements
-            # convert the intersections to the asteroid frame
             ast_ints = []
             for pt in intersections:
                 if np.linalg.norm(pt) < 1e-9:
@@ -1291,10 +1293,12 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
                 ast_ints.append(pt_ast)
             
             ast_ints = np.array(ast_ints)
-            
             # this updates the estimated asteroid mesh used in both rmesh and est_ast
             est_ast_rmesh.update(ast_ints, max_angle)
-            
+            # intersection = caster.castray(state[0:3], target)
+            # ast_int = Ra.T.dot(intersection)            
+            # est_ast_rmesh.single_update(ast_int, max_angle) 
+
             v_group.create_dataset(str(ii), data=est_ast_rmesh.get_verts(), compression=compression,
                                    compression_opts=compression_opts)
             f_group.create_dataset(str(ii), data=est_ast_rmesh.get_faces(), compression=compression,
@@ -1306,12 +1310,18 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
                                        compression_opts=compression_opts)
             targets_group.create_dataset(str(ii), data=targets, compression=compression,
                                          compression_opts=compression_opts)
+            # targets_group.create_dataset(str(ii), data=target, compression=compression,
+            #                              compression_opts=compression_opts)
             Ra_group.create_dataset(str(ii), data=Ra, compression=compression,
                                     compression_opts=compression_opts)
             inertial_intersections_group.create_dataset(str(ii), data=intersections, compression=compression,
                                                         compression_opts=compression_opts)
             asteroid_intersections_group.create_dataset(str(ii), data=ast_ints, compression=compression,
                                                         compression_opts=compression_opts)
+            # inertial_intersections_group.create_dataset(str(ii), data=intersection, compression=compression,
+            #                                             compression_opts=compression_opts)
+            # asteroid_intersections_group.create_dataset(str(ii), data=ast_int, compression=compression,
+            #                                             compression_opts=compression_opts)
             
 
     logger.info("Refinement complete")
