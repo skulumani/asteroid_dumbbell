@@ -1070,6 +1070,7 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
     (true_ast_meshdata, true_ast, complete_controller,
         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
         AbsTol, RelTol) = initialize_refinement(filename, asteroid_name)
+    v_bumpy, f_bumpy = wavefront.read_obj('./data/shape_model/CASTALIA/castalia_bump.obj') 
     
     # define the initial condition as teh terminal state of the exploration sim
     with h5py.File(filename, 'r') as hf:
@@ -1141,8 +1142,8 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
             # update the asteroid inside the caster
             nv = true_ast.rotate_vertices(t)
             Ra = true_ast.rot_ast2int(t)
-            
-            caster.update_mesh(nv, true_ast.get_faces())
+            nv = Ra.dot(v_bumpy.T).T        
+            caster.update_mesh(nv, f_bumpy)
 
             # do the raycasting
             intersections = caster.castarray(state[0:3], targets)
@@ -1202,6 +1203,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
     (true_ast_meshdata, true_ast, complete_controller,
         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
         AbsTol, RelTol) = initialize_refinement(filename, asteroid_name)
+
     v_bumpy, f_bumpy = wavefront.read_obj('./data/shape_model/CASTALIA/castalia_bump.obj') 
     # define the initial condition as teh terminal state of the exploration sim
     with h5py.File(filename, 'r') as hf:
@@ -1271,7 +1273,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
             # update the asteroid inside the caster
             nv = Ra.dot(v_bumpy.T).T
             
-            caster.update_mesh(nv, true_ast.get_faces())
+            caster.update_mesh(nv,f_bumpy)
 
             # do the raycasting
             intersections = caster.castarray(state[0:3], targets)
