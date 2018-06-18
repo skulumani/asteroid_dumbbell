@@ -1097,6 +1097,137 @@ def refine_landing_area(filename, asteroid_name, desired_landing_site):
 
     logger.info("Refinement complete")
 
+def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site):
+    """Perform a kinematics only refinement of the landing area
+
+    No dynamic simulation
+    """
+    logger = logging.getLogger(__name__)
+    
+    num_steps = int(3600)
+    time = np.arange(0, num_steps)
+    t0, tf = time[0], time[-1]
+    dt = time[1] - time[0]
+    
+    # intialize the simulation objects
+    (true_ast_meshdata, true_ast, complete_controller,
+        est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
+        AbsTol, RelTol) = initialize_refinement(filename, asteroid_name)
+    
+    # define the initial condition as teh terminal state of the exploration sim
+    with h5py.File(filename, 'r') as hf:
+        state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
+        explore_tf = hf['time'][()][-1]
+        explore_state = hf['state/' + str(explore_tf)][()]
+        explore_Ra = hf['Ra/' + str(explore_tf)][()]
+    
+        explore_AbsTol = hf["simulation_parameters/AbsTol"][()]
+        explore_RelTol = hf["simulation_parameters/RelTol"][()]
+
+    initial_state = explore_state
+
+    # open the file and recreate the objects
+    with h5py.File(filename, 'r+') as hf:
+        # groups to save the refined data
+        if "refinement" in hf:
+            del hf['refinement']
+
+        refinement_group = hf.create_group("refinement")
+
+        refinement_group.create_dataset("time", data=time, compression=compression,
+                                        compression_opts=compression_opts)
+        refinement_group.create_dataset("initial_state", data=initial_state)
+        v_group = refinement_group.create_group("reconstructed_vertex")
+        f_group = refinement_group.create_group("reconstructed_face")
+        w_group = refinement_group.create_group("reconstructed_weight")
+        state_group = refinement_group.create_group("state")
+        targets_group = refinement_group.create_group("targets")
+        Ra_group = refinement_group.create_group("Ra")
+        inertial_intersections_group = refinement_group.create_group("inertial_intersections")
+        asteroid_intersections_group = refinement_group.create_group("asteroid_intersections")
+
+        logger.info("Estimated asteroid has {} vertices and {} faces".format(
+            est_ast_rmesh.get_verts().shape[0],
+            est_ast_rmesh.get_faces().shape[0]))
+            
+        logger.info("Now refining the faces close to the landing site")
+        # perform remeshing over the landing area and take a bunch of measurements 
+        est_ast_meshdata.remesh_faces_in_view(desired_landing_site, np.deg2rad(40),
+                                              0.02)
+        logger.info("Estimated asteroid has {} vertices and {} faces".format(
+            est_ast_rmesh.get_verts().shape[0],
+            est_ast_rmesh.get_faces().shape[0]))
+        logger.info("Now starting dynamic simulation and taking measurements again again")
+        complete_controller.set_vertices_in_view(est_ast_rmesh, desired_landing_site,
+                                                 np.deg2rad(40))
+
+        system = integrate.ode(eoms.eoms_controlled_inertial_refinement_pybind)
+        # system = integrate.ode(eoms.eoms_controlled_inertial_control_cost_pybind)
+        system.set_integrator("lsoda", atol=explore_AbsTol, rtol=explore_RelTol, nsteps=10000)
+        system.set_initial_value(initial_state, t0)
+        system.set_f_params(true_ast, dum, complete_controller, est_ast_rmesh, 
+                            est_ast, desired_landing_site)
+        # system.set_f_params(true_ast, dum, complete_controller, est_ast_rmesh, est_ast)
+        # TODO make sure that at this point the new faces have a high weight
+        ii = 1
+        while system.successful() and system.t < tf:
+            t = system.t + dt
+            state = system.integrate(system.t + dt)
+            logger.info("Step: {} Time: {} Pos: {} Uncertainty: {}".format(ii, t,
+                                                                           state[0:3],
+                                                                           np.sum(est_ast_rmesh.get_weights())))
+
+            targets = lidar.define_targets(state[0:3],
+                                            state[6:15].reshape((3, 3)),
+                                            np.linalg.norm(state[0:3]))
+
+            # update the asteroid inside the caster
+            nv = true_ast.rotate_vertices(t)
+            Ra = true_ast.rot_ast2int(t)
+            
+            caster.update_mesh(nv, true_ast.get_faces())
+
+            # do the raycasting
+            intersections = caster.castarray(state[0:3], targets)
+
+            # reconstruct the mesh with new measurements
+            # convert the intersections to the asteroid frame
+            ast_ints = []
+            for pt in intersections:
+                if np.linalg.norm(pt) < 1e-9:
+                    logger.info("No intersection for this point")
+                    pt_ast = np.array([np.nan, np.nan, np.nan])
+                else:
+                    pt_ast = Ra.T.dot(pt)
+
+                ast_ints.append(pt_ast)
+            
+            ast_ints = np.array(ast_ints)
+            
+            # this updates the estimated asteroid mesh used in both rmesh and est_ast
+            est_ast_rmesh.update(ast_ints, max_angle)
+            
+            v_group.create_dataset(str(ii), data=est_ast_rmesh.get_verts(), compression=compression,
+                                   compression_opts=compression_opts)
+            f_group.create_dataset(str(ii), data=est_ast_rmesh.get_faces(), compression=compression,
+                                   compression_opts=compression_opts)
+            w_group.create_dataset(str(ii), data=est_ast_rmesh.get_weights(), compression=compression,
+                                   compression_opts=compression_opts)
+
+            state_group.create_dataset(str(ii), data=state, compression=compression,
+                                       compression_opts=compression_opts)
+            targets_group.create_dataset(str(ii), data=targets, compression=compression,
+                                         compression_opts=compression_opts)
+            Ra_group.create_dataset(str(ii), data=Ra, compression=compression,
+                                    compression_opts=compression_opts)
+            inertial_intersections_group.create_dataset(str(ii), data=intersections, compression=compression,
+                                                        compression_opts=compression_opts)
+            asteroid_intersections_group.create_dataset(str(ii), data=ast_ints, compression=compression,
+                                                        compression_opts=compression_opts)
+            
+            ii += 1
+
+    logger.info("Refinement complete")
 def landing(filename, desired_landing_site):
     """Open the HDF5 file and continue the simulation from the terminal state
     to landing on the surface over an additional few hours
