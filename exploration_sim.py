@@ -254,7 +254,7 @@ def initialize_refinement(output_filename, ast_name="castalia"):
     # estimated asteroid (starting as an ellipse)
     if (ast_name == "castalia" or ast_name == "itokawa"
             or ast_name == "golevka" or ast_name == "52760"):
-        surf_area = 0.05
+        surf_area = 0.01
         max_angle = np.sqrt(surf_area / true_ast.get_axes()[0]**2)
         min_angle = 10
         max_radius = 0.03
@@ -1196,7 +1196,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
     """
     logger = logging.getLogger(__name__)
     
-    num_steps = int(3600)
+    num_steps = int(7200)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -1246,7 +1246,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
         logger.info("Now refining the faces close to the landing site")
         # perform remeshing over the landing area and take a bunch of measurements 
         est_ast_meshdata.remesh_faces_in_view(desired_landing_site, np.deg2rad(40),
-                                              0.05)
+                                              0.02)
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
             est_ast_rmesh.get_faces().shape[0]))
@@ -1294,7 +1294,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
             
             ast_ints = np.array(ast_ints)
             # this updates the estimated asteroid mesh used in both rmesh and est_ast
-            est_ast_rmesh.update(ast_ints, max_angle)
+            est_ast_rmesh.update(ast_ints, max_angle, meas_weight=0.5, vert_weight=1.0)
             # intersection = caster.castray(state[0:3], target)
             # ast_int = Ra.T.dot(intersection)            
             # est_ast_rmesh.single_update(ast_int, max_angle) 
