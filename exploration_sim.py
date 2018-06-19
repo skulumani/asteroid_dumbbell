@@ -860,7 +860,7 @@ def animate_landing(filename, move_cam=False, mesh_weight=False):
 
         state=np.array(state)
 
-        mfig = graphics.mayavi_figure(size=(800, 600))
+        mfig = graphics.mayavi_figure(bg=(0, 0, 0),size=(800, 600))
 
         # option for the mesh weight
         if mesh_weight:
@@ -885,9 +885,9 @@ def animate_landing(filename, move_cam=False, mesh_weight=False):
 
         # add some text objects
         time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
-                                       color=(0, 0, 0), width=0.05)
+                                       color=(1, 1, 1), width=0.05)
         weight_text = graphics.mlab.text(0.1, 0.2, "w: {:8.1f}".format(0), figure=mfig,
-                                         color=(0, 0, 0), width=0.05)
+                                         color=(1, 1, 1), width=0.05)
 
         mayavi_objects = (mesh, com, time_text, weight_text)
 
@@ -1617,7 +1617,7 @@ def plot_volume(filename):
 
     publication.plot_volume(t_array, vol_array, true_volume)
 
-def landing_site_plots(input_filename):
+def refine_site_plots(input_filename):
     """Given the exploration reconstruction data (after all the exploration)
     
     This function will select a specific area and generate surface slope/roughness 
@@ -1638,6 +1638,211 @@ def landing_site_plots(input_filename):
         explore_v = hf['reconstructed_vertex/' + str(explore_tf)][()]
         explore_f = hf['reconstructed_face/' + str(explore_tf)][()]
         explore_w = hf['reconstructed_weight/' + str(explore_tf)][()]
+        
+        explore_name = hf['simulation_parameters/true_asteroid/name'][()][:-4]
+        explore_m1 = hf['simulation_parameters/dumbbell/m1'][()]
+        explore_m2 = hf['simulation_parameters/dumbbell/m2'][()]
+        explore_l = hf['simulation_parameters/dumbbell/l'][()]
+        explore_AbsTol = hf['simulation_parameters/AbsTol'][()]
+        explore_RelTol = hf['simulation_parameters/RelTol'][()]
+        
+        explore_true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
+        explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
+    
+    # build meshdata and asteroid from the terminal estimate
+    est_meshdata = mesh_data.MeshData(explore_v, explore_f)
+    est_ast = asteroid.Asteroid(explore_name, est_meshdata)
+    # chose step size based on spacecraft landing footprint
+
+    max_radius = np.max(est_ast.get_axes()) # for castalia
+    delta_angle = 0.05 / max_radius
+    grid_long, grid_lat = np.meshgrid(np.arange(-np.pi, np.pi, delta_angle),
+                                      np.arange(-np.pi/2, np.pi/2, delta_angle))
+    # interpolate and create a radius plot
+    fig_radius, ax_radius = plt.subplots(1, 1)
+    # compute radius of each vertex and lat/long 
+    spherical_vertices = wavefront.cartesian2spherical(explore_v)
+    r = spherical_vertices[:, 0]
+    lat = spherical_vertices[:, 1]
+    long = spherical_vertices[:, 2]
+    grid_r = interpolate.griddata(np.vstack((long, lat)).T, r, (grid_long, grid_lat), method='nearest')
+    grid_r_smooth = ndimage.gaussian_filter(grid_r, sigma=10*delta_angle)
+    # ax.scatter(long, lat,c=r)
+    # ax.imshow(grid_r.T, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
+    ax_radius.contour(grid_long, grid_lat, grid_r)
+    ax_radius.set_title('Radius (km)')
+    ax_radius.set_xlabel('Longitude (rad)')
+    ax_radius.set_ylabel('Latitude (rad)')
+    
+    fig_radius_img, ax_radius_img = plt.subplots(1, 1)
+    img = ax_radius_img.imshow(grid_r, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
+    ax_radius_img.set_title('Radius (km)')
+    ax_radius_img.set_ylabel('Latitude (rad)')
+    fig_radius_img.colorbar(img)
+    
+    fig_density, ax_density = plt.subplots(1, 1)
+    # divider = make_axes_locatable(ax_density)
+    # cax = divider.append_axes('right', size='5%', pad=0.05)
+    ax_density.plot(long, lat, 'k.', ms=1)
+    d = ax_density.hist2d(long, lat, grid_long.shape )[3]
+    # fig_density.colorbar(d, cax=cax, orientation='vertical')
+    fig_density.colorbar(d, orientation='vertical')
+    ax_density.set_title('Vertex density')
+    ax_density.set_xlabel('Longitude')
+    ax_density.set_ylabel('Latitude')
+
+    # plot of surface slope
+    # get the surface slope(ast) and all face centers(mesh)
+    face_center = est_meshdata.get_all_face_center()
+    face_slope = est_ast.surface_slope()
+    spherical_face_center = wavefront.cartesian2spherical(face_center)
+    # plot of face area
+    face_area = est_meshdata.get_all_face_area()
+    grid_area = interpolate.griddata(np.vstack((spherical_face_center[:, 2],
+                                                  spherical_face_center[:, 1])).T,
+                                                 face_area,
+                                                 (grid_long, grid_lat),
+                                                 method='nearest') * 1e6 # convert to meters
+    grid_area_smooth = ndimage.gaussian_filter(grid_area, sigma=10*delta_angle)
+    fig_area, ax_area = plt.subplots(1, 1)
+    # contour = ax_area.contour(grid_long, grid_lat, grid_area*1e6)
+    img_area = ax_area.imshow(grid_area_smooth, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                   origin="lower")
+    ax_area.set_title('Face area (square meters)')
+    ax_area.set_xlabel('Longitude')
+    ax_area.set_ylabel('Latitude')
+    fig_area.colorbar(img_area)
+    
+    
+    grid_slope = interpolate.griddata(np.vstack((spherical_face_center[:, 2],
+                                                  spherical_face_center[:, 1])).T,
+                                                 face_slope,
+                                                 (grid_long, grid_lat),
+                                                 method='nearest') * 180/np.pi
+    grid_slope_smooth = ndimage.gaussian_filter(grid_slope, sigma=10*delta_angle)
+    slope_mask = grid_slope_smooth > 5;
+    grid_slope_smooth_masked = grid_slope_smooth
+    grid_slope_smooth_masked[slope_mask] = 90
+
+    fig_slope, ax_slope = plt.subplots(2, 1)
+    # ax_slope.contour(grid_long, grid_lat, grid_slope)
+    img_slope = ax_slope[0].imshow(grid_slope, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                    origin="lower")
+    ax_slope[0].set_title('Surface Slope (deg)')
+    ax_slope[0].set_xlabel('Longitude')
+    ax_slope[0].set_ylabel('Latitude')
+    fig_slope.colorbar(img_slope, ax=ax_slope[0])
+    
+    img_slope_masked = ax_slope[1].imshow(grid_slope_smooth, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                       origin="lower")
+    ax_slope[1].set_title('Surface Slope (deg)')
+    ax_slope[1].set_xlabel('Longitude')
+    ax_slope[1].set_ylabel('Latitude')
+    slope_cbar_masked = fig_slope.colorbar(img_slope_masked, ax=ax_slope[1])
+    slope_cbar_masked.set_clim(0, 5)
+
+    # build an image of the distance from the explore_state to each point on the surface
+    # compute geodesic distance to each face center 
+    geodesic_distance = geodesic.central_angle(explore_state[0:3], face_center)
+    grid_dist = interpolate.griddata(np.vstack((spherical_face_center[:, 2],
+                                                spherical_face_center[:, 1])).T,
+                                     geodesic_distance,
+                                     (grid_long, grid_lat),
+                                     method="nearest")
+    grid_dist_masked = grid_dist
+    grid_dist_masked[slope_mask] = np.pi
+
+    fig_dist, ax_dist = plt.subplots(2, 1)
+    img_dist = ax_dist[0].imshow(grid_dist, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                              origin="lower")
+    ax_dist[0].set_title("Distance to surface")
+    ax_dist[0].set_xlabel("Longitude")
+    ax_dist[0].set_ylabel("Latitude")
+    fig_dist.colorbar(img_dist, ax=ax_dist[0])
+    
+    img_dist_mask = ax_dist[1].imshow(grid_dist_masked, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                                   origin="lower")
+    ax_dist[1].set_title("Masked distance to surface")
+    ax_dist[1].set_xlabel("Longitude")
+    ax_dist[1].set_ylabel("Latitude")
+    dist_cbar_masked = fig_dist.colorbar(img_dist_mask, ax=ax_dist[1])
+    dist_cbar_masked.set_clim(0, np.pi)
+
+    # build an image of random science value over entire surface
+    np.random.seed(9)
+    grid_science = np.random.rand(grid_dist.shape[0], grid_dist.shape[1])
+    grid_science = ndimage.gaussian_filter(grid_science, 50*delta_angle)
+    grid_science_masked = grid_science
+    grid_science_masked[slope_mask] = 0
+
+    fig_science, ax_science = plt.subplots(2, 1)
+    img_science = ax_science[0].imshow(grid_science, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                      origin="lower")
+    ax_science[0].set_title("Science Value")
+    ax_science[0].set_xlabel("Longitude")
+    ax_science[0].set_ylabel("Latitude")
+    fig_science.colorbar(img_science, ax=ax_science[0])
+
+    img_science_mask = ax_science[1].imshow(grid_science_masked, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                                            origin="lower")
+    ax_science[1].set_title("Masked Science Value")
+    ax_science[1].set_xlabel("Longitude")
+    ax_science[1].set_ylabel("Latitude")
+    fig_science.colorbar(img_science_mask, ax=ax_science[1])
+    
+    # normalize all the cost arrays, sum and plot together then find the minimum
+    total_cost = (-grid_science_masked / np.max(grid_science_masked) 
+                  + 2 * grid_dist_masked / np.max(grid_dist_masked)
+                  + grid_slope_smooth_masked/ np.max(grid_slope_smooth_masked)) / 3
+    total_cost_smooth = ndimage.gaussian_filter(total_cost, 10*delta_angle)
+    total_cost_smooth_masked = total_cost_smooth
+    total_cost_smooth_masked[slope_mask] = 1
+
+    # find minimum
+    min_index = np.unravel_index(total_cost_smooth_masked.argmin(),
+                                 total_cost_smooth_masked.shape)
+    desired_pos_spherical = np.array([grid_r[min_index[0], min_index[1]],
+                                      grid_lat[min_index[0], min_index[1]],
+                                      grid_long[min_index[0], min_index[1]]])
+    desired_pos_cartesian = wavefront.spherical2cartesian(desired_pos_spherical)
+    print("Desired Landing site: {} ".format(desired_pos_cartesian))
+
+    fig_cost, ax_cost = plt.subplots(1, 1)
+    img_cost = ax_cost.imshow(total_cost_smooth_masked, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+                               origin="lower")
+    ax_cost.set_title("Landing cost")
+    ax_cost.set_xlabel("Longitude")
+    ax_cost.set_ylabel("Latitude")
+    fig_cost.colorbar(img_cost)
+    ax_cost.plot(grid_long[min_index[0], min_index[1]],
+                 grid_lat[min_index[0], min_index[1]],
+                 marker='o', color='blue')
+
+    plt.show()
+    
+    return desired_pos_cartesian
+
+def landing_site_plots(input_filename):
+    """Given the exploration reconstruction data (after all the exploration)
+    
+    This function will select a specific area and generate surface slope/roughness 
+    plots
+
+    It returns the desired landing location on the surface in the asteroid fixed frame
+    """
+
+    # generate a surface slope map for each face of an asteroid
+    # load a asteroid
+    with h5py.File(input_filename, 'r') as hf:
+        state_keys = np.array(utilities.sorted_nicely(list(hf['refinement/state'].keys())))
+        explore_tf = hf['refinement/time'][()][-1]
+        explore_name = hf['simulation_parameters/true_asteroid/name'][()]
+        # explore_tf = int(state_keys[-1])
+        explore_state = hf['refinement/state/' + str(explore_tf)][()]
+        explore_Ra = hf['refinement/Ra/' + str(explore_tf)][()]
+        explore_v = hf['refinement/reconstructed_vertex/' + str(explore_tf)][()]
+        explore_f = hf['refinement/reconstructed_face/' + str(explore_tf)][()]
+        explore_w = hf['refinement/reconstructed_weight/' + str(explore_tf)][()]
         
         explore_name = hf['simulation_parameters/true_asteroid/name'][()][:-4]
         explore_m1 = hf['simulation_parameters/dumbbell/m1'][()]
@@ -1906,6 +2111,7 @@ if __name__ == "__main__":
         save_animation(args.simulation_data, move_cam=args.move_cam,
                        mesh_weight=args.mesh_weight, output_path=args.save_animation)
     elif args.landing:
+        landing_site_plots(args.simulation_data)
         desired_landing_spot = np.array([0.47180473, -0.01972284, 0.36729988])
         landing(args.simulation_data, desired_landing_spot)
     elif args.landing_animation:
@@ -1916,7 +2122,7 @@ if __name__ == "__main__":
         landing_site_plots(args.simulation_data)
     elif args.landing_refine:
         # landing location in the asteroid fixed frame
-        # desired_landing_spot = landing_site_plots(args.simulation_data)
+        desired_landing_spot = refine_site_plots(args.simulation_data)
         desired_landing_spot = np.array([0.47180473, -0.01972284, 0.36729988])
         refine_landing_area(args.simulation_data, args.name, desired_landing_spot)
     elif args.landing_refine_animation:
