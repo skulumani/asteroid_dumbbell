@@ -602,9 +602,14 @@ def translation_land_controller(time, state, ext_force, dum, ast,
     radius_slope =(np.linalg.norm(final_pos) - np.linalg.norm(initial_pos)) / (descent_tf) 
     rdes =  radius_slope * (time - t0) + np.linalg.norm(initial_pos)
     
-    body_pos_des = rdes * final_pos / np.linalg.norm(final_pos) 
-    body_vel_des = radius_slope * final_pos / np.linalg.norm(final_pos)
-    body_acc_des = np.zeros(3)
+    if np.allclose(state[0:3], final_pos, rtol=1e-1, atol=1e-1):
+        body_pos_des = final_pos;
+        body_vel_des = np.zeros(3);
+        body_acc_des = np.zeros(3);
+    else:
+        body_pos_des = rdes * final_pos / np.linalg.norm(final_pos) 
+        body_vel_des = radius_slope * final_pos / np.linalg.norm(final_pos)
+        body_acc_des = np.zeros(3)
     # transform this body position/velocity into the inertial frame
     inertial_pos = Ra2i.dot(body_pos_des)
     inertial_vel = body_vel_des + np.cross(omega_ast_vec, body_pos_des)
