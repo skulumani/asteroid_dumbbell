@@ -642,7 +642,7 @@ def save_animation(filename, move_cam=False, mesh_weight=False,
         est_initial_faces = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
             
         # think about a black background as well
-        mfig = graphics.mayavi_figure(size=(800,600), offscreen=True)
+        mfig = graphics.mayavi_figure(bg=(0, 0, 0), size=(800,600), offscreen=True)
         
         if mesh_weight:
             mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces,
@@ -669,13 +669,13 @@ def save_animation(filename, move_cam=False, mesh_weight=False,
                                            color=(1, 0, 0), radius=0.1)
 
         pc_points = graphics.mayavi_points3d(mfig, inertial_intersections[0], 
-                                             color=(0, 0, 1), scale_factor=0.05)
+                                             color=(0, 0, 1), scale_factor=0.01)
         
         # add some text objects
         time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
-                                       color=(0, 0, 0), width=0.05)
+                                       color=(1, 1, 1), width=0.05)
         weight_text = graphics.mlab.text(0.1, 0.2, "w: {:8.1f}".format(0), figure=mfig,
-                                         color=(0, 0, 0), width=0.05)
+                                         color=(1, 1, 1), width=0.05)
         # mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
         mayavi_objects = (mesh, com, pc_points, time_text, weight_text)
     
@@ -684,7 +684,8 @@ def save_animation(filename, move_cam=False, mesh_weight=False,
     animation.inertial_asteroid_trajectory_cpp_save(time, state, inertial_intersections,
                                                     filename, mayavi_objects, move_cam=move_cam,
                                                     mesh_weight=mesh_weight,
-                                                    output_path=output_path)
+                                                    output_path=output_path,
+                                                    magnification=4)
     # now call ffmpeg
     fps = 60
     name = 'exploration'
@@ -731,7 +732,7 @@ def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
         est_initial_faces = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
             
         # think about a black background as well
-        mfig = graphics.mayavi_figure(size=(800,600))
+        mfig = graphics.mayavi_figure(size=(800,600), bg=(0, 0, 0))
         
         if mesh_weight:
             mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces,
@@ -758,13 +759,13 @@ def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
                                            color=(1, 0, 0), radius=0.1)
 
         pc_points = graphics.mayavi_points3d(mfig, inertial_intersections[0], 
-                                             color=(0, 0, 1), scale_factor=0.05)
+                                             color=(0, 0, 1), scale_factor=0.01)
         
         # add some text objects
         time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
-                                       color=(0, 0, 0), width=0.05)
+                                       color=(1, 1, 1), width=0.05)
         weight_text = graphics.mlab.text(0.1, 0.2, "w: {:8.1f}".format(0), figure=mfig,
-                                         color=(0, 0, 0), width=0.05)
+                                         color=(1, 1, 1), width=0.05)
         # mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
         mayavi_objects = (mesh, com, pc_points, time_text, weight_text)
     
@@ -946,7 +947,8 @@ def save_animate_landing(filename, move_cam=False, mesh_weight=False):
 
     animation.inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects, 
                                                  move_cam=move_cam, mesh_weight=mesh_weight,
-                                                 output_path=output_path)
+                                                 output_path=output_path,
+                                                 magnification=4)
     # now call ffmpeg
     fps = 60
     name = 'landing'
@@ -1035,7 +1037,8 @@ def save_animate_refinement(filename, move_cam=False, mesh_weight=False, save_an
     animation.inertial_asteroid_refinement_cpp_save(time, state, inertial_intersections,
                                                     filename, mayavi_objects, move_cam=move_cam,
                                                     mesh_weight=mesh_weight,
-                                                    output_path=output_path)
+                                                    output_path=output_path,
+                                                    magnification=4)
     # now call ffmpeg
     fps = 60
     name = 'refinement'
@@ -2070,7 +2073,7 @@ if __name__ == "__main__":
     group.add_argument("-v", "--volume", help="Generate plot of volume",
                        action="store_true")
     group.add_argument("-sa", "--save_animation", help="Save the animation as a sequence of images",
-                       action="store", type=str)
+                       action="store_true")
     group.add_argument("-l" , "--landing", help="Continue from the end of exploration to the surface",
                        action="store_true")
     group.add_argument("-la", "--landing_animation", help="Landing animation",
@@ -2109,7 +2112,7 @@ if __name__ == "__main__":
         animate_uncertainty(args.simulation_data)
     elif args.save_animation:
         save_animation(args.simulation_data, move_cam=args.move_cam,
-                       mesh_weight=args.mesh_weight, output_path=args.save_animation)
+                       mesh_weight=args.mesh_weight)
     elif args.landing:
         landing_site_plots(args.simulation_data)
         desired_landing_spot = np.array([0.47180473, -0.01972284, 0.36729988])
