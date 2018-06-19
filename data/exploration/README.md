@@ -35,6 +35,16 @@ Copies of exploration data and refinement run using a bumpy version of Castalia
 20180619_castalia_refinement.hdf5
 ~~~
 
+## Landing
+
+Now run landing based on the refinement
+
+~~~
+20180619_castalia_landing.hdf5
+~~~
+
+It includes all the data from the exploration and refinement
+
 ## HDF5 Data structure
 
 ~~~
