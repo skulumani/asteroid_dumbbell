@@ -602,7 +602,8 @@ def translation_land_controller(time, state, ext_force, dum, ast,
     radius_slope =(np.linalg.norm(final_pos) - np.linalg.norm(initial_pos)) / (descent_tf) 
     rdes =  radius_slope * (time - t0) + np.linalg.norm(initial_pos)
     
-    if np.allclose(state[0:3], final_pos, rtol=1e-1, atol=1e-1):
+    if (np.allclose(state[0:3], final_pos, rtol=1e-1, atol=1e-1) or 
+            time > t0 + descent_tf):
         body_pos_des = final_pos;
         body_vel_des = np.zeros(3);
         body_acc_des = np.zeros(3);
