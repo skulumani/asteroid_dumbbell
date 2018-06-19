@@ -850,8 +850,8 @@ def animate_landing(filename, move_cam=False, mesh_weight=False):
     """Animation for the landing portion of simulation
     """
     with h5py.File(filename, 'r') as hf:
-        time = hf['time'][()]
-        state_group = hf['state']
+        time = hf['landing/time'][()]
+        state_group = hf['landing/state']
         state_keys = np.array(utilities.sorted_nicely(list(state_group.keys())))
 
         state = []
@@ -864,8 +864,8 @@ def animate_landing(filename, move_cam=False, mesh_weight=False):
 
         # option for the mesh weight
         if mesh_weight:
-            mesh = graphics.mayavi_addMesh(mfig, hf['vertices'][()], hf['faces'][()],
-                                           scalars=np.squeeze(hf['weight'][()]),
+            mesh = graphics.mayavi_addMesh(mfig, hf['landing/vertices'][()], hf['landing/faces'][()],
+                                           scalars=np.squeeze(hf['landing/weight'][()]),
                                            color=None, colormap='viridis')
         else:
             mesh = graphics.mayavi_addMesh(mfig, hf['vertices'][()], hf['faces'][()])
@@ -914,11 +914,11 @@ def save_animate_landing(filename, move_cam=False, mesh_weight=False):
 
         # option for the mesh weight
         if mesh_weight:
-            mesh = graphics.mayavi_addMesh(mfig, hf['vertices'][()], hf['faces'][()],
-                                           scalars=np.squeeze(hf['weight'][()]),
+            mesh = graphics.mayavi_addMesh(mfig, hf['landing/vertices'][()], hf['landing/faces'][()],
+                                           scalars=np.squeeze(hf['landing/weight'][()]),
                                            color=None, colormap='viridis')
         else:
-            mesh = graphics.mayavi_addMesh(mfig, hf['vertices'][()], hf['faces'][()])
+            mesh = graphics.mayavi_addMesh(mfig, hf['landing/vertices'][()], hf['landing/faces'][()])
 
         xaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([2, 0, 0]), color=(1, 0, 0)) 
         yaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 2, 0]), color=(0, 1, 0)) 
@@ -1197,7 +1197,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
     logger = logging.getLogger(__name__)
     
     num_steps = int(3600*3)
-    time = np.arange(0, num_steps)
+    time = np.arange(max_steps, max_steps + num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
     
@@ -1223,6 +1223,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
     with h5py.File(filename, 'r+') as hf:
         # groups to save the refined data
         if "refinement" in hf:
+            input("Press ENTER to delete refinement group!!!")
             del hf['refinement']
 
         refinement_group = hf.create_group("refinement")
@@ -1299,24 +1300,24 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
             # ast_int = Ra.T.dot(intersection)            
             # est_ast_rmesh.single_update(ast_int, max_angle) 
 
-            v_group.create_dataset(str(ii), data=est_ast_rmesh.get_verts(), compression=compression,
+            v_group.create_dataset(str(t), data=est_ast_rmesh.get_verts(), compression=compression,
                                    compression_opts=compression_opts)
-            f_group.create_dataset(str(ii), data=est_ast_rmesh.get_faces(), compression=compression,
+            f_group.create_dataset(str(t), data=est_ast_rmesh.get_faces(), compression=compression,
                                    compression_opts=compression_opts)
-            w_group.create_dataset(str(ii), data=est_ast_rmesh.get_weights(), compression=compression,
+            w_group.create_dataset(str(t), data=est_ast_rmesh.get_weights(), compression=compression,
                                    compression_opts=compression_opts)
 
-            state_group.create_dataset(str(ii), data=state, compression=compression,
+            state_group.create_dataset(str(t), data=state, compression=compression,
                                        compression_opts=compression_opts)
-            targets_group.create_dataset(str(ii), data=targets, compression=compression,
+            targets_group.create_dataset(str(t), data=targets, compression=compression,
                                          compression_opts=compression_opts)
             # targets_group.create_dataset(str(ii), data=target, compression=compression,
             #                              compression_opts=compression_opts)
-            Ra_group.create_dataset(str(ii), data=Ra, compression=compression,
+            Ra_group.create_dataset(str(t), data=Ra, compression=compression,
                                     compression_opts=compression_opts)
-            inertial_intersections_group.create_dataset(str(ii), data=intersections, compression=compression,
+            inertial_intersections_group.create_dataset(str(t), data=intersections, compression=compression,
                                                         compression_opts=compression_opts)
-            asteroid_intersections_group.create_dataset(str(ii), data=ast_ints, compression=compression,
+            asteroid_intersections_group.create_dataset(str(t), data=ast_ints, compression=compression,
                                                         compression_opts=compression_opts)
             # inertial_intersections_group.create_dataset(str(ii), data=intersection, compression=compression,
             #                                             compression_opts=compression_opts)
@@ -1333,7 +1334,7 @@ def landing(filename, desired_landing_site):
     """
     logger = logging.getLogger(__name__)
 
-    logger.info("Opening the HDF5 file from exploration {}".format(input_filename))
+    logger.info("Opening the HDF5 file from refinement {}".format(filename))
     
     # TODO Look at blender_sim
     # get all the terminal states from the exploration stage
@@ -1356,8 +1357,9 @@ def landing(filename, desired_landing_site):
         explore_true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
         explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
     
+    pdb.set_trace()
     num_steps = int(3600) # 2 hours to go from home pos to the surface
-    time = np.arange(max_steps,max_steps  + num_steps)
+    time = np.arange(max_steps + explore_tf ,max_steps + explore_tf  + num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
     
@@ -1372,6 +1374,10 @@ def landing(filename, desired_landing_site):
 
     initial_state = explore_state
     with h5py.File(filename, 'r+') as hf:
+        # delete the landing group if it exists
+        if "landing" in hf:
+            input("Press ENTER to delete the landing group!!!")
+            del hf['landing']
         # save data to HDF5 file
         hf.create_dataset('landing/time', data=time, compression=compression,
                           compression_opts=compression_opts)
@@ -1901,7 +1907,8 @@ if __name__ == "__main__":
         save_animation(args.simulation_data, move_cam=args.move_cam,
                        mesh_weight=args.mesh_weight, output_path=args.save_animation)
     elif args.landing:
-        landing(args.simulation_data)
+        desired_landing_spot = np.array([0.47180473, -0.01972284, 0.36729988])
+        landing(args.simulation_data, desired_landing_spot)
     elif args.landing_animation:
         animate_landing(args.simulation_data, move_cam=args.move_cam, mesh_weight=args.mesh_weight)
     elif args.landing_save_animation:
