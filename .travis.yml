@@ -23,9 +23,9 @@ before_install:
     - pip install --user cpp-coveralls
 install:
     - echo "Now try building FDCL-HDF5"
-    # - cd ./extern/fdcl-hdf5 && mkdir build && cmake .. 
+    - cd extern/fdcl-hdf5 && mkdir build && cd build && cmake ..
+    - cd ../../../
     # - make && make install
-    - pwd
     # - cd ../../
     # - mkdir build && cd build && cmake -DCOVERAGE=1 ..
     # - make -j4 all
