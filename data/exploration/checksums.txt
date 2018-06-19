@@ -1,0 +1,12 @@
+87e727db4eb3e4c9921c16e45e95e4c7  ./explore/20180615_exploration_52760_15000.hdf5
+5947fd075928127ed7d248dda2b05d3f  ./explore/20180615_exploration_castalia_15000.hdf5
+db4ec75266c10b70fa4ccaf00cdb7305  ./land/20180619_castalia_landing.hdf5
+259043d2774e30e3f5017690226b175e  ./refine/20180619_castalia_refinement.hdf5
+032108528f2f75a22fc52f76b6e8e24f  20180619_castlia.tar.gz
+a65aa78ae66e9256c4de942c431355e8  20180619_castlia.tar.gz.partaa
+13c4aa79d9d7b857e2c597bf20c0e476  20180619_castlia.tar.gz.partab
+3d9c34ae40706a725b2cb84eeb99addc  20180619_castlia.tar.gz.partac
+779917b67db4c52e994751dac2c959fe  20180619_castlia.tar.gz.partad
+eb3029b3dd614a33184468850f84a5e2  20180619_castlia.tar.gz.partae
+d9eb23cb3b5d5215e5d31fa48139b4d3  20180619_castlia.tar.gz.partaf
+f92e849f231eaffbceb4ecd026d84c0f  20180619_castlia.tar.gz.partag
