@@ -240,7 +240,7 @@ def initialize_refinement(output_filename, ast_name="castalia"):
     # switch based on asteroid name
     if ast_name == "castalia":
         refine_file_name = "castalia_bump.obj"
-        v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia_bump.obj')
+        v, f = wavefront.read_obj('./data/shape_model/CASTALIA/castalia_bump_2.obj')
     else:
         print("Incorrect asteroid name")
         return 1
@@ -273,7 +273,7 @@ def initialize_refinement(output_filename, ast_name="castalia"):
     lidar = cgal.Lidar()
     lidar = lidar.view_axis(np.array([1, 0, 0]))
     lidar = lidar.up_axis(np.array([0, 0, 1]))
-    lidar = lidar.fov(np.deg2rad(np.array([7, 7]))).dist(2).num_steps(3)
+    lidar = lidar.fov(np.deg2rad(np.array([2, 2]))).dist(2).num_steps(3)
 
     # raycaster from c++ using the bumpy asteroid
     caster = cgal.RayCaster(v, f) 
@@ -1196,7 +1196,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
     """
     logger = logging.getLogger(__name__)
     
-    num_steps = int(7200)
+    num_steps = int(3600*3)
     time = np.arange(0, num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -1206,7 +1206,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
         est_ast_meshdata, est_ast_rmesh, est_ast, lidar, caster, max_angle, dum,
         AbsTol, RelTol) = initialize_refinement(filename, asteroid_name)
 
-    v_bumpy, f_bumpy = wavefront.read_obj('./data/shape_model/CASTALIA/castalia_bump.obj') 
+    v_bumpy, f_bumpy = wavefront.read_obj('./data/shape_model/CASTALIA/castalia_bump_2.obj') 
     # define the initial condition as teh terminal state of the exploration sim
     with h5py.File(filename, 'r') as hf:
         state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
