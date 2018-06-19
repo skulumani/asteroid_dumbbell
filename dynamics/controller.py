@@ -573,14 +573,14 @@ def attitude_land_controller(time, state,  ext_moment, dum, ast):
     return u_m
 
 def translation_land_controller(time, state, ext_force, dum, ast,
-                                desired_asteroid_pos):
+                                desired_asteroid_pos, t0, initial_position):
     """Land vertically on the surface
 
     """
     # final position in the asteroid fixed frame (for castalia)
     # final_pos = np.array([0.734214, 0, 0])
     final_pos = desired_asteroid_pos
-    initial_pos = np.array([1.5, 0, 0])
+    initial_pos = initial_position
     descent_tf = 3600
 
     # extract the state
@@ -599,11 +599,11 @@ def translation_land_controller(time, state, ext_force, dum, ast,
     omega_ast_dot_vec = np.zeros(3)
     # determine desired position and velocity in the body fixed frame at this current time input
     # we'll use a simple linear interpolation between initial and final states
-    xslope =(final_pos[0] - initial_pos[0]) / (descent_tf) 
-    xdes =  xslope * (time - 15000) + initial_pos[0]
+    radius_slope =(np.linalg.norm(final_pos) - np.linalg.norm(initial_pos)) / (descent_tf) 
+    rdes =  radius_slope * (time - t0) + np.linalg.norm(initial_pos)
     
-    body_pos_des = np.array([xdes, 0, 0])
-    body_vel_des = np.array([xslope, 0, 0])
+    body_pos_des = rdes * final_pos / np.linalg.norm(final_pos) 
+    body_vel_des = radius_slope * final_pos / np.linalg.norm(final_pos)
     body_acc_des = np.zeros(3)
     # transform this body position/velocity into the inertial frame
     inertial_pos = Ra2i.dot(body_pos_des)

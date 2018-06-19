@@ -711,7 +711,8 @@ def eoms_controlled_inertial_control_cost_pybind(t, state, true_ast, dum,
 
 # TODO Update this function for use in exploration_sim.py land option
 def eoms_controlled_land_pybind(t, state, true_ast, dum, est_ast,
-                                desired_asteroid_pos):
+                                desired_asteroid_pos, t0,
+                                initial_position):
     """Inertial dumbbell equations of motion about an asteroid 
     
     This method must be used with the scipy.integrate.ode class instead of the
@@ -791,7 +792,8 @@ def eoms_controlled_land_pybind(t, state, true_ast, dum, est_ast,
     # compute the control input
     u_m = controller.attitude_land_controller(t, state, M1_est + M2_est, dum, est_ast)
     u_f = controller.translation_land_controller(t, state, F1_est + F2_est, dum, est_ast,
-                                                 desired_asteroid_pos)
+                                                 desired_asteroid_pos, t0,
+                                                 initial_position)
 
     pos_dot = vel
     vel_dot = 1/(dum.m1+dum.m2) *(F1 + F2 + u_f)

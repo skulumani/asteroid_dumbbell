@@ -868,7 +868,7 @@ def animate_landing(filename, move_cam=False, mesh_weight=False):
                                            scalars=np.squeeze(hf['landing/weight'][()]),
                                            color=None, colormap='viridis')
         else:
-            mesh = graphics.mayavi_addMesh(mfig, hf['vertices'][()], hf['faces'][()])
+            mesh = graphics.mayavi_addMesh(mfig, hf['landing/vertices'][()], hf['landing/faces'][()])
 
         xaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([2, 0, 0]), color=(1, 0, 0)) 
         yaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 2, 0]), color=(0, 1, 0)) 
@@ -1358,7 +1358,7 @@ def landing(filename, desired_landing_site):
         explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
     
     num_steps = int(3600) # 2 hours to go from home pos to the surface
-    time = np.arange(max_steps + explore_tf ,max_steps + explore_tf  + num_steps)
+    time = np.arange(explore_tf, explore_tf  + num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
     
@@ -1396,18 +1396,18 @@ def landing(filename, desired_landing_site):
         system = integrate.ode(eoms.eoms_controlled_land_pybind)
         system.set_integrator("lsoda", atol=explore_AbsTol, rtol=explore_RelTol,  nsteps=10000)
         system.set_initial_value(initial_state, t0)
-        system.set_f_params(true_ast, dum, est_ast, desired_landing_site)
+        system.set_f_params(true_ast, dum, est_ast, desired_landing_site, t0, initial_state[0:3])
         
         ii = 1
         while system.successful() and system.t < tf:
             t = system.t + dt
             state = system.integrate(system.t + dt)
 
-            logger.info("Step: {} Time: {}".format(ii, t))
+            logger.info("Step: {} Time: {} Pos: {}".format(ii, t, state[0:3]))
             
-            state_group.create_dataset(str(ii), data=state, compression=compression,
+            state_group.create_dataset(str(t), data=state, compression=compression,
                                        compression_opts=compression_opts)
-            Ra_group.create_dataset(str(ii), data=est_ast.rot_ast2int(t), compression=compression,
+            Ra_group.create_dataset(str(t), data=est_ast.rot_ast2int(t), compression=compression,
                                     compression_opts=compression_opts)
             ii+=1
 
