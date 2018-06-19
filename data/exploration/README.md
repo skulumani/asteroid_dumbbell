@@ -31,6 +31,10 @@ Copy these and then run the refinement, followed by the landing
 
 Copies of exploration data and refinement run using a bumpy version of Castalia
 
+~~~
+20180619_castalia_refinement.hdf5
+~~~
+
 ## HDF5 Data structure
 
 ~~~
