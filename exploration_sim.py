@@ -804,7 +804,7 @@ def animate_refinement(filename, move_cam=False, mesh_weight=False, save_animati
         est_initial_faces = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
             
         # think about a black background as well
-        mfig = graphics.mayavi_figure(size=(800,600))
+        mfig = graphics.mayavi_figure(bg=(0, 0 ,0), size=(800,600))
         
         if mesh_weight:
             mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces,
@@ -831,13 +831,13 @@ def animate_refinement(filename, move_cam=False, mesh_weight=False, save_animati
                                            color=(1, 0, 0), radius=0.1)
 
         pc_points = graphics.mayavi_points3d(mfig, inertial_intersections[0], 
-                                             color=(0, 0, 1), scale_factor=0.05)
+                                             color=(0, 0, 1), scale_factor=0.01)
         
         # add some text objects
         time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
-                                       color=(0, 0, 0), width=0.05)
+                                       color=(1, 1, 1), width=0.05)
         weight_text = graphics.mlab.text(0.1, 0.2, "w: {:8.1f}".format(0), figure=mfig,
-                                         color=(0, 0, 0), width=0.05)
+                                         color=(1, 1, 1), width=0.05)
         # mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
         mayavi_objects = (mesh, com, pc_points, time_text, weight_text)
     
@@ -993,7 +993,7 @@ def save_animate_refinement(filename, move_cam=False, mesh_weight=False, save_an
         est_initial_faces = hf['simulation_parameters/estimate_asteroid/initial_faces'][()]
             
         # think about a black background as well
-        mfig = graphics.mayavi_figure(size=(800,600), offscreen=True)
+        mfig = graphics.mayavi_figure(size=(800,600), offscreen=True, bg=(0 ,0 ,0))
         
         if mesh_weight:
             mesh = graphics.mayavi_addMesh(mfig, est_initial_vertices, est_initial_faces,
@@ -1020,13 +1020,13 @@ def save_animate_refinement(filename, move_cam=False, mesh_weight=False, save_an
                                            color=(1, 0, 0), radius=0.1)
 
         pc_points = graphics.mayavi_points3d(mfig, inertial_intersections[0], 
-                                             color=(0, 0, 1), scale_factor=0.05)
+                                             color=(0, 0, 1), scale_factor=0.01)
         
         # add some text objects
         time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
-                                       color=(0, 0, 0), width=0.05)
+                                       color=(1, 1, 1), width=0.05)
         weight_text = graphics.mlab.text(0.1, 0.2, "w: {:8.1f}".format(0), figure=mfig,
-                                         color=(0, 0, 0), width=0.05)
+                                         color=(1, 1, 1), width=0.05)
         # mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
         mayavi_objects = (mesh, com, pc_points, time_text, weight_text)
         
