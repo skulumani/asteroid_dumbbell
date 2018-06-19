@@ -413,10 +413,10 @@ def inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects,
     ts = com.mlab_source
 
     with h5py.File(filename, 'r') as hf:
-        v = hf['vertices'][()]
-        f = hf['faces'][()]
+        v = hf['landing/vertices'][()]
+        f = hf['landing/faces'][()]
 
-        Ra_group = hf['Ra']
+        Ra_group = hf['landing/Ra']
         keys = np.array(utilities.sorted_nicely(list(Ra_group.keys())))
         
         ii = 0

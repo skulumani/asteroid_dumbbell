@@ -900,8 +900,8 @@ def save_animate_landing(filename, move_cam=False, mesh_weight=False):
     """
 
     with h5py.File(filename, 'r') as hf:
-        time = hf['time'][()]
-        state_group = hf['state']
+        time = hf['landing/time'][()]
+        state_group = hf['landing/state']
         state_keys = np.array(utilities.sorted_nicely(list(state_group.keys())))
 
         state = []
@@ -1871,7 +1871,7 @@ if __name__ == "__main__":
     group.add_argument("-la", "--landing_animation", help="Landing animation",
                        action="store_true")
     group.add_argument("-lsa", "--landing_save_animation", help="Save landing animation to a video",
-                       action="store", nargs=1)
+                       action="store_true")
     group.add_argument("-lp", "--landing_plots", help="Generate plots to select landing site",
                        action="store_true")
     group.add_argument("-lr", "--landing_refine", help="Determine best landing spot and refine prior to using -l",
