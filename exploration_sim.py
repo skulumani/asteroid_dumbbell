@@ -1357,7 +1357,6 @@ def landing(filename, desired_landing_site):
         explore_true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
         explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
     
-    pdb.set_trace()
     num_steps = int(3600) # 2 hours to go from home pos to the surface
     time = np.arange(max_steps + explore_tf ,max_steps + explore_tf  + num_steps)
     t0, tf = time[0], time[-1]
