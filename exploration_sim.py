@@ -1246,13 +1246,13 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
         logger.info("Now refining the faces close to the landing site")
         # perform remeshing over the landing area and take a bunch of measurements 
         est_ast_meshdata.remesh_faces_in_view(desired_landing_site, np.deg2rad(20),
-                                              0.009)
+                                              0.01)
         logger.info("Estimated asteroid has {} vertices and {} faces".format(
             est_ast_rmesh.get_verts().shape[0],
             est_ast_rmesh.get_faces().shape[0]))
         logger.info("Now starting dynamic simulation and taking measurements again again")
         complete_controller.set_vertices_in_view(est_ast_rmesh, desired_landing_site,
-                                                 np.deg2rad(20))
+                                                 np.deg2rad(25))
         state = initial_state;
         for ii, t in enumerate(time):
             Ra = true_ast.rot_ast2int(t)
@@ -1294,7 +1294,7 @@ def kinematics_refine_landing_area(filename, asteroid_name, desired_landing_site
             
             ast_ints = np.array(ast_ints)
             # this updates the estimated asteroid mesh used in both rmesh and est_ast
-            est_ast_rmesh.update(ast_ints, max_angle, meas_weight=0.01, vert_weight=1.0)
+            est_ast_rmesh.update(ast_ints, max_angle, meas_weight=1.0, vert_weight=1.0)
             # intersection = caster.castray(state[0:3], target)
             # ast_int = Ra.T.dot(intersection)            
             # est_ast_rmesh.single_update(ast_int, max_angle) 
