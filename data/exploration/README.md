@@ -1,8 +1,7 @@
-* `explore.hdf5` - created using explore_main.cpp. Kinematics only simulation of cost function based 
-exploration without any control cost. Plot the results using `dissertation/explore_plots.py`
-* `explore_control.hdf5` - created using explore_control_main.cpp. Kinematics only simulation with control
-component of the cost function. Plots results using `dissertation/explore_plots.py`
-* `20180602_exploration_sim_control_sim_15000.hdf5` - exploration sim around asteroid castalia. Can recompute using 
+
+## Running the simulation
+    
+1. Run exploration
 
     ~~~
     python exploration_sim.py -c <name of hdf5 to save>
@@ -15,6 +14,39 @@ component of the cost function. Plots results using `dissertation/explore_plots.
     ~~~
     python exploration_sim.py -a <name of hdf5>
     ~~~
+    
+2. Run the refinement
+
+    ~~~
+    python exploration_sim.py -lkr <name of HDF5 file from exploration> <name of asteroid>
+    ~~~
+
+    To animate the refinement process
+
+    ~~~
+    python exploration_sim.py -lra <name of HDF5 file> <name of asteroid>
+    ~~~
+    
+3. Run the landing
+
+    ~~~
+    python exploration_sim.py -l <name of hdf5> <name of asteroid>
+    ~~~
+
+    To animate the landing
+
+    ~~~
+    python exploration_sim.py -la <name of HDF5> <name of asteroid>
+    ~~~
+
+Each stage will add an additional group with the HDF5 file. The structure of the groups is:
+
+~~~
+simulation_parameters
+reconstruction
+refinement
+landing
+~~~
 
 ## Exploration data
 
@@ -26,6 +58,8 @@ Good exploration files are in exploration subdirectory
 ~~~
 
 Copy these and then run the refinement, followed by the landing
+
+The appropriate truth models for the asteroids are stored within Git
 
 ## Refinement
 
@@ -45,15 +79,6 @@ Now run landing based on the refinement
 
 It includes all the data from the exploration and refinement
 
-## HDF5 Data structure
-
-~~~
-simulation_parameters
-reconstruction
-refinement
-landing
-
-~~~
 ## Splitting large files
 
 To split:
