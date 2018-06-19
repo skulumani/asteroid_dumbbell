@@ -1360,7 +1360,7 @@ def landing(filename, desired_landing_site):
         explore_true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
         explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
     
-    num_steps = int(3600) # 2 hours to go from home pos to the surface
+    num_steps = int(5000) # 2 hours to go from home pos to the surface
     time = np.arange(explore_tf, explore_tf  + num_steps)
     t0, tf = time[0], time[-1]
     dt = time[1] - time[0]
@@ -2114,8 +2114,8 @@ if __name__ == "__main__":
         save_animation(args.simulation_data, move_cam=args.move_cam,
                        mesh_weight=args.mesh_weight)
     elif args.landing:
-        landing_site_plots(args.simulation_data)
-        desired_landing_spot = np.array([0.47180473, -0.01972284, 0.36729988])
+        # landing_site_plots(args.simulation_data)
+        desired_landing_spot = np.array([0.48501797, -0.02027519, 0.37758639])
         landing(args.simulation_data, desired_landing_spot)
     elif args.landing_animation:
         animate_landing(args.simulation_data, move_cam=args.move_cam, mesh_weight=args.mesh_weight)
@@ -2125,7 +2125,7 @@ if __name__ == "__main__":
         landing_site_plots(args.simulation_data)
     elif args.landing_refine:
         # landing location in the asteroid fixed frame
-        desired_landing_spot = refine_site_plots(args.simulation_data)
+        # desired_landing_spot = refine_site_plots(args.simulation_data)
         desired_landing_spot = np.array([0.47180473, -0.01972284, 0.36729988])
         refine_landing_area(args.simulation_data, args.name, desired_landing_spot)
     elif args.landing_refine_animation:
