@@ -27,6 +27,19 @@ Good exploration files are in exploration subdirectory
 
 Copy these and then run the refinement, followed by the landing
 
+## Refinement
+
+Copies of exploration data and refinement run using a bumpy version of Castalia
+
+## HDF5 Data structure
+
+~~~
+simulation_parameters
+reconstruction
+refinement
+landing
+
+~~~
 ## Splitting large files
 
 To split:
