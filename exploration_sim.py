@@ -911,7 +911,7 @@ def save_animate_landing(filename, move_cam=False, mesh_weight=False):
 
         state=np.array(state)
 
-        mfig = graphics.mayavi_figure(size=(800, 600), offscreen=True)
+        mfig = graphics.mayavi_figure(bg=(0, 0, 0), size=(800, 600), offscreen=True)
 
         # option for the mesh weight
         if mesh_weight:
@@ -936,9 +936,9 @@ def save_animate_landing(filename, move_cam=False, mesh_weight=False):
 
         # add some text objects
         time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
-                                       color=(0, 0, 0), width=0.05)
+                                       color=(1, 1, 1), width=0.05)
         weight_text = graphics.mlab.text(0.1, 0.2, "w: {:8.1f}".format(0), figure=mfig,
-                                         color=(0, 0, 0), width=0.05)
+                                         color=(1, 1, 1), width=0.05)
 
         mayavi_objects = (mesh, com, time_text, weight_text)
 
