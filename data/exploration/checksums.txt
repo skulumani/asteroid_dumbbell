@@ -1,6 +1,6 @@
 87e727db4eb3e4c9921c16e45e95e4c7  explore/20180615_exploration_52760_15000.hdf5
 5947fd075928127ed7d248dda2b05d3f  explore/20180615_exploration_castalia_15000.hdf5
-a758ad3b358dbe51b620cf7341544e7c  land/20180619_castalia_landing.hdf5
+db6b842f8f4664b54c7f868a138b4a57  land/20180619_castalia_landing.hdf5
 bf66c7e164ac0879cba452db9a7b546f  refine/20180619_castalia_refinement.hdf5
 38e7943bf040711a20a3157acb877696  20180619_castlia.tar.gz
 ce7e732a1dd150a179395f38551784ce  20180619_castlia.tar.gz.partaa
