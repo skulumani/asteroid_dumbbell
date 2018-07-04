@@ -27,6 +27,8 @@ int main(int argc, char* argv[])
     if (input.option_exists("-h")) {
         std::cout << "Kinematic only exploration with asteroid reconstruction" << std::endl;
         std::cout << "explore -o data.hdf5 -n ast_name" << std::endl;
+        std::cout << "Possible asteroids are: castalia, geographos, golevka, 52760" << std::endl;
+        return 1;
     }
     
     const std::string output_file = input.get_command_option("-o");
