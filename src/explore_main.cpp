@@ -84,7 +84,8 @@ int main(int argc, char* argv[])
                 reconstructed_weight_group(hf.get(), "reconstructed_weight"),
                 state_group(hf.get(), "state"),
                 targets_group(hf.get(), "targets"),
-                intersections_group(hf.get(), "intersections");
+                intersections_group(hf.get(), "intersections"),
+                volume_group(hf.get(), "volume");
 
     // place satellite in a specific location and define view axis
     // satellite is in the asteroid fixed frame
@@ -143,7 +144,7 @@ int main(int argc, char* argv[])
         state_group.write(std::to_string(ii), state_ptr->get_state());
         targets_group.write(std::to_string(ii), target);
         intersections_group.write(std::to_string(ii), intersection);
-
+        // compute and save volume
     }
     
     /* hf.close(); */
