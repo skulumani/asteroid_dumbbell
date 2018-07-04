@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     // CONSTANTS
     // initialize all the objects
     double min_angle, max_radius, max_distance, surf_area; 
-    Eigen::Vector3d axes(3);
+    Eigen::Vector3d axes(3), initial_pos(3);
     std::shared_ptr<MeshData> true_asteroid;
 
     if (ast_name.compare("castalia") == 0) {
@@ -59,6 +59,7 @@ int main(int argc, char* argv[])
         // semi major axes of castalia
         axes << 1.6130 / 2.0, 0.9810 / 2.0, 0.8260 / 2.0;
         true_asteroid = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+        initial_pos << 1.5, 0, 0;
     } else if ( ast_name.compare("geographos") == 0) {
         min_angle=10;
         max_radius=0.05;
@@ -68,6 +69,7 @@ int main(int argc, char* argv[])
         axes << 5, 2, 2.1;
         axes = axes / 2.0;
         true_asteroid = Loader::load("./data/shape_model/RADAR/1620geographos.obj");
+        initial_pos << 5, 0, 0;
     } else if (ast_name.compare("golevka") == 0) {
         min_angle=10;
         max_radius=0.03;
@@ -77,6 +79,7 @@ int main(int argc, char* argv[])
         axes << 1.5, 1.5, 1.5;
         axes = axes /2.0;
         true_asteroid = Loader::load("./data/shape_model/RADAR/6489golevka.obj");
+        initial_pos << 1.5, 0, 0;
     } else if (ast_name.compare("52760") == 0) {
         min_angle=10;
         max_radius=0.05;
@@ -86,6 +89,7 @@ int main(int argc, char* argv[])
         axes << 1.1, 1.1, 1.1;
         axes = axes / 2.0;
         true_asteroid = Loader::load("./data/shape_model/RADAR/52760.obj");
+        initial_pos << 1.5, 0, 0;
     } else {
         std::cout << "Unrecognized asteroid!" << std::endl;
         return 1;
@@ -119,7 +123,7 @@ int main(int argc, char* argv[])
     // place satellite in a specific location and define view axis
     // satellite is in the asteroid fixed frame
     State initial_state, state;
-    initial_state.pos((Eigen::RowVector3d() << 1.5, 0, 0).finished())
+    initial_state.pos(initial_pos)
          .vel((Eigen::RowVector3d() << 0, 0, 0).finished())
          .att((Eigen::MatrixXd::Identity(3, 3)))
          .ang_vel((Eigen::RowVector3d() << 0, 0, 0).finished());
@@ -149,8 +153,9 @@ int main(int argc, char* argv[])
     hf->write("initial_state", state_ptr->get_state()); 
 
     // LOOP HERE
-    for (int ii = 0; ii < true_asteroid->number_of_vertices(); ++ii) {
-        
+    double sum_weights = rmesh_ptr->get_weights().sum();
+    int ii = 0;
+    while (sum_weights > 1e-2) { 
         // compute targets for use in caster (point at the asteroid origin)
         target = sensor.define_target(state_ptr->get_pos(),
                 state_ptr->get_att(), dist);    
@@ -174,6 +179,8 @@ int main(int argc, char* argv[])
         targets_group.write(std::to_string(ii), target);
         intersections_group.write(std::to_string(ii), intersection);
         // compute and save volume
+        sum_weights = rmesh_ptr->get_weights().sum();
+        ii += 1;
     }
     
     /* hf.close(); */
