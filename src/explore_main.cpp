@@ -18,17 +18,15 @@
 #include <memory>
 #include <iostream>
 #include <string>
+#include <tuple>
 
 int main(int argc, char* argv[])
 {
-    // CONSTANTS
-    // semi major axes of castalia
-    Eigen::Vector3d axes(3);
-    axes << 1.6130 / 2.0, 0.9810 / 2.0, 0.8260 / 2.0;
 
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
         std::cout << "Kinematic only exploration with asteroid reconstruction" << std::endl;
+        std::cout << "explore -o data.hdf5 -n ast_name" << std::endl
     }
     
     const std::string output_file = input.get_command_option("-o");
@@ -37,13 +35,29 @@ int main(int argc, char* argv[])
         std::cout << "explore -o data.hdf5" << std::endl;
         return 1;
     }
+    
+    const std::string ast_name = input.get_common_option("-n");
+    if (ast_name.empty()) {
+        std::cout << "You need an asteroid name: castalia, geographos, golevka, 52760" << std::endl;
+        std::cout << "explore -o data.hdf5 -n ast_name" << std::endl;
+    }
 
+    // CONSTANTS
     // initialize all the objects
-    double min_angle(10), max_radius(0.03), max_distance(0.5);
-    double surf_area(0.005);
+    double min_angle, max_radius, max_distance, surf_area; 
+    Eigen::Vector3d axes(3);
+    std::shared_ptr<MeshData> true_asteroid;
 
-    std::shared_ptr<MeshData> true_asteroid =
-        Loader::load("./data/shape_model/CASTALIA/castalia_bump.obj");
+    if {ast_name.compare("castalia") {
+        min_angle=10;
+        max_radius=0.03;
+        max_distance=0.5;
+        surf_area=0.005;
+        // semi major axes of castalia
+        axes << 1.6130 / 2.0, 0.9810 / 2.0, 0.8260 / 2.0;
+        std::shared_ptr<MeshData> true_asteroid =
+            Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+    }
 
     RayCaster caster(true_asteroid);
     SurfMesh ellipsoid(axes(0), axes(1), axes(2),
@@ -102,7 +116,7 @@ int main(int argc, char* argv[])
     hf->write("initial_state", state_ptr->get_state()); 
 
     // LOOP HERE
-    for (int ii = 0; ii < 1000; ++ii) {
+    for (int ii = 0; ii < true_asteroid->number_of_vertices(); ++ii) {
         
         // compute targets for use in caster (point at the asteroid origin)
         target = sensor.define_target(state_ptr->get_pos(),
