@@ -57,6 +57,33 @@ int main(int argc, char* argv[])
         // semi major axes of castalia
         axes << 1.6130 / 2.0, 0.9810 / 2.0, 0.8260 / 2.0;
         true_asteroid = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+    } else if ( ast_name.compare("geographos") == 0) {
+        min_angle=10;
+        max_radius=0.05;
+        max_distance=0.5;
+        surf_area=0.005;
+        // semi major axes of castalia
+        axes << 5, 2, 2.1;
+        axes = axes / 2.0;
+        true_asteroid = Loader::load("./data/shape_model/RADAR/1620geographos.obj");
+    } else if (ast_name.compare("golevka") == 0) {
+        min_angle=10;
+        max_radius=0.03;
+        max_distance=0.5;
+        surf_area=0.005;
+        // semi major axes of castalia
+        axes << 1.5, 1.5, 1.5;
+        axes = axes /2.0;
+        true_asteroid = Loader::load("./data/shape_model/RADAR/6489golevka.obj");
+    } else if (ast_name.compare("52760") == 0) {
+        min_angle=10;
+        max_radius=0.05;
+        max_distance=0.5;
+        surf_area=0.005;
+        // semi major axes of castalia
+        axes << 1.1, 1.1, 1.1;
+        axes = axes / 2.0;
+        true_asteroid = Loader::load("./data/shape_model/RADAR/52760.obj");
     } else {
         std::cout << "Unrecognized asteroid!" << std::endl;
         return 1;
