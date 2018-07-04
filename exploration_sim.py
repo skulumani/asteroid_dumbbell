@@ -2082,6 +2082,8 @@ if __name__ == "__main__":
                        action="store_true")
     group.add_argument("-lp", "--landing_plots", help="Generate plots to select landing site",
                        action="store_true")
+    group.add_argument("-rp", "--refine_plots", help="Generate plots for landing refinement", 
+                       action="store_true")
     group.add_argument("-lr", "--landing_refine", help="Determine best landing spot and refine prior to using -l",
                        action="store_true")
     group.add_argument("-lkr", "--landing_kinematic_refine", help="Landing refinement using a kinematics only model",
@@ -2123,6 +2125,8 @@ if __name__ == "__main__":
         save_animate_landing(args.simulation_data, move_cam=args.move_cam, mesh_weight=args.mesh_weight)
     elif args.landing_plots:
         landing_site_plots(args.simulation_data)
+    elif args.refine_plots:
+        refine_site_plots(args.simulation_data)
     elif args.landing_refine:
         # landing location in the asteroid fixed frame
         # desired_landing_spot = refine_site_plots(args.simulation_data)
