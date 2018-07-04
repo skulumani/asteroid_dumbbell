@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     InputParser input(argc, argv);
     if (input.option_exists("-h")) {
         std::cout << "Kinematic only exploration with asteroid reconstruction" << std::endl;
-        std::cout << "explore -o data.hdf5 -n ast_name" << std::endl
+        std::cout << "explore -o data.hdf5 -n ast_name" << std::endl;
     }
     
     const std::string output_file = input.get_command_option("-o");
@@ -36,10 +36,11 @@ int main(int argc, char* argv[])
         return 1;
     }
     
-    const std::string ast_name = input.get_common_option("-n");
+    const std::string ast_name = input.get_command_option("-n");
     if (ast_name.empty()) {
         std::cout << "You need an asteroid name: castalia, geographos, golevka, 52760" << std::endl;
         std::cout << "explore -o data.hdf5 -n ast_name" << std::endl;
+        return 1;
     }
 
     // CONSTANTS
@@ -48,15 +49,17 @@ int main(int argc, char* argv[])
     Eigen::Vector3d axes(3);
     std::shared_ptr<MeshData> true_asteroid;
 
-    if {ast_name.compare("castalia") {
+    if (ast_name.compare("castalia") == 0) {
         min_angle=10;
         max_radius=0.03;
         max_distance=0.5;
         surf_area=0.005;
         // semi major axes of castalia
         axes << 1.6130 / 2.0, 0.9810 / 2.0, 0.8260 / 2.0;
-        std::shared_ptr<MeshData> true_asteroid =
-            Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+        true_asteroid = Loader::load("./data/shape_model/CASTALIA/castalia.obj");
+    } else {
+        std::cout << "Unrecognized asteroid!" << std::endl;
+        return 1;
     }
 
     RayCaster caster(true_asteroid);
