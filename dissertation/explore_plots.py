@@ -54,19 +54,19 @@ def exploration_generate_plots(data_path, img_path='/tmp/diss_explore',
             ms.reset(x=v[:, 0], y=v[:, 1], z=v[:,2], triangles=f_initial)
             graphics.mlab.savefig(filename, magnification=4)
         
-        """Create a bunch of images for animation"""
-        animation_path = os.path.join(img_path, 'animation')
-        if not os.path.exists(animation_path):
-            os.makedirs(animation_path)
-        ms.reset(x=v_initial[:, 0], y=v_initial[:, 1], z=v_initial[:, 2], triangles=f_initial,
-                 scalars=w_initial)
-        graphics.mayavi_view(mfig)
-        for ii, vk in enumerate(v_keys[::step]):
-            filename = os.path.join(animation_path, str(ii).zfill(7) + '.jpg')
-            v = rv[vk][()]
-            w = np.squeeze(rw[str(vk)][()])
-            ms.reset(x=v[:, 0], y=v[:, 1], z=v[:, 2], triangles=f_initial, scalars=w)
-            graphics.mayavi_savefig(mfig, filename, magnification=magnification)
+        # """Create a bunch of images for animation"""
+        # animation_path = os.path.join(img_path, 'animation')
+        # if not os.path.exists(animation_path):
+        #     os.makedirs(animation_path)
+        # ms.reset(x=v_initial[:, 0], y=v_initial[:, 1], z=v_initial[:, 2], triangles=f_initial,
+        #          scalars=w_initial)
+        # graphics.mayavi_view(mfig)
+        # for ii, vk in enumerate(v_keys[::step]):
+        #     filename = os.path.join(animation_path, str(ii).zfill(7) + '.jpg')
+        #     v = rv[vk][()]
+        #     w = np.squeeze(rw[str(vk)][()])
+        #     ms.reset(x=v[:, 0], y=v[:, 1], z=v[:, 2], triangles=f_initial, scalars=w)
+        #     graphics.mayavi_savefig(mfig, filename, magnification=magnification)
 
 def plot_uncertainty(filename):
     """Compute the sum of uncertainty and plot as function of time"""
