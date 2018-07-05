@@ -44,11 +44,11 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
         "font.serif": [],                   # blank entries should cause plots to inherit fonts from the document
         "font.sans-serif": [],
         "font.monospace": [],
-        # "axes.labelsize": 8,               # LaTeX default is 10pt font.
-        # "font.size": 8,
-        # "legend.fontsize": 8,               # Make the legend/label fonts a little smaller
-        # "xtick.labelsize": 8,
-        # "ytick.labelsize": 8,
+        "axes.labelsize": 10,               # LaTeX default is 10pt font.
+        "font.size": 10,
+        "legend.fontsize": 10,               # Make the legend/label fonts a little smaller
+        "xtick.labelsize": 10,
+        "ytick.labelsize": 10,
         "figure.figsize": figsize(1),     # default fig size of 0.9 textwidth
         "figure.autolayout": True,
         "pgf.preamble": [
@@ -56,7 +56,7 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
             ]
         }
 
-# matplotlib.rcParams.update(pgf_with_latex)
+matplotlib.rcParams.update(pgf_with_latex)
 sns.set_style('ticks', pgf_with_latex)
 # sns.color_palette('bright')
 linewidth=3
@@ -82,7 +82,9 @@ def plot_uncertainty(time, uncertainty,img_path="/tmp", fname_suffix="", wscale=
             sns.despine()
             # plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
-            tikz_save(os.path.join(img_path, fname) + '.tex', figurewidth='\\tikzwidth', figureheight='\\tikzheight')
+            np.savetxt(os.path.join(img_path, fname) + ".csv",np.stack((time/time[-1], uncertainty/uncertainty[0]), axis=1) , delimiter=",",
+                       header="NORMALIZED_TIME, NORMALIZED_UNCERTAINTY", comments='')
+            # tikz_save(os.path.join(img_path, fname) + '.tex', externalize_tables=True)
     if show:
         plt.show()
 
@@ -155,7 +157,9 @@ def plot_volume(time, volume, true_volume, img_path="/tmp", fname_suffix="",
             sns.despine()
             # plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
-            tikz_save(os.path.join(img_path, fname) + '.tex', figurewidth='\\tikzwidth', figureheight='\\tikzheight')
+            # tikz_save(os.path.join(img_path, fname) + '.tex', externalize_tables=True)
+            np.savetxt(os.path.join(img_path, fname) + ".csv",np.stack((time/time[-1], (volume-true_volume)/true_volume)), delimiter=",",
+                       header="NORMALIZED_TIME, VOLUME_PERCENT_ERROR", comments='')
     
     if show:
         plt.show()
