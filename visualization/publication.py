@@ -164,6 +164,12 @@ def plot_volume(time, volume, true_volume, img_path="/tmp", fname_suffix="",
     if show:
         plt.show()
 
+def plot_refinment_plots():
+    """Plot the surface refinement plots"""
+    pass
+
+
+
     
 
 

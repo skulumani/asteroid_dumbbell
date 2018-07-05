@@ -1669,27 +1669,27 @@ def refine_site_plots(input_filename):
     delta_angle = 0.05 / max_radius
     grid_long, grid_lat = np.meshgrid(np.arange(-np.pi, np.pi, delta_angle),
                                       np.arange(-np.pi/2, np.pi/2, delta_angle))
-    # interpolate and create a radius plot
-    fig_radius, ax_radius = plt.subplots(1, 1)
-    # compute radius of each vertex and lat/long 
-    spherical_vertices = wavefront.cartesian2spherical(explore_v)
-    r = spherical_vertices[:, 0]
-    lat = spherical_vertices[:, 1]
-    long = spherical_vertices[:, 2]
-    grid_r = interpolate.griddata(np.vstack((long, lat)).T, r, (grid_long, grid_lat), method='nearest')
-    grid_r_smooth = ndimage.gaussian_filter(grid_r, sigma=10*delta_angle)
-    # ax.scatter(long, lat,c=r)
-    # ax.imshow(grid_r.T, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
-    ax_radius.contour(grid_long, grid_lat, grid_r)
-    ax_radius.set_title('Radius (km)')
-    ax_radius.set_xlabel('Longitude (rad)')
-    ax_radius.set_ylabel('Latitude (rad)')
+    # # interpolate and create a radius plot
+    # fig_radius, ax_radius = plt.subplots(1, 1)
+    # # compute radius of each vertex and lat/long 
+    # spherical_vertices = wavefront.cartesian2spherical(explore_v)
+    # r = spherical_vertices[:, 0]
+    # lat = spherical_vertices[:, 1]
+    # long = spherical_vertices[:, 2]
+    # grid_r = interpolate.griddata(np.vstack((long, lat)).T, r, (grid_long, grid_lat), method='nearest')
+    # grid_r_smooth = ndimage.gaussian_filter(grid_r, sigma=10*delta_angle)
+    # # ax.scatter(long, lat,c=r)
+    # # ax.imshow(grid_r.T, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
+    # ax_radius.contour(grid_long, grid_lat, grid_r)
+    # ax_radius.set_title('Radius (km)')
+    # ax_radius.set_xlabel('Longitude (rad)')
+    # ax_radius.set_ylabel('Latitude (rad)')
     
-    fig_radius_img, ax_radius_img = plt.subplots(1, 1)
-    img = ax_radius_img.imshow(grid_r, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
-    ax_radius_img.set_title('Radius (km)')
-    ax_radius_img.set_ylabel('Latitude (rad)')
-    fig_radius_img.colorbar(img)
+    # fig_radius_img, ax_radius_img = plt.subplots(1, 1)
+    # img = ax_radius_img.imshow(grid_r, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2), origin='lower')
+    # ax_radius_img.set_title('Radius (km)')
+    # ax_radius_img.set_ylabel('Latitude (rad)')
+    # fig_radius_img.colorbar(img)
     
     fig_density, ax_density = plt.subplots(1, 1)
     # divider = make_axes_locatable(ax_density)
@@ -1715,14 +1715,14 @@ def refine_site_plots(input_filename):
                                                  (grid_long, grid_lat),
                                                  method='nearest') * 1e6 # convert to meters
     grid_area_smooth = ndimage.gaussian_filter(grid_area, sigma=10*delta_angle)
-    fig_area, ax_area = plt.subplots(1, 1)
-    # contour = ax_area.contour(grid_long, grid_lat, grid_area*1e6)
-    img_area = ax_area.imshow(grid_area_smooth, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
-                   origin="lower")
-    ax_area.set_title('Face area (square meters)')
-    ax_area.set_xlabel('Longitude')
-    ax_area.set_ylabel('Latitude')
-    fig_area.colorbar(img_area)
+    # fig_area, ax_area = plt.subplots(1, 1)
+    # # contour = ax_area.contour(grid_long, grid_lat, grid_area*1e6)
+    # img_area = ax_area.imshow(grid_area_smooth, extent=(-np.pi, np.pi, -np.pi/2, np.pi/2),
+    #                origin="lower")
+    # ax_area.set_title('Face area (square meters)')
+    # ax_area.set_xlabel('Longitude')
+    # ax_area.set_ylabel('Latitude')
+    # fig_area.colorbar(img_area)
     
     
     grid_slope = interpolate.griddata(np.vstack((spherical_face_center[:, 2],
