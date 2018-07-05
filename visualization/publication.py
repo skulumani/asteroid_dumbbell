@@ -56,9 +56,9 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
             ]
         }
 
-matplotlib.rcParams.update(pgf_with_latex)
+# matplotlib.rcParams.update(pgf_with_latex)
 sns.set_style('whitegrid', pgf_with_latex)
-sns.color_palette('bright')
+# sns.color_palette('bright')
 linewidth=3
 
 def plot_uncertainty(time, uncertainty,img_path="/tmp", fname_suffix="", wscale=1, hscale=0.75,
@@ -79,9 +79,9 @@ def plot_uncertainty(time, uncertainty,img_path="/tmp", fname_suffix="", wscale=
         fig_names = ('uncertainty',)
         for fig, fname in zip(fig_handles, fig_names):
             plt.figure(fig.number)
-            plt.savefig(os.path.join(img_path, fname) +  '.pgf')
+            # plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
-            tikz_save(os.path.join(img_path, fname) + '.tex', figurewidth='\textwidth')
+            tikz_save(os.path.join(img_path, fname) + '.tex', figurewidth='\\tikzwidth', figureheight='\\tikzheight')
     if show:
         plt.show()
 
@@ -152,9 +152,9 @@ def plot_volume(time, volume, true_volume, img_path="/tmp", fname_suffix="",
         fig_names = ('volume',)
         for fig, fname in zip(fig_handles, fig_names):
             plt.figure(fig.number)
-            plt.savefig(os.path.join(img_path, fname) +  '.pgf')
+            # plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
-            tikz_save(os.path.join(img_path, fname) + '.tex', figurewidth='\textwidth')
+            tikz_save(os.path.join(img_path, fname) + '.tex', figurewidth='\\tikzwidth', figureheight='\\tikzheight')
     
     if show:
         plt.show()
