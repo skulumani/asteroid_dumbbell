@@ -19,6 +19,7 @@ dependencies:
     - astro
     - kinematics
     - mayavi
+    - matplotlib2tikz
     # - pydistmesh # only makes solid meshes and not surface mesh
 prefix: /home/shankar/anaconda3/envs/asteroid
 

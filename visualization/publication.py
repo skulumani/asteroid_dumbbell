@@ -13,6 +13,8 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 from matplotlib import colors, cm
 
+from matplotlib2tikz import save as tikz_save
+
 import os
 
 time_label=r'Normalized Time'
@@ -79,6 +81,7 @@ def plot_uncertainty(time, uncertainty,img_path="/tmp", fname_suffix="", wscale=
             plt.figure(fig.number)
             plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
+            tikz_save(os.path.join(img_path, fname) + '.tex', figurewidth='\textwidth')
     if show:
         plt.show()
 
@@ -151,6 +154,7 @@ def plot_volume(time, volume, true_volume, img_path="/tmp", fname_suffix="",
             plt.figure(fig.number)
             plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
+            tikz_save(os.path.join(img_path, fname) + '.tex', figurewidth='\textwidth')
     
     if show:
         plt.show()
