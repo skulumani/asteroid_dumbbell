@@ -57,7 +57,7 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
         }
 
 # matplotlib.rcParams.update(pgf_with_latex)
-sns.set_style('whitegrid', pgf_with_latex)
+sns.set_style('ticks', pgf_with_latex)
 # sns.color_palette('bright')
 linewidth=3
 
@@ -68,7 +68,7 @@ def plot_uncertainty(time, uncertainty,img_path="/tmp", fname_suffix="", wscale=
 
     # create a figure
     uncertainty_figure, uncertainty_ax = plt.subplots(1, 1, figsize=figsize(scale=wscale))
-    uncertainty_ax.plot(time/time[-1], uncertainty/uncertainty[0], linewidth=linewidth, linestyle='-', label='Uncertainty')
+    uncertainty_ax.plot(time/time[-1], uncertainty/uncertainty[0],label='Uncertainty')
     uncertainty_ax.set_xlabel(time_label)
     uncertainty_ax.set_ylabel(r'Normalized Uncertainty')
     uncertainty_ax.set_xlim([0, 1])
@@ -79,6 +79,7 @@ def plot_uncertainty(time, uncertainty,img_path="/tmp", fname_suffix="", wscale=
         fig_names = ('uncertainty',)
         for fig, fname in zip(fig_handles, fig_names):
             plt.figure(fig.number)
+            sns.despine()
             # plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
             tikz_save(os.path.join(img_path, fname) + '.tex', figurewidth='\\tikzwidth', figureheight='\\tikzheight')
@@ -133,8 +134,7 @@ def plot_volume(time, volume, true_volume, img_path="/tmp", fname_suffix="",
     
     vol_fig, vol_ax = plt.subplots(1, 1, figsize=figsize(scale=wscale))
     vol_ax.plot(time/time[-1], 100 * (volume-true_volume)/true_volume,
-                linewidth=linewidth, label='Percent Error',
-                linestyle='-')
+                label='Percent Error')
     # vol_ax.plot(time/time[-1], volume,
     #             linewidth=linewidth, label='Estimate',
     #             linestyle='-')
@@ -152,6 +152,7 @@ def plot_volume(time, volume, true_volume, img_path="/tmp", fname_suffix="",
         fig_names = ('volume',)
         for fig, fname in zip(fig_handles, fig_names):
             plt.figure(fig.number)
+            sns.despine()
             # plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
             tikz_save(os.path.join(img_path, fname) + '.tex', figurewidth='\\tikzwidth', figureheight='\\tikzheight')
