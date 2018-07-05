@@ -60,7 +60,7 @@ sns.color_palette('bright')
 linewidth=3
 
 def plot_uncertainty(time, uncertainty,img_path="/tmp", fname_suffix="", wscale=1, hscale=0.75,
-                     pgf_save=False):
+                     pgf_save=False, show=True):
     """Plot uncertainty vs. time
     """
 
@@ -79,8 +79,8 @@ def plot_uncertainty(time, uncertainty,img_path="/tmp", fname_suffix="", wscale=
             plt.figure(fig.number)
             plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
-
-    plt.show()
+    if show:
+        plt.show()
 
 def plot_state(time, pos_inertial, pos_asteroid, fname_suffix="", wscale=1, hscale=0.75,
                pgf_save=False):
@@ -124,11 +124,12 @@ def plot_state(time, pos_inertial, pos_asteroid, fname_suffix="", wscale=1, hsca
     pos_radius_ax.set_ylabel(r'Radius')
     plt.show()
 
-def plot_volume(time, volume, true_volume, img_path="/tmp", fname_suffix="", wscale=1, hscale=0.75, pgf_save=False):
+def plot_volume(time, volume, true_volume, img_path="/tmp", fname_suffix="",
+                wscale=1, hscale=0.75, pgf_save=False, show=True):
     """Plot the volume over time"""
     
     vol_fig, vol_ax = plt.subplots(1, 1, figsize=figsize(scale=wscale))
-    vol_ax.plot(time/time[-1], (volume-true_volume)/true_volume,
+    vol_ax.plot(time/time[-1], 100 * (volume-true_volume)/true_volume,
                 linewidth=linewidth, label='Percent Error',
                 linestyle='-')
     # vol_ax.plot(time/time[-1], volume,
@@ -150,8 +151,9 @@ def plot_volume(time, volume, true_volume, img_path="/tmp", fname_suffix="", wsc
             plt.figure(fig.number)
             plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
-
-    plt.show()
+    
+    if show:
+        plt.show()
 
     
 

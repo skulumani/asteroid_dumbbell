@@ -72,20 +72,17 @@ int main(int argc, char* argv[])
         initial_pos << 5, 0, 0;
     } else if (ast_name.compare("golevka") == 0) {
         min_angle=10;
-        max_radius=0.03;
+        max_radius=0.015;
         max_distance=0.5;
         surf_area=0.005;
-        // semi major axes of castalia
-        axes << 1.5, 1.5, 1.5;
-        axes = axes /2.0;
+        axes << 0.4, 0.4, 0.4;
         true_asteroid = Loader::load("./data/shape_model/RADAR/6489golevka.obj");
-        initial_pos << 1.5, 0, 0;
+        initial_pos << 1, 0, 0;
     } else if (ast_name.compare("52760") == 0) {
         min_angle=10;
         max_radius=0.05;
         max_distance=0.5;
         surf_area=0.005;
-        // semi major axes of castalia
         axes << 1.1, 1.1, 1.1;
         axes = axes / 2.0;
         true_asteroid = Loader::load("./data/shape_model/RADAR/52760.obj");
