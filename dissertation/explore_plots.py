@@ -173,7 +173,7 @@ if __name__ == "__main__":
     parser.add_argument("--show", help="Show the plots", action="store_true",
                         default=False)
     parser.add_argument("-m", "--magnification", help="Magnification for images",
-                       action="store", type=int, const=1, nargs='?', default=1)
+                       action="store", type=int, const=4, nargs='?', default=4)
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-r", "--reconstruct", help="Reconstruction plots for video",
