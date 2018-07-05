@@ -1414,15 +1414,14 @@ def landing(filename, desired_landing_site):
                                     compression_opts=compression_opts)
             ii+=1
 
-def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
+def reconstruct_images(filename, output_path="/tmp/reconstruct_images", 
+                       magnification=1, show=True):
     """Read teh HDF5 data and generate a bunch of images of the reconstructing 
     asteroid
     """
     logger = logging.getLogger(__name__)
     logger.info("Starting image generation")
     
-    magnification = 1
-    offscreen = True
     # check if location exists
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -1443,12 +1442,19 @@ def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
         w_initial = np.squeeze(hf['simulation_parameters/estimate_asteroid/initial_weight'][()])
 
         """Partial images during the reconstruction"""
+        scale = 1.25
+        max_x = scale*np.max(v_initial[:, 0])
+        min_x = scale*np.min(v_initial[:, 0])
+        max_y = scale*np.max(v_initial[:, 1])
+        min_y = scale*np.min(v_initial[:, 1])
+        max_z = scale*np.max(v_initial[:, 2])
+        min_z = scale*np.min(v_initial[:, 2])
         logger.info('Starting on partial reconstruction images')
 
-        mfig = graphics.mayavi_figure(offscreen=offscreen)
+        mfig = graphics.mayavi_figure(offscreen=(not show))
         mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial)
         ms = mesh.mlab_source
-        graphics.mayavi_axes(mfig, [-1, 1, -1, 1, -1, 1], line_width=5, color=(1, 0, 0))
+        graphics.mayavi_axes(mfig, [min_x, max_x, min_x, max_x, min_x, max_x], line_width=5, color=(1, 0, 0))
         graphics.mayavi_view(fig=mfig)
 
         partial_index = np.array([1, v_keys.shape[0]*1/4, v_keys.shape[0]*1/2,
@@ -1463,7 +1469,7 @@ def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
         
         """Partial images using a colormap for the data"""
         logger.info('Now using a colormap for the uncertainty')
-        mfig = graphics.mayavi_figure(offscreen=offscreen)
+        mfig = graphics.mayavi_figure(offscreen=(not show))
         mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial,
                                        color=None, colormap='viridis',
                                        scalars=w_initial)
@@ -1482,19 +1488,19 @@ def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
             ms.set(x=v[:, 0], y=v[:, 1], z=v[:,2], triangles=f_initial,
                      scalars=w)
             graphics.mlab.savefig(filename, magnification=magnification)
-
-        """Generate the completed shape at a variety of different angles"""
-        logger.info('Now generating some views of the final shape')
-        # change the mesh to the finished mesh
-        ms.reset(x=rv[v_keys[-1]][()][:, 0],y=rv[v_keys[-1]][()][:, 1],z=rv[v_keys[-1]][()][:, 2],
-                 triangles=f_initial)
-        elevation = np.array([30, -30])
-        azimuth = np.array([0, 45, 135, 215, 315])
+        
+        # """Generate the completed shape at a variety of different angles"""
+        # logger.info('Now generating some views of the final shape')
+        # # change the mesh to the finished mesh
+        # ms.reset(x=rv[v_keys[-1]][()][:, 0],y=rv[v_keys[-1]][()][:, 1],z=rv[v_keys[-1]][()][:, 2],
+        #          triangles=f_initial)
+        # elevation = np.array([30, -30])
+        # azimuth = np.array([0, 45, 135, 215, 315])
     
-        for az, el in itertools.product(azimuth, elevation):
-            filename = os.path.join(output_path,'final_az=' + str(az) + '_el=' + str(el) + '.jpg')
-            graphics.mayavi_view(fig=mfig, azimuth=az, elevation=el)
-            graphics.mlab.savefig(filename, magnification=magnification)
+        # for az, el in itertools.product(azimuth, elevation):
+        #     filename = os.path.join(output_path,'final_az=' + str(az) + '_el=' + str(el) + '.jpg')
+        #     graphics.mayavi_view(fig=mfig, azimuth=az, elevation=el)
+        #     graphics.mlab.savefig(filename, magnification=magnification)
 
         # """Create a bunch of images for animation"""
         # logger.info('Now making images for a movie')
@@ -1515,7 +1521,7 @@ def reconstruct_images(filename, output_path="/tmp/reconstruct_images"):
 
     return mfig
 
-def plot_uncertainty(filename):
+def plot_uncertainty(filename, img_path, show=True):
     """Compute the sum of uncertainty and plot as function of time"""
     logger = logging.getLogger(__name__)
     logger.info("Uncertainty plot as funciton of time")
@@ -1546,7 +1552,8 @@ def plot_uncertainty(filename):
         w_array = np.array(w_array)
         
     logger.info("Plotting")
-    publication.plot_uncertainty(t_array, w_array)
+    publication.plot_uncertainty(t_array, w_array, img_path=img_path, pgf_save=True,
+                                 show=show)
 
 def animate_uncertainty(filename):
     """Create a 2D projection of the uncertainty of the surface as a function of 
@@ -1598,7 +1605,7 @@ def plot_state_trajectory(filename):
 
     publication.plot_state(t_array, state_inertial_array, state_asteroid_array)
 
-def plot_volume(filename):
+def plot_volume(filename, img_path, show=True):
     """Compute the volume of the asteroid at each time step
     """
     with h5py.File(filename, 'r') as hf:
@@ -1618,7 +1625,8 @@ def plot_volume(filename):
         true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
         true_volume = stats.volume(true_vertices, true_faces)
 
-    publication.plot_volume(t_array, vol_array, true_volume)
+    publication.plot_volume(t_array, vol_array, true_volume, img_path=img_path, pgf_save=True,
+                            show=show)
 
 def refine_site_plots(input_filename):
     """Given the exploration reconstruction data (after all the exploration)
@@ -2054,7 +2062,11 @@ if __name__ == "__main__":
                         action="store_true")
     parser.add_argument("-mw", "--mesh_weight", help="For use with the -a, --animate option. This will add the uncertainty as a colormap to the asteroid",
                         action="store_true")
-    
+    parser.add_argument("--show", help="Show the plots", action="store_true",
+                        default=False)
+    parser.add_argument("-m", "--magnification", help="Magnification for images",
+                       action="store", type=int, const=4, nargs='?', default=4)
+
     group = parser.add_mutually_exclusive_group()
     # group.add_argument("-s", "--simulate", help="Run the exploration simulation",
     #                    action="store_true")
@@ -2063,15 +2075,15 @@ if __name__ == "__main__":
     group.add_argument("-a", "--animate", help="Animate the data from the exploration sim",
                        action="store_true")
     group.add_argument("-r", "--reconstruct", help="Generate images for the reconstruction",
-                       action="store_true")
+                       action="store", type=str)
     group.add_argument("-u", "--uncertainty", help="Generate uncertainty plot",
-                       action="store_true")
+                       action="store", type=str)
     group.add_argument("-au", "--animate_uncertainty", help="Animate map view of uncertainty over time",
                        action="store_true")
     group.add_argument("-st", "--state" , help="Generate state trajectory plots",
                        action="store_true")
     group.add_argument("-v", "--volume", help="Generate plot of volume",
-                       action="store_true")
+                       action="store", type=str)
     group.add_argument("-sa", "--save_animation", help="Save the animation as a sequence of images",
                        action="store_true")
     group.add_argument("-l" , "--landing", help="Continue from the end of exploration to the surface",
@@ -2094,22 +2106,22 @@ if __name__ == "__main__":
                         action="store_true")
 
     args = parser.parse_args()
-                                                                
+                        
+
     if args.control_sim:
         simulate_control(args.simulation_data, args.name)
     elif args.reconstruct:
-        output_path = tempfile.mkdtemp()
-        reconstruct_images(args.simulation_data, output_path)
-        print("Images saved to: {}".format(output_path))
+        reconstruct_images(args.simulation_data,output_path=args.reconstruct , magnification=args.magnification,
+                           show=args.show)
+    elif args.volume:
+        plot_volume(args.simulation_data, img_path=args.volume, show=args.show)
+    elif args.uncertainty:
+        plot_uncertainty(args.simulation_data, img_path=args.uncertainty, show=args.show)
     elif args.animate:
         animate(args.simulation_data, move_cam=args.move_cam,
                 mesh_weight=args.mesh_weight)
-    elif args.uncertainty:
-        plot_uncertainty(args.simulation_data)
     elif args.state:
         plot_state_trajectory(args.simulation_data)
-    elif args.volume:
-        plot_volume(args.simulation_data)
     elif args.animate_uncertainty:
         animate_uncertainty(args.simulation_data)
     elif args.save_animation:
