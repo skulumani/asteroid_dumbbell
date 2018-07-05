@@ -16,10 +16,5 @@ PYTHONPATH=./ python exploration_sim.py -r $IMG_PATH/52760 ./data/exploration/ex
 PYTHONPATH=./ python exploration_sim.py -u $IMG_PATH/52760 ./data/exploration/explore/20180615_exploration_castalia_15000.hdf5 castalia
 PYTHONPATH=./ python exploration_sim.py -v $IMG_PATH/52760 ./data/exploration/explore/20180615_exploration_castalia_15000.hdf5 castalia
 
-epstopdf_dir $IMG_PATH/castalia
-epstopdf_dir $IMG_PATH/52760
-trash $IMG_PATH/castalia/*.eps
-trash $IMG_PATH/52760/*.eps
-
 
 
