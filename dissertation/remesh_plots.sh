@@ -7,8 +7,12 @@ ASTEROIDS="castalia geographos golevka 52760"
 echo "Going to generate data and the plots"
 for ast in $ASTEROIDS
 do 
-    echo "Saving data to $DATA_PATH/$ast.hdf5"
-    ./bin/explore -o ${DATA_PATH}/$ast.hdf5 -n $ast
+    if [ -e "$DATA_PATH/$ast.hdf5" ]; then
+        echo "File exists"
+    else 
+        echo "File does not exist"
+        ./bin/explore -o ${DATA_PATH}/$ast.hdf5 -n $ast
+    fi 
     echo "Now plotting $ast"
     mkdir -p $1/$ast
     PYTHONPATH=./ python dissertation/explore_plots.py -r ${DATA_PATH}/$ast.hdf5 $DATA_PATH/$ast
