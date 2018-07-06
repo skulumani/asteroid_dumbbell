@@ -26,6 +26,7 @@ PYTHONPATH=./ python exploration_sim.py -st $IMG_PATH/52760/state ./data/explora
 mkdir -p $IMG_PATH/52760/refine
 PYTHONPATH=./ python exploration_sim.py -rp $IMG_PATH/52760/refine ./data/exploration/explore/20180615_exploration_52760_15000.hdf5 52760
 
+# make this a function and pass in the appropriate paths
 cd $IMG_PATH/castalia
 for file in $IMG_PATH/castalia/*.eps
 do
