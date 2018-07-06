@@ -192,6 +192,7 @@ def plot_state(time, pos_inertial, pos_asteroid, fname_suffix="",
                                                                              pos_asteroid[:, 2],
                                                                              pos_inertial_spherical[:, 0]), axis=1) , delimiter=",",
                header="NORMALIZED_TIME, INERTIAL_X, INERTIAL_Y, INERTIAL_Z, ASTEROID_X, ASTEROID_Y, ASTEROID_Z, RADIUS", comments='')
+    
 
     if pgf_save:
         fig_handles = (pos_comp_fig, ast_comp_fig, pos_mercator_inertial_fig,

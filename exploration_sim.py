@@ -1579,12 +1579,15 @@ def animate_uncertainty(filename):
 
 def plot_state_trajectory(filename, img_path, show=False):
     """Plot the state trajectory of the satellite around the asteroid
-
+    
+    This plots the data from the exploration step
     """
 
     with h5py.File(filename, 'r') as hf:
         state_group = hf['state']
         Ra_group = hf['Ra']
+        rv = hf['reconstructed_vertex']
+        rf = hf['reconstructed_face']
 
         state_keys = np.array(utilities.sorted_nicely(list(hf['state'].keys())))
 
@@ -1602,6 +1605,27 @@ def plot_state_trajectory(filename, img_path, show=False):
             w_ast = state_inertial_array[ii, 15:18]
 
             state_asteroid_array[ii, :] = np.hstack((pos_ast, vel_ast, R_sc2ast.reshape(-1), w_ast)) 
+    
+
+        # draw three dimensional trajectory
+        v_final = rv[state_keys[-1]][()]
+        f_final = rf[state_keys[-1]][()]
+
+        mfig = graphics.mayavi_figure(offscreen=(not show))
+        mesh = graphics.mayavi_addMesh(mfig, v_final, f_final)
+        scale = 1.25
+        max_x = scale*np.max(v_final[:, 0])
+        min_x = scale*np.min(v_final[:, 0])
+        max_y = scale*np.max(v_final[:, 1])
+        min_y = scale*np.min(v_final[:, 1])
+        max_z = scale*np.max(v_final[:, 2])
+        min_z = scale*np.min(v_final[:, 2])
+        graphics.mayavi_axes(mfig, [min_x, max_x, min_x, max_x, min_x, max_x], line_width=5, color=(1, 0, 0))
+        graphics.mayavi_plot_trajectory(mfig, state_asteroid_array[:, 0:3], color=(0, 0, 1), scale_factor=0.05, mode='sphere')
+        graphics.mayavi_points3d(mfig, state_asteroid_array[0, 0:3], color=(0, 1, 0), scale_factor=0.2)
+        graphics.mayavi_points3d(mfig, state_asteroid_array[-1, 0:3], color=(1, 0, 0), scale_factor=0.2)
+        graphics.mayavi_view(mfig)
+        graphics.mayavi_savefig(mfig, os.path.join(img_path, 'asteroid_trajectory.jpg'), magnification=4)
 
     publication.plot_state(t_array, state_inertial_array, state_asteroid_array,
                            img_path=img_path, show=show)
@@ -1772,7 +1796,46 @@ def landing_site_plots(input_filename, img_path, show=False):
         
         explore_true_vertices = hf['simulation_parameters/true_asteroid/vertices'][()]
         explore_true_faces = hf['simulation_parameters/true_asteroid/faces'][()]
+
+        landing_keys = np.array(utilities.sorted_nicely(list(hf['landing/state'].keys())))
+        landing_state_group = hf['landing/state']
+        landing_Ra_group = hf['landing/Ra']
+        landing_time = hf['landing/time'][()]
+        landing_v = hf['landing/vertices'][()]
+        landing_f = hf['landing/faces'][()]
     
+        # draw the trajectory in the asteroid frame using mayavi
+        t_array = np.zeros(len(landing_keys))
+        state_inertial_array = np.zeros((len(landing_keys), 18))
+        state_asteroid_array = np.zeros((len(landing_keys), 18))
+        
+        for ii, sk in enumerate(landing_keys):
+            t_array[ii] = ii
+            state_inertial_array[ii, :] = landing_state_group[sk][()]
+            Ra = landing_Ra_group[sk][()]
+            pos_ast = Ra.T.dot(state_inertial_array[ii, 0:3].T).T
+            vel_ast = Ra.T.dot(state_inertial_array[ii, 3:6].T).T
+            R_sc2ast = Ra.T.dot(state_inertial_array[ii, 6:15].reshape((3, 3)))
+            w_ast = state_inertial_array[ii, 15:18]
+
+            state_asteroid_array[ii, :] = np.hstack((pos_ast, vel_ast, R_sc2ast.reshape(-1), w_ast)) 
+
+    mfig = graphics.mayavi_figure(offscreen=(not show))
+    mesh = graphics.mayavi_addMesh(mfig, landing_v, landing_f)
+    scale = 1.25
+    max_x = scale*np.max(landing_v[:, 0])
+    min_x = scale*np.min(landing_v[:, 0])
+    max_y = scale*np.max(landing_v[:, 1])
+    min_y = scale*np.min(landing_v[:, 1])
+    max_z = scale*np.max(landing_v[:, 2])
+    min_z = scale*np.min(landing_v[:, 2])
+    graphics.mayavi_axes(mfig, [min_x, max_x, min_x, max_x, min_x, max_x], line_width=5, color=(1, 0, 0))
+    graphics.mayavi_plot_trajectory(mfig, state_asteroid_array[:, 0:3], color=(0, 0, 1), scale_factor=0.01, mode='sphere')
+    graphics.mayavi_points3d(mfig, state_asteroid_array[0, 0:3], color=(0, 1, 0), scale_factor=0.1)
+    graphics.mayavi_points3d(mfig, state_asteroid_array[-1, 0:3], color=(1, 0, 0), scale_factor=0.1)
+    graphics.mlab.view(*(45, 54, 4.9, np.array([0.43, -0.057, 0.22])))
+    graphics.mayavi_savefig(mfig, os.path.join(img_path, 'asteroid_trajectory.jpg'), magnification=4)
+
     # build meshdata and asteroid from the terminal estimate
     est_meshdata = mesh_data.MeshData(explore_v, explore_f)
     est_ast = asteroid.Asteroid(explore_name, est_meshdata)

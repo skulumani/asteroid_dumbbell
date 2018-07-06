@@ -427,7 +427,7 @@ def mayavi_addPoint(fig, p, radius=0.1, color=( 0, 0, 1 ), **kwargs):
                               **kwargs)
         return point
 
-def mayavi_plot_trajectory(fig, pos, color=(1, 0, 0)):
+def mayavi_plot_trajectory(fig, pos, color=(1, 0, 0), **kwargs):
     r"""Draw trajectory onto mayavi figure
 
     traj = mayavi_plot_trajectory(fig, pos, color)    
@@ -453,9 +453,9 @@ def mayavi_plot_trajectory(fig, pos, color=(1, 0, 0)):
     logger = logging.getLogger(__name__)
     
     if len(pos) == 3: # only a single position
-        l = mlab.points3d(pos[0], pos[1], pos[2], color=color)
+        l = mlab.points3d(pos[0], pos[1], pos[2], color=color, **kwargs)
     elif len(pos) > 3:
-        l = mlab.points3d(pos[:, 0], pos[:, 1], pos[:, 2], color=color) 
+        l = mlab.points3d(pos[:, 0], pos[:, 1], pos[:, 2], color=color, **kwargs) 
     
 
     return l
