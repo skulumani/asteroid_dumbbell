@@ -39,7 +39,7 @@ PYTHONPATH=./ python exploration_sim.py -rp $IMG_PATH/castalia/refine ./data/exp
 epstopdf_directory $IMG_PATH/castalia/refine
 
 mkdir -p $IMG_PATH/castalia/land
-PYTHONPATH=./ python exploration_sim.py -lp $IMG_PATH/castalia/land ./data/exploration/refine/20180619_castalia_refinement.hdf5 castalia
+PYTHONPATH=./ python exploration_sim.py -lp $IMG_PATH/castalia/land ./data/exploration/land/20180619_castalia_landing.hdf5 castalia
 epstopdf_directory $IMG_PATH/castalia/land
 
 echo "Plot 52760 exploration data"
