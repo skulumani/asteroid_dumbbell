@@ -36,13 +36,23 @@ int main(int argc, char* argv[]) {
         std::cout << "No input file!" << std::endl;
         return 1;
     } 
+    
+    const std::string face_string = input.get_command_option("-f");
+    int face;
+    if (face_string.empty()) {
+        face = 0;
+    } else {
+        face = std::stoi(face_string);
+    }
 
     std::shared_ptr<MeshData> mesh = Loader::load(input_file);
 
     // define a set of faces to refine
     Eigen::Vector3d pos(1, 0, 0);
-    std::vector<Face_index> faces_to_refine = mesh->faces_in_fov(pos, 1.7);
-    
+    /* std::vector<Face_index> faces_to_refine = mesh->faces_in_fov(pos, 0.3); */
+    std::vector<Face_index> faces_to_refine;
+    faces_to_refine.push_back(Face_index(6));
+    faces_to_refine.push_back(Face_index(7));
     std::cout << "Old number of vertices: " << mesh->surface_mesh.number_of_vertices() << std::endl;
     double target_edge_length(0.1);
     int number_of_iterations(3);
