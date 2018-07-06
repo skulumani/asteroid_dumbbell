@@ -12,7 +12,7 @@ import utilities
 
 view = (0, 25, 3.32, np.array([-0.04, -0.015, -0.029]))
 # load the bumpy castalia
-vb_true, fb_true = wavefront.read_obj('./data/shape_model/CASTALIA/castalia_bump.obj')
+vb_true, fb_true = wavefront.read_obj('./data/shape_model/CASTALIA/castalia_bump_2.obj')
 mfig = graphics.mayavi_figure(offscreen=False)
 mesh = graphics.mayavi_addMesh(mfig, vb_true, fb_true)
 graphics.mayavi_view(mfig, *view)
