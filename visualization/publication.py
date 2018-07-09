@@ -122,7 +122,8 @@ def plot_uncertainty(time, uncertainty,img_path="/tmp", fname_suffix="", wscale=
             # plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
             np.savetxt(os.path.join(img_path, fname) + ".csv",np.stack((time/time[-1], uncertainty/uncertainty[0]), axis=1) , delimiter=",",
-                       header="NORMALIZED_TIME, NORMALIZED_UNCERTAINTY", comments='')
+                       header="NORMALIZED_TIME, NORMALIZED_UNCERTAINTY", comments='',
+                       fmt="%6.3f")
             # tikz_save(os.path.join(img_path, fname) + '.tex', externalize_tables=True)
     if show:
         plt.show()
@@ -191,7 +192,8 @@ def plot_state(time, pos_inertial, pos_asteroid, fname_suffix="",
                                                                              pos_asteroid[:, 1],
                                                                              pos_asteroid[:, 2],
                                                                              pos_inertial_spherical[:, 0]), axis=1) , delimiter=",",
-               header="NORMALIZED_TIME, INERTIAL_X, INERTIAL_Y, INERTIAL_Z, ASTEROID_X, ASTEROID_Y, ASTEROID_Z, RADIUS", comments='')
+               header="NORMALIZED_TIME, INERTIAL_X, INERTIAL_Y, INERTIAL_Z, ASTEROID_X, ASTEROID_Y, ASTEROID_Z, RADIUS", comments='',
+               fmt="%6.3f")
     
 
     if pgf_save:
@@ -236,8 +238,9 @@ def plot_volume(time, volume, true_volume, img_path="/tmp", fname_suffix="",
             # plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
             # tikz_save(os.path.join(img_path, fname) + '.tex', externalize_tables=True)
-            np.savetxt(os.path.join(img_path, fname) + ".csv",np.stack((time/time[-1], (volume-true_volume)/true_volume)), delimiter=",",
-                       header="NORMALIZED_TIME, VOLUME_PERCENT_ERROR", comments='')
+            np.savetxt(os.path.join(img_path, fname) + ".csv",np.stack((time/time[-1], (volume-true_volume)/true_volume), axis=1), delimiter=",",
+                       header="NORMALIZED_TIME, VOLUME_PERCENT_ERROR", comments='',
+                       fmt="%6.3f")
     
     if show:
         plt.show()
