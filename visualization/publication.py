@@ -238,7 +238,7 @@ def plot_volume(time, volume, true_volume, img_path="/tmp", fname_suffix="",
             # plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
             # tikz_save(os.path.join(img_path, fname) + '.tex', externalize_tables=True)
-            np.savetxt(os.path.join(img_path, fname) + ".csv",np.stack((time/time[-1], (volume-true_volume)/true_volume), axis=1), delimiter=",",
+            np.savetxt(os.path.join(img_path, fname) + ".csv",np.stack((time/time[-1], 100 * (volume-true_volume)/true_volume), axis=1), delimiter=",",
                        header="NORMALIZED_TIME, VOLUME_PERCENT_ERROR", comments='',
                        fmt="%6.3f")
     
