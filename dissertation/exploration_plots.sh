@@ -38,8 +38,10 @@ PYTHONPATH=./ python exploration_sim.py -st $IMG_PATH/castalia/state ./data/expl
 PS4=$!
 PYTHONPATH=./ python exploration_sim.py -rp $IMG_PATH/castalia/refine ./data/exploration/explore/20180615_exploration_castalia_15000.hdf5 castalia &
 PS5=$!
-PYTHONPATH=./ python exploration_sim.py -lp $IMG_PATH/castalia/land ./data/exploration/land/20180619_castalia_landing.hdf5 castalia
-wait $PS1 $PS2 $PS3 $PS4 $PS5
+PYTHONPATH=./ python exploration_sim.py -lp $IMG_PATH/castalia/land ./data/exploration/land/20180619_castalia_landing.hdf5 castalia &
+PS6=$!
+
+wait $PS1 $PS2 $PS3 $PS4 $PS5 $PS6
 epstopdf_directory $IMG_PATH/castalia &
 epstopdf_directory $IMG_PATH/castalia/state &
 epstopdf_directory $IMG_PATH/castalia/refine &
