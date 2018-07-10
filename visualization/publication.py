@@ -54,6 +54,7 @@ from scipy import integrate, interpolate, ndimage
 from matplotlib2tikz import save as tikz_save
 
 import os
+import pdb
 
 time_label=r'Normalized Time'
 cmap = 'viridis'
@@ -121,7 +122,8 @@ def plot_uncertainty(time, uncertainty,img_path="/tmp", fname_suffix="", wscale=
             sns.despine()
             # plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
-            np.savetxt(os.path.join(img_path, fname) + ".csv",np.stack((time/time[-1], uncertainty/uncertainty[0]), axis=1) , delimiter=",",
+            step_size=10
+            np.savetxt(os.path.join(img_path, fname) + ".csv",np.stack((time[::step_size]/time[-1], uncertainty[::step_size]/uncertainty[0]), axis=1) , delimiter=",",
                        header="NORMALIZED_TIME, NORMALIZED_UNCERTAINTY", comments='',
                        fmt="%6.3f")
             # tikz_save(os.path.join(img_path, fname) + '.tex', externalize_tables=True)
@@ -184,14 +186,15 @@ def plot_state(time, pos_inertial, pos_asteroid, fname_suffix="",
     pos_radius_ax.set_ylabel(r'Radius')
     pos_radius_ax.set_title(r'Radius')    
 
-    np.savetxt(os.path.join(img_path, 'state_trajectory') + ".csv",np.stack((time/time[-1],
-                                                                             pos_inertial[:, 0],
-                                                                             pos_inertial[:, 1],
-                                                                             pos_inertial[:, 2],
-                                                                             pos_asteroid[:, 0],
-                                                                             pos_asteroid[:, 1],
-                                                                             pos_asteroid[:, 2],
-                                                                             pos_inertial_spherical[:, 0]), axis=1) , delimiter=",",
+    step_size=10
+    np.savetxt(os.path.join(img_path, 'state_trajectory') + ".csv",np.stack((time[::step_size]/time[-1],
+                                                                             pos_inertial[::step_size, 0],
+                                                                             pos_inertial[::step_size, 1],
+                                                                             pos_inertial[::step_size, 2],
+                                                                             pos_asteroid[::step_size, 0],
+                                                                             pos_asteroid[::step_size, 1],
+                                                                             pos_asteroid[::step_size, 2],
+                                                                             pos_inertial_spherical[::step_size, 0]), axis=1) , delimiter=",",
                header="NORMALIZED_TIME, INERTIAL_X, INERTIAL_Y, INERTIAL_Z, ASTEROID_X, ASTEROID_Y, ASTEROID_Z, RADIUS", comments='',
                fmt="%6.3f")
     
@@ -238,7 +241,11 @@ def plot_volume(time, volume, true_volume, img_path="/tmp", fname_suffix="",
             # plt.savefig(os.path.join(img_path, fname) +  '.pgf')
             plt.savefig(os.path.join(img_path, fname) +  '.eps', dpi=1200)
             # tikz_save(os.path.join(img_path, fname) + '.tex', externalize_tables=True)
-            np.savetxt(os.path.join(img_path, fname) + ".csv",np.stack((time/time[-1], 100 * (volume-true_volume)/true_volume), axis=1), delimiter=",",
+            step_size=10
+            np.savetxt(os.path.join(img_path, fname) + ".csv",
+                       np.stack((time[::step_size]/time[-1], 100 * (volume[::step_size]-true_volume)/true_volume), 
+                                axis=1),
+                       delimiter=",",
                        header="NORMALIZED_TIME, VOLUME_PERCENT_ERROR", comments='',
                        fmt="%6.3f")
     
