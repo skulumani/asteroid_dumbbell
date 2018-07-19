@@ -668,7 +668,7 @@ def save_animation(filename, move_cam=False, mesh_weight=False,
                                            color=(1, 0, 0), radius=0.1)
 
         pc_points = graphics.mayavi_points3d(mfig, inertial_intersections[0], 
-                                             color=(0, 0, 1), scale_factor=0.01)
+                                             color=(0, 0, 1), scale_factor=0.03)
         
         # add some text objects
         time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
@@ -687,18 +687,17 @@ def save_animation(filename, move_cam=False, mesh_weight=False,
                                                     magnification=4)
     # now call ffmpeg
     fps = 60
-    name = 'exploration'
+    name = os.path.join(output_path, 'exploration.mp4')
     ffmpeg_fname = os.path.join(output_path, '%07d.jpg')
-    cmd = "ffmpeg -framerate {} -i {} -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' {}.mp4".format(fps, ffmpeg_fname, name)
+    cmd = "ffmpeg -framerate {} -i {} -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' {}".format(fps, ffmpeg_fname, name)
     print(cmd)
     subprocess.check_output(['bash', '-c', cmd])
 
     # remove folder now
     for file in os.listdir(output_path): 
         file_path = os.path.join(output_path, file)
-        if os.path.isfile(file_path):
+        if file_path.endswith('.jpg'):
             os.remove(file_path)
-    os.rmdir(output_path)
 
 def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
     """Given a HDF5 file from simulate this will animate teh motion
@@ -758,7 +757,7 @@ def animate(filename, move_cam=False, mesh_weight=False, save_animation=False):
                                            color=(1, 0, 0), radius=0.1)
 
         pc_points = graphics.mayavi_points3d(mfig, inertial_intersections[0], 
-                                             color=(0, 0, 1), scale_factor=0.01)
+                                             color=(0, 0, 1), scale_factor=0.03)
         
         # add some text objects
         time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
@@ -1962,7 +1961,7 @@ if __name__ == "__main__":
     group.add_argument("-v", "--volume", help="Generate plot of volume",
                        action="store", type=str)
     group.add_argument("-sa", "--save_animation", help="Save the animation as a sequence of images",
-                       action="store_true")
+                       action="store", type=str)
     group.add_argument("-l" , "--landing", help="Continue from the end of exploration to the surface",
                        action="store_true")
     group.add_argument("-la", "--landing_animation", help="Landing animation",
@@ -2010,7 +2009,7 @@ if __name__ == "__main__":
         animate_uncertainty(args.simulation_data)
     elif args.save_animation:
         save_animation(args.simulation_data, move_cam=args.move_cam,
-                       mesh_weight=args.mesh_weight)
+                       mesh_weight=args.mesh_weight, output_path=args.save_animation)
     elif args.landing:
         # landing_site_plots(args.simulation_data)
         desired_landing_spot = np.array([0.48501797, -0.02027519, 0.37758639])

@@ -9,6 +9,8 @@ import numpy as np
 import os
 import h5py
 import argparse
+import subprocess
+import datetime
 
 from point_cloud import wavefront
 from visualization import graphics, publication
@@ -164,6 +166,11 @@ def plot_volume(filename, img_path="/tmp/diss_explore", show=True):
                             show=show)
 
 def save_animation(filename, output_path, mesh_weight=False, magnification=4):
+    
+    output_path = os.path.join(output_path, 'animation')
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+
     with h5py.File(filename, 'r') as hf:
         rv = hf['reconstructed_vertex']
         rw = hf['reconstructed_weight']
@@ -225,7 +232,9 @@ def save_animation(filename, output_path, mesh_weight=False, magnification=4):
 
     # now call ffmpeg
     fps = 60
-    name = os.path.join(output_path, 'reconstruction.mp4')
+    name_str = "reconstruction_" + datetime.datetime.now().strftime("%Y%m%dT%H%M%S") + ".mp4"
+
+    name = os.path.join(output_path, name_str)
     ffmpeg_fname = os.path.join(output_path, '%07d.jpg')
     cmd = "ffmpeg -framerate {} -i {} -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' {}".format(fps, ffmpeg_fname, name)
     print(cmd)
