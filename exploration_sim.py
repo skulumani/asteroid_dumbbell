@@ -830,7 +830,7 @@ def animate_refinement(filename, move_cam=False, mesh_weight=False, save_animati
                                            color=(1, 0, 0), radius=0.1)
 
         pc_points = graphics.mayavi_points3d(mfig, inertial_intersections[0], 
-                                             color=(0, 0, 1), scale_factor=0.01)
+                                             color=(0, 0, 1), scale_factor=0.03)
         
         # add some text objects
         time_text = graphics.mlab.text(0.1, 0.1, "t: {:8.1f}".format(0), figure=mfig,
@@ -894,7 +894,7 @@ def animate_landing(filename, move_cam=False, mesh_weight=False):
                                             move_cam=move_cam, mesh_weight=mesh_weight)
     graphics.mlab.show()
 
-def save_animate_landing(filename, move_cam=False, mesh_weight=False):
+def save_animate_landing(filename,output_path,move_cam=False, mesh_weight=False):
     """Save the landing animation
     """
 
@@ -949,20 +949,19 @@ def save_animate_landing(filename, move_cam=False, mesh_weight=False):
                                                  magnification=4)
     # now call ffmpeg
     fps = 60
-    name = 'landing'
+    name = os.path.join(output_path, 'landing.mp4')
     ffmpeg_fname = os.path.join(output_path, '%07d.jpg')
-    cmd = "ffmpeg -framerate {} -i {} -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' {}.mp4".format(fps, ffmpeg_fname, name)
+    cmd = "ffmpeg -framerate {} -i {} -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' {}".format(fps, ffmpeg_fname, name)
     print(cmd)
     subprocess.check_output(['bash', '-c', cmd])
 
     # remove folder now
     for file in os.listdir(output_path): 
         file_path = os.path.join(output_path, file)
-        if os.path.isfile(file_path):
+        if file_path.endswith('.jpg'):
             os.remove(file_path)
-    os.rmdir(output_path)
 
-def save_animate_refinement(filename, move_cam=False, mesh_weight=False, save_animation=False):
+def save_animate_refinement(filename, output_path, move_cam=False, mesh_weight=False):
     """Save the refinement animation
     """
     # TODO Animate the changing of the mesh itself as a function of time
@@ -1030,7 +1029,6 @@ def save_animate_refinement(filename, move_cam=False, mesh_weight=False, save_an
         # mayavi_objects = (mesh, ast_axes, com, dum_axes, pc_lines)
         mayavi_objects = (mesh, com, pc_points, time_text, weight_text)
         
-    output_path = tempfile.mkdtemp()
     print("Images will be saved to {}".format(output_path))
     animation.inertial_asteroid_refinement_cpp_save(time, state, inertial_intersections,
                                                     filename, mayavi_objects, move_cam=move_cam,
@@ -1039,7 +1037,7 @@ def save_animate_refinement(filename, move_cam=False, mesh_weight=False, save_an
                                                     magnification=4)
     # now call ffmpeg
     fps = 60
-    name = 'refinement'
+    name = os.path.join(output_path, 'refinement.mp4')
     ffmpeg_fname = os.path.join(output_path, '%07d.jpg')
     cmd = "ffmpeg -framerate {} -i {} -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' {}.mp4".format(fps, ffmpeg_fname, name)
     print(cmd)
@@ -1048,9 +1046,8 @@ def save_animate_refinement(filename, move_cam=False, mesh_weight=False, save_an
     # remove folder now
     for file in os.listdir(output_path): 
         file_path = os.path.join(output_path, file)
-        if os.path.isfile(file_path):
+        if file_path.endswith('.jpg'):
             os.remove(file_path)
-    os.rmdir(output_path)
 
 def refine_landing_area(filename, asteroid_name, desired_landing_site):
     """Called after exploration is completed
@@ -1967,7 +1964,7 @@ if __name__ == "__main__":
     group.add_argument("-la", "--landing_animation", help="Landing animation",
                        action="store_true")
     group.add_argument("-lsa", "--landing_save_animation", help="Save landing animation to a video",
-                       action="store_true")
+                       action="store", type=str)
     group.add_argument("-lp", "--landing_plots", help="Generate plots to select landing site",
                        action="store")
     group.add_argument("-rp", "--refine_plots", help="Generate plots for landing refinement", 
@@ -1979,7 +1976,7 @@ if __name__ == "__main__":
     group.add_argument("-lra", "--landing_refine_animation", help="Animate the refinement process",
                        action="store_true")
     group.add_argument("-lrsa", "--landing_refine_save_animation", help="Save the refinment animation",
-                        action="store_true")
+                        action="store", type=str)
 
     args = parser.parse_args()
                         
@@ -2017,7 +2014,8 @@ if __name__ == "__main__":
     elif args.landing_animation:
         animate_landing(args.simulation_data, move_cam=args.move_cam, mesh_weight=args.mesh_weight)
     elif args.landing_save_animation:
-        save_animate_landing(args.simulation_data, move_cam=args.move_cam, mesh_weight=args.mesh_weight)
+        save_animate_landing(args.simulation_data, move_cam=args.move_cam, mesh_weight=args.mesh_weight,
+                             output_path=args.landing_save_animation)
     elif args.landing_refine:
         # landing location in the asteroid fixed frame
         # desired_landing_spot = refine_site_plots(args.simulation_data)
@@ -2027,7 +2025,8 @@ if __name__ == "__main__":
         animate_refinement(args.simulation_data, move_cam=args.move_cam, mesh_weight=args.mesh_weight)
     elif args.landing_refine_save_animation:
         save_animate_refinement(args.simulation_data, move_cam=args.move_cam,
-                                mesh_weight=args.mesh_weight)
+                                mesh_weight=args.mesh_weight,
+                                output_path=args.landing_refine_save_animation)
     elif args.landing_kinematic_refine:
         desired_landing_spot = np.array([0.47180473, -0.01972284, 0.36729988])
         kinematics_refine_landing_area(args.simulation_data, args.name, desired_landing_spot)
