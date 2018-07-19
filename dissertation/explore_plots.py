@@ -163,6 +163,80 @@ def plot_volume(filename, img_path="/tmp/diss_explore", show=True):
     publication.plot_volume(t_array, vol_array, true_volume, img_path=img_path, pgf_save=True,
                             show=show)
 
+def save_animation(filename, output_path, mesh_weight=False, magnification=4):
+    with h5py.File(filename, 'r') as hf:
+        rv = hf['reconstructed_vertex']
+        rw = hf['reconstructed_weight']
+        
+        # get all the keys
+        v_keys = np.array(utilities.sorted_nicely(list(rv.keys())))
+        w_keys = np.array(utilities.sorted_nicely(list(rw.keys())))
+
+        v_initial = hf['initial_vertex'][()]
+        f_initial = hf['initial_faces'][()]
+        w_initial = np.squeeze(hf['initial_weight'][()])
+            
+        # think about a black background as well
+        mfig = graphics.mayavi_figure(bg=(0, 0, 0), size=(800,600), offscreen=True)
+        
+        if mesh_weight:
+            mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial,
+                                           scalars=w_initial,
+                                           color=None, colormap='viridis')
+        else:
+            mesh = graphics.mayavi_addMesh(mfig, v_initial, f_initial)
+
+        # xaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([2, 0, 0]), color=(1, 0, 0)) 
+        # yaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 2, 0]), color=(0, 1, 0)) 
+        # zaxis = graphics.mayavi_addLine(mfig, np.array([0, 0, 0]), np.array([0, 0, 2]), color=(0, 0, 1)) 
+        # ast_axes = (xaxis, yaxis, zaxis)
+        
+        print("Images will be saved to {}".format(output_path))
+        ms = mesh.mlab_source
+        # determine the maximum extents of the mesh and add some margin
+        scale = 1.25
+        max_x = scale*np.max(v_initial[:, 0])
+        min_x = scale*np.min(v_initial[:, 0])
+        max_y = scale*np.max(v_initial[:, 1])
+        min_y = scale*np.min(v_initial[:, 1])
+        max_z = scale*np.max(v_initial[:, 2])
+        min_z = scale*np.min(v_initial[:, 2])
+
+        graphics.mayavi_axes(mfig, [min_x, max_x, min_x, max_x, min_x, max_x], line_width=5, color=(1, 0, 0))
+        graphics.mayavi_view(fig=mfig)
+
+        # loop over keys and save images
+        for img_index, vk in enumerate(v_keys):
+            filename = os.path.join(output_path, str(vk).zfill(7) + '.jpg')
+            new_vertices = rv[str(vk)][()]
+            new_faces = f_initial
+            new_weight = rw[str(vk)][()]
+
+            # generate an image and save it 
+            if mesh_weight:
+                ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                       z=new_vertices[:,2], triangles=new_faces,
+                       scalars=new_weight)
+            else:
+                ms.set(x=new_vertices[:, 0],y=new_vertices[:, 1],
+                       z=new_vertices[:,2], triangles=new_faces)
+
+            graphics.mlab.savefig(filename, magnification=magnification)
+
+    # now call ffmpeg
+    fps = 60
+    name = os.path.join(output_path, 'reconstruction.mp4')
+    ffmpeg_fname = os.path.join(output_path, '%07d.jpg')
+    cmd = "ffmpeg -framerate {} -i {} -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' {}".format(fps, ffmpeg_fname, name)
+    print(cmd)
+    subprocess.check_output(['bash', '-c', cmd])
+
+    # remove folder now
+    for file in os.listdir(output_path): 
+        file_path = os.path.join(output_path, file)
+        if file_path.endswith('.jpg'):
+            os.remove(file_path)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate plots from explore",
                                      formatter_class=argparse.RawTextHelpFormatter)
@@ -174,7 +248,11 @@ if __name__ == "__main__":
                         default=False)
     parser.add_argument("-m", "--magnification", help="Magnification for images",
                        action="store", type=int, const=4, nargs='?', default=4)
-
+    parser.add_argument("-mc", "--move_cam", help="For use with the -a, --animate option. This will translate the camera and give you a view from the satellite",
+                        action="store_true")
+    parser.add_argument("-mw", "--mesh_weight", help="For use with the -a, --animate option. This will add the uncertainty as a colormap to the asteroid",
+                        action="store_true")
+     
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-r", "--reconstruct", help="Reconstruction plots for video",
                        action="store_true")
@@ -183,6 +261,8 @@ if __name__ == "__main__":
     group.add_argument("-s", "--state", help="State trajectory plot",
                        action="store_true")
     group.add_argument("-v", "--volume", help="Volume of estimate",
+                       action="store_true")
+    group.add_argument("-a", "--animation", help="Animation and video of the reconstruction",
                        action="store_true")
     args = parser.parse_args()
 
@@ -194,6 +274,9 @@ if __name__ == "__main__":
         plot_state_trajectory(args.hdf5_file)
     elif args.volume:
         plot_volume(args.hdf5_file, img_path=args.img_path, show=args.show)
+    elif args.animation:
+        save_animation(args.hdf5_file, output_path=args.img_path,
+                       mesh_weight=args.mesh_weight)
 
 
 

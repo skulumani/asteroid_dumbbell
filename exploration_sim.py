@@ -615,7 +615,6 @@ def save_animation(filename, move_cam=False, mesh_weight=False,
                    output_path=tempfile.mkdtemp()):
     """Given a HDF5 file from simulate this will animate teh motion
     """
-    # TODO Animate the changing of the mesh itself as a function of time
     with h5py.File(filename, 'r') as hf:
         # get the inertial state and asteroid mesh object
         time = hf['time'][()]
