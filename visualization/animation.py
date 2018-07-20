@@ -400,8 +400,8 @@ def inertial_asteroid_refinement_cpp(time, state, inertial_intersections,
             yield
 
 def inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects, 
-                                       move_cam=False, mesh_weight=False,
-                                       output_path="/tmp/landing", magnification=1):
+                                       output_path, move_cam=False, mesh_weight=False,
+                                       magnification=1):
     """Animation for the landing portion 
     """
     mesh, com, time_text, weight_text = mayavi_objects

@@ -940,7 +940,6 @@ def save_animate_landing(filename,output_path,move_cam=False, mesh_weight=False)
 
         mayavi_objects = (mesh, com, time_text, weight_text)
 
-        output_path = tempfile.mkdtemp()
         print("Images will be saved to {}".format(output_path))
 
     animation.inertial_asteroid_landing_cpp_save(time, state, filename, mayavi_objects, 
