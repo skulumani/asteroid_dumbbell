@@ -10,3 +10,6 @@
 [submodule "extern/fdcl-hdf5"]
 	path = extern/fdcl-hdf5
 	url = https://github.com/skulumani/fdcl-hdf5.git
+[submodule "examples/openmp_example"]
+	path = examples/openmp_example
+	url = git@github.com:fdcl-gwu/openmp_example.git
