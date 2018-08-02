@@ -13,3 +13,6 @@
 [submodule "examples/openmp_example"]
 	path = examples/openmp_example
 	url = git@github.com:fdcl-gwu/openmp_example.git
+[submodule "examples/pybind_example"]
+	path = examples/pybind_example
+	url = git@github.com:fdcl-gwu/pybind_example.git
