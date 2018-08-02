@@ -46,7 +46,7 @@ function cleanup {
     echo "Deleted temp working directory $TEMP_DIR"
 }
 
-trap cleanup EXIT
+# trap cleanup EXIT
 
 echo "Installing some dependencies"
 sudo apt-get -qq update
